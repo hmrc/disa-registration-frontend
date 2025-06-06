@@ -20,7 +20,7 @@ Reference instructions for [setting up docker](https://docs.tax.service.gov.uk/m
 ### Service manager
 The whole service can be started with:
 ```bash
-sm2 --start DISA_ALL
+sm2 --start DISA_REGISTRATION_ALL
 ```
 
 ### Locally
