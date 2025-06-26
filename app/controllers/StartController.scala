@@ -20,10 +20,9 @@ import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, RequestId}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import views.html.StartView
+import views.html.{EndView, StartView}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,6 +32,7 @@ class StartController @Inject() (
   identify:                 IdentifierAction,
   val controllerComponents: MessagesControllerComponents,
   view:                     StartView,
+  endView:                  EndView,
   grs:                      GRSConnector,
   val authConnector:        AuthConnector
 )(implicit ec:              ExecutionContext)
@@ -66,14 +66,23 @@ class StartController @Inject() (
   }
 
   def retrieveData2(): Action[AnyContent] = Action.async { implicit request =>
-    implicit val hc: HeaderCarrier =
-      HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    val headers: Seq[(String, String)] = request.headers.toSimpleMap.toSeq.filterNot { case (key, _) =>
+      key.equalsIgnoreCase("Authorization")
+    }
+
+    val hc = HeaderCarrier(
+      extraHeaders = headers,
+      authorization = None,
+      otherHeaders = Seq.empty,
+      sessionId = None,
+      requestId = request.headers.get("X-Request-ID").map(RequestId),
+    )
 
     authorised() {
       request.getQueryString("journeyId") match {
         case Some(journeyId) =>
-          grs.fetchJourneyData(journeyId).map { resultString =>
-            Ok(resultString)
+          grs.fetchJourneyData(journeyId)(hc).map { resultString =>
+            Ok(endView(resultString))
           }.recover {
             case ex: Exception =>
               InternalServerError(s"Failed to fetch GRS journey data: ${ex.getMessage}")
