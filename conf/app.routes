@@ -24,9 +24,4 @@ GET        /start                       controllers.StartController.onPageLoad()
 
 GET /startGrs controllers.StartController.grsJourney()
 
-##GET /retrieveData/:journeyId     controllers.StartController.retrieveData(journeyId:String)
-##GET /retrieveData                 controllers.StartController.retrieveData(journeyId:String)
-
-
-##GET /retrieveData/:journeyId     controllers.StartController.retrieveData(journeyId:String)
-GET /retrieveDat2     controllers.StartController.retrieveData2()
+GET /retrieveData     controllers.StartController.retrieveData()

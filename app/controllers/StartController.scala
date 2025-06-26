@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,7 +35,8 @@ class StartController @Inject() (
   view:                     StartView,
   endView:                  EndView,
   grs:                      GRSConnector,
-  val authConnector:        AuthConnector
+  val authConnector:        AuthConnector,
+  config:                   FrontendAppConfig
 )(implicit ec:              ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -46,26 +48,13 @@ class StartController @Inject() (
 
   def grsJourney: Action[AnyContent] = Action.async { implicit request =>
     authorised() {
-      Future.successful(Redirect("http://localhost:9718/identify-your-incorporated-business/test-only/create-limited-company-journey"))
+      Future.successful(Redirect(config.grsJourneyUrl))
     }.recover { case ex: Throwable =>
       InternalServerError(s"Failed to create journey: ${ex.getMessage}")
     }
   }
 
-  def retrieveData(journeyId: String)(): Action[AnyContent] = Action.async { implicit request =>
-    authorised() {
-      grs
-        .fetchJourneyData(journeyId)
-        .map { resultString =>
-          Ok(resultString)
-        }
-        .recover { case ex: Exception =>
-          InternalServerError(s"Failed to fetch GRS journey data: ${ex.getMessage}")
-        }
-    }
-  }
-
-  def retrieveData2(): Action[AnyContent] = Action.async { implicit request =>
+  def retrieveData(): Action[AnyContent] = identify.async { implicit request =>
     val headers: Seq[(String, String)] = request.headers.toSimpleMap.toSeq.filterNot { case (key, _) =>
       key.equalsIgnoreCase("Authorization")
     }
@@ -75,40 +64,25 @@ class StartController @Inject() (
       authorization = None,
       otherHeaders = Seq.empty,
       sessionId = None,
-      requestId = request.headers.get("X-Request-ID").map(RequestId),
+      requestId = request.headers.get("X-Request-ID").map(RequestId)
     )
 
     authorised() {
       request.getQueryString("journeyId") match {
         case Some(journeyId) =>
-          grs.fetchJourneyData(journeyId)(hc).map { resultString =>
-            Ok(endView(resultString))
-          }.recover {
-            case ex: Exception =>
+          grs
+            .fetchJourneyData(journeyId)(hc)
+            .map { resultString =>
+              Ok(endView(resultString))
+            }
+            .recover { case ex: Exception =>
               InternalServerError(s"Failed to fetch GRS journey data: ${ex.getMessage}")
-          }
+            }
 
         case None =>
           Future.successful(BadRequest("Missing 'journeyId' query parameter"))
       }
     }
+
   }
-
-  def retrieveData3(): Action[AnyContent] = Action.async { implicit request =>
-    request.getQueryString("journeyId") match {
-      case Some(journeyId) =>
-        grs
-          .fetchJourneyData(journeyId)
-          .map { resultString =>
-            Ok(resultString)
-          }
-          .recover { case ex: Exception =>
-            InternalServerError(s"Failed to fetch GRS journey data: ${ex.getMessage}")
-          }
-
-      case None =>
-        Future.successful(BadRequest("Missing 'journeyId' query parameter"))
-    }
-  }
-
 }

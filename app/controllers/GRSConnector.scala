@@ -30,8 +30,6 @@ class GRSConnector @Inject() (httpClient: HttpClientV2)(implicit ec: ExecutionCo
     httpClient.get(url"$url")
       .execute[HttpResponse].map(_.body)
   }
-  
-  //http://localhost:9718/identify-your-incorporated-business/test-only/retrieve-journey?journeyId=8c3c168a-269c-4ee4-a597-726d44c4a44c
 
 }
 
