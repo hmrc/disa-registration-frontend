@@ -7,7 +7,7 @@ site.no = No
 site.yes = Yes
 site.continue = Continue
 site.start = Start now
-site.startAgain = Start again
+site.startAgain = Start grs journey
 site.signIn = Sign in
 site.govuk = GOV.UK
 
@@ -47,3 +47,6 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+
+start.title = start
+start.heading = start
