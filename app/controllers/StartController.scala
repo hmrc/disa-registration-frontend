@@ -54,7 +54,7 @@ class StartController @Inject() (
     }
   }
 
-  def retrieveData(): Action[AnyContent] = identify.async { implicit request =>
+  def retrieveData(journeyId: String): Action[AnyContent] = identify.async { implicit request =>
     val headers: Seq[(String, String)] = request.headers.toSimpleMap.toSeq.filterNot { case (key, _) =>
       key.equalsIgnoreCase("Authorization")
     }
@@ -68,21 +68,15 @@ class StartController @Inject() (
     )
 
     authorised() {
-      request.getQueryString("journeyId") match {
-        case Some(journeyId) =>
-          grs
-            .fetchJourneyData(journeyId)(hc)
-            .map { resultString =>
-              Ok(endView(resultString))
-            }
-            .recover { case ex: Exception =>
-              InternalServerError(s"Failed to fetch GRS journey data: ${ex.getMessage}")
-            }
+      grs
+        .fetchJourneyData(journeyId)(hc)
+        .map { resultString =>
+          Ok(endView(resultString))
+        }
+        .recover { case ex: Exception =>
+          InternalServerError(s"Failed to fetch GRS journey data: ${ex.getMessage}")
+        }
 
-        case None =>
-          Future.successful(BadRequest("Missing 'journeyId' query parameter"))
-      }
     }
-
   }
 }
