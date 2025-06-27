@@ -18,6 +18,7 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import models.GrsJourneyRequest
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -77,6 +78,26 @@ class StartController @Inject() (
           InternalServerError(s"Failed to fetch GRS journey data: ${ex.getMessage}")
         }
 
+    }
+  }
+
+  def startJourney: Action[AnyContent] = Action.async { implicit request =>
+    val grsRequest = GrsJourneyRequest(
+      continueUrl = "http://localhost:9000/disa-registration-frontend/retrieveData",
+      businessVerificationCheck = true,
+      None,
+      "vrs",
+      "http://localhost:9514/feedback/vat-registration",
+      "VATC",
+      "/accessibility",
+      None
+    )
+
+
+    authorised() {
+      grs.createJourney(grsRequest)(hc).map(url => Redirect(url)).recover { case ex: Exception =>
+        InternalServerError(s"Failed to fetch GRS journey data: ${ex.getMessage}")
+      }
     }
   }
 }

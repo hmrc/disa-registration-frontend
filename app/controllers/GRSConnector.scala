@@ -16,8 +16,12 @@
 
 package controllers
 
+import models.GrsJourneyRequest
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpReads, HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpReads, HttpResponse, InternalServerException, StringContextOps}
+import play.api.http.Status._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,10 +31,19 @@ class GRSConnector @Inject() (httpClient: HttpClientV2)(implicit ec: ExecutionCo
 
   def fetchJourneyData(journeyId: String)(implicit hc: HeaderCarrier): Future[String] = {
     val url = s"http://localhost:9718/identify-your-incorporated-business/test-only/retrieve-journey?journeyId=$journeyId"
-    httpClient.get(url"$url")
-      .execute[HttpResponse].map(_.body)
+    httpClient
+      .get(url"$url")
+      .execute[HttpResponse]
+      .map(_.body)
+  }
+
+  def createJourney(grsJourneyRequest: GrsJourneyRequest)(implicit hc: HeaderCarrier): Future[String] = {
+    val url = "http://localhost:9718/identify-your-incorporated-business/test-only/create-limited-company-journey"
+    httpClient.post(url"$url").withBody(Json.toJson(grsJourneyRequest)).execute[HttpResponse].map {
+      case response @ HttpResponse(CREATED, _, _) =>
+        (response.json \ "journeyStartUrl").as[String]
+      case response => throw new InternalServerException(s"Invalid response from Limited Company: Status: ${response.status} Body: ${response.body}")
+    }
   }
 
 }
-
-

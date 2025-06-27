@@ -25,3 +25,5 @@ GET        /start                       controllers.StartController.onPageLoad()
 GET /startGrs controllers.StartController.grsJourney()
 
 GET /retrieveData     controllers.StartController.retrieveData(journeyId:String)
+
+GET /test     controllers.StartController.startJourney()
