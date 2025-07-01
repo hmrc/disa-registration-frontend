@@ -81,21 +81,20 @@ class StartController @Inject() (
     }
   }
 
-  def startJourney: Action[AnyContent] = Action.async { implicit request =>
-    val grsRequest = GrsJourneyRequest(
-      continueUrl = "http://localhost:9000/disa-registration-frontend/retrieveData",
+  def retrieveGrsStartUrl() = identify.async { implicit request =>
+    val req = GrsJourneyRequest(
+      continueUrl = "/disa-registration-frontend/retrieveData",
       businessVerificationCheck = true,
-      None,
-      "vrs",
-      "http://localhost:9514/feedback/vat-registration",
-      "VATC",
-      "/accessibility",
-      None
+      optServiceName = Some("disa-registration-frontend"),
+      deskProServiceId = "vrs",
+      signOutUrl = "/testSignOutUrl",
+      regime = "VATC",
+      accessibilityUrl = "/accessibility-statement/my-service",
+      labels = None
     )
 
-
     authorised() {
-      grs.createJourney(grsRequest)(hc).map(url => Redirect(url)).recover { case ex: Exception =>
+      grs.createJourney(req)(hc).map(url => Redirect(url)).recover { case ex: Exception =>
         InternalServerError(s"Failed to fetch GRS journey data: ${ex.getMessage}")
       }
     }

@@ -26,4 +26,5 @@ GET /startGrs controllers.StartController.grsJourney()
 
 GET /retrieveData     controllers.StartController.retrieveData(journeyId:String)
 
-GET /test     controllers.StartController.startJourney()
+GET /retrieveGrsStartUrl     controllers.StartController.retrieveGrsStartUrl()
+

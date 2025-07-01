@@ -7,7 +7,7 @@ site.no = No
 site.yes = Yes
 site.continue = Continue
 site.start = Start now
-site.startAgain = Start grs journey
+site.startAgain = Start GRS and BV Journey
 site.signIn = Sign in
 site.govuk = GOV.UK
 
@@ -49,4 +49,4 @@ unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
 start.title = start
-start.heading = start
+start.heading = GRS and BV Journey

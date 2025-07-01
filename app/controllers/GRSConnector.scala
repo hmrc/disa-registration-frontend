@@ -38,12 +38,17 @@ class GRSConnector @Inject() (httpClient: HttpClientV2)(implicit ec: ExecutionCo
   }
 
   def createJourney(grsJourneyRequest: GrsJourneyRequest)(implicit hc: HeaderCarrier): Future[String] = {
-    val url = "http://localhost:9718/identify-your-incorporated-business/test-only/create-limited-company-journey"
-    httpClient.post(url"$url").withBody(Json.toJson(grsJourneyRequest)).execute[HttpResponse].map {
-      case response @ HttpResponse(CREATED, _, _) =>
+    println(hc)
+    val url = "http://localhost:9718/identify-your-incorporated-business/api/limited-company-journey"
+    httpClient.post(url"$url").withBody(Json.toJson(grsJourneyRequest)).setHeader("Content-Type"->"application/json").execute[HttpResponse].map {
+      case response@HttpResponse(CREATED, _, _) =>
         (response.json \ "journeyStartUrl").as[String]
       case response => throw new InternalServerException(s"Invalid response from Limited Company: Status: ${response.status} Body: ${response.body}")
     }
   }
 
+
+
 }
+
+
