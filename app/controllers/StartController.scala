@@ -18,7 +18,7 @@ package controllers
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.GrsJourneyRequest
+import models.{GrsJourneyRequest, Labels, LabelsLanguage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
@@ -81,7 +81,8 @@ class StartController @Inject() (
     }
   }
 
-  def retrieveGrsStartUrl() = identify.async { implicit request =>
+  def retrieveGrsStartUrl(): Action[AnyContent] = identify.async { implicit request =>
+
     val req = GrsJourneyRequest(
       continueUrl = "/disa-registration-frontend/retrieveData",
       businessVerificationCheck = true,
@@ -90,7 +91,7 @@ class StartController @Inject() (
       signOutUrl = "/testSignOutUrl",
       regime = "VATC",
       accessibilityUrl = "/accessibility-statement/my-service",
-      labels = None
+      labels = Some(Labels(LabelsLanguage("test"),LabelsLanguage("test")))
     )
 
     authorised() {
