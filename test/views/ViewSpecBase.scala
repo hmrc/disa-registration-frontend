@@ -12,7 +12,7 @@ import play.api.test.FakeRequest
 trait ViewSpecBase extends AnyWordSpec with GuiceOneAppPerSuite with Matchers with MockitoSugar with ScalaFutures {
 
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
-  implicit val request: Request[AnyContent] = FakeRequest()
-  implicit val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
-  val messagesApi: MessagesApi = app.injector.instanceOf[play.api.i18n.MessagesApi]
+  implicit val request: Request[AnyContent]          = FakeRequest()
+  implicit val messages: Messages                    = app.injector.instanceOf[MessagesApi].preferred(Seq(Lang("en")))
+  val messagesApi: MessagesApi                       = app.injector.instanceOf[play.api.i18n.MessagesApi]
 }
