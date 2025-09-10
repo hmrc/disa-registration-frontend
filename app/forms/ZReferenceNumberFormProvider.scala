@@ -22,7 +22,7 @@ import play.api.data.Form
 class ZReferenceNumberFormProvider extends Mappings {
   def apply(): Form[String] =
     Form(
-        "value" -> text("orgDetails.zReferenceNumber.error.missing")
-          .verifying(regexp("^Z[0-9]{4}$", "orgDetails.zReferenceNumber.error.invalid"))
+      "value" -> text("orgDetails.zReferenceNumber.error.missing")
+        .verifying(regexp("^Z[0-9]{4}$", "orgDetails.zReferenceNumber.error.invalid"))
     )
 }

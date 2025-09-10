@@ -22,11 +22,11 @@ import play.api.mvc.{ActionBuilder, AnyContent}
 import javax.inject.Inject
 
 class Actions @Inject() (
-                          identifierAction: IdentifierAction,
-                          dataRetrievalAction: DataRetrievalAction,
-                          dataRequiredAction: DataRequiredAction,
-                        ) {
-  
+  identifierAction: IdentifierAction,
+  dataRetrievalAction: DataRetrievalAction,
+  dataRequiredAction: DataRequiredAction
+) {
+
   def identify(): ActionBuilder[IdentifierRequest, AnyContent] =
     identifierAction
 

@@ -28,24 +28,24 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 class ZReferenceNumberController @Inject() (
-                                             val controllerComponents: MessagesControllerComponents,
-                                             actions: Actions,
-                                             formProvider: ZReferenceNumberFormProvider,
-                                             view: ZReferenceNumberView
-                                           ) extends FrontendBaseController
-  with I18nSupport {
-  
+  val controllerComponents: MessagesControllerComponents,
+  actions: Actions,
+  formProvider: ZReferenceNumberFormProvider,
+  view: ZReferenceNumberView
+) extends FrontendBaseController
+    with I18nSupport {
+
   private val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = actions.getData().async  { implicit request =>
+  def onPageLoad(): Action[AnyContent] = actions.getData().async { implicit request =>
     val preparedForm = request.userAnswers.fold(form)(_.get(ZReferenceNumberPage) match {
-      case None => form
+      case None        => form
       case Some(value) => form.fill(value)
     })
-    
+
     Future.successful(Ok(view(preparedForm)))
   }
-  
+
   def onSubmit(): Action[AnyContent] = actions.identify().async { implicit request =>
     form
       .bindFromRequest()
