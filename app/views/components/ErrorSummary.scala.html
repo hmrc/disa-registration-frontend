@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package pages
+@import uk.gov.hmrc.govukfrontend.views.html.components.{ErrorSummary => govErrorSummary}
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichFormErrors
 
-import play.api.libs.json.JsPath
-import queries.{Gettable, Settable}
+@this(
+  govUkErrorSummary: GovukErrorSummary
+)
 
-sealed trait QuestionPage[A] extends Page with Gettable[A] with Settable[A]
+@(errors: Seq[FormError])(implicit messages: Messages)
 
-case object ZReferenceNumberPage extends QuestionPage[String] {
-  override def path: JsPath = JsPath \ "organisationDetails" \ toString
-
-  override def toString: String = "zReferenceNumber"
+@if(errors.nonEmpty) {
+  @govUkErrorSummary(
+    govErrorSummary(
+      errorList = errors
+        .map(err => err.copy(key = err.key, args = err.args))
+        .asTextErrorLinks,
+      title = Text(messages("error.summary.title"))
+    )
+  )
 }
+

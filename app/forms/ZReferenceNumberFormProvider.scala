@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import play.api.libs.json.JsPath
-import queries.{Gettable, Settable}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-sealed trait QuestionPage[A] extends Page with Gettable[A] with Settable[A]
-
-case object ZReferenceNumberPage extends QuestionPage[String] {
-  override def path: JsPath = JsPath \ "organisationDetails" \ toString
-
-  override def toString: String = "zReferenceNumber"
+class ZReferenceNumberFormProvider extends Mappings {
+  def apply(): Form[String] =
+    Form(
+        "value" -> text("orgDetails.zReferenceNumber.error.missing")
+          .verifying(regexp("^Z[0-9]{4}$", "orgDetails.zReferenceNumber.error.invalid"))
+    )
 }

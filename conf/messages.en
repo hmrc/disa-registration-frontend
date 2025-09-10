@@ -6,6 +6,7 @@ site.change = Change
 site.no = No
 site.yes = Yes
 site.continue = Continue
+site.saveAndContinue = Save and continue
 site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
@@ -52,3 +53,10 @@ pageNotFound.title = Page not found
 pageNotFound.heading = Page not found
 pageNotFound.paragraph1 = If you typed the web address, check it is correct.
 pageNotFound.paragraph2 = If you pasted the web address, check you copied the entire address.
+
+### Organisation Details
+
+orgDetails.zReferenceNumber.title = What is your Z-reference number?
+orgDetails.zReferenceNumber.hint = This is usually a Z followed by 4 numbers - for example, Z1234
+orgDetails.zReferenceNumber.error.missing = You need to tell us what your Z reference number is
+orgDetails.zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format.  It's usually a Z followed by 4 numbers

@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package views.helpers
 
-import play.api.libs.json.JsPath
-import queries.{Gettable, Settable}
+import play.api.data.Field
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 
-sealed trait QuestionPage[A] extends Page with Gettable[A] with Settable[A]
+object InputTextHelper {
 
-case object ZReferenceNumberPage extends QuestionPage[String] {
-  override def path: JsPath = JsPath \ "organisationDetails" \ toString
+  def defineInputClasses(defaultInputClasses: String, inputClasses: Option[String]): String =
+    inputClasses.map(clazz => s" $clazz").getOrElse(defaultInputClasses)
 
-  override def toString: String = "zReferenceNumber"
+  def fieldErrorMessages(field: Field)(implicit messages: Messages): Option[ErrorMessage] =
+    field.error.map(err => ErrorMessage(content = HtmlContent(messages(err.message))))
 }
