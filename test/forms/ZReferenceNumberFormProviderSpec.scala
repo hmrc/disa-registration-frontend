@@ -16,48 +16,58 @@
 
 package forms
 
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.must.Matchers
-import play.api.data.Form
+import play.api.data.{Form, FormError}
 
-final class ZReferenceNumberFormProviderSpec extends AnyWordSpec with Matchers {
+final class ZReferenceNumberFormProviderSpec extends FormSpec {
 
   private val form: Form[String] = new ZReferenceNumberFormProvider()()
+  private val fieldKey           = "value"
 
-  "ZReferenceNumberFormProvider" should {
+  "ZReferenceNumberFormProvider" - {
 
     "bind a valid Z-ref like Z1234" in {
-      val result = form.bind(Map("value" -> "Z1234"))
+      val result = form.bind(Map(fieldKey -> "Z1234"))
       result.errors mustBe Nil
       result.value.get mustBe "Z1234"
     }
 
     "bind a valid Z-ref with whitespace" in {
-      val result = form.bind(Map("value" -> "   Z1234   "))
+      val result = form.bind(Map(fieldKey -> "   Z1234   "))
       result.errors mustBe Nil
       result.value.get mustBe "Z1234"
     }
 
     "fail when missing" in {
-      val result = form.bind(Map("value" -> ""))
-      result.errors.map(_.message) must contain("orgDetails.zReferenceNumber.error.missing")
+      checkForError(form, Map(fieldKey -> ""), Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.missing")))
     }
 
     "fail for lowercase z" in {
-      val result = form.bind(Map("value" -> "z1234"))
-      result.errors.map(_.message) must contain("orgDetails.zReferenceNumber.error.invalid")
+      checkForError(
+        form,
+        Map(fieldKey -> "z1234"),
+        Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+      )
     }
 
     "fail for wrong length" in {
-      form.bind(Map("value" -> "Z12")).errors.map(_.message)    must contain("orgDetails.zReferenceNumber.error.invalid")
-      form.bind(Map("value" -> "Z12345")).errors.map(_.message) must contain(
-        "orgDetails.zReferenceNumber.error.invalid"
+      checkForError(
+        form,
+        Map(fieldKey -> "Z12"),
+        Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+      )
+      checkForError(
+        form,
+        Map(fieldKey -> "Z12345"),
+        Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
       )
     }
 
     "fail for wrong prefix" in {
-      val result = form.bind(Map("value" -> "A1234"))
-      result.errors.map(_.message) must contain("orgDetails.zReferenceNumber.error.invalid")
+      checkForError(
+        form,
+        Map(fieldKey -> "A1234"),
+        Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+      )
     }
   }
 }
