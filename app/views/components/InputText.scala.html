@@ -15,16 +15,17 @@
  *@
 
 @import views.helpers.InputTextHelper
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import views.ViewImplicits._
 
 @this(govukInput: GovukInput)
 
 @(
   field: Field,
   inputClass: Option[String] = None,
-  hint: Option[String] = None,
+  hintKey: Option[String] = None,
   autocomplete: Option[String] = None,
+  captionKey: Option[String] = None,
   labelKey: Option[String] = None,
   labelIsPageHeading: Boolean = false
 )(implicit messages: Messages)
@@ -32,9 +33,9 @@
 @input = @{
   Input(
     autocomplete = autocomplete,
-    hint = hint.map(x => Hint(content = Text(messages(x)))),
+    hint = hintKey.map(key => Hint(content = Text(messages(key)))),
     errorMessage = InputTextHelper.fieldErrorMessages(field),
-    classes = inputClass.getOrElse(""),
+    classes = inputClass.getOrElse("")
   )
   .withFormField(field)
 }
@@ -43,7 +44,7 @@
   @govukInput(input)
 } { key =>
   @if(labelIsPageHeading) {
-    @govukInput(input.withHeading(Text(messages(key)))) } else {
+    @govukInput(input.withHeadingAndCaption(messages(key), captionKey)) } else {
     @govukInput(input.copy(label = Label(isPageHeading = false, content = Text(messages(key)), classes = "govuk-label--m")))
   }
 }
