@@ -27,7 +27,7 @@ object ViewImplicits {
     def withHeadingAndCaption(heading: String, caption: Option[String]): Input =
       caption match {
         case Some(value) => input.withHeadingAndSectionCaption(Text(heading), Text(messages(value)))
-        case None => input.withHeading(Text(heading))
+        case None        => input.withHeading(Text(heading))
       }
   }
 }
