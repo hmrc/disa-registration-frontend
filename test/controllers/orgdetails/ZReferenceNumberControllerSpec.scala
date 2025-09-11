@@ -44,6 +44,7 @@ class ZReferenceNumberControllerSpec extends SpecBase {
     }
 
     "POST /z-reference-number" - {
+      // TODO Placeholder test to be rewitten when wired up
       "must return 404 for a valid submission" in {
         val request = FakeRequest(POST, zRefRoute).withFormUrlEncodedBody("value" -> "Z1234")
 

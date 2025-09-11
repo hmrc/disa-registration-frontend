@@ -16,7 +16,11 @@
 
 package pages
 
+import pages.PageConstants.organisationDetailsSection
 import play.api.libs.json.JsPath
-import queries.{Gettable, Settable}
 
-trait QuestionPage[A] extends Page with Gettable[A] with Settable[A]
+case object ZReferenceNumberPage extends QuestionPage[String] {
+  override def path: JsPath = organisationDetailsSection \ toString
+
+  override def toString: String = "zReferenceNumber"
+}

@@ -29,8 +29,7 @@
 @(form: Form[String])(implicit request: Request[_], messages: Messages)
 
 @layout(
-  pageTitle    = title(form, messages("orgDetails.zReferenceNumber.title")),
-  showBackLink = true
+  pageTitle    = title(form, messages("orgDetails.zReferenceNumber.title"))
 ) {
   @formHelper(action = ZReferenceNumberController.onSubmit(), Symbol("autoComplete") -> "off") {
     @errorSummary(form.errors)
