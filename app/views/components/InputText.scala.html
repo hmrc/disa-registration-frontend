@@ -44,7 +44,7 @@
   @govukInput(input)
 } { key =>
   @if(labelIsPageHeading) {
-    @govukInput(input.withHeadingAndCaption(messages(key), captionKey)) } else {
+    @govukInput(input.withHeadingAndCaption(key, captionKey)) } else {
     @govukInput(input.copy(label = Label(isPageHeading = false, content = Text(messages(key)), classes = "govuk-label--m")))
   }
 }

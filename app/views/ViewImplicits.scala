@@ -24,10 +24,10 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.input.Input
 object ViewImplicits {
   implicit class InputImplicits(input: Input)(implicit messages: Messages) extends RichInputSupport {
 
-    def withHeadingAndCaption(heading: String, caption: Option[String]): Input =
-      caption match {
-        case Some(value) => input.withHeadingAndSectionCaption(Text(heading), Text(messages(value)))
-        case None        => input.withHeading(Text(heading))
+    def withHeadingAndCaption(headingKey: String, captionKey: Option[String]): Input =
+      captionKey match {
+        case Some(value) => input.withHeadingAndSectionCaption(Text(messages(headingKey)), Text(messages(value)))
+        case None        => input.withHeading(Text(messages(headingKey)))
       }
   }
 }

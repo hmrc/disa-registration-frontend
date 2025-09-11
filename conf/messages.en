@@ -62,4 +62,4 @@ sectionTitle.orgDetails = Organisation details
 orgDetails.zReferenceNumber.title = What is your Z-reference number?
 orgDetails.zReferenceNumber.hint = This is usually a Z followed by 4 numbers - for example, Z1234
 orgDetails.zReferenceNumber.error.missing = You need to tell us what your Z reference number is
-orgDetails.zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format.  It’s usually a Z followed by 4 numbers
+orgDetails.zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers

@@ -33,7 +33,7 @@ class ErrorSummarySpec extends ViewSpecBase {
       val html   = app.injector.instanceOf[ErrorSummary].apply(errors)
 
       html.body must include("govuk-error-summary")
-      html.body must include("There is a problem")
+      html.body must include(messages("error.summary.title"))
       html.body must include("""<a href="#value">""")
     }
   }

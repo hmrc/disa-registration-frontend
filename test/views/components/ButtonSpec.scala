@@ -25,7 +25,7 @@ class ButtonSpec extends ViewSpecBase {
     "render a standard save-and-continue button" in {
       val html = app.injector.instanceOf[Button].apply()(messages)
 
-      html.body must include("Save and continue")
+      html.body must include(messages("site.saveAndContinue"))
       html.body must include("govuk-button")
     }
 
@@ -39,7 +39,7 @@ class ButtonSpec extends ViewSpecBase {
           href = Some("/start")
         )(messages)
 
-      html.body must include("Start now")
+      html.body must include(messages("site.start"))
       html.body must include("id=\"submit\"")
       html.body must include("href=\"/start\"")
     }

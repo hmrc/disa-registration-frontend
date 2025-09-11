@@ -49,7 +49,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
       caption must include("Organisation details")
 
       val h1 = doc.select("h1 > label").get(0).ownText
-      h1 mustBe "What is your Z-reference number?"
+      h1 mustBe messages("orgDetails.zReferenceNumber.title")
     }
 
     "render the form posting to Z ref page with a single text input named 'value'" in {
@@ -68,7 +68,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
       val doc  = docEmpty
       val hint = doc.select(".govuk-hint").text()
 
-      hint must include("This is usually a Z followed by 4 numbers - for example, Z1234")
+      hint must include(messages("orgDetails.zReferenceNumber.hint"))
     }
 
     "render a primary submit button" in {
@@ -76,7 +76,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
       val btn = doc.selectFirst(".govuk-button")
 
       Option(btn) mustBe defined
-      btn.text() must include("Save and continue")
+      btn.text() must include(messages("site.saveAndContinue"))
     }
 
     "preserve the entered value when bound successfully" in {
@@ -93,8 +93,8 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
       val summary = doc.selectFirst(".govuk-error-summary")
 
       Option(summary) mustBe defined
-      summary.text() must include("There is a problem")
-      summary.text() must include("You need to tell us what your Z reference number is")
+      summary.text() must include(messages("error.summary.title"))
+      summary.text() must include(messages("orgDetails.zReferenceNumber.error.missing"))
 
       val input = doc.selectFirst("input[name=value]")
 
@@ -113,7 +113,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
       val summary = doc.selectFirst(".govuk-error-summary").select("a")
 
       Option(summary) mustBe defined
-      summary.text() mustBe "Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers"
+      summary.text() must include(messages("orgDetails.zReferenceNumber.error.invalid"))
     }
   }
 }

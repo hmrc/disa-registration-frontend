@@ -16,42 +16,110 @@
 
 package views.components
 
-import play.api.data.Form
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import play.api.data.{Field, Form}
 import play.api.data.Forms.{nonEmptyText, single}
 import views.ViewSpecBase
 import views.html.components.InputText
 
 class InputTextSpec extends ViewSpecBase {
 
-  private val form         = Form(single("v" -> nonEmptyText))
-  private def fieldNoErr   = form.bind(Map("v" -> "abc"))("v")
-  private def fieldWithErr = form.bind(Map("v" -> ""))("v")
+  private val form = Form(single("v" -> nonEmptyText))
+  private val view = app.injector.instanceOf[InputText]
+
+  private def fieldOk  = form.bind(Map("v" -> "Z1234"))("v")
+  private def fieldErr = form.bind(Map("v" -> ""))("v")
+
+  private def renderDoc(
+    field: Field,
+    inputClass: Option[String] = None,
+    hintKey: Option[String] = None,
+    autocomplete: Option[String] = None,
+    captionKey: Option[String] = None,
+    labelKey: Option[String] = None,
+    labelIsPageHeading: Boolean = false
+  ): Document = {
+    val html = view(
+      field = field,
+      inputClass = inputClass,
+      hintKey = hintKey,
+      autocomplete = autocomplete,
+      captionKey = captionKey,
+      labelKey = labelKey,
+      labelIsPageHeading = labelIsPageHeading
+    )
+    Jsoup.parse(html.body)
+  }
 
   "InputText component" should {
 
-    "render an input without error" in {
-      val html = app.injector
-        .instanceOf[InputText]
-        .apply(
-          field = fieldNoErr,
-          labelKey = Some("label.key"),
-          hintKey = Some("hint here"),
-          labelIsPageHeading = false
-        )
+    "render a standard labelled input with hint and no caption" in {
+      val doc = renderDoc(fieldOk, hintKey = Some("hint.key"), labelKey = Some("label.key"))
 
-      html.body must include("name=\"v\"")
-      html.body must include("hint here")
+      val label = Option(doc.selectFirst("label.govuk-label.govuk-label--m"))
+      label mustBe defined
+      label.get.text() mustBe messages("label.key")
+
+      Option(doc.selectFirst("h1")) mustBe empty
+
+      val input = Option(doc.selectFirst("input[name=v]"))
+      input mustBe defined
+
+      val hint = Option(doc.selectFirst(".govuk-hint"))
+      hint mustBe defined
+      hint.get.text() mustBe messages("hint.key")
+
+      input.get.attr("aria-describedby") must not be empty
     }
 
-    "render an input with error message" in {
-      val html = app.injector
-        .instanceOf[InputText]
-        .apply(
-          field = fieldWithErr,
-          labelKey = Some("label.key")
-        )
+    "render page heading and caption when label is page heading and caption is present" in {
+      val doc =
+        renderDoc(fieldOk, labelKey = Some("label.key"), captionKey = Some("caption.key"), labelIsPageHeading = true)
 
-      html.body must include("govuk-input--error")
+      val h1 = Option(doc.selectFirst(".govuk-label"))
+      h1 mustBe defined
+      h1.get.ownText mustBe messages("label.key")
+
+      val caption = Option(doc.selectFirst(".hmrc-caption"))
+      caption mustBe defined
+      caption.get.ownText mustBe messages("caption.key")
+
+      doc.select("label.govuk-label--m").size() mustBe 0
+    }
+
+    "apply custom classes and autocomplete" in {
+      val doc = renderDoc(
+        fieldOk,
+        labelKey = Some("label.key"),
+        inputClass = Some("custom another"),
+        autocomplete = Some("postal-code")
+      )
+
+      val input = Option(doc.selectFirst("input[name=v]"))
+      input mustBe defined
+      input.get.classNames() must contain allOf ("custom", "another")
+      input.get.attr("autocomplete") mustBe "postal-code"
+    }
+
+    "show error class and inline error message when the field has errors" in {
+      val doc = renderDoc(fieldErr, labelKey = Some("label.key"))
+
+      val input = Option(doc.selectFirst("input[name=v]"))
+      input mustBe defined
+      input.get.classNames() must contain("govuk-input--error")
+
+      val inlineError = Option(doc.selectFirst(".govuk-error-message"))
+      inlineError mustBe defined
+      inlineError.get.text().toLowerCase must include(messages("error.required").toLowerCase)
+    }
+
+    "render without label when labelKey is None" in {
+      val doc = renderDoc(fieldOk, labelKey = None)
+
+      doc.select("label.govuk-label").size() mustBe 0
+      doc.select("h1").size() mustBe 0
+      Option(doc.selectFirst("input[name=v]")) mustBe defined
     }
   }
 }
