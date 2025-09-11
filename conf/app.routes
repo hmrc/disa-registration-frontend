@@ -22,5 +22,8 @@ GET         /unauthorised                                controllers.Unauthorise
 
 ### Organisation Details
 
+GET         /registered-isa-manager                      controllers.orgdetails.RegisteredIsaManagerController.onPageLoad()
+POST        /registered-isa-manager                      controllers.orgdetails.RegisteredIsaManagerController.onSubmit()
+
 GET         /z-reference-number                          controllers.orgdetails.ZReferenceNumberController.onPageLoad()
 POST        /z-reference-number                          controllers.orgdetails.ZReferenceNumberController.onSubmit()
