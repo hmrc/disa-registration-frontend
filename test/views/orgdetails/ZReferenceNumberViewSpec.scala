@@ -113,7 +113,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
       val summary = doc.selectFirst(".govuk-error-summary").select("a")
 
       Option(summary) mustBe defined
-      summary.text() mustBe "Enter the Z-reference number in the correct format. It's usually a Z followed by 4 numbers"
+      summary.text() mustBe "Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers"
     }
   }
 }
