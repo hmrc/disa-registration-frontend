@@ -16,7 +16,6 @@
 
 package pages
 
-import play.api.libs.json.JsPath
 import queries.{Gettable, Settable}
 
 trait QuestionPage[A] extends Page with Gettable[A] with Settable[A]
