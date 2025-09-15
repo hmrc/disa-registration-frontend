@@ -29,19 +29,16 @@ class ButtonSpec extends ViewSpecBase {
       html.body must include("govuk-button")
     }
 
-    "respect attributes and href" in {
+    "respect attributes and message" in {
       val html = app.injector
         .instanceOf[Button]
         .apply(
           messageKey = "site.start",
-          isStartButton = true,
-          attributes = Map("id" -> "submit"),
-          href = Some("/start")
+          attributes = Map("id" -> "submit")
         )(messages)
 
       html.body must include(messages("site.start"))
       html.body must include("id=\"submit\"")
-      html.body must include("href=\"/start\"")
     }
   }
 }

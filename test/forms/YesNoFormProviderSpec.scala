@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,18 +12,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.{Button => govButton}
+package forms
 
-@this(govukButton: GovukButton)
+import play.api.data.{Form, FormError}
 
-@(
-  messageKey: String = "site.saveAndContinue",
-  attributes: Map[String, String] = Map.empty,
-)(implicit messages: Messages)
+class YesNoFormProviderSpec extends FormSpec {
 
-@govukButton(govButton(
-  content = Text(messages(messageKey)),
-  attributes = attributes
-))
+  private val form: Form[Boolean] = new YesNoFormProvider()("error")
+  private val fieldKey            = "value"
+
+  "YesNoFormProvider" - {
+
+    "bind a valid response" in {
+      val result = form.bind(Map(fieldKey -> "true"))
+      result.errors mustBe Nil
+      result.value.get mustBe true
+    }
+
+    "fail when missing" in {
+      checkForError(form, Map(fieldKey -> ""), Seq(FormError(fieldKey, "error")))
+    }
+  }
+}
