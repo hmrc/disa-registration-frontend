@@ -16,42 +16,56 @@
 
 package controllers.orgdetails
 
-import controllers.actions.Actions
-import forms.YesNoFormProvider
+import controllers.actions.*
+import forms.RegisteredIsaManagerFormProvider
+import handlers.ErrorHandler
+import models.Mode
+import navigation.Navigator
 import pages.RegisteredIsaManagerPage
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.orgdetails.RegisteredIsaManagerView
 
+import java.util.MissingResourceException
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class RegisteredIsaManagerController @Inject() (
-  val controllerComponents: MessagesControllerComponents,
-  actions: Actions,
-  formProvider: YesNoFormProvider,
-  view: RegisteredIsaManagerView
-) extends FrontendBaseController
-    with I18nSupport {
+class RegisteredIsaManagerController @Inject()(
+                                         override val messagesApi: MessagesApi,
+                                         sessionRepository: SessionRepository,
+                                         navigator: Navigator,
+                                         identify: IdentifierAction,
+                                         getData: DataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         formProvider: RegisteredIsaManagerFormProvider,
+                                         val controllerComponents: MessagesControllerComponents,
+                                         view: RegisteredIsaManagerView
+                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = formProvider("orgDetails.registeredIsaManager.error.missing")
+  val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = actions.getData().async { implicit request =>
-    val preparedForm = request.userAnswers.fold(form)(_.get(RegisteredIsaManagerPage) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    })
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) {
+    implicit request =>
 
-    Future.successful(Ok(view(preparedForm)))
+      val preparedForm = request.userAnswers.fold(form)(_.get(RegisteredIsaManagerPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      })
+
+      Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(): Action[AnyContent] = actions.identify().async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-        value => Future.successful(NotFound)
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+
+      form.bindFromRequest().fold(
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, mode))),
+        // TODO implement user answer setting
+        _ => request.userAnswers.fold(Future.successful(NotFound))(ua =>
+          Future.successful(Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode, ua))))
       )
   }
 }

@@ -22,5 +22,8 @@ GET         /unauthorised                                controllers.Unauthorise
 
 ### Organisation Details
 
-GET         /registered-isa-manager                      controllers.orgdetails.RegisteredIsaManagerController.onPageLoad()
-POST        /registered-isa-manager                      controllers.orgdetails.RegisteredIsaManagerController.onSubmit()
+GET        /registered-isa-manager                        controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
+POST       /registered-isa-manager                        controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode)
+
+GET        /change-registered-isa-manager                 controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-registered-isa-manager                 controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = CheckMode)

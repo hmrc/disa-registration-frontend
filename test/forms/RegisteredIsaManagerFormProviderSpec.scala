@@ -16,23 +16,30 @@
 
 package forms
 
-import play.api.data.{Form, FormError}
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-class YesNoFormProviderSpec extends FormSpec {
+class RegisteredIsaManagerFormProviderSpec extends BooleanFieldBehaviours {
 
-  private val form: Form[Boolean] = new YesNoFormProvider()("error")
-  private val fieldKey            = "value"
+  val requiredKey = "registeredIsaManager.error.required"
+  val invalidKey = "error.boolean"
 
-  "YesNoFormProvider" - {
+  val form = new RegisteredIsaManagerFormProvider()()
 
-    "bind a valid response" in {
-      val result = form.bind(Map(fieldKey -> "true"))
-      result.errors mustBe Nil
-      result.value.get mustBe true
-    }
+  ".value" - {
 
-    "fail when missing" in {
-      checkForError(form, Map(fieldKey -> ""), Seq(FormError(fieldKey, "error")))
-    }
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
   }
 }

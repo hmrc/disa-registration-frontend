@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,18 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.{Button => govButton}
+package forms
 
-@this(govukButton: GovukButton)
+import javax.inject.Inject
 
-@(
-  messageKey: String = "site.saveAndContinue",
-  attributes: Map[String, String] = Map.empty,
-)(implicit messages: Messages)
+import forms.mappings.Mappings
+import play.api.data.Form
 
-@govukButton(govButton(
-  content = Text(messages(messageKey)),
-  attributes = attributes
-))
+class RegisteredIsaManagerFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("registeredIsaManager.error.required")
+    )
+}

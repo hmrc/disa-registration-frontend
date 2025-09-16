@@ -60,5 +60,6 @@ sectionTitle.orgDetails = Organisation details
 
 ### Organisation Details
 
-orgDetails.registeredIsaManager.title = Is your organisation registered to manage ISAs with HMRC?
-orgDetails.registeredIsaManager.error.missing = You need to tell us if you are registered as an ISA manager with HMRC
+registeredIsaManager.title = Is your organisation registered to manage ISAs with HMRC?
+registeredIsaManager.heading = Is your organisation registered to manage ISAs with HMRC?
+registeredIsaManager.error.required = You need to tell us if you are registered as an ISA manager with HMRC
