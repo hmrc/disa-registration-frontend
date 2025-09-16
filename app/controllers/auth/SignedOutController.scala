@@ -33,7 +33,7 @@ class SignedOutController @Inject() (
     Ok(view())
   }
 
-  //Needs updating once we can determine whether use has answered any questions.
+  // Needs updating once we can determine whether use has answered any questions.
   def onPageLoadUserAnswersNotSaved(): Action[AnyContent] = Action { implicit request =>
     Ok(userAnswersNotSavedView())
   }
