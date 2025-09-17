@@ -40,7 +40,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
   // def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new ZReferenceNumberFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val zReferenceNumberRoute = routes.ZReferenceNumberController.onPageLoad(NormalMode).url
 
