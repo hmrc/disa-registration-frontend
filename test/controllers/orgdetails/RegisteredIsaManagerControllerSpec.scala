@@ -39,7 +39,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
   def onwardRoute = Call("GET", "/foo")
 
   val formProvider = new RegisteredIsaManagerFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   lazy val registeredIsaManagerRoute = orgdetails.routes.RegisteredIsaManagerController.onPageLoad(NormalMode).url
 

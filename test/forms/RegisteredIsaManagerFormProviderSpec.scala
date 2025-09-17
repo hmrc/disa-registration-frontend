@@ -22,7 +22,7 @@ import play.api.data.FormError
 class RegisteredIsaManagerFormProviderSpec extends BooleanFieldBehaviours {
 
   val requiredKey = "registeredIsaManager.error.required"
-  val invalidKey = "error.boolean"
+  val invalidKey  = "error.boolean"
 
   val form = new RegisteredIsaManagerFormProvider()()
 

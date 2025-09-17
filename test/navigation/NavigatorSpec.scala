@@ -45,5 +45,10 @@ class NavigatorSpec extends SpecBase {
           .onPageLoad()
       }
     }
+
+    "must navigate correctly from RegisteredIsaManager page" in {
+      navigator.nextPage(RegisteredIsaManagerPage, NormalMode, UserAnswers("id")) mustBe ???
+      navigator.nextPage(RegisteredIsaManagerPage, CheckMode, UserAnswers("id")) mustBe ???
+    }
   }
 }

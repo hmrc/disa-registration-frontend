@@ -32,40 +32,41 @@ import java.util.MissingResourceException
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegisteredIsaManagerController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: RegisteredIsaManagerFormProvider,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: RegisteredIsaManagerView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class RegisteredIsaManagerController @Inject() (
+  override val messagesApi: MessagesApi,
+  sessionRepository: SessionRepository,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: RegisteredIsaManagerFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: RegisteredIsaManagerView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) {
-    implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
+    val preparedForm = request.userAnswers.fold(form)(_.get(RegisteredIsaManagerPage) match {
+      case None        => form
+      case Some(value) => form.fill(value)
+    })
 
-      val preparedForm = request.userAnswers.fold(form)(_.get(RegisteredIsaManagerPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      })
-
-      Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async {
-    implicit request =>
-
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         // TODO implement user answer setting
-        _ => request.userAnswers.fold(Future.successful(NotFound))(ua =>
-          Future.successful(Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode, ua))))
+        _ =>
+          request.userAnswers.fold(Future.successful(NotFound))(ua =>
+            Future.successful(Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode, ua)))
+          )
       )
   }
 }
