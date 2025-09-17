@@ -40,7 +40,8 @@ lazy val microservice = (project in file("."))
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     pipelineStages := Seq(digest),
-    Assets / pipelineStages := Seq(concat)
+    Assets / pipelineStages := Seq(concat),
+    scalacOptions += "-Wconf:src=routes/.*:s"
   )
 
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
@@ -54,3 +55,5 @@ lazy val it =
     .dependsOn(microservice % "test->test")
 
 addCommandAlias("prePrChecks", ";scalafmtCheckAll;scalafmtSbtCheck")
+
+addCommandAlias("precommit", ";scalafmtAll;coverage;test;it/test;coverageReport")
