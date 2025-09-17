@@ -18,56 +18,142 @@ package controllers.orgdetails
 
 import base.SpecBase
 import forms.ZReferenceNumberFormProvider
-import play.api.Application
+import models.{NormalMode, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import pages.ZReferenceNumberPage
+import play.api.inject.bind
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 import views.html.orgdetails.ZReferenceNumberView
+import controllers.routes.JourneyRecoveryController
 
-class ZReferenceNumberControllerSpec extends SpecBase {
+import scala.concurrent.Future
 
-  private implicit val app: Application = applicationBuilder().build()
-  private lazy val zRefRoute            = routes.ZReferenceNumberController.onPageLoad().url
-  private val formProvider              = ZReferenceNumberFormProvider()
+// TODO add tests back in when next page is present and UAs are wired up
+class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  "GET /z-reference-number" - {
+  // def onwardRoute = Call("GET", "/foo")
+
+  val formProvider = new ZReferenceNumberFormProvider()
+  val form = formProvider()
+
+  lazy val zReferenceNumberRoute = routes.ZReferenceNumberController.onPageLoad(NormalMode).url
+
+  "ZReferenceNumber Controller" - {
+
     "must return OK and the correct view for a GET" in {
-      val request = FakeRequest(GET, zRefRoute)
 
-      val result = route(app, request).value
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
-      val view = injector.instanceOf[ZReferenceNumberView]
+      running(application) {
+        val request = FakeRequest(GET, zReferenceNumberRoute)
 
-      status(result) mustEqual OK
+        val result = route(application, request).value
 
-      contentAsString(result) mustEqual
-        view(formProvider())(request, messages).toString
+        val view = application.injector.instanceOf[ZReferenceNumberView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+      }
     }
 
-    "POST /z-reference-number" - {
-      // TODO Placeholder test to be rewitten when wired up
-      "must return 404 for a valid submission" in {
-        val request = FakeRequest(POST, zRefRoute).withFormUrlEncodedBody("value" -> "Z1234")
+    "must populate the view correctly on a GET when the question has previously been answered" in {
 
-        val result = route(app, request).value
+      val userAnswers = UserAnswers(userAnswersId).set(ZReferenceNumberPage, "answer").success.value
 
-        val view = injector.instanceOf[ZReferenceNumberView]
+      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-        status(result) mustEqual NOT_FOUND
+      running(application) {
+        val request = FakeRequest(GET, zReferenceNumberRoute)
+
+        val view = application.injector.instanceOf[ZReferenceNumberView]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
       }
+    }
 
-      "must return 400 with errors for invalid submission" in {
-        val request   = FakeRequest(POST, zRefRoute).withFormUrlEncodedBody("value" -> "bad")
-        val boundForm = formProvider().bind(Map("value" -> "bad"))
+//    "must redirect to the next page when valid data is submitted" in {
+//
+//      val mockSessionRepository = mock[SessionRepository]
+//
+//      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+//
+//      val application =
+//        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+//          .overrides(
+//            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+//            bind[SessionRepository].toInstance(mockSessionRepository)
+//          )
+//          .build()
+//
+//      running(application) {
+//        val request =
+//          FakeRequest(POST, zReferenceNumberRoute)
+//            .withFormUrlEncodedBody(("value", "answer"))
+//
+//        val result = route(application, request).value
+//
+//        status(result) mustEqual SEE_OTHER
+//        redirectLocation(result).value mustEqual onwardRoute.url
+//      }
+//    }
 
-        val result = route(app, request).value
+    "must return a Bad Request and errors when invalid data is submitted" in {
 
-        val view = injector.instanceOf[ZReferenceNumberView]
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, zReferenceNumberRoute)
+            .withFormUrlEncodedBody(("value", ""))
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = application.injector.instanceOf[ZReferenceNumberView]
+
+        val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-
-        contentAsString(result) mustEqual
-          view(boundForm)(request, messages).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
+
+//    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+//
+//      val application = applicationBuilder(userAnswers = None).build()
+//
+//      running(application) {
+//        val request = FakeRequest(GET, zReferenceNumberRoute)
+//
+//        val result = route(application, request).value
+//
+//        status(result) mustEqual SEE_OTHER
+//        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+//      }
+//    }
+//
+//    "must redirect to Journey Recovery for a POST if no existing data is found" in {
+//
+//      val application = applicationBuilder(userAnswers = None).build()
+//
+//      running(application) {
+//        val request =
+//          FakeRequest(POST, zReferenceNumberRoute)
+//            .withFormUrlEncodedBody(("value", "answer"))
+//
+//        val result = route(application, request).value
+//
+//        status(result) mustEqual SEE_OTHER
+//        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+//      }
+//    }
   }
 }

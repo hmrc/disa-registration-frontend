@@ -16,8 +16,9 @@
 
 package controllers.orgdetails
 
-import controllers.actions.Actions
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import forms.ZReferenceNumberFormProvider
+import models.Mode
 import pages.ZReferenceNumberPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -29,7 +30,8 @@ import scala.concurrent.Future
 
 class ZReferenceNumberController @Inject() (
   val controllerComponents: MessagesControllerComponents,
-  actions: Actions,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
   formProvider: ZReferenceNumberFormProvider,
   view: ZReferenceNumberView
 ) extends FrontendBaseController
@@ -37,20 +39,20 @@ class ZReferenceNumberController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = actions.getData().async { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     val preparedForm = request.userAnswers.fold(form)(_.get(ZReferenceNumberPage) match {
       case None        => form
       case Some(value) => form.fill(value)
     })
 
-    Future.successful(Ok(view(preparedForm)))
+    Future.successful(Ok(view(preparedForm, mode)))
   }
 
-  def onSubmit(): Action[AnyContent] = actions.identify().async { implicit request =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         value => Future.successful(NotFound)
       )
   }

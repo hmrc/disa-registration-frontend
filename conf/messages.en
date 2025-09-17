@@ -59,7 +59,11 @@ sectionTitle.orgDetails = Organisation details
 
 ### Organisation Details
 
-orgDetails.zReferenceNumber.title = What is your Z-reference number?
-orgDetails.zReferenceNumber.hint = This is usually a Z followed by 4 numbers - for example, Z1234
-orgDetails.zReferenceNumber.error.missing = You need to tell us what your Z reference number is
-orgDetails.zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers
+zReferenceNumber.title = What is your Z-reference number?
+zReferenceNumber.heading = What is your Z-reference number?
+zReferenceNumber.details.summary = Don’t know your Z-reference number?
+zReferenceNumber.details.content = If you’re already registered with HMRC as an ISA manager you can {0} if you have forgotten it or don’t know it.
+zReferenceNumber.details.content.link = check your Z-reference number
+zReferenceNumber.hint = This is usually a Z followed by 4 numbers - for example, Z1234
+zReferenceNumber.error.required = You need to tell us what your Z reference number is
+zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers

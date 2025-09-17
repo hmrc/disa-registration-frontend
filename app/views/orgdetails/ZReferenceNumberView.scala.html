@@ -14,35 +14,62 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import views.html.components.{InputText, Button, ErrorSummary}
-@import controllers.orgdetails.routes._
+@import viewmodels.InputWidth._
+@import controllers.orgdetails.routes.ZReferenceNumberController
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import config.FrontendAppConfig
 
 @this(
-  layout: templates.Layout,
-  formHelper: FormWithCSRF,
-  errorSummary: ErrorSummary,
-  inputText: InputText,
-  button: Button
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    govukLabel: GovukLabel,
+    govukDetails: GovukDetails,
+    govukButton: GovukButton,
+    hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+    config: FrontendAppConfig
 )
 
-@(form: Form[String])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(
-  pageTitle    = title(form, messages("orgDetails.zReferenceNumber.title"))
-) {
-  @formHelper(action = ZReferenceNumberController.onSubmit(), Symbol("autoComplete") -> "off") {
-    @errorSummary(form.errors)
+@link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
+  text = messages("zReferenceNumber.details.content.link"),
+  href = Some(config.listOfRegisteredIsaManagersUrl)
+)) }
 
-    @inputText(
-      field = form("value"),
-      inputClass = Some("govuk-input--width-5"),
-      hintKey = Some("orgDetails.zReferenceNumber.hint"),
-      captionKey = Some("sectionTitle.orgDetails"),
-      labelKey = Some("orgDetails.zReferenceNumber.title"),
-      labelIsPageHeading = true
-    )
+@layout(pageTitle = title(form, messages("zReferenceNumber.title"))) {
 
-    @button(attributes = Map("id" -> "submit"))
-  }
+    @formHelper(action = ZReferenceNumberController.onSubmit(mode)) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukLabel(HmrcPageHeadingLabel.apply(
+          content = Text(messages("zReferenceNumber.heading")),
+          caption = HmrcSectionCaption(messages("sectionTitle.orgDetails")),
+          attributes = Map("for" -> "value")
+        ))
+
+        @govukDetails(Details(
+          summary = Text(messages("zReferenceNumber.details.summary")),
+          content = HtmlContent(messages("zReferenceNumber.details.content", link))
+        ))
+
+        @govukInput(
+            InputViewModel(
+                field = form("value"),
+                label = Label()
+            )
+            .withWidth(Fixed5)
+            .withHint(Hint(content = Text(messages("zReferenceNumber.hint"))))
+
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.saveAndContinue"))
+        )
+    }
 }

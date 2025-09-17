@@ -17,6 +17,7 @@
 package views.orgdetails
 
 import forms.ZReferenceNumberFormProvider
+import models.NormalMode
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
@@ -28,16 +29,16 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
   private val form: Form[String] = new ZReferenceNumberFormProvider().apply()
   private val view               = app.injector.instanceOf[ZReferenceNumberView]
 
-  private def docEmpty: Document = Jsoup.parse(view(form).body)
+  private def docEmpty: Document = Jsoup.parse(view(form, NormalMode).body)
 
   private def docWith(value: String): Document = {
     val bound = form.bind(Map("value" -> value))
-    Jsoup.parse(view(bound).body)
+    Jsoup.parse(view(bound, NormalMode).body)
   }
 
   private def docInvalid(value: String): Document = {
     val invalid = form.bind(Map("value" -> value))
-    Jsoup.parse(view(invalid).body)
+    Jsoup.parse(view(invalid, NormalMode).body)
   }
 
   "ZReferenceNumberView" should {
@@ -49,7 +50,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
       caption must include("Organisation details")
 
       val h1 = doc.select("h1 > label").get(0).ownText
-      h1 mustBe messages("orgDetails.zReferenceNumber.title")
+      h1 mustBe messages("zReferenceNumber.title")
     }
 
     "render the form posting to Z ref page with a single text input named 'value'" in {
@@ -57,7 +58,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
 
       val formEl = doc.selectFirst("form")
       Option(formEl) mustBe defined
-      formEl.attr("action") mustBe controllers.orgdetails.routes.ZReferenceNumberController.onSubmit().url
+      formEl.attr("action") mustBe controllers.orgdetails.routes.ZReferenceNumberController.onSubmit(NormalMode).url
       formEl.attr("method").toLowerCase mustBe "post"
 
       val input = doc.selectFirst("input[name=value]")
@@ -68,7 +69,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
       val doc  = docEmpty
       val hint = doc.select(".govuk-hint").text()
 
-      hint must include(messages("orgDetails.zReferenceNumber.hint"))
+      hint must include(messages("zReferenceNumber.hint"))
     }
 
     "render a primary submit button" in {
@@ -94,7 +95,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
 
       Option(summary) mustBe defined
       summary.text() must include(messages("error.summary.title"))
-      summary.text() must include(messages("orgDetails.zReferenceNumber.error.missing"))
+      summary.text() must include(messages("zReferenceNumber.error.required"))
 
       val input = doc.selectFirst("input[name=value]")
 
@@ -113,7 +114,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
       val summary = doc.selectFirst(".govuk-error-summary").select("a")
 
       Option(summary) mustBe defined
-      summary.text() must include(messages("orgDetails.zReferenceNumber.error.invalid"))
+      summary.text() must include(messages("zReferenceNumber.error.invalid"))
     }
   }
 }

@@ -38,14 +38,14 @@ final class ZReferenceNumberFormProviderSpec extends FormSpec {
     }
 
     "fail when missing" in {
-      checkForError(form, Map(fieldKey -> ""), Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.missing")))
+      checkForError(form, Map(fieldKey -> ""), Seq(FormError(fieldKey, "zReferenceNumber.error.required")))
     }
 
     "fail for lowercase z" in {
       checkForError(
         form,
         Map(fieldKey -> "z1234"),
-        Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+        Seq(FormError(fieldKey, "zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
       )
     }
 
@@ -53,12 +53,12 @@ final class ZReferenceNumberFormProviderSpec extends FormSpec {
       checkForError(
         form,
         Map(fieldKey -> "Z12"),
-        Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+        Seq(FormError(fieldKey, "zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
       )
       checkForError(
         form,
         Map(fieldKey -> "Z12345"),
-        Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+        Seq(FormError(fieldKey, "zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
       )
     }
 
@@ -66,7 +66,7 @@ final class ZReferenceNumberFormProviderSpec extends FormSpec {
       checkForError(
         form,
         Map(fieldKey -> "A1234"),
-        Seq(FormError(fieldKey, "orgDetails.zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+        Seq(FormError(fieldKey, "zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
       )
     }
   }

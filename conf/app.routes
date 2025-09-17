@@ -22,5 +22,7 @@ GET         /unauthorised                                controllers.Unauthorise
 
 ### Organisation Details
 
-GET         /z-reference-number                          controllers.orgdetails.ZReferenceNumberController.onPageLoad()
-POST        /z-reference-number                          controllers.orgdetails.ZReferenceNumberController.onSubmit()
+GET        /z-reference-number                        controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /z-reference-number                        controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /change-z-reference-number                 controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-z-reference-number                 controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
