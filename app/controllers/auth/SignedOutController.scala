@@ -21,14 +21,26 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.auth.SignedOutView
+import views.html.{SignOutAnswersNotSavedView, SignOutAnswersSavedView}
 
 class SignedOutController @Inject() (
   val controllerComponents: MessagesControllerComponents,
-  view: SignedOutView
+  view: SignedOutView,
+  signOutAnswersNotSavedView: SignOutAnswersNotSavedView,
+  signOutAnswersSavedView: SignOutAnswersSavedView
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = Action { implicit request =>
     Ok(view())
   }
+
+  def signOutAnswersSaved(): Action[AnyContent] = Action { implicit request =>
+    Ok(signOutAnswersSavedView())
+  }
+
+  def signOutAnswersNotSaved(): Action[AnyContent] = Action { implicit request =>
+    Ok(signOutAnswersNotSavedView())
+  }
+
 }
