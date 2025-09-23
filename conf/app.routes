@@ -16,7 +16,6 @@ GET         /check-your-answers                                 controllers.Chec
 
 GET         /account/sign-out-survey                            controllers.auth.AuthController.signOut()
 GET         /account/sign-out                                   controllers.auth.AuthController.signOutNoSurvey()
-GET         /account/auto-sign-out-user-answers-saved           controllers.auth.SignedOutController.onPageLoad()
-GET         /account/auto-sign-out-user-answers-not-saved     controllers.auth.SignedOutController.onPageLoadUserAnswersNotSaved()
+GET         /account/auto-sign-out                              controllers.auth.SignedOutController.onPageLoad()
 
 GET         /unauthorised                                       controllers.UnauthorisedController.onPageLoad()

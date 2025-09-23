@@ -24,16 +24,11 @@ import views.html.auth._
 
 class SignedOutController @Inject() (
   val controllerComponents: MessagesControllerComponents,
-  view: SignedOutView,
-  userAnswersNotSavedView: SignedOutUserAnswersNotSavedView
+  view: SignedOutView
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = Action { implicit request =>
     Ok(view())
-  }
-
-  def onPageLoadUserAnswersNotSaved(): Action[AnyContent] = Action { implicit request =>
-    Ok(userAnswersNotSavedView())
   }
 }

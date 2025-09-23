@@ -19,7 +19,7 @@ package controllers.auth
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.auth.{SignedOutUserAnswersNotSavedView, SignedOutView}
+import views.html.auth.SignedOutView
 
 class SignedOutControllerSpec extends SpecBase {
 
@@ -35,22 +35,6 @@ class SignedOutControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[SignedOutView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
-      }
-    }
-
-    "must return OK and the correct view for a GET for onPageLoadUserAnswersNotSaved " in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.SignedOutController.onPageLoadUserAnswersNotSaved().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[SignedOutUserAnswersNotSavedView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
