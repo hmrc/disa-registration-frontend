@@ -23,7 +23,7 @@ class ZReferenceNumberFormProvider extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("zReferenceNumber.error.required")
-        .transform(_.trim, identity)
+        .transform(_.trim.toUpperCase, identity)
         .verifying(regexp("^Z[0-9]{4}$", "zReferenceNumber.error.invalid"))
     )
 }

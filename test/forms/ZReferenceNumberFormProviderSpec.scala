@@ -37,16 +37,14 @@ final class ZReferenceNumberFormProviderSpec extends FormSpec {
       result.value.get mustBe "Z1234"
     }
 
-    "fail when missing" in {
-      checkForError(form, Map(fieldKey -> ""), Seq(FormError(fieldKey, "zReferenceNumber.error.required")))
+    "pass for lowercase z" in {
+      val result = form.bind(Map(fieldKey -> "z1234"))
+      result.errors mustBe Nil
+      result.value.get mustBe "Z1234"
     }
 
-    "fail for lowercase z" in {
-      checkForError(
-        form,
-        Map(fieldKey -> "z1234"),
-        Seq(FormError(fieldKey, "zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
-      )
+    "fail when missing" in {
+      checkForError(form, Map(fieldKey -> ""), Seq(FormError(fieldKey, "zReferenceNumber.error.required")))
     }
 
     "fail for wrong length" in {
