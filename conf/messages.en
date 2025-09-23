@@ -62,4 +62,4 @@ sectionTitle.orgDetails = Organisation details
 
 registeredIsaManager.title = Is your organisation registered to manage ISAs with HMRC?
 registeredIsaManager.heading = Is your organisation registered to manage ISAs with HMRC?
-registeredIsaManager.error.required = You need to tell us if you are registered as an ISA manager with HMRC
+registeredIsaManager.error.required = You must select either yes or no.  For example select yes, if you are registered as an ISA manager with HMRC
