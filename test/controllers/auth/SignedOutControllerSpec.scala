@@ -20,8 +20,7 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.auth.SignedOutView
-import views.html.SignOutAnswersSavedView
-import views.html.SignOutAnswersNotSavedView
+import views.html.SignOutView
 
 class SignedOutControllerSpec extends SpecBase {
 
@@ -42,31 +41,16 @@ class SignedOutControllerSpec extends SpecBase {
         contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
-    "must return OK and the correct view for a GET for signOutAnswersSaved" in {
+    "must return OK and the correct view for a GET for signOut" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.SignedOutController.signOutAnswersSaved().url)
+        val request = FakeRequest(GET, routes.SignedOutController.signOut().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SignOutAnswersSavedView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
-      }
-    }
-    "must return OK and the correct view for a GET for signOutAnswersNotSaved" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.SignedOutController.signOutAnswersNotSaved().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[SignOutAnswersNotSavedView]
+        val view = application.injector.instanceOf[SignOutView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString

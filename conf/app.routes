@@ -15,10 +15,9 @@ GET         /there-is-a-problem                          controllers.JourneyReco
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
-GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
+GET         /account/sign-out-no-survey                   controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
-GET         /account/sign-out-answers-saved              controllers.auth.SignedOutController.signOutAnswersSaved()
-GET         /account/sign-out-answers-not-saved          controllers.auth.SignedOutController.signOutAnswersNotSaved()
+GET         /account/sign-out                            controllers.auth.SignedOutController.signOut()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
