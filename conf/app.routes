@@ -19,3 +19,11 @@ GET         /account/sign-out                            controllers.auth.AuthCo
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
+
+### Organisation Details
+
+GET        /registered-isa-manager                        controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
+POST       /registered-isa-manager                        controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode)
+
+GET        /change-registered-isa-manager                 controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-registered-isa-manager                 controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = CheckMode)
