@@ -21,9 +21,12 @@ GET         /account/signed-out                          controllers.auth.Signed
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
 ### Organisation Details
+GET        /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
+POST       /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode)
+GET        /change-registered-isa-manager                controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-registered-isa-manager                controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registered-isa-manager                        controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
-POST       /registered-isa-manager                        controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode)
-
-GET        /change-registered-isa-manager                 controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-registered-isa-manager                 controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = CheckMode)
+GET        /z-reference-number                           controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /z-reference-number                           controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)

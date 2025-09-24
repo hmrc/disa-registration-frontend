@@ -28,11 +28,13 @@ class Navigator @Inject() () {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case RegisteredIsaManagerPage => _ => ???
+    case ZReferenceNumberPage     => _ => ???
     case _                        => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case RegisteredIsaManagerPage => _ => ???
+    case ZReferenceNumberPage     => _ => ???
     case _                        => _ => routes.CheckYourAnswersController.onPageLoad()
   }
 
