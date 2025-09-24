@@ -55,9 +55,14 @@ pageNotFound.paragraph1 = If you typed the web address, check it is correct.
 pageNotFound.paragraph2 = If you pasted the web address, check you copied the entire address.
 
 ## Section Titles
+
 sectionTitle.orgDetails = Organisation details
 
 ### Organisation Details
+
+registeredIsaManager.title = Is your organisation registered to manage ISAs with HMRC?
+registeredIsaManager.heading = Is your organisation registered to manage ISAs with HMRC?
+registeredIsaManager.error.required = You must select either yes or no.  For example select yes, if you are registered as an ISA manager with HMRC
 
 zReferenceNumber.title = What is your organisation’s Z-reference number?
 zReferenceNumber.heading = What is your organisation’s Z-reference number?

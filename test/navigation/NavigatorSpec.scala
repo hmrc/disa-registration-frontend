@@ -45,10 +45,5 @@ class NavigatorSpec extends SpecBase {
           .onPageLoad()
       }
     }
-    // TODO uncomment when next page is in place
-//    "must navigate from ZReferenceNumber page correctly" in {
-//      navigator.nextPage(ZReferenceNumberPage, NormalMode, UserAnswers("id")) mustBe ???
-//      navigator.nextPage(ZReferenceNumberPage, CheckMode, UserAnswers("id")) mustBe ???
-//    }
   }
 }
