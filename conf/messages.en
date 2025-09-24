@@ -81,5 +81,5 @@ page.signOut.feedback.link.text = Send us your feedback.
 page.signOut.paragraph2 = Your thoughts and ideas will help us to make improvements.
 page.signOut.govuk.text = Back to GOV.UK
 govuk.link = https://www.gov.uk/
-page.signOut.savedAnswers.title = We have saved your answers and signed you out
-page.signOut.savedAnswers.heading = We have saved your answers and signed you out
+page.signOut.title = We have saved your answers and signed you out
+page.signOut.heading = We have saved your answers and signed you out

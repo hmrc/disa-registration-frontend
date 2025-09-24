@@ -21,13 +21,13 @@ layout: templates.Layout
 @()(implicit request: RequestHeader, messages: Messages)
 
 @layout(
-    pageTitle = messages("page.signOut.savedAnswers.title"),
+    pageTitle = messages("page.signOut.title"),
     showBackLink = false,
     timeout      = false,
     showSignOut  = false
 ) {
 
-    <h1 class="govuk-heading-xl">@messages("page.signOut.savedAnswers.title")</h1>
+    <h1 class="govuk-heading-xl">@messages("page.signOut.heading")</h1>
 
     <p class="govuk-body">@messages("page.signOut.paragraph1")</p>
     <p class="govuk-body">
