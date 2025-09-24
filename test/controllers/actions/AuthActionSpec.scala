@@ -22,12 +22,14 @@ import config.FrontendAppConfig
 import controllers.routes
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.net.URLEncoder.encode
+import java.nio.charset.StandardCharsets
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,6 +38,8 @@ class AuthActionSpec extends SpecBase {
   class Harness(authAction: IdentifierAction) {
     def onPageLoad(): Action[AnyContent] = authAction(_ => Results.Ok)
   }
+
+  val config = injector.instanceOf[FrontendAppConfig]
 
   "Auth Action" - {
 
@@ -178,7 +182,9 @@ class AuthActionSpec extends SpecBase {
           val result     = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+          redirectLocation(result) mustBe Some(
+            s"${config.loginUrl}?continue=${encode(config.loginContinueUrl, StandardCharsets.UTF_8)}"
+          )
         }
       }
     }

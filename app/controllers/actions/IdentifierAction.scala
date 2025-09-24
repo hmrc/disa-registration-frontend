@@ -52,11 +52,9 @@ class AuthenticatedIdentifierAction @Inject() (
         block(IdentifierRequest(request, internalId))
       }.getOrElse(throw new UnauthorizedException("Unable to retrieve internal Id"))
     } recover {
-      case _: UnsupportedAffinityGroup =>
+      case _: UnsupportedAffinityGroup | _: NoActiveSession =>
         Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
-      case _: NoActiveSession        =>
-        Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
-      case _: AuthorisationException =>
+      case _: AuthorisationException                        =>
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
