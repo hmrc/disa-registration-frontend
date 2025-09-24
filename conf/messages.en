@@ -59,8 +59,8 @@ sectionTitle.orgDetails = Organisation details
 
 ### Organisation Details
 
-zReferenceNumber.title = What is your Z-reference number?
-zReferenceNumber.heading = What is your Z-reference number?
+zReferenceNumber.title = What is your organisation’s Z-reference number?
+zReferenceNumber.heading = What is your organisation’s Z-reference number?
 zReferenceNumber.details.summary = Don’t know your Z-reference number?
 zReferenceNumber.details.content = If you’re already registered with HMRC as an ISA manager you can {0} if you have forgotten it or don’t know it.
 zReferenceNumber.details.content.link = check your Z-reference number
