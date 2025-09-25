@@ -83,3 +83,5 @@ page.signOut.govuk.text = Back to GOV.UK
 govuk.link = https://www.gov.uk/
 page.signOut.title = We have saved your answers and signed you out
 page.signOut.heading = We have saved your answers and signed you out
+page.signOut.answers.not.saved.title = We have signed you out
+page.signOut.answers.not.saved.heading = We have signed you out
