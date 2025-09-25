@@ -73,9 +73,6 @@ zReferenceNumber.hint = This is usually a Z followed by 4 numbers, for example Z
 zReferenceNumber.error.required = You need to tell us what your organisation’s Z reference number is
 zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers
 
-
-page.signOut.title = We have signed you out
-page.signOut.heading = We have signed you out
 page.signOut.paragraph1 = This is a new service and we want to know what you think of it.
 page.signOut.feedback.link.text = Send us your feedback.
 page.signOut.paragraph2 = Your thoughts and ideas will help us to make improvements.
