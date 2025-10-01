@@ -23,7 +23,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{SignOutAnswersNotSavedView, SignOutView}
 import views.html.auth._
 
-
 class SignedOutController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: SignedOutView,
