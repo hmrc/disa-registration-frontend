@@ -19,8 +19,7 @@ package controllers.auth
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.auth.SignedOutView
-import views.html.{SignOutAnswersNotSavedView, SignOutView}
+import views.html.auth._
 
 class SignedOutControllerSpec extends SpecBase {
 
