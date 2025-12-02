@@ -24,7 +24,7 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("addLiaisonOfficer.title"))) {
+@layout(pageTitle = titleNoForm(messages("addLiaisonOfficer.title"), Some(messages("sectionTitle.liaisonOfficers")))) {
 
   <div>
     <h1 class="govuk-heading-xl">
