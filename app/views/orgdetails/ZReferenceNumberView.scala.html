@@ -39,7 +39,7 @@
   href = Some(config.listOfRegisteredIsaManagersUrl)
 )) }
 
-@layout(pageTitle = title(form, messages("zReferenceNumber.title"))) {
+@layout(pageTitle = title(form, messages("zReferenceNumber.title"), Some(messages("sectionTitle.orgDetails")))) {
 
     @formHelper(action = ZReferenceNumberController.onSubmit(mode)) {
 

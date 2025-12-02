@@ -22,7 +22,7 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("addASignatory.title"))) {
+@layout(pageTitle = titleNoForm(messages("addASignatory.title"), Some(messages("sectionTitle.signatories")))) {
 
   <div>
     <h1 class="govuk-heading-xl">
