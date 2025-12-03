@@ -21,3 +21,8 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {}
+
+implicit lazy val arbitraryIsaProducts: Arbitrary[IsaProducts] =
+  Arbitrary {
+    Gen.oneOf(IsaProducts.values)
+  }

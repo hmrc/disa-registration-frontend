@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package pages
+package models.journeyData
 
-import queries.{Gettable, Settable}
+import play.api.libs.json.{Json, OFormat}
 
-trait QuestionPage[A] extends Page with Gettable[A] with Settable[A]
+case class CorrespondenceAddress(useThisAddress: Boolean, address: Option[String])
+
+object CorrespondenceAddress {
+  implicit val format: OFormat[CorrespondenceAddress] = Json.format[CorrespondenceAddress]
+}

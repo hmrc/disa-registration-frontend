@@ -26,22 +26,22 @@ import models._
 @Singleton
 class Navigator @Inject() () {
 
-  private val normalRoutes: Page => UserAnswers => Call = {
-    case RegisteredIsaManagerPage => _ => ???
-    case ZReferenceNumberPage     => _ => ???
-    case _                        => _ => routes.IndexController.onPageLoad()
+  private val normalRoutes: Page => Call = {
+    case RegisteredIsaManagerPage => ???
+    case ZReferenceNumberPage     => ???
+    case _                        => routes.IndexController.onPageLoad()
   }
 
-  private val checkRouteMap: Page => UserAnswers => Call = {
-    case RegisteredIsaManagerPage => _ => ???
-    case ZReferenceNumberPage     => _ => ???
-    case _                        => _ => routes.CheckYourAnswersController.onPageLoad()
+  private val checkRouteMap: Page => Call = {
+    case RegisteredIsaManagerPage => ???
+    case ZReferenceNumberPage     => ???
+    case _                        => routes.CheckYourAnswersController.onPageLoad()
   }
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
+  def nextPage(page: Page, mode: Mode): Call = mode match {
     case NormalMode =>
-      normalRoutes(page)(userAnswers)
+      normalRoutes(page)
     case CheckMode  =>
-      checkRouteMap(page)(userAnswers)
+      checkRouteMap(page)
   }
 }

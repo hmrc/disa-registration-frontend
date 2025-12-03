@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package queries
+package models.journeyData
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-import scala.util.{Success, Try}
+case class IsaProducts(dataItem: Option[String], dataItem2: Option[String])
 
-sealed trait Query {
-
-  def path: JsPath
-}
-
-trait Gettable[A] extends Query
-
-trait Settable[A] extends Query {
-
-  def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
-    Success(userAnswers)
+object IsaProducts {
+  implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]
 }

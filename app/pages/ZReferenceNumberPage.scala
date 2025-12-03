@@ -19,8 +19,7 @@ package pages
 import pages.PageConstants.organisationDetailsSection
 import play.api.libs.json.JsPath
 
-case object ZReferenceNumberPage extends QuestionPage[String] {
-  override def path: JsPath = organisationDetailsSection \ toString
+case object ZReferenceNumberPage extends Page {
 
   override def toString: String = "zReferenceNumber"
 }

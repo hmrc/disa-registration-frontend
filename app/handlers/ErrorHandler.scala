@@ -17,7 +17,7 @@
 package handlers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.RequestHeader
+import play.api.mvc.{Request, RequestHeader}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.{ErrorTemplate, NotFoundView}
@@ -36,10 +36,13 @@ class ErrorHandler @Inject() (
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit
     rh: RequestHeader
-  ): Future[Html] =
+  ): Future[Html] = {
+    implicit val request: Request[_] = Request(rh, "")
     Future.successful(view(pageTitle, heading, message))
+  }
 
-  override def notFoundTemplate(implicit requestHeader: RequestHeader): Future[Html] =
+  override def notFoundTemplate(implicit requestHeader: RequestHeader): Future[Html] = {
+    implicit val request: Request[_] = Request(requestHeader, "")
     Future.successful(notFoundView())
-
+  }
 }

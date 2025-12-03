@@ -54,6 +54,16 @@ pageNotFound.heading = Page not found
 pageNotFound.paragraph1 = If you typed the web address, check it is correct.
 pageNotFound.paragraph2 = If you pasted the web address, check you copied the entire address.
 
+page.signOut.paragraph1 = This is a new service and we want to know what you think of it.
+page.signOut.feedback.link.text = Send us your feedback
+page.signOut.paragraph2 = Your thoughts and ideas will help us to make improvements.
+page.signOut.govuk.text = Back to GOV.UK
+govuk.link = https://www.gov.uk/
+page.signOut.title = We have saved your answers and signed you out
+page.signOut.heading = We have saved your answers and signed you out
+page.signOut.answers.not.saved.title = We have signed you out
+page.signOut.answers.not.saved.heading = We have signed you out
+
 ## Section Titles
 
 sectionTitle.orgDetails = Organisation details
@@ -74,15 +84,14 @@ zReferenceNumber.hint = This is usually a Z followed by 4 numbers, for example Z
 zReferenceNumber.error.required = You need to tell us what your organisation’s Z reference number is
 zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers
 
-page.signOut.paragraph1 = This is a new service and we want to know what you think of it.
-page.signOut.feedback.link.text = Send us your feedback
-page.signOut.paragraph2 = Your thoughts and ideas will help us to make improvements.
-page.signOut.govuk.text = Back to GOV.UK
-govuk.link = https://www.gov.uk/
-page.signOut.title = We have saved your answers and signed you out
-page.signOut.heading = We have saved your answers and signed you out
-page.signOut.answers.not.saved.title = We have signed you out
-page.signOut.answers.not.saved.heading = We have signed you out
+### ISA Products
+isaProducts.title = Which ISA products does your organisation offer?
+isaProducts.heading = Which ISA products does your organisation offer?
+isaProducts.cash ISAs = Cash ISAs
+isaProducts.cashJuniorIsas = Cash Junior ISAs
+isaProducts.checkYourAnswersLabel = Which ISA products does your organisation offer?
+isaProducts.error.required = Select isaProducts
+isaProducts.change.hidden = IsaProducts
 
 addLiaisonOfficer.title = Add liaison officer
 addLiaisonOfficer.heading = Add liaison officer
