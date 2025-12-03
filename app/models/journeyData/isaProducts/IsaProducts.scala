@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeyData.isaProducts
 
+import models.journeyData.TaskListSection
 import play.api.libs.json.{Json, OFormat}
 
-case class IsaProducts(dataItem: Option[String], dataItem2: Option[String])
+case class IsaProducts(isaProducts: Option[Seq[IsaProduct]], dataItem2: Option[String]) extends TaskListSection {
+  override def sectionName: String = "isaProducts"
+}
 
 object IsaProducts {
   implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]

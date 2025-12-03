@@ -87,10 +87,13 @@ zReferenceNumber.error.invalid = Enter the Z-reference number in the correct for
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
 isaProducts.heading = Which ISA products does your organisation offer?
-isaProducts.cash ISAs = Cash ISAs
+isaProducts.cashIsas = Cash ISAs
 isaProducts.cashJuniorIsas = Cash Junior ISAs
+isaProducts.stocksAndSharesIsas = Stocks and Shares ISAs
+isaProducts.stocksAndSharesJuniorIsas = Stocks and Shares Junior ISAs
+isaProducts.innovativeFinanceIsas = Innovative Finance ISAs
 isaProducts.checkYourAnswersLabel = Which ISA products does your organisation offer?
-isaProducts.error.required = Select isaProducts
+isaProducts.error.required = Select the ISA products your organisation offers
 isaProducts.change.hidden = IsaProducts
 
 addLiaisonOfficer.title = Add liaison officer

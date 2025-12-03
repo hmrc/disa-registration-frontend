@@ -22,7 +22,7 @@ import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {}
 
-implicit lazy val arbitraryIsaProducts: Arbitrary[IsaProducts] =
+implicit lazy val arbitraryIsaProducts: Arbitrary[IsaProduct] =
   Arbitrary {
-    Gen.oneOf(IsaProducts.values)
+    Gen.oneOf(IsaProduct.values)
   }

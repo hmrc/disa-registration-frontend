@@ -18,7 +18,9 @@ package models.journeyData
 
 import play.api.libs.json.{Json, OFormat}
 
-case class LiaisonOfficers(dataItem: Option[String], dataItem2: Option[String])
+case class LiaisonOfficers(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
+  override def sectionName: String = "liaisonOfficers"
+}
 
 object LiaisonOfficers {
   implicit val format: OFormat[LiaisonOfficers] = Json.format[LiaisonOfficers]

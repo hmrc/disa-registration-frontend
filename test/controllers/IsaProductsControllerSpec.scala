@@ -2,7 +2,7 @@ package controllers
 
 import base.SpecBase
 import forms.IsaProductsFormProvider
-import models.{IsaProducts, NormalMode, UserAnswers}
+import models.{IsaProduct, NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -26,7 +26,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new IsaProductsFormProvider()
   val form         = formProvider()
 
-  "IsaProducts Controller" - {
+  "IsaProduct Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -47,7 +47,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(IsaProductsPage, IsaProducts.values.toSet).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(IsaProductsPage, IsaProduct.values.toSet).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -59,7 +59,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IsaProducts.values.toSet), NormalMode)(
+        contentAsString(result) mustEqual view(form.fill(IsaProduct.values.toSet), NormalMode)(
           request,
           messages(application)
         ).toString
@@ -83,7 +83,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value[0]", IsaProducts.values.head.toString))
+            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
 
         val result = route(application, request).value
 
@@ -133,7 +133,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value[0]", IsaProducts.values.head.toString))
+            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
 
         val result = route(application, request).value
 

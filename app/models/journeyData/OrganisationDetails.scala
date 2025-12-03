@@ -24,7 +24,9 @@ case class OrganisationDetails(
   fcaNumber: Option[String] = None,
   correspondenceAddress: Option[CorrespondenceAddress] = None,
   orgTelephoneNumber: Option[String] = None
-)
+) extends TaskListSection {
+  override def sectionName: String = "organisationDetails"
+}
 
 object OrganisationDetails {
   implicit val format: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]

@@ -16,12 +16,8 @@
 
 package models.journeyData
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsObject, JsResult, JsValue, OFormat}
 
-case class FeesCommissionsAndIncentives(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "feesCommissionsAndIncentives"
-}
-
-object FeesCommissionsAndIncentives {
-  implicit val format: OFormat[FeesCommissionsAndIncentives] = Json.format[FeesCommissionsAndIncentives]
+trait TaskListSection {
+  def sectionName: String
 }

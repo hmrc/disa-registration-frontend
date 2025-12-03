@@ -18,7 +18,9 @@ package models.journeyData
 
 import play.api.libs.json.{Json, OFormat}
 
-case class BusinessVerification(dataItem: Option[String], dataItem2: Option[String])
+case class BusinessVerification(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
+  override def sectionName: String = "businessVerification"
+}
 
 object BusinessVerification {
   implicit val format: OFormat[BusinessVerification] = Json.format[BusinessVerification]

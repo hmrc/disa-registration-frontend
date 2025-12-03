@@ -16,6 +16,7 @@
 
 package models.journeyData
 
+import models.journeyData.isaProducts.IsaProducts
 import play.api.libs.json.{Format, Json, Reads, Writes}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 

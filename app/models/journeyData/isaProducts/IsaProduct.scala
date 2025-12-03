@@ -14,23 +14,30 @@
  * limitations under the License.
  */
 
-package models
+package models.journeyData.isaProducts
 
+import models.{Enumerable, WithName}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import viewmodels.govuk.checkbox._
+import viewmodels.govuk.checkbox.*
 
-sealed trait IsaProducts
+sealed trait IsaProduct
 
-object IsaProducts extends Enumerable.Implicits {
+object IsaProduct extends Enumerable.Implicits {
 
-  case object CashIsas extends WithName("cashIsas") with IsaProducts
-  case object CashJuniorIsas extends WithName("cashJuniorIsas") with IsaProducts
+  case object CashIsas extends WithName("cashIsas") with IsaProduct
+  case object CashJuniorIsas extends WithName("cashJuniorIsas") with IsaProduct
+  case object StocksAndSharesIsas extends WithName("stocksAndSharesIsas") with IsaProduct
+  case object StocksAndShareJuniorIsas extends WithName("stocksAndSharesJuniorIsas") with IsaProduct
+  case object InnovativeFinanceIsas extends WithName("innovativeFinanceIsas") with IsaProduct
 
-  val values: Seq[IsaProducts] = Seq(
+  val values: Seq[IsaProduct] = Seq(
     CashIsas,
-    CashJuniorIsas
+    CashJuniorIsas,
+    StocksAndSharesIsas,
+    StocksAndShareJuniorIsas,
+    InnovativeFinanceIsas
   )
 
   def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
@@ -43,6 +50,6 @@ object IsaProducts extends Enumerable.Implicits {
       )
     }
 
-  implicit val enumerable: Enumerable[IsaProducts] =
+  implicit val enumerable: Enumerable[IsaProduct] =
     Enumerable(values.map(v => v.toString -> v): _*)
 }

@@ -17,25 +17,28 @@
 package services
 
 import connectors.DisaRegistrationConnector
-import models.journeyData.JourneyData
+import models.journeyData.{JourneyData, TaskListSection}
+import play.api.Logging
+import play.api.libs.json.{OFormat, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector)(implicit ec: ExecutionContext) {
+class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def get(groupId: String)(implicit hc: HeaderCarrier): Future[Option[JourneyData]] =
     connector.getJourneyData(groupId).value.map {
-      case Left(upstreamError) => ???
-      case Right(response)     => response.json.validate[JourneyData].fold(_ => throw new Exception(), jd => Some(jd))
+      case Left(upstreamError) => None
+      case Right(response)     => response.json.validate[JourneyData].fold(_ => None, jd => Some(jd))
     }
 
-  def update[A](journeyData: JourneyData, groupId: String, taskListJourney: String)(implicit
+  def update[A <: TaskListSection: Writes](taskListSection: A, groupId: String)(implicit
     hc: HeaderCarrier
   ): Future[Unit] =
-    connector.updateJourneyData(journeyData, groupId, taskListJourney).value.map {
-      case Left(upstreamError) => ???
+    connector.updateTaskListJourney(taskListSection, groupId, taskListSection.sectionName).value.map {
+      case Left(upstreamError) => Future.failed(throw new Exception())
       case Right(response)     => ()
     }
 }

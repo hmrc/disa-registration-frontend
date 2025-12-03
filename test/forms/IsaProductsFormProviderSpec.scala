@@ -1,7 +1,7 @@
 package forms
 
 import forms.behaviours.CheckboxFieldBehaviours
-import models.IsaProducts
+import models.IsaProduct
 import play.api.data.FormError
 
 class IsaProductsFormProviderSpec extends CheckboxFieldBehaviours {
@@ -13,10 +13,10 @@ class IsaProductsFormProviderSpec extends CheckboxFieldBehaviours {
     val fieldName   = "value"
     val requiredKey = "isaProducts.error.required"
 
-    behave like checkboxField[IsaProducts](
+    behave like checkboxField[IsaProduct](
       form,
       fieldName,
-      validValues = IsaProducts.values,
+      validValues = IsaProduct.values,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

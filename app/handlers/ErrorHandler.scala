@@ -17,7 +17,8 @@
 package handlers
 
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Request, RequestHeader}
+import play.api.mvc.Results.BadRequest
+import play.api.mvc.{Request, RequestHeader, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.{ErrorTemplate, NotFoundView}
@@ -45,4 +46,7 @@ class ErrorHandler @Inject() (
     implicit val request: Request[_] = Request(requestHeader, "")
     Future.successful(notFoundView())
   }
+
+  def badRequestError(implicit request: RequestHeader): Future[Result] =
+    badRequestTemplate.map(BadRequest(_))
 }

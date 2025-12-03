@@ -18,11 +18,12 @@ package connectors
 
 import cats.data.EitherT
 import config.FrontendAppConfig
-import models.journeyData.JourneyData
-import models.journeyData.JourneyData.TaskListJourney
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import models.journeyData.TaskListSection
+import play.api.libs.json.{Json, OFormat, Writes}
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,7 +35,7 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
   def getJourneyData(
     groupId: String
   )(implicit hc: HeaderCarrier): EitherT[Future, UpstreamErrorResponse, HttpResponse] = {
-    val url = s"${appConfig.disaRegistrationBaseUrl}/store/$groupId"
+    val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/store/$groupId"
     read(
       http
         .get(url"$url")
@@ -42,15 +43,20 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
       context = "DisaRegistrationConnector: getJourneyData"
     )
   }
-  def updateJourneyData[A](journeyData: JourneyData, groupId: String, taskListJourney: String)(implicit
+  def updateTaskListJourney[A <: TaskListSection: Writes](
+    data: A,
+    groupId: String,
+    taskListJourney: String
+  )(implicit
     hc: HeaderCarrier
   ): EitherT[Future, UpstreamErrorResponse, HttpResponse] = {
-    val url = s"${appConfig.disaRegistrationBaseUrl}/store/$groupId/$taskListJourney"
+    val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/store/$groupId/$taskListJourney"
     read(
       http
         .post(url"$url")
+        .withBody(Json.toJson(data))
         .execute[Either[UpstreamErrorResponse, HttpResponse]],
-      context = "DisaRegistrationConnector: updateJourneyData"
+      context = "DisaRegistrationConnector: updateTaskListJourney"
     )
   }
 }

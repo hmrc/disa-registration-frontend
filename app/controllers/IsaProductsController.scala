@@ -16,17 +16,20 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.IsaProductsFormProvider
-import javax.inject.Inject
+import handlers.ErrorHandler
 import models.Mode
+import models.journeyData.isaProducts.IsaProduct
 import navigation.Navigator
 import pages.IsaProductsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.IsaProductsView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IsaProductsController @Inject() (
@@ -36,6 +39,8 @@ class IsaProductsController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: IsaProductsFormProvider,
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler,
   val controllerComponents: MessagesControllerComponents,
   view: IsaProductsView
 )(implicit ec: ExecutionContext)
@@ -45,22 +50,32 @@ class IsaProductsController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val preparedForm = request.journeyData.isaProducts.fold(form)(_.dataItem2 match {
-      case None        => form
-      case Some(value) => form.fill(???)
+    val preparedForm = request.journeyData.isaProducts.fold(form)(_.isaProducts match {
+      case None              => form
+      case Some(isaProducts) => form.fill(isaProducts.toSet)
     })
 
     Ok(view(preparedForm, mode))
   }
 
-  // TODO implement answer setting
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value => Future.successful(NotFound)
+          answer => {
+            val data           = request.journeyData
+            val updatedSection = data.isaProducts.map(_.copy(isaProducts = Some(answer.toSeq)))
+
+            updatedSection.fold {
+              errorHandler.badRequestError
+            } { section =>
+              journeyAnswersService.update(section, request.groupId).map { _ =>
+                Redirect(navigator.nextPage(IsaProductsPage, mode))
+              }
+            }
+          }
         )
   }
 }

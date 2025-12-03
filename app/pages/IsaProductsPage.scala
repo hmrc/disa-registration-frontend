@@ -16,10 +16,8 @@
 
 package pages
 
-import models.IsaProducts
-import play.api.libs.json.JsPath
-
 case object IsaProductsPage extends Page {
 
   override def toString: String = "isaProducts"
+
 }

@@ -17,17 +17,16 @@
 package forms
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
+import models.journeyData.isaProducts.IsaProduct
 import play.api.data.Form
 import play.api.data.Forms.set
-import models.IsaProducts
 
 class IsaProductsFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Set[IsaProducts]] =
+  def apply(): Form[Set[IsaProduct]] =
     Form(
-      "value" -> set(enumerable[IsaProducts]("isaProducts.error.required"))
+      "value" -> set(enumerable[IsaProduct]("isaProducts.error.required"))
         .verifying(nonEmptySet("isaProducts.error.required"))
     )
 }
