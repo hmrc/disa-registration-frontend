@@ -1,3 +1,3 @@
 # Add all the application routes to the app.routes file
-->         /disa-registration-frontend                    app.Routes
+->         /obligations/enrolment/isa                    app.Routes
 ->         /                          health.Routes
