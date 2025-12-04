@@ -16,9 +16,6 @@
 
 package pages
 
-import pages.PageConstants.organisationDetailsSection
-import play.api.libs.json.JsPath
-
 case object ZReferenceNumberPage extends Page {
 
   override def toString: String = "zReferenceNumber"

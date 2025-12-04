@@ -17,19 +17,20 @@
 package controllers.orgdetails
 
 import base.SpecBase
-import controllers.{orgdetails, routes}
+import controllers.orgdetails
 import forms.RegisteredIsaManagerFormProvider
-import models.{NormalMode, UserAnswers}
+import models.NormalMode
+import models.journeyData.isaProducts.IsaProducts
+import models.journeyData.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.RegisteredIsaManagerPage
 import play.api.inject.bind
+import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.SessionRepository
 import views.html.orgdetails.RegisteredIsaManagerView
 
 import scala.concurrent.Future
@@ -47,7 +48,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, registeredIsaManagerRoute)
@@ -63,9 +64,12 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(RegisteredIsaManagerPage, true).success.value
+      val journeyData = JourneyData(
+        groupId = groupId,
+        organisationDetails = Some(OrganisationDetails(registeredToManageIsa = Some(true)))
+      )
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, registeredIsaManagerRoute)
@@ -81,15 +85,14 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
-
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(
+        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(journeyData = Some(emptyJourneyData))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
           .build()
 
@@ -107,7 +110,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val request =
@@ -127,7 +130,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 // TODO add back in when user answer setting is in place
 //    "must redirect to Journey Recovery for a GET if no existing data is found" in {
 //
-//      val application = applicationBuilder(userAnswers = None).build()
+//      val application = applicationBuilder(journeyData = None).build()
 //
 //      running(application) {
 //        val request = FakeRequest(GET, registeredIsaManagerRoute)
@@ -141,7 +144,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 //
 //    "must redirect to Journey Recovery for a POST if no existing data is found" in {
 //
-//      val application = applicationBuilder(userAnswers = None).build()
+//      val application = applicationBuilder(journeyData = None).build()
 //
 //      running(application) {
 //        val request =

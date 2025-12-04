@@ -16,9 +16,6 @@
 
 package pages
 
-import pages.PageConstants.organisationDetailsSection
-import play.api.libs.json.JsPath
-
 object RegisteredIsaManagerPage extends Page {
 
   override def toString: String = "registeredIsaManager"

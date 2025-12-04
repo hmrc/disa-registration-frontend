@@ -17,17 +17,19 @@
 package base
 
 import controllers.actions.*
-import models.UserAnswers
+import models.journeyData.JourneyData
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{OptionValues, TryValues}
+import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.{Injector, bind}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
+import services.JourneyAnswersService
 
 trait SpecBase
     extends AnyFreeSpec
@@ -38,18 +40,21 @@ trait SpecBase
     with IntegrationPatience
     with GuiceOneAppPerSuite {
 
-  val userAnswersId: String = "id"
+  val groupId: String = "id"
 
-  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
+  def emptyJourneyData: JourneyData = JourneyData(groupId)
 
   def messages(implicit app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
+  protected val mockJourneyAnswersService: JourneyAnswersService = mock[JourneyAnswersService]
+
+  protected def applicationBuilder(journeyData: Option[JourneyData] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
+        bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
       )
 
   def injector: Injector = app.injector

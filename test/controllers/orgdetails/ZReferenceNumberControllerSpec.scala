@@ -18,21 +18,13 @@ package controllers.orgdetails
 
 import base.SpecBase
 import forms.ZReferenceNumberFormProvider
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.NormalMode
+import models.journeyData.isaProducts.IsaProducts
+import models.journeyData.{JourneyData, OrganisationDetails}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.ZReferenceNumberPage
-import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import repositories.SessionRepository
 import views.html.orgdetails.ZReferenceNumberView
-import controllers.routes.JourneyRecoveryController
-
-import scala.concurrent.Future
 
 // TODO add tests back in when next page is present and UAs are wired up
 class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
@@ -48,7 +40,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, zReferenceNumberRoute)
@@ -64,9 +56,10 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(ZReferenceNumberPage, "answer").success.value
+      val journeyData =
+        JourneyData(groupId = groupId, organisationDetails = Some(OrganisationDetails(zRefNumber = Some("zRef"))))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, zReferenceNumberRoute)
@@ -76,7 +69,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("zRef"), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -87,7 +80,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 //      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 //
 //      val application =
-//        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+//        applicationBuilder(journeyData = Some(emptyJourneyData))
 //          .overrides(
 //            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
 //            bind[SessionRepository].toInstance(mockSessionRepository)
@@ -108,7 +101,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val request =
@@ -128,7 +121,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
 //    "must redirect to Journey Recovery for a GET if no existing data is found" in {
 //
-//      val application = applicationBuilder(userAnswers = None).build()
+//      val application = applicationBuilder(journeyData = None).build()
 //
 //      running(application) {
 //        val request = FakeRequest(GET, zReferenceNumberRoute)
@@ -142,7 +135,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 //
 //    "must redirect to Journey Recovery for a POST if no existing data is found" in {
 //
-//      val application = applicationBuilder(userAnswers = None).build()
+//      val application = applicationBuilder(journeyData = None).build()
 //
 //      running(application) {
 //        val request =

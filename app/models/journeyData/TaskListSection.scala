@@ -16,8 +16,6 @@
 
 package models.journeyData
 
-import play.api.libs.json.{JsObject, JsResult, JsValue, OFormat}
-
 trait TaskListSection {
   def sectionName: String
 }

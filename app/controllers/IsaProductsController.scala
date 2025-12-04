@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.IsaProductsFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.isaProducts.IsaProduct
+import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
 import navigation.Navigator
 import pages.IsaProductsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -66,14 +66,11 @@ class IsaProductsController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           answer => {
             val data           = request.journeyData
-            val updatedSection = data.isaProducts.map(_.copy(isaProducts = Some(answer.toSeq)))
+            val updatedSection = data.isaProducts
+              .fold(IsaProducts(isaProducts = Some(answer.toSeq), None))(_.copy(isaProducts = Some(answer.toSeq)))
 
-            updatedSection.fold {
-              errorHandler.badRequestError
-            } { section =>
-              journeyAnswersService.update(section, request.groupId).map { _ =>
-                Redirect(navigator.nextPage(IsaProductsPage, mode))
-              }
+            journeyAnswersService.update(updatedSection, request.groupId).map { _ =>
+              Redirect(navigator.nextPage(IsaProductsPage, mode))
             }
           }
         )

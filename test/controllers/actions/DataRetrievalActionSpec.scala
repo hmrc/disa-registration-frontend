@@ -17,19 +17,21 @@
 package controllers.actions
 
 import base.SpecBase
-import models.UserAnswers
+import models.journeyData.JourneyData
 import models.requests.{IdentifierRequest, OptionalDataRequest}
-import org.mockito.Mockito._
+import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
-import repositories.SessionRepository
+import services.JourneyAnswersService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
-  class Harness(sessionRepository: SessionRepository) extends DataRetrievalActionImpl(sessionRepository) {
+  class Harness(journeyAnswersService: JourneyAnswersService) extends DataRetrievalActionImpl(journeyAnswersService) {
     def callTransform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = transform(request)
   }
 
@@ -38,28 +40,24 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when there is no data in the cache" - {
 
       "must set userAnswers to 'None' in the request" in {
-
-        val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get("id")) thenReturn Future(None)
-        val action            = new Harness(sessionRepository)
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(None)
+        val action = new Harness(mockJourneyAnswersService)
 
         val result = action.callTransform(IdentifierRequest(FakeRequest(), "id")).futureValue
 
-        result.userAnswers must not be defined
+        result.journeyData must not be defined
       }
     }
 
     "when there is data in the cache" - {
 
       "must build a userAnswers object and add it to the request" in {
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Some(JourneyData("id")))
+        val action = new Harness(mockJourneyAnswersService)
 
-        val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id")))
-        val action            = new Harness(sessionRepository)
+        val result = action.callTransform(IdentifierRequest(FakeRequest(), "id")).futureValue
 
-        val result = action.callTransform(new IdentifierRequest(FakeRequest(), "id")).futureValue
-
-        result.userAnswers mustBe defined
+        result.journeyData mustBe defined
       }
     }
   }
