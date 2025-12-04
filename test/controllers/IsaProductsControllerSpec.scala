@@ -99,7 +99,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("isaProducts[0]", IsaProduct.values.head.toString))
+            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
 
         val result = route(application, request).value
 
