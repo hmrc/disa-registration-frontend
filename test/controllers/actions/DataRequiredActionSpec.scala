@@ -18,33 +18,34 @@ package controllers.actions
 
 import base.SpecBase
 import models.journeyData.JourneyData
-import models.requests.{IdentifierRequest, OptionalDataRequest}
+import models.requests.{DataRequest, OptionalDataRequest}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Result
 import play.api.test.FakeRequest
 import services.JourneyAnswersService
 
 import scala.concurrent.Future
 
-class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
+class DataRequiredActionSpec extends SpecBase with MockitoSugar {
 
-  class Harness(journeyAnswersService: JourneyAnswersService) extends DataRetrievalActionImpl(journeyAnswersService) {
-    def callTransform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = transform(request)
+  class Harness(journeyAnswersService: JourneyAnswersService) extends DataRequiredActionImpl() {
+    def callTransform[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] = refine(request)
   }
 
-  "Data Retrieval Action" - {
+  "Data Required Action" - {
 
     "when there is no data in the cache" - {
 
       "must set userAnswers to 'None' in the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(None)
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq(testGroupId))(any)) thenReturn Future(None)
         val action = new Harness(mockJourneyAnswersService)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), "id")).futureValue
+        val result = action.callTransform(OptionalDataRequest(FakeRequest(), testGroupId, None)).futureValue
 
-        result.journeyData must not be defined
+        result.isLeft mustBe true
       }
     }
 
@@ -54,9 +55,11 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
         when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Some(JourneyData("id")))
         val action = new Harness(mockJourneyAnswersService)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), "id")).futureValue
+        val Right(result) =
+          action.callTransform(OptionalDataRequest(FakeRequest(), testGroupId, Some(testJourneyData))).futureValue
 
-        result.journeyData mustBe defined
+        result.groupId mustBe testGroupId
+        result.journeyData mustBe testJourneyData
       }
     }
   }

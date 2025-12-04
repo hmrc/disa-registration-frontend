@@ -64,7 +64,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val journeyData = JourneyData(groupId = groupId, isaProducts = Some(IsaProducts(Some(IsaProduct.values), None)))
+      val journeyData =
+        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(Some(IsaProduct.values), None)))
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 

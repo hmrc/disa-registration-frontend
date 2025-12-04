@@ -16,6 +16,8 @@
 
 package handlers
 
+import play.api.mvc.Results.BadRequest
+import play.api.test.Helpers.{await, contentAsString, defaultAwaitTimeout, status}
 import play.twirl.api.Html
 import views.ViewSpecBase
 import views.html.{ErrorTemplate, NotFoundView}

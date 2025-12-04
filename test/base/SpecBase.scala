@@ -16,12 +16,15 @@
 
 package base
 
+import config.FrontendAppConfig
+import connectors.BaseConnector
 import controllers.actions.*
 import models.journeyData.JourneyData
+import org.mockito.Mockito
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{OptionValues, TryValues}
+import org.scalatest.{BeforeAndAfterEach, OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
@@ -30,6 +33,11 @@ import play.api.inject.{Injector, bind}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import services.JourneyAnswersService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import utils.TestData
+
+import scala.concurrent.ExecutionContext
 
 trait SpecBase
     extends AnyFreeSpec
@@ -38,15 +46,23 @@ trait SpecBase
     with OptionValues
     with ScalaFutures
     with IntegrationPatience
-    with GuiceOneAppPerSuite {
-
-  val groupId: String = "id"
-
-  def emptyJourneyData: JourneyData = JourneyData(groupId)
+    with GuiceOneAppPerSuite
+    with BeforeAndAfterEach
+    with TestData {
 
   def messages(implicit app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
+
+  // Mocks
   protected val mockJourneyAnswersService: JourneyAnswersService = mock[JourneyAnswersService]
+  protected val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
+  protected val mockAppConfig: FrontendAppConfig                 = mock[FrontendAppConfig]
+  protected val mockRequestBuilder: RequestBuilder               = mock[RequestBuilder]
+  protected val mockBaseConnector: BaseConnector                 = mock[BaseConnector]
+
+  override def beforeEach(): Unit = Mockito.reset()
 
   protected def applicationBuilder(journeyData: Option[JourneyData] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
