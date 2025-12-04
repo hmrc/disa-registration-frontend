@@ -15,6 +15,7 @@
  *@
 
 @import models.journeyData.isaProducts.IsaProduct
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 
 @this(
     layout: templates.Layout,
@@ -37,14 +38,16 @@
         @govukCheckboxes(
             CheckboxesViewModel(
                 form   = form,
-                name   = "value",
+                name   = "isaProducts",
+                hint   = Some(Hint(content = Text(messages("isaProducts.hint")))),
                 legend = LegendViewModel(messages("isaProducts.heading")).asPageHeading(),
                 items  = IsaProduct.checkboxItems
             )
+            .withHeadingAndSectionCaption(Text(messages("isaProducts.heading")), Text(messages("sectionTitle.isaProducts")))
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.continue"))
+            ButtonViewModel(messages("site.saveAndContinue"))
         )
     }
 }

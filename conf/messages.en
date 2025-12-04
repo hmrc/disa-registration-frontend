@@ -68,6 +68,7 @@ page.signOut.answers.not.saved.heading = We have signed you out
 
 sectionTitle.orgDetails = Organisation details
 sectionTitle.liaisonOfficers = Liaison officers
+sectionTitle.isaProducts = ISA products
 
 ### Organisation Details
 
@@ -92,10 +93,10 @@ isaProducts.cashJuniorIsas = Cash Junior ISAs
 isaProducts.stocksAndSharesIsas = Stocks and Shares ISAs
 isaProducts.stocksAndSharesJuniorIsas = Stocks and Shares Junior ISAs
 isaProducts.innovativeFinanceIsas = Innovative Finance ISAs
-isaProducts.checkYourAnswersLabel = Which ISA products does your organisation offer?
 isaProducts.error.required = Select the ISA products your organisation offers
-isaProducts.change.hidden = IsaProducts
+isaProducts.hint = Select all that apply
 
+### LOs
 addLiaisonOfficer.title = Add liaison officer
 addLiaisonOfficer.heading = Add liaison officer
 addLiaisonOfficer.p1 = You must have at least 1 liaison officer to register your organisation as an ISA manager.

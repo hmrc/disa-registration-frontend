@@ -19,7 +19,7 @@ package services
 import connectors.DisaRegistrationConnector
 import models.journeyData.{JourneyData, TaskListSection}
 import play.api.Logging
-import play.api.libs.json.{OFormat, Writes}
+import play.api.libs.json.Writes
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject

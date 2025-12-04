@@ -26,7 +26,7 @@ class IsaProductsFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Set[IsaProduct]] =
     Form(
-      "value" -> set(enumerable[IsaProduct]("isaProducts.error.required"))
+      "isaProducts" -> set(enumerable[IsaProduct]("isaProducts.error.required"))
         .verifying(nonEmptySet("isaProducts.error.required"))
     )
 }

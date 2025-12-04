@@ -19,7 +19,7 @@ package connectors
 import cats.data.EitherT
 import config.FrontendAppConfig
 import models.journeyData.TaskListSection
-import play.api.libs.json.{Json, OFormat, Writes}
+import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2

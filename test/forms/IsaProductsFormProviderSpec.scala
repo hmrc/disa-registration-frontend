@@ -8,9 +8,9 @@ class IsaProductsFormProviderSpec extends CheckboxFieldBehaviours {
 
   val form = new IsaProductsFormProvider()()
 
-  ".value" - {
+  ".isaProducts" - {
 
-    val fieldName   = "value"
+    val fieldName   = "isaProducts"
     val requiredKey = "isaProducts.error.required"
 
     behave like checkboxField[IsaProduct](
