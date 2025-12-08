@@ -21,7 +21,8 @@ layout: templates.Layout
 @()(implicit request: RequestHeader, messages: Messages)
 
 @layout(
-    pageTitle = messages("internalServerError.title")
+    pageTitle = messages("internalServerError.title"),
+    showBackLink = false
 ) {
 
     <h1 class="govuk-heading-xl">@messages("internalServerError.heading")</h1>
