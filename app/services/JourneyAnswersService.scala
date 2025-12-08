@@ -17,8 +17,11 @@
 package services
 
 import connectors.DisaRegistrationConnector
+import models.UpstreamErrorMapper.mapToErrorResponse
 import models.journeyData.{JourneyData, TaskListSection}
+import models.{ErrorResponse, InternalServerErr}
 import play.api.Logging
+import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,17 +31,19 @@ import scala.concurrent.{ExecutionContext, Future}
 class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector)(implicit ec: ExecutionContext)
     extends Logging {
 
-  def get(groupId: String)(implicit hc: HeaderCarrier): Future[Option[JourneyData]] =
+  def get(groupId: String)(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Option[JourneyData]]] =
     connector.getJourneyData(groupId).value.map {
-      case Left(upstreamError) => None
-      case Right(response)     => response.json.validate[JourneyData].fold(_ => None, jd => Some(jd))
+      case Left(upstreamError)                             => Left(mapToErrorResponse(upstreamError))
+      case Right(response) if response.status == NOT_FOUND => Right(None)
+      case Right(response)                                 =>
+        response.json.validate[JourneyData].fold(_ => Left(InternalServerErr()), data => Right(Some(data)))
     }
 
   def update[A <: TaskListSection: Writes](taskListSection: A, groupId: String)(implicit
     hc: HeaderCarrier
-  ): Future[Unit] =
+  ): Future[Either[ErrorResponse, Unit]] =
     connector.updateTaskListJourney(taskListSection, groupId, taskListSection.sectionName).value.map {
-      case Left(upstreamError) => Future.failed(throw new Exception())
-      case Right(response)     => ()
+      case Left(upstreamError) => Left(mapToErrorResponse(upstreamError))
+      case Right(response)     => Right(())
     }
 }

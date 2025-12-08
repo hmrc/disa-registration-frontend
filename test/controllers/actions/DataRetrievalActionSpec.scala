@@ -17,13 +17,16 @@
 package controllers.actions
 
 import base.SpecBase
+import models.BadRequestErr
 import models.journeyData.JourneyData
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.Result
 import play.api.test.FakeRequest
+import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation, status}
 import services.JourneyAnswersService
 
 import scala.concurrent.Future
@@ -31,18 +34,18 @@ import scala.concurrent.Future
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
   class Harness(journeyAnswersService: JourneyAnswersService) extends DataRetrievalActionImpl(journeyAnswersService) {
-    def callTransform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = transform(request)
+    def callRefine[A](request: IdentifierRequest[A]): Future[Either[Result, OptionalDataRequest[A]]] = refine(request)
   }
 
   "Data Retrieval Action" - {
 
-    "when there is no data in the cache" - {
+    "when NOT FOUND is returned" - {
 
       "must set userAnswers to 'None' in the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(None)
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Right(None))
         val action = new Harness(mockJourneyAnswersService)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), "id")).futureValue
+        val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
 
         result.journeyData must not be defined
       }
@@ -51,12 +54,30 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when there is data in the cache" - {
 
       "must build a userAnswers object and add it to the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Some(JourneyData("id")))
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(
+          Right(Some(JourneyData("id")))
+        )
         val action = new Harness(mockJourneyAnswersService)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), "id")).futureValue
+        val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
 
         result.journeyData mustBe defined
+      }
+    }
+
+    "when an upstream error response occurs" - {
+
+      "must redirect to journey recovery" in {
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(
+          Left(BadRequestErr("fubar"))
+        )
+        val action = new Harness(mockJourneyAnswersService)
+
+        val Left(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
+
+        redirectLocation(Future.successful(result)) mustBe Some(
+          controllers.routes.JourneyRecoveryController.onPageLoad().url
+        )
       }
     }
   }

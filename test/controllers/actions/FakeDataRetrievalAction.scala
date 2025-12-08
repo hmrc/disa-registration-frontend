@@ -18,13 +18,14 @@ package controllers.actions
 
 import models.journeyData.JourneyData
 import models.requests.{IdentifierRequest, OptionalDataRequest}
+import play.api.mvc.Result
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeDataRetrievalAction(dataToReturn: Option[JourneyData]) extends DataRetrievalAction {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    Future(OptionalDataRequest(request.request, request.groupId, dataToReturn))
+  override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, OptionalDataRequest[A]]] =
+    Future(Right(OptionalDataRequest(request.request, request.groupId, dataToReturn)))
 
   override protected implicit val executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global

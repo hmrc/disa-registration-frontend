@@ -49,30 +49,33 @@ class IsaProductsController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val preparedForm = request.journeyData.isaProducts.fold(form)(_.isaProducts match {
-      case None              => form
-      case Some(isaProducts) => form.fill(isaProducts.toSet)
-    })
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
+    val preparedForm = (for {
+      journeyData <- request.journeyData
+      products    <- journeyData.isaProducts
+      values      <- products.isaProducts
+    } yield form.fill(values.toSet)).getOrElse(form)
 
     Ok(view(preparedForm, mode))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          answer => {
-            val data           = request.journeyData
-            val updatedSection = data.isaProducts
-              .fold(IsaProducts(isaProducts = Some(answer.toSeq), None))(_.copy(isaProducts = Some(answer.toSeq)))
-
-            journeyAnswersService.update(updatedSection, request.groupId).map { _ =>
-              Redirect(navigator.nextPage(IsaProductsPage, mode))
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+        answer => {
+          val updatedSection =
+            request.journeyData.flatMap(_.isaProducts) match {
+              case Some(existing) =>
+                existing.copy(isaProducts = Some(answer.toSeq))
+              case None           => IsaProducts(isaProducts = Some(answer.toSeq), dataItem2 = None)
             }
+
+          journeyAnswersService.update(updatedSection, request.groupId).map { _ =>
+            Redirect(navigator.nextPage(IsaProductsPage, mode))
           }
-        )
+        }
+      )
   }
 }

@@ -16,9 +16,13 @@
 
 package controllers.actions
 
+import controllers.JourneyRecoveryController
+import models.ErrorResponse
+
 import javax.inject.Inject
 import models.requests.{IdentifierRequest, OptionalDataRequest}
-import play.api.mvc.ActionTransformer
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionRefiner, ActionTransformer, Result, Results}
 import services.JourneyAnswersService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -30,14 +34,15 @@ class DataRetrievalActionImpl @Inject() (
 )(implicit val executionContext: ExecutionContext)
     extends DataRetrievalAction {
 
-  protected def transform[A](
+  protected def refine[A](
     request: IdentifierRequest[A]
-  ): Future[OptionalDataRequest[A]] = {
+  ): Future[Either[Result, OptionalDataRequest[A]]] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    journeyAnswersService.get(request.groupId).map { journeyData =>
-      OptionalDataRequest(request.request, request.groupId, journeyData)
+    journeyAnswersService.get(request.groupId).map {
+      case Left(error: ErrorResponse) => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url))
+      case Right(journeyData)         => Right(OptionalDataRequest(request.request, request.groupId, journeyData))
     }
   }
 }
 
-trait DataRetrievalAction extends ActionTransformer[IdentifierRequest, OptionalDataRequest]
+trait DataRetrievalAction extends ActionRefiner[IdentifierRequest, OptionalDataRequest]

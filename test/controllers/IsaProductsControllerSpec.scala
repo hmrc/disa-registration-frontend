@@ -62,6 +62,22 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must return OK and the correct view for a GET if no existing journey data found" in {
+      val application = applicationBuilder(journeyData = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, isaProductsRoute)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[IsaProductsView]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+      }
+    }
+
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val journeyData =
@@ -88,10 +104,35 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       when(
         mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(())
+      ) thenReturn Future.successful(Right(()))
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, isaProductsRoute)
+            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must redirect to the next page when valid data is submitted and no existing data was found" in {
+
+      when(
+        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(Right(()))
+
+      val application =
+        applicationBuilder(journeyData = None)
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
@@ -126,36 +167,6 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(journeyData = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, isaProductsRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(journeyData = None).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
