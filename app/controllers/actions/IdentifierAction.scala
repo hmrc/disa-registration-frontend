@@ -18,16 +18,16 @@ package controllers.actions
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import controllers.{UnauthorisedController, routes}
+import controllers.routes
 import models.requests.IdentifierRequest
-import play.api.mvc.Results.*
 import play.api.mvc.*
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions, NoActiveSession}
-import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import play.api.mvc.Results.*
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions, NoActiveSession}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -52,8 +52,7 @@ class AuthenticatedIdentifierAction @Inject() (
         block(IdentifierRequest(request, groupId))
       case Some(_) ~ Some(affinity)           =>
         Future.successful(
-          Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString))
-        )
+          Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString)))
       case _                                  =>
         Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     }
