@@ -36,7 +36,8 @@ trait SpecBase
     with OptionValues
     with ScalaFutures
     with IntegrationPatience
-    with GuiceOneAppPerSuite {
+    with GuiceOneAppPerSuite
+    with AuthTestSupport {
 
   val userAnswersId: String = "id"
 

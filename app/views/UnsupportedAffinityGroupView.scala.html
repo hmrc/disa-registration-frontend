@@ -22,12 +22,14 @@
 
 @layout(
     pageTitle = titleNoForm(messages("unsupportedAffinityGroup.title")),
-    timeout   = false
+    timeout   = false,
+    showBackLink = false
 ) {
 
     <h1 class="govuk-heading-xl">@messages("unsupportedAffinityGroup.heading")</h1>
-
-    <p class="govuk-body">@messages("unsupportedAffinityGroup.paragraph1")</p>
-    <p class="govuk-body">@messages("unsupportedAffinityGroup.paragraph2")<a href="" class="govuk-link">@messages("unsupportedAffinityGroup.linkText")</a>@messages("unsupportedAffinityGroup.fullStop")</p>
-    <a class="govuk-link" href="https://www.gov.uk/guidance/apply-to-be-an-isa-manager">@messages("unsupportedAffinityGroup.linkText2")</a>
+    <div class = "govuk-body">
+        <p>@messages(s"unsupportedAffinityGroup.paragraph1.${affinityGroup.toLowerCase}")</p>
+        <p>@messages("unsupportedAffinityGroup.paragraph2") <a href="" class="govuk-link">@messages("unsupportedAffinityGroup.linkText")</a>@messages("unsupportedAffinityGroup.fullStop")</p>
+        <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="https://www.gov.uk/guidance/apply-to-be-an-isa-manager">@messages("unsupportedAffinityGroup.linkText2")</a>
+    </div>
 }

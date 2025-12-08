@@ -17,21 +17,15 @@
 package controllers.actions
 
 import base.SpecBase
-import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
-import uk.gov.hmrc.http.HeaderCarrier
 
-import java.net.URLEncoder.encode
-import java.nio.charset.StandardCharsets
+import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
 
 class AuthActionSpec extends SpecBase {
 
@@ -45,7 +39,7 @@ class AuthActionSpec extends SpecBase {
 
     "when the user hasn't logged in" - {
 
-      "must redirect the user to log in " in {
+      "must redirect the user to log in" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -54,10 +48,11 @@ class AuthActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new MissingBearerToken),
+            failingAuthConnector(new MissingBearerToken),
             appConfig,
             bodyParsers
           )
+
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
 
@@ -69,7 +64,7 @@ class AuthActionSpec extends SpecBase {
 
     "the user's session has expired" - {
 
-      "must redirect the user to log in " in {
+      "must redirect the user to log in" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -78,10 +73,11 @@ class AuthActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new BearerTokenExpired),
+            failingAuthConnector(new BearerTokenExpired),
             appConfig,
             bodyParsers
           )
+
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
 
@@ -102,10 +98,11 @@ class AuthActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new InsufficientEnrolments),
+            failingAuthConnector(new InsufficientEnrolments),
             appConfig,
             bodyParsers
           )
+
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
 
@@ -126,10 +123,11 @@ class AuthActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new InsufficientConfidenceLevel),
+            failingAuthConnector(new InsufficientConfidenceLevel),
             appConfig,
             bodyParsers
           )
+
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
 
@@ -150,10 +148,11 @@ class AuthActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new UnsupportedAuthProvider),
+            failingAuthConnector(new UnsupportedAuthProvider),
             appConfig,
             bodyParsers
           )
+
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
 
@@ -163,9 +162,9 @@ class AuthActionSpec extends SpecBase {
       }
     }
 
-    "the user has an unsupported affinity group" - {
+    "the user has an unsupported affinity group (Agent)" - {
 
-      "must redirect the user to the unauthorised page" in {
+      "must redirect the user to the unsupported affinity group page" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -174,16 +173,54 @@ class AuthActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new UnsupportedAffinityGroup),
+            successfulAuthConnector(
+              affinityGroup = Some(AffinityGroup.Agent),
+              groupId = Some("group-id-123")
+            ),
             appConfig,
             bodyParsers
           )
+
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(
-            s"${config.loginUrl}?continue=${encode(config.loginContinueUrl, StandardCharsets.UTF_8)}"
+            routes.UnsupportedAffinityGroupController
+              .onPageLoad(AffinityGroup.Agent.toString)
+              .url
+          )
+        }
+      }
+    }
+
+    "the user has an unsupported affinity group (Individual)" - {
+
+      "must redirect the user to the unsupported affinity group page" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            successfulAuthConnector(
+              affinityGroup = Some(AffinityGroup.Individual),
+              groupId = Some("group-id-123")
+            ),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(
+            routes.UnsupportedAffinityGroupController
+              .onPageLoad(AffinityGroup.Individual.toString)
+              .url
           )
         }
       }
@@ -200,10 +237,11 @@ class AuthActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new UnsupportedCredentialRole),
+            failingAuthConnector(new UnsupportedCredentialRole),
             appConfig,
             bodyParsers
           )
+
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest())
 
@@ -213,14 +251,4 @@ class AuthActionSpec extends SpecBase {
       }
     }
   }
-}
-
-class FakeFailingAuthConnector @Inject() (exceptionToReturn: Throwable) extends AuthConnector {
-  val serviceUrl: String = ""
-
-  override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[A] =
-    Future.failed(exceptionToReturn)
 }

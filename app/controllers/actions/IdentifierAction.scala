@@ -22,7 +22,7 @@ import controllers.{UnauthorisedController, routes}
 import models.requests.IdentifierRequest
 import play.api.mvc.Results.*
 import play.api.mvc.*
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions}
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions, NoActiveSession}
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
@@ -32,49 +32,35 @@ import uk.gov.hmrc.auth.core.retrieve.~
 import scala.concurrent.{ExecutionContext, Future}
 
 trait IdentifierAction
-  extends ActionBuilder[IdentifierRequest, AnyContent]
+    extends ActionBuilder[IdentifierRequest, AnyContent]
     with ActionFunction[Request, IdentifierRequest]
 
-class AuthenticatedIdentifierAction @Inject()(
-                                               override val authConnector: AuthConnector,
-                                               config: FrontendAppConfig,
-                                               val parser: BodyParsers.Default
-                                             )(implicit val executionContext: ExecutionContext)
-  extends IdentifierAction
+class AuthenticatedIdentifierAction @Inject() (
+  override val authConnector: AuthConnector,
+  config: FrontendAppConfig,
+  val parser: BodyParsers.Default
+)(implicit val executionContext: ExecutionContext)
+    extends IdentifierAction
     with AuthorisedFunctions {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised().retrieve(Retrievals.internalId and Retrievals.affinityGroup) {
-      case Some(internalId) ~ Some(Organisation) =>
-        block(IdentifierRequest(request, internalId))
-      case Some(_) ~ Some(affinity) =>
-        Future.successful(Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString)))
-      case _ =>
+    authorised().retrieve(Retrievals.groupIdentifier and Retrievals.affinityGroup) {
+      case Some(groupId) ~ Some(Organisation) =>
+        block(IdentifierRequest(request, groupId))
+      case Some(_) ~ Some(affinity)           =>
+        Future.successful(
+          Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString))
+        )
+      case _                                  =>
         Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     }
   } recover {
+    case _: NoActiveSession        =>
+      Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
     case _: AuthorisationException =>
       Redirect(routes.UnauthorisedController.onPageLoad())
-  }
-}
-
-class SessionIdentifierAction @Inject()(
-                                         val parser: BodyParsers.Default
-                                       )(implicit val executionContext: ExecutionContext)
-  extends IdentifierAction {
-
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
-
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-
-    hc.sessionId match {
-      case Some(session) =>
-        block(IdentifierRequest(request, session.value))
-      case None =>
-        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-    }
   }
 }

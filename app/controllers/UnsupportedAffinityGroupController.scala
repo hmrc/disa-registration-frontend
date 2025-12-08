@@ -18,21 +18,20 @@ package controllers
 
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{UnauthorisedView, UnsupportedAffinityGroupView}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class UnsupportedAffinityGroupController @Inject()(
-                                                    val controllerComponents: MessagesControllerComponents,
-                                                    unsupportedAffinityGroupView: UnsupportedAffinityGroupView,
-                                                    unauthorisedView: UnauthorisedView,
-                                                    override val authConnector: AuthConnector
-                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with AuthorisedFunctions with I18nSupport {
+class UnsupportedAffinityGroupController @Inject() (
+  val controllerComponents: MessagesControllerComponents,
+  unsupportedAffinityGroupView: UnsupportedAffinityGroupView,
+  unauthorisedView: UnauthorisedView
+) extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad(affinityGroup: String): Action[AnyContent] = Action.async { implicit request =>
-        Future.successful(Unauthorized(unsupportedAffinityGroupView(affinityGroup)))
-    }
+    Future.successful(Unauthorized(unsupportedAffinityGroupView(affinityGroup)))
+  }
 }
