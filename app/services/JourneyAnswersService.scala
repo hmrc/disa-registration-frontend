@@ -27,15 +27,16 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Right
 
 class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector)(implicit ec: ExecutionContext)
     extends Logging {
 
   def get(groupId: String)(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Option[JourneyData]]] =
     connector.getJourneyData(groupId).value.map {
-      case Left(upstreamError)                             => Left(mapToErrorResponse(upstreamError))
-      case Right(response) if response.status == NOT_FOUND => Right(None)
-      case Right(response)                                 =>
+      case Left(upstreamError) if upstreamError.statusCode == NOT_FOUND => Right(None)
+      case Left(upstreamError)                                          => Left(mapToErrorResponse(upstreamError))
+      case Right(response)                                              =>
         response.json.validate[JourneyData].fold(_ => Left(InternalServerErr()), data => Right(Some(data)))
     }
 

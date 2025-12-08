@@ -58,10 +58,10 @@ class JourneyAnswersServiceSpec extends SpecBase {
       }
 
       "must return Right(None) when connector returns a Not Found" in {
-        val httpResponse = HttpResponse(status = 404, body = "")
+        val upstreamError = UpstreamErrorResponse("", 404, 404)
 
         when(mockConnector.getJourneyData(ArgumentMatchers.eq(testGroupId))(any()))
-          .thenReturn(rightT(httpResponse))
+          .thenReturn(leftT(upstreamError))
 
         val result = service.get(testGroupId).futureValue
 
