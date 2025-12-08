@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import models.BadRequestErr
+import models.DataRetrievalResult.*
 import models.journeyData.JourneyData
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import org.mockito.ArgumentMatchers
@@ -26,7 +26,7 @@ import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation, status}
+import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation}
 import services.JourneyAnswersService
 
 import scala.concurrent.Future
@@ -42,7 +42,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when NOT FOUND is returned" - {
 
       "must set userAnswers to 'None' in the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Right(None))
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Empty)
         val action = new Harness(mockJourneyAnswersService)
 
         val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
@@ -54,9 +54,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when there is data in the cache" - {
 
       "must build a userAnswers object and add it to the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(
-          Right(Some(JourneyData("id")))
-        )
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Found(JourneyData("id")))
         val action = new Harness(mockJourneyAnswersService)
 
         val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
@@ -68,9 +66,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when an upstream error response occurs" - {
 
       "must redirect to journey recovery" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(
-          Left(BadRequestErr("fubar"))
-        )
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Failed)
         val action = new Harness(mockJourneyAnswersService)
 
         val Left(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue

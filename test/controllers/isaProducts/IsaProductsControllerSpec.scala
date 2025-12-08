@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.isaProducts
 
 import base.SpecBase
+import controllers.routes
 import forms.IsaProductsFormProvider
 import models.NormalMode
 import models.journeyData.JourneyData
@@ -104,7 +105,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       when(
         mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(Right(()))
+      ) thenReturn Future.successful(Some(()))
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
@@ -129,7 +130,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       when(
         mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(Right(()))
+      ) thenReturn Future.successful(Some(()))
 
       val application =
         applicationBuilder(journeyData = None)

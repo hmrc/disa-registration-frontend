@@ -18,7 +18,7 @@ package config
 
 import base.SpecBase
 import com.typesafe.config.{Config, ConfigFactory}
-import play.api.{Configuration, Environment}
+import play.api.Configuration
 
 class FrontendAppConfigSpec extends SpecBase {
 

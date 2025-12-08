@@ -67,13 +67,13 @@ class IsaProductsController @Inject() (
         answer => {
           val updatedSection =
             request.journeyData.flatMap(_.isaProducts) match {
-              case Some(existing) =>
-                existing.copy(isaProducts = Some(answer.toSeq))
+              case Some(existing) => existing.copy(isaProducts = Some(answer.toSeq))
               case None           => IsaProducts(isaProducts = Some(answer.toSeq), dataItem2 = None)
             }
 
-          journeyAnswersService.update(updatedSection, request.groupId).map { _ =>
-            Redirect(navigator.nextPage(IsaProductsPage, mode))
+          journeyAnswersService.update(updatedSection, request.groupId).flatMap {
+            case None    => errorHandler.internalServerError
+            case Some(_) => Future.successful(Redirect(navigator.nextPage(IsaProductsPage, mode)))
           }
         }
       )

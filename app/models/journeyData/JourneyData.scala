@@ -40,20 +40,4 @@ object JourneyData {
     Format(MongoJavatimeFormats.instantReads, MongoJavatimeFormats.instantWrites)
 
   implicit val format: Format[JourneyData] = Json.format[JourneyData]
-
-  case class TaskListJourney[A](reads: Reads[A], writes: Writes[A])
-
-  val taskListJourneyHandlers: Map[String, TaskListJourney[_]] = Map(
-    "businessVerification"         -> TaskListJourney(BusinessVerification.format, BusinessVerification.format),
-    "organisationDetails"          -> TaskListJourney(OrganisationDetails.format, OrganisationDetails.format),
-    "isaProducts"                  -> TaskListJourney(IsaProducts.format, IsaProducts.format),
-    "certificatesOfAuthority"      -> TaskListJourney(CertificatesOfAuthority.format, CertificatesOfAuthority.format),
-    "liaisonOfficers"              -> TaskListJourney(LiaisonOfficers.format, LiaisonOfficers.format),
-    "signatories"                  -> TaskListJourney(Signatories.format, Signatories.format),
-    "outsourcedAdministration"     -> TaskListJourney(OutsourcedAdministration.format, OutsourcedAdministration.format),
-    "feesCommissionsAndIncentives" -> TaskListJourney(
-      FeesCommissionsAndIncentives.format,
-      FeesCommissionsAndIncentives.format
-    )
-  )
 }

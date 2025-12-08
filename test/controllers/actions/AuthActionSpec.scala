@@ -30,7 +30,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import java.net.URLEncoder.encode
 import java.nio.charset.StandardCharsets
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthActionSpec extends SpecBase {

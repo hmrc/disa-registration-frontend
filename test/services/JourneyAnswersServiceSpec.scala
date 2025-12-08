@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import cats.data.EitherT
 import connectors.DisaRegistrationConnector
-import models.InternalServerErr
+import models.DataRetrievalResult.*
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -46,7 +46,7 @@ class JourneyAnswersServiceSpec extends SpecBase {
 
     "get" - {
 
-      "must return Left(ErrorResponse) when connector returns a Left (upstream error)" in {
+      "must return Failed when connector returns a Left (upstream error)" in {
         val upstreamError = UpstreamErrorResponse("", 500, 500)
 
         when(mockConnector.getJourneyData(ArgumentMatchers.eq(testGroupId))(any()))
@@ -54,10 +54,10 @@ class JourneyAnswersServiceSpec extends SpecBase {
 
         val result = service.get(testGroupId).futureValue
 
-        result mustBe Left(InternalServerErr())
+        result mustBe Failed
       }
 
-      "must return Right(None) when connector returns a Not Found" in {
+      "must return Empty when connector returns a Not Found" in {
         val upstreamError = UpstreamErrorResponse("", 404, 404)
 
         when(mockConnector.getJourneyData(ArgumentMatchers.eq(testGroupId))(any()))
@@ -65,10 +65,10 @@ class JourneyAnswersServiceSpec extends SpecBase {
 
         val result = service.get(testGroupId).futureValue
 
-        result mustBe Right(None)
+        result mustBe Empty
       }
 
-      "must return Right(Some(JourneyData)) when connector returns valid JSON in a Right" in {
+      "must return Found(JourneyData)) when connector returns valid JSON in a Right" in {
         val json         = Json.toJson(testJourneyData)
         val httpResponse = HttpResponse(
           status = 200,
@@ -80,10 +80,10 @@ class JourneyAnswersServiceSpec extends SpecBase {
 
         val result = service.get(testGroupId).futureValue
 
-        result mustBe Right(Some(testJourneyData))
+        result mustBe Found(testJourneyData)
       }
 
-      "must return Left(InternalServerErr) when connector returns Right but JSON validation fails" in {
+      "must return Failed when connector returns Right but JSON validation fails" in {
         val invalidJson  = Json.obj("something" -> "else")
         val httpResponse = HttpResponse(
           status = 200,
@@ -95,7 +95,7 @@ class JourneyAnswersServiceSpec extends SpecBase {
 
         val result = service.get(testGroupId).futureValue
 
-        result mustBe Left(InternalServerErr())
+        result mustBe Failed
       }
     }
 
@@ -114,7 +114,7 @@ class JourneyAnswersServiceSpec extends SpecBase {
 
         val result = service.update(testIsaProductsAnswers, testGroupId).futureValue
 
-        result mustBe Right(())
+        result mustBe Some(())
         verify(mockConnector)
           .updateTaskListJourney(testIsaProductsAnswers, testGroupId, testIsaProductsAnswers.sectionName)
       }
@@ -132,7 +132,7 @@ class JourneyAnswersServiceSpec extends SpecBase {
 
         val result = service.update(testIsaProductsAnswers, testGroupId).futureValue
 
-        result mustBe Left(InternalServerErr())
+        result mustBe None
       }
     }
   }

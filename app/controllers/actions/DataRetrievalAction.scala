@@ -16,31 +16,34 @@
 
 package controllers.actions
 
-import controllers.JourneyRecoveryController
-import models.ErrorResponse
-
-import javax.inject.Inject
+import models.DataRetrievalResult.*
 import models.requests.{IdentifierRequest, OptionalDataRequest}
+import play.api.Logging
 import play.api.mvc.Results.Redirect
-import play.api.mvc.{ActionRefiner, ActionTransformer, Result, Results}
+import play.api.mvc.{ActionRefiner, Result, Results}
 import services.JourneyAnswersService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataRetrievalActionImpl @Inject() (
   journeyAnswersService: JourneyAnswersService
 )(implicit val executionContext: ExecutionContext)
-    extends DataRetrievalAction {
+    extends DataRetrievalAction
+    with Logging {
 
   protected def refine[A](
     request: IdentifierRequest[A]
   ): Future[Either[Result, OptionalDataRequest[A]]] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     journeyAnswersService.get(request.groupId).map {
-      case Left(error: ErrorResponse) => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url))
-      case Right(journeyData)         => Right(OptionalDataRequest(request.request, request.groupId, journeyData))
+      case Failed             =>
+        logger.warn(s"Error from backend getting answers for groupId:[${request.groupId}]")
+        Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url))
+      case Found(journeyData) => Right(OptionalDataRequest(request.request, request.groupId, Some(journeyData)))
+      case Empty              => Right(OptionalDataRequest(request.request, request.groupId, None))
     }
   }
 }

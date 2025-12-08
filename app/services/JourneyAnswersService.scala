@@ -17,9 +17,9 @@
 package services
 
 import connectors.DisaRegistrationConnector
-import models.UpstreamErrorMapper.mapToErrorResponse
+import models.DataRetrievalResult.*
+import models.DataRetrievalResult
 import models.journeyData.{JourneyData, TaskListSection}
-import models.{ErrorResponse, InternalServerErr}
 import play.api.Logging
 import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.Writes
@@ -32,19 +32,31 @@ import scala.util.Right
 class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector)(implicit ec: ExecutionContext)
     extends Logging {
 
-  def get(groupId: String)(implicit hc: HeaderCarrier): Future[Either[ErrorResponse, Option[JourneyData]]] =
+  def get(groupId: String)(implicit hc: HeaderCarrier): Future[DataRetrievalResult] =
     connector.getJourneyData(groupId).value.map {
-      case Left(upstreamError) if upstreamError.statusCode == NOT_FOUND => Right(None)
-      case Left(upstreamError)                                          => Left(mapToErrorResponse(upstreamError))
+      case Left(upstreamError) if upstreamError.statusCode == NOT_FOUND => Empty
+      case Left(upstreamError)                                          => Failed
       case Right(response)                                              =>
-        response.json.validate[JourneyData].fold(_ => Left(InternalServerErr()), data => Right(Some(data)))
+        response.json
+          .validate[JourneyData]
+          .fold(
+            errors => {
+              logger.error(s"Failed to parse answers with error(s):\n${errors.map(error => error.toString + '\n')}")
+              Failed
+            },
+            data => Found(data)
+          )
     }
 
   def update[A <: TaskListSection: Writes](taskListSection: A, groupId: String)(implicit
     hc: HeaderCarrier
-  ): Future[Either[ErrorResponse, Unit]] =
-    connector.updateTaskListJourney(taskListSection, groupId, taskListSection.sectionName).value.map {
-      case Left(upstreamError) => Left(mapToErrorResponse(upstreamError))
-      case Right(response)     => Right(())
+  ): Future[Option[Unit]] = {
+    val sectionName = taskListSection.sectionName
+    connector.updateTaskListJourney(taskListSection, groupId, sectionName).value.map {
+      case Left(upstreamError) =>
+        logger.warn(s"Failed to update answers for groupId:[$groupId] for section:[$sectionName]")
+        None
+      case Right(response)     => Some(())
     }
+  }
 }
