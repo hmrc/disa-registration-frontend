@@ -26,15 +26,15 @@ import scala.concurrent.{ExecutionContext, Future}
 trait AuthTestSupport {
 
   protected def successfulAuthConnector(
-                                         groupId: Option[String] = Some("group-id"),
-                                         affinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation)
-                                       ): AuthConnector =
+    groupId: Option[String] = Some("group-id"),
+    affinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation)
+  ): AuthConnector =
     new AuthConnector {
-      
+
       override def authorise[A](
-                                 predicate: Predicate,
-                                 retrieval: Retrieval[A]
-                               )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
+        predicate: Predicate,
+        retrieval: Retrieval[A]
+      )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
 
         val result: Option[String] ~ Option[AffinityGroup] =
           new ~(groupId, affinityGroup)
@@ -44,14 +44,14 @@ trait AuthTestSupport {
     }
 
   protected def failingAuthConnector(
-                                      exception: Throwable
-                                    ): AuthConnector =
+    exception: Throwable
+  ): AuthConnector =
     new AuthConnector {
-      
+
       override def authorise[A](
-                                 predicate: Predicate,
-                                 retrieval: Retrieval[A]
-                               )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =
+        predicate: Predicate,
+        retrieval: Retrieval[A]
+      )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] =
         Future.failed(exception)
     }
 }

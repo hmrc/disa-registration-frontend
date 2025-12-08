@@ -39,7 +39,8 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
           val controller = new UnsupportedAffinityGroupController(
             controllerComponents = application.injector.instanceOf[MessagesControllerComponents],
             unsupportedAffinityGroupView = application.injector.instanceOf[UnsupportedAffinityGroupView],
-            unauthorisedView = application.injector.instanceOf[UnauthorisedView])
+            unauthorisedView = application.injector.instanceOf[UnauthorisedView]
+          )
 
           val result = controller.onPageLoad(AffinityGroup.Agent.toString)(FakeRequest())
 
@@ -47,7 +48,10 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
 
           val document = Jsoup.parse(contentAsString(result))
 
-          document.select("div.govuk-body > p").first().text() mustBe "You’ve signed in using an agent services Government Gateway user ID. Only users with an organisation account can register to use this service."
+          document
+            .select("div.govuk-body > p")
+            .first()
+            .text() mustBe "You’ve signed in using an agent services Government Gateway user ID. Only users with an organisation account can register to use this service."
         }
       }
 
@@ -60,7 +64,8 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
           val controller = new UnsupportedAffinityGroupController(
             controllerComponents = application.injector.instanceOf[MessagesControllerComponents],
             unsupportedAffinityGroupView = application.injector.instanceOf[UnsupportedAffinityGroupView],
-            unauthorisedView = application.injector.instanceOf[UnauthorisedView])
+            unauthorisedView = application.injector.instanceOf[UnauthorisedView]
+          )
 
           val result = controller.onPageLoad(AffinityGroup.Individual.toString)(FakeRequest())
 
@@ -68,7 +73,10 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
 
           val document = Jsoup.parse(contentAsString(result))
 
-          document.select("div.govuk-body > p").first().text() mustBe "You’ve signed in with an individual account. Only users with an organisation account can register to use this service."
+          document
+            .select("div.govuk-body > p")
+            .first()
+            .text() mustBe "You’ve signed in with an individual account. Only users with an organisation account can register to use this service."
         }
       }
     }

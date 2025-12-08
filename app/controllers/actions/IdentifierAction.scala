@@ -52,7 +52,8 @@ class AuthenticatedIdentifierAction @Inject() (
         block(IdentifierRequest(request, groupId))
       case Some(_) ~ Some(affinity)           =>
         Future.successful(
-          Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString)))
+          Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString))
+        )
       case _                                  =>
         Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     }
