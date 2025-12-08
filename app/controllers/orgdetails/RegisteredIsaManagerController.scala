@@ -18,7 +18,6 @@ package controllers.orgdetails
 
 import controllers.actions.*
 import forms.RegisteredIsaManagerFormProvider
-import handlers.ErrorHandler
 import models.Mode
 import navigation.Navigator
 import pages.RegisteredIsaManagerPage
@@ -28,7 +27,6 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.orgdetails.RegisteredIsaManagerView
 
-import java.util.MissingResourceException
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
