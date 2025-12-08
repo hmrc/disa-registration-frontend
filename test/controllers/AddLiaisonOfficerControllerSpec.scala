@@ -60,7 +60,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
         status(result) mustEqual OK
         contentAsString(result) must include(
           "Add liaison officer - Liaison officers - disa-registration-frontend - GOV.UK"
-        ) // optional: check view content
+        )
       }
     }
 
