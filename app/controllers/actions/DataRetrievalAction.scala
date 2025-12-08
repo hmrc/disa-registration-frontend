@@ -16,10 +16,9 @@
 
 package controllers.actions
 
-import models.DataRetrievalResult.*
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import play.api.Logging
-import play.api.mvc.Results.Redirect
+import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{ActionRefiner, Result, Results}
 import services.JourneyAnswersService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -38,13 +37,15 @@ class DataRetrievalActionImpl @Inject() (
     request: IdentifierRequest[A]
   ): Future[Either[Result, OptionalDataRequest[A]]] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    journeyAnswersService.get(request.groupId).map {
-      case Failed             =>
-        logger.warn(s"Error from backend getting answers for groupId:[${request.groupId}]")
-        Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad().url))
-      case Found(journeyData) => Right(OptionalDataRequest(request.request, request.groupId, Some(journeyData)))
-      case Empty              => Right(OptionalDataRequest(request.request, request.groupId, None))
-    }
+    journeyAnswersService
+      .get(request.groupId)
+      .map { journeyData =>
+        Right(OptionalDataRequest(request.request, request.groupId, journeyData))
+      }
+      .recover { case e: Throwable =>
+        logger.warn(s"Failed to retrieve answers for user with groupId: [${request.groupId}] with error: [$e]")
+        Left(InternalServerError)
+      }
   }
 }
 

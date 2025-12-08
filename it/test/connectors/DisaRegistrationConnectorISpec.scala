@@ -16,12 +16,17 @@
 
 package connectors
 
+import models.journeyData.JourneyData
 import models.journeyData.isaProducts.IsaProduct.CashJuniorIsas
-import models.journeyData.isaProducts.IsaProducts
+import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK, UNAUTHORIZED}
+import play.api.libs.json.Json
 import play.api.test.Helpers.await
+import uk.gov.hmrc.http.{JsValidationException, NotFoundException, UpstreamErrorResponse}
 import utils.BaseIntegrationSpec
 import utils.WiremockHelper.{stubGet, stubPost}
+
+import scala.concurrent.Future
 
 class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
 
@@ -32,33 +37,39 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
   "DisaRegistrationConnector.getJourneyData" should {
 
     val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
+    val testIsaProductsAnswers = IsaProducts(Some(IsaProduct.values), None)
+    val testJourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
+    
+    "return Some(journeyData) when backend returns 200 OK" in {
+      stubGet(getJourneyDataUrl, OK, Json.toJson(testJourneyData).toString)
 
-    "return Right(HttpResponse) when backend returns 200 OK" in {
-      stubGet(getJourneyDataUrl, OK, "")
-
-      val Right(response) =
-        await(connector.getJourneyData(testGroupId).value)
-
-      response.status shouldBe OK
-      response.body shouldBe ""
+      val response = await(connector.getJourneyData(testGroupId))
+      
+      response shouldBe Some(testJourneyData)
     }
 
-    "return Left(UpstreamErrorResponse) when backend returns an error status (401)" in {
+    "return None when backend returns 404 Not Found" in {
+      stubGet(getJourneyDataUrl, NOT_FOUND, """{"code":"NOT_FOUND", "message":"Not found"}""")
+
+      val response = await(connector.getJourneyData(testGroupId))
+
+      response shouldBe None
+    }
+
+    "propagate exception when backend returns an error status (401)" in {
       stubGet(getJourneyDataUrl, UNAUTHORIZED, """{"error":"Not authorised"}""")
 
-      val Left(err) =
-        await(connector.getJourneyData(testGroupId).value)
+      val err = await(connector.getJourneyData(testGroupId).failed)
 
-      err.statusCode shouldBe UNAUTHORIZED
-      err.message should include("Not authorised")
+      err shouldBe an[UpstreamErrorResponse]
+      err.getMessage should include ("Not authorised")
     }
 
-    "return Left(UpstreamErrorResponse) when the call fails with an unexpected exception" in {
-      val Left(err) =
-        await(connector.getJourneyData("non-existent").value)
+    "propagate exception when the call fails with bad json" in {
+      stubGet(getJourneyDataUrl, OK, """{"json":"bad"}""")
+      val err = await(connector.getJourneyData(testGroupId).failed)
 
-      err.statusCode shouldBe NOT_FOUND
-      err.message should include("No response could be served as there are no stub mappings in this WireMock instance.")
+      err shouldBe an[JsValidationException]
     }
   }
 
@@ -66,32 +77,35 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
     val testSectionAnswers = IsaProducts(Some(Seq(CashJuniorIsas)), None)
     val updateTaskListJourneyUrl = s"/disa-registration/store/$testGroupId/${testSectionAnswers.sectionName}"
 
-    "return Right(HttpResponse) when backend returns 204 NoContent" in {
-      stubPost(updateTaskListJourneyUrl, 204, "")
+    "return Unit when backend returns 204 NoContent" in {
+      stubPost(updateTaskListJourneyUrl, NO_CONTENT, "")
 
-      val Right(response) =
-        await(connector.updateTaskListJourney(testSectionAnswers, testGroupId, testSectionAnswers.sectionName).value)
+      val response =
+        await(connector.updateTaskListJourney(testSectionAnswers, testGroupId, testSectionAnswers.sectionName))
 
-      response.status shouldBe NO_CONTENT
-      response.body shouldBe ""
+      response shouldBe ()
     }
 
-    "return Left(UpstreamErrorResponse) when backend returns an error status (401)" in {
-      stubPost(updateTaskListJourneyUrl, UNAUTHORIZED, """{"error":"Not authorised"}""")
+    "propagate exception when backend returns an error status (401)" in {
+      stubPost(updateTaskListJourneyUrl, UNAUTHORIZED, """{"code":"UNAUTHORIZED", "message":"Unauthorised"}""")
 
-      val Left(err) =
-        await(connector.updateTaskListJourney(testSectionAnswers, testGroupId, testSectionAnswers.sectionName).value)
+      val ex = intercept[UpstreamErrorResponse] {
+        await(
+          connector.updateTaskListJourney(
+            testSectionAnswers,
+            testGroupId,
+            testSectionAnswers.sectionName
+          )
+        )
+      }
 
-      err.statusCode shouldBe UNAUTHORIZED
-      err.message should include("Not authorised")
+      ex.statusCode shouldBe UNAUTHORIZED
     }
 
-    "return Left(UpstreamErrorResponse) when the call fails with an unexpected exception" in {
-      val Left(err) =
-        await(connector.updateTaskListJourney(testSectionAnswers, testGroupId, testSectionAnswers.sectionName).value)
-
-      err.statusCode shouldBe NOT_FOUND
-      err.message should include("No response could be served as there are no stub mappings in this WireMock instance.")
+    "propagate exception when the call fails with an unexpected exception" in {
+      intercept[UpstreamErrorResponse] {
+        await(connector.updateTaskListJourney(testSectionAnswers, testGroupId, testSectionAnswers.sectionName))
+      }
     }
   }
 }

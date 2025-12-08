@@ -17,12 +17,12 @@
 package connectors
 
 import base.SpecBase
-import cats.data.EitherT
+import models.journeyData.JourneyData
 import models.journeyData.isaProducts.IsaProducts
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsResultException, Json}
 import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 import scala.concurrent.Future
@@ -46,92 +46,73 @@ class DisaRegistrationConnectorSpec extends SpecBase {
 
     "getJourneyData" - {
 
-      "return HttpResponse on successful call" in new TestSetup {
-        val mockHttpResponse: HttpResponse = HttpResponse(
-          status = 200,
-          json = Json.toJson(testIsaProductsAnswers),
+      "return Some(journeyData) on successful call" in new TestSetup {
+        when(mockRequestBuilder.execute[JourneyData](any(), any()))
+          .thenReturn(Future.successful(testJourneyData))
+
+        val result: Option[JourneyData] = connector.getJourneyData(testGroupId).futureValue
+
+        result shouldBe Some(testJourneyData)
+      }
+
+      "return None on a Not Found response" in new TestSetup {
+        val upstreamErrorResponse: UpstreamErrorResponse = UpstreamErrorResponse(
+          message = "Not found",
+          statusCode = 404,
+          reportAs = 404,
           headers = Map.empty
         )
 
-        when(mockBaseConnector.read(any(), any()))
-          .thenAnswer { invocation =>
-            val future = invocation
-              .getArgument[Future[Either[UpstreamErrorResponse, HttpResponse]]](
-                0,
-                classOf[Future[Either[UpstreamErrorResponse, HttpResponse]]]
-              )
-            EitherT(future)
-          }
+        when(mockRequestBuilder.execute[JourneyData](any(), any()))
+          .thenReturn(Future.failed(upstreamErrorResponse))
 
-        when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
-          .thenReturn(Future.successful(Right(mockHttpResponse)))
+        val result: Option[JourneyData] = connector.getJourneyData(testGroupId).futureValue
 
-        val result: Either[UpstreamErrorResponse, HttpResponse] =
-          connector.getJourneyData(testGroupId).value.futureValue
-
-        result shouldBe Right(mockHttpResponse)
+        result shouldBe None
       }
 
-      "return UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
+      "propagate UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
         val upstreamErrorResponse: UpstreamErrorResponse = UpstreamErrorResponse(
           message = "Not authorised to access this service",
           statusCode = 401,
           reportAs = 401,
           headers = Map.empty
         )
-        when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
-          .thenReturn(Future.successful(Left(upstreamErrorResponse)))
+        when(mockRequestBuilder.execute[JourneyData](any(), any()))
+          .thenReturn(Future.failed(upstreamErrorResponse))
 
-        val result: Either[UpstreamErrorResponse, HttpResponse] =
-          connector.getJourneyData(testGroupId).value.futureValue
-
-        result shouldBe Left(upstreamErrorResponse)
+        val thrown = connector.getJourneyData(testGroupId).failed.futureValue
+        thrown mustBe upstreamErrorResponse
       }
 
       "return UpstreamErrorResponse when the call to DISA Registration fails with an unexpected Throwable exception" in new TestSetup {
         val runtimeException = new RuntimeException("Connection timeout")
 
-        when(mockBaseConnector.read(any(), any()))
-          .thenAnswer { invocation =>
-            val future = invocation
-              .getArgument[Future[Either[UpstreamErrorResponse, HttpResponse]]](
-                0,
-                classOf[Future[Either[UpstreamErrorResponse, HttpResponse]]]
-              )
-            EitherT(
-              future.recover { case e =>
-                Left(UpstreamErrorResponse(s"Unexpected error: ${e.getMessage}", 500, 500))
-              }
-            )
-          }
-        when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.failed(runtimeException))
 
-        val Left(result): Either[UpstreamErrorResponse, HttpResponse] =
-          connector.getJourneyData(testGroupId).value.futureValue
-
-        result.statusCode shouldBe 500
-        result.message      should include("Unexpected error: Connection timeout")
+        intercept[Throwable] {
+          connector.getJourneyData(testGroupId).futureValue
+        }
       }
     }
 
     "updateTaskListJourney" - {
 
-      "return HttpResponse on successful call" in new TestSetup {
+      "return Unit on successful call" in new TestSetup {
         val mockHttpResponse: HttpResponse = HttpResponse(
           status = 204,
           headers = Map.empty
         )
 
-        when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
-          .thenReturn(Future.successful(Right(mockHttpResponse)))
+        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
+          .thenReturn(Future.successful(mockHttpResponse))
 
-        val result: Either[UpstreamErrorResponse, HttpResponse] = connector
+        val result: Unit = connector
           .updateTaskListJourney(testIsaProductsAnswers, testGroupId, testIsaProductsAnswers.sectionName)
-          .value
           .futureValue
 
-        result shouldBe Right(mockHttpResponse)
+        result shouldBe ()
       }
 
       "return UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
@@ -141,31 +122,27 @@ class DisaRegistrationConnectorSpec extends SpecBase {
           reportAs = 401,
           headers = Map.empty
         )
-        when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
-          .thenReturn(Future.successful(Left(upstreamErrorResponse)))
+        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
+          .thenReturn(Future.failed(upstreamErrorResponse))
 
-        val result: Either[UpstreamErrorResponse, HttpResponse] = connector
-          .updateTaskListJourney(testIsaProductsAnswers, testGroupId, testIsaProductsAnswers.sectionName)
-          .value
-          .futureValue
-
-        result shouldBe Left(upstreamErrorResponse)
+        intercept[Throwable] {
+          connector
+            .updateTaskListJourney(testIsaProductsAnswers, testGroupId, testIsaProductsAnswers.sectionName)
+            .futureValue
+        }
       }
 
       "return UpstreamErrorResponse when the call to DISA Registration fails with an unexpected Throwable exception" in new TestSetup {
         val runtimeException = new RuntimeException("Connection timeout")
 
-        when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
+        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.failed(runtimeException))
 
-        val Left(result): Either[UpstreamErrorResponse, HttpResponse] =
+        intercept[Throwable] {
           connector
             .updateTaskListJourney(testIsaProductsAnswers, testGroupId, testIsaProductsAnswers.sectionName)
-            .value
             .futureValue
-
-        result.statusCode shouldBe 500
-        result.message      should include("Unexpected error: Connection timeout")
+        }
       }
     }
   }

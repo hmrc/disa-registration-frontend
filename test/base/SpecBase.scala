@@ -17,7 +17,6 @@
 package base
 
 import config.FrontendAppConfig
-import connectors.BaseConnector
 import controllers.actions.*
 import models.journeyData.JourneyData
 import org.mockito.Mockito
@@ -60,7 +59,6 @@ trait SpecBase
   protected val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
   protected val mockAppConfig: FrontendAppConfig                 = mock[FrontendAppConfig]
   protected val mockRequestBuilder: RequestBuilder               = mock[RequestBuilder]
-  protected val mockBaseConnector: BaseConnector                 = mock[BaseConnector]
 
   override def beforeEach(): Unit = Mockito.reset()
 

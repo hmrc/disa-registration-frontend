@@ -17,16 +17,16 @@
 package controllers.actions
 
 import base.SpecBase
-import models.DataRetrievalResult.*
 import models.journeyData.JourneyData
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation}
+import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation, status}
 import services.JourneyAnswersService
 
 import scala.concurrent.Future
@@ -42,7 +42,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when NOT FOUND is returned" - {
 
       "must set userAnswers to 'None' in the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Empty)
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.successful(None)
         val action = new Harness(mockJourneyAnswersService)
 
         val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
@@ -54,7 +54,9 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when there is data in the cache" - {
 
       "must build a userAnswers object and add it to the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Found(JourneyData("id")))
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.successful(
+          Some(JourneyData("id"))
+        )
         val action = new Harness(mockJourneyAnswersService)
 
         val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
@@ -65,15 +67,14 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
     "when an upstream error response occurs" - {
 
-      "must redirect to journey recovery" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Failed)
+      "must give an InternalServerError result" in {
+        val ex     = new Exception
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.failed(ex)
         val action = new Harness(mockJourneyAnswersService)
 
         val Left(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
 
-        redirectLocation(Future.successful(result)) mustBe Some(
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
-        )
+        status(Future(result)) mustBe INTERNAL_SERVER_ERROR
       }
     }
   }

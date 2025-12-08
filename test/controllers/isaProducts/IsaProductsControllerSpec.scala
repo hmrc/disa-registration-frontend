@@ -105,7 +105,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       when(
         mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(Some(()))
+      ) thenReturn Future.successful(())
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
@@ -130,7 +130,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       when(
         mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(Some(()))
+      ) thenReturn Future.successful(())
 
       val application =
         applicationBuilder(journeyData = None)
@@ -168,6 +168,31 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+      }
+    }
+
+    "must return Internal Server Error when invalid data is submitted" in {
+
+      when(
+        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.failed(new Exception)
+
+      val application =
+        applicationBuilder(journeyData = None)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, isaProductsRoute)
+            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual INTERNAL_SERVER_ERROR
+        contentAsString(result) must include(messages.messages("journeyRecovery.continue.title"))
       }
     }
   }

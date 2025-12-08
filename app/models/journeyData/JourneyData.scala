@@ -18,7 +18,6 @@ package models.journeyData
 
 import models.journeyData.isaProducts.IsaProducts
 import play.api.libs.json.{Format, Json, Reads, Writes}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
@@ -36,8 +35,5 @@ case class JourneyData(
 )
 
 object JourneyData {
-  implicit val instantFormat: Format[Instant] =
-    Format(MongoJavatimeFormats.instantReads, MongoJavatimeFormats.instantWrites)
-
   implicit val format: Format[JourneyData] = Json.format[JourneyData]
 }

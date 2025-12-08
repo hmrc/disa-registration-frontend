@@ -20,9 +20,10 @@ import controllers.actions.*
 import forms.IsaProductsFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeyData.isaProducts.IsaProducts
 import navigation.Navigator
 import pages.IsaProductsPage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
@@ -37,7 +38,6 @@ class IsaProductsController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   formProvider: IsaProductsFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
@@ -45,7 +45,8 @@ class IsaProductsController @Inject() (
   view: IsaProductsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   val form = formProvider()
 
@@ -71,10 +72,17 @@ class IsaProductsController @Inject() (
               case None           => IsaProducts(isaProducts = Some(answer.toSeq), dataItem2 = None)
             }
 
-          journeyAnswersService.update(updatedSection, request.groupId).flatMap {
-            case None    => errorHandler.internalServerError
-            case Some(_) => Future.successful(Redirect(navigator.nextPage(IsaProductsPage, mode)))
-          }
+          journeyAnswersService
+            .update(updatedSection, request.groupId)
+            .map { _ =>
+              Redirect(navigator.nextPage(IsaProductsPage, mode))
+            }
+            .recoverWith { case e =>
+              logger.warn(
+                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+              )
+              errorHandler.internalServerError
+            }
         }
       )
   }

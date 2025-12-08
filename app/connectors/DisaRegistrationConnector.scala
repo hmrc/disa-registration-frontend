@@ -16,14 +16,15 @@
 
 package connectors
 
-import cats.data.EitherT
 import config.FrontendAppConfig
-import models.journeyData.TaskListSection
+import models.journeyData.{JourneyData, TaskListSection}
+import play.api.Logging
+import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,32 +32,47 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(implicit
   val ec: ExecutionContext
-) extends BaseConnector {
+) extends HttpErrorFunctions
+    with Logging {
   def getJourneyData(
     groupId: String
-  )(implicit hc: HeaderCarrier): EitherT[Future, UpstreamErrorResponse, HttpResponse] = {
+  )(implicit hc: HeaderCarrier): Future[Option[JourneyData]] = {
     val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/store/$groupId"
-    read(
-      http
-        .get(url"$url")
-        .execute[Either[UpstreamErrorResponse, HttpResponse]],
-      context = "DisaRegistrationConnector: getJourneyData"
-    )
+    http
+      .get(url"$url")
+      .execute[JourneyData]
+      .map(Some.apply)
+      .recover {
+        case e: UpstreamErrorResponse if e.statusCode == NOT_FOUND => None
+      }
   }
+
   def updateTaskListJourney[A <: TaskListSection: Writes](
     data: A,
     groupId: String,
     taskListJourney: String
   )(implicit
     hc: HeaderCarrier
-  ): EitherT[Future, UpstreamErrorResponse, HttpResponse] = {
+  ): Future[Unit] = {
     val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/store/$groupId/$taskListJourney"
-    read(
-      http
-        .post(url"$url")
-        .withBody(Json.toJson(data))
-        .execute[Either[UpstreamErrorResponse, HttpResponse]],
-      context = "DisaRegistrationConnector: updateTaskListJourney"
-    )
+    http
+      .post(url"$url")
+      .withBody(Json.toJson(data))
+      .execute[HttpResponse]
+      .flatMap(response =>
+        response.status match {
+          case s if s == NO_CONTENT => Future.successful(())
+          case status               =>
+            logger.error(s"Unexpected status from backend updating journey: [$status] for groupId: [$groupId]")
+            Future.failed(
+              UpstreamErrorResponse(
+                "updateTaskListJourney failed",
+                status,
+                status,
+                response.headers
+              )
+            )
+        }
+      )
   }
 }

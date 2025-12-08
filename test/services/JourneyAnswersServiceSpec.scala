@@ -19,12 +19,10 @@ package services
 import base.SpecBase
 import cats.data.EitherT
 import connectors.DisaRegistrationConnector
-import models.DataRetrievalResult.*
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 
 import scala.concurrent.Future
@@ -36,91 +34,60 @@ class JourneyAnswersServiceSpec extends SpecBase {
 
   val service = new JourneyAnswersService(mockConnector)
 
-  private def rightT[A](resp: HttpResponse): EitherT[Future, UpstreamErrorResponse, HttpResponse] =
-    EitherT.rightT[Future, UpstreamErrorResponse](resp)
-
-  private def leftT[A](err: UpstreamErrorResponse): EitherT[Future, UpstreamErrorResponse, HttpResponse] =
-    EitherT.leftT[Future, HttpResponse](err)
-
   "JourneyAnswersService" - {
 
     "get" - {
 
-      "must return Failed when connector returns a Left (upstream error)" in {
-        val upstreamError = UpstreamErrorResponse("", 500, 500)
-
+      "must return Some(JourneyData)) when connector returns valid JSON in a HttpResponse" in {
         when(mockConnector.getJourneyData(ArgumentMatchers.eq(testGroupId))(any()))
-          .thenReturn(leftT(upstreamError))
+          .thenReturn(Future.successful(Some(testJourneyData)))
 
         val result = service.get(testGroupId).futureValue
 
-        result mustBe Failed
+        result mustBe Some(testJourneyData)
       }
 
-      "must return Empty when connector returns a Not Found" in {
-        val upstreamError = UpstreamErrorResponse("", 404, 404)
-
+      "must return None when connector returns a None" in {
         when(mockConnector.getJourneyData(ArgumentMatchers.eq(testGroupId))(any()))
-          .thenReturn(leftT(upstreamError))
+          .thenReturn(Future.successful(None))
 
         val result = service.get(testGroupId).futureValue
 
-        result mustBe Empty
+        result mustBe None
       }
 
-      "must return Found(JourneyData)) when connector returns valid JSON in a Right" in {
-        val json         = Json.toJson(testJourneyData)
-        val httpResponse = HttpResponse(
-          status = 200,
-          body = json.toString()
-        )
+      "must propagate exception from connector" in {
+        val ex = new Exception
 
         when(mockConnector.getJourneyData(ArgumentMatchers.eq(testGroupId))(any()))
-          .thenReturn(rightT(httpResponse))
+          .thenReturn(Future.failed(ex))
 
-        val result = service.get(testGroupId).futureValue
+        val thrown = service.get(testGroupId).failed.futureValue
 
-        result mustBe Found(testJourneyData)
-      }
-
-      "must return Failed when connector returns Right but JSON validation fails" in {
-        val invalidJson  = Json.obj("something" -> "else")
-        val httpResponse = HttpResponse(
-          status = 200,
-          body = invalidJson.toString()
-        )
-
-        when(mockConnector.getJourneyData(ArgumentMatchers.eq(testGroupId))(any()))
-          .thenReturn(rightT(httpResponse))
-
-        val result = service.get(testGroupId).futureValue
-
-        result mustBe Failed
+        thrown mustBe ex
       }
     }
 
     "update" - {
 
-      "must complete successfully when connector returns Right" in {
-        val httpResponse = HttpResponse(200, "")
-
+      "must complete successfully when connector returns Unit" in {
         when(
           mockConnector.updateTaskListJourney(
             ArgumentMatchers.eq(testIsaProductsAnswers),
             ArgumentMatchers.eq(testGroupId),
             ArgumentMatchers.eq(testIsaProductsAnswers.sectionName)
           )(any(), any())
-        ).thenReturn(rightT(httpResponse))
+        ).thenReturn(Future.successful(()))
 
         val result = service.update(testIsaProductsAnswers, testGroupId).futureValue
 
-        result mustBe Some(())
+        result mustBe ()
         verify(mockConnector)
           .updateTaskListJourney(testIsaProductsAnswers, testGroupId, testIsaProductsAnswers.sectionName)
       }
 
-      "must fail the Future when connector returns Left" in {
-        val upstreamError = UpstreamErrorResponse("boom", 500, 500)
+      "must propagate eexceptioon from connector" in {
+        val ex = new Exception
 
         when(
           mockConnector.updateTaskListJourney(
@@ -128,11 +95,10 @@ class JourneyAnswersServiceSpec extends SpecBase {
             ArgumentMatchers.eq(testGroupId),
             ArgumentMatchers.eq(testIsaProductsAnswers.sectionName)
           )(any(), any())
-        ).thenReturn(leftT(upstreamError))
+        ).thenReturn(Future.failed(ex))
 
-        val result = service.update(testIsaProductsAnswers, testGroupId).futureValue
-
-        result mustBe None
+        val thrown = service.update(testIsaProductsAnswers, testGroupId).failed.futureValue
+        thrown mustBe ex
       }
     }
   }

@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-package models
+package models.journeyData
 
-import models.journeyData.JourneyData
+import play.api.libs.json.{JsValue, Json, OFormat}
+import utils.JsonFormatSpec
 
-sealed trait DataRetrievalResult
+class OutsourcedAdministrationFormatSpec extends JsonFormatSpec[OutsourcedAdministration] {
 
-object DataRetrievalResult {
-  case object Failed extends DataRetrievalResult
-  case object Empty extends DataRetrievalResult
-  final case class Found(data: JourneyData) extends DataRetrievalResult
+  override val model =
+    OutsourcedAdministration(
+      dataItem = Some("foo"),
+      dataItem2 = Some("bar")
+    )
+
+  override val json: JsValue = Json.parse("""
+    {
+      "dataItem": "foo",
+      "dataItem2": "bar"
+    }
+  """)
+
+  override implicit val format: OFormat[OutsourcedAdministration] = OutsourcedAdministration.format
 }
