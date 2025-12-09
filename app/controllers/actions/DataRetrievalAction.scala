@@ -16,22 +16,37 @@
 
 package controllers.actions
 
-import javax.inject.Inject
 import models.requests.{IdentifierRequest, OptionalDataRequest}
-import play.api.mvc.ActionTransformer
-import repositories.SessionRepository
+import play.api.Logging
+import play.api.mvc.Results.InternalServerError
+import play.api.mvc.{ActionRefiner, Result, Results}
+import services.JourneyAnswersService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataRetrievalActionImpl @Inject() (
-  val sessionRepository: SessionRepository
+  journeyAnswersService: JourneyAnswersService
 )(implicit val executionContext: ExecutionContext)
-    extends DataRetrievalAction {
+    extends DataRetrievalAction
+    with Logging {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    sessionRepository.get(request.userId).map {
-      OptionalDataRequest(request.request, request.userId, _)
-    }
+  protected def refine[A](
+    request: IdentifierRequest[A]
+  ): Future[Either[Result, OptionalDataRequest[A]]] = {
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    journeyAnswersService
+      .get(request.groupId)
+      .map { journeyData =>
+        Right(OptionalDataRequest(request.request, request.groupId, journeyData))
+      }
+      .recover { case e: Throwable =>
+        logger.warn(s"Failed to retrieve answers for user with groupId: [${request.groupId}] with error: [$e]")
+        Left(InternalServerError)
+      }
+  }
 }
 
-trait DataRetrievalAction extends ActionTransformer[IdentifierRequest, OptionalDataRequest]
+trait DataRetrievalAction extends ActionRefiner[IdentifierRequest, OptionalDataRequest]

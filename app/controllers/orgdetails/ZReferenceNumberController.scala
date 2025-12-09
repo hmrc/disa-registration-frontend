@@ -19,7 +19,6 @@ package controllers.orgdetails
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import forms.ZReferenceNumberFormProvider
 import models.Mode
-import pages.ZReferenceNumberPage
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -40,14 +39,15 @@ class ZReferenceNumberController @Inject() (
   private val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    val preparedForm = request.userAnswers.fold(form)(_.get(ZReferenceNumberPage) match {
+    val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.zRefNumber match {
       case None        => form
       case Some(value) => form.fill(value)
-    })
+    }))
 
     Future.successful(Ok(view(preparedForm, mode)))
   }
 
+  // TODO implement answer setting
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form
       .bindFromRequest()

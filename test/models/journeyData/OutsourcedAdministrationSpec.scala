@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package queries
+package models.journeyData
 
-import models.UserAnswers
-import play.api.libs.json.JsPath
+import play.api.libs.json.{JsValue, Json, OFormat}
+import utils.JsonFormatSpec
 
-import scala.util.{Success, Try}
+class OutsourcedAdministrationFormatSpec extends JsonFormatSpec[OutsourcedAdministration] {
 
-sealed trait Query {
+  override val model =
+    OutsourcedAdministration(
+      dataItem = Some("foo"),
+      dataItem2 = Some("bar")
+    )
 
-  def path: JsPath
-}
+  override val json: JsValue = Json.parse("""
+    {
+      "dataItem": "foo",
+      "dataItem2": "bar"
+    }
+  """)
 
-trait Gettable[A] extends Query
-
-trait Settable[A] extends Query {
-
-  def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
-    Success(userAnswers)
+  override implicit val format: OFormat[OutsourcedAdministration] = OutsourcedAdministration.format
 }

@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.UserAnswers
+
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.AddLiaisonOfficerView
@@ -28,7 +28,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.AddLiaisonOfficerController.onPageLoad().url)

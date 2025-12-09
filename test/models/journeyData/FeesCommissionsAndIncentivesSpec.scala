@@ -14,8 +14,25 @@
  * limitations under the License.
  */
 
-package pages
+package models.journeyData
 
-import queries.{Gettable, Settable}
+import play.api.libs.json.{JsValue, Json, OFormat}
+import utils.JsonFormatSpec
 
-trait QuestionPage[A] extends Page with Gettable[A] with Settable[A]
+class FeesCommissionsAndIncentivesFormatSpec extends JsonFormatSpec[FeesCommissionsAndIncentives] {
+
+  override val model =
+    FeesCommissionsAndIncentives(
+      dataItem = Some("x"),
+      dataItem2 = Some("y")
+    )
+
+  override val json: JsValue = Json.parse("""
+    {
+      "dataItem": "x",
+      "dataItem2": "y"
+    }
+  """)
+
+  override implicit val format: OFormat[FeesCommissionsAndIncentives] = FeesCommissionsAndIncentives.format
+}
