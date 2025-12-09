@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import org.jsoup.Jsoup
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
@@ -39,7 +40,7 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
           val controller = new UnsupportedAffinityGroupController(
             controllerComponents = application.injector.instanceOf[MessagesControllerComponents],
             unsupportedAffinityGroupView = application.injector.instanceOf[UnsupportedAffinityGroupView],
-            unauthorisedView = application.injector.instanceOf[UnauthorisedView]
+            appConfig = application.injector.instanceOf[FrontendAppConfig]
           )
 
           val result = controller.onPageLoad(AffinityGroup.Agent.toString)(FakeRequest())
@@ -52,6 +53,14 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
             .select("div.govuk-body > p")
             .first()
             .text() mustBe "You’ve signed in using an agent services Government Gateway user ID. Only users with an organisation account can register to use this service."
+          document
+            .select("#main-content > div > div > div > p:nth-child(2) > a")
+            .attr(
+              "href"
+            ) mustBe "http://localhost:9949/auth-login-stub/gg-sign-in?continue=http%3A%2F%2Flocalhost%3A9000%2Fdisa-registration-frontend"
+          document
+            .select("#main-content > div > div > div > a")
+            .attr("href") mustBe "https://www.gov.uk/guidance/apply-to-be-an-isa-manager"
         }
       }
 
@@ -64,7 +73,7 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
           val controller = new UnsupportedAffinityGroupController(
             controllerComponents = application.injector.instanceOf[MessagesControllerComponents],
             unsupportedAffinityGroupView = application.injector.instanceOf[UnsupportedAffinityGroupView],
-            unauthorisedView = application.injector.instanceOf[UnauthorisedView]
+            appConfig = application.injector.instanceOf[FrontendAppConfig]
           )
 
           val result = controller.onPageLoad(AffinityGroup.Individual.toString)(FakeRequest())
@@ -77,6 +86,15 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
             .select("div.govuk-body > p")
             .first()
             .text() mustBe "You’ve signed in with an individual account. Only users with an organisation account can register to use this service."
+          document
+            .select("#main-content > div > div > div > p:nth-child(2) > a")
+            .attr(
+              "href"
+            ) mustBe "http://localhost:9949/auth-login-stub/gg-sign-in?continue=http%3A%2F%2Flocalhost%3A9000%2Fdisa-registration-frontend"
+          document
+            .select("#main-content > div > div > div > a")
+            .attr("href") mustBe "https://www.gov.uk/guidance/apply-to-be-an-isa-manager"
+
         }
       }
     }

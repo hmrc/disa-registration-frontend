@@ -16,22 +16,32 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{UnauthorisedView, UnsupportedAffinityGroupView}
+import views.html.UnsupportedAffinityGroupView
 
+import java.net.URLEncoder
 import javax.inject.Inject
 import scala.concurrent.Future
 
 class UnsupportedAffinityGroupController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   unsupportedAffinityGroupView: UnsupportedAffinityGroupView,
-  unauthorisedView: UnauthorisedView
+  appConfig: FrontendAppConfig
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(affinityGroup: String): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Unauthorized(unsupportedAffinityGroupView(affinityGroup)))
+    Future.successful(
+      Unauthorized(
+        unsupportedAffinityGroupView(
+          affinityGroup = affinityGroup.toLowerCase,
+          loginHref = s"${appConfig.loginUrl}?continue=${URLEncoder.encode(appConfig.loginContinueUrl, "UTF-8")}",
+          guidanceHref = appConfig.isaManagerGuidanceUrl
+        )
+      )
+    )
   }
 }
