@@ -21,6 +21,8 @@ import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 
+import java.net.URLEncoder
+
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
 
@@ -38,6 +40,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val signOutUrl: String            = configuration.get[String]("urls.signOut")
   val isaManagerGuidanceUrl: String =
     configuration.get[String]("urls.isaManagerGuidance")
+  val ggSignInUrl: String = s"$loginUrl?continue=${URLEncoder.encode(loginContinueUrl, "UTF-8")}"
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/disa-registration-frontend"

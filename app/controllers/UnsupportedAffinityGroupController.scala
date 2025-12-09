@@ -22,7 +22,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.UnsupportedAffinityGroupView
 
-import java.net.URLEncoder
 import javax.inject.Inject
 import scala.concurrent.Future
 
@@ -38,7 +37,7 @@ class UnsupportedAffinityGroupController @Inject() (
       Unauthorized(
         unsupportedAffinityGroupView(
           affinityGroup = affinityGroup.toLowerCase,
-          loginHref = s"${appConfig.loginUrl}?continue=${URLEncoder.encode(appConfig.loginContinueUrl, "UTF-8")}",
+          loginHref = appConfig.ggSignInUrl,
           guidanceHref = appConfig.isaManagerGuidanceUrl
         )
       )
