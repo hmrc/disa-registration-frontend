@@ -54,8 +54,8 @@ pageNotFound.heading = Page not found
 pageNotFound.paragraph1 = If you typed the web address, check it is correct.
 pageNotFound.paragraph2 = If you pasted the web address, check you copied the entire address.
 
-unsupportedAffinityGroup.title = Sorry, you're unable to use this service
-unsupportedAffinityGroup.heading = Sorry, you're unable to use this service
+unsupportedAffinityGroup.title = Sorry, you’re unable to use this service
+unsupportedAffinityGroup.heading = Sorry, you’re unable to use this service
 unsupportedAffinityGroup.paragraph1.individual = You’ve signed in with an individual account. Only users with an organisation account can register to use this service.
 unsupportedAffinityGroup.paragraph1.agent = You’ve signed in using an agent services Government Gateway user ID. Only users with an organisation account can register to use this service.
 unsupportedAffinityGroup.paragraph2 = If the group still needs to register,
