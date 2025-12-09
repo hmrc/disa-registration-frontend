@@ -27,7 +27,7 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("isaProducts.title"))) {
+@layout(pageTitle = title(form, messages("isaProducts.title"), Some(messages("sectionTitle.isaProducts")))) {
 
     @formHelper(action = routes.IsaProductsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
