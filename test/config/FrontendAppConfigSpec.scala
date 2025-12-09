@@ -17,26 +17,19 @@
 package config
 
 import base.SpecBase
-import com.typesafe.config.{Config, ConfigFactory}
-import play.api.Configuration
 
 class FrontendAppConfigSpec extends SpecBase {
 
-  private val validConfig: Config =
-    ConfigFactory.parseString("""
-        |microservice.services.disa-registration.protocol=http
-        |microservice.services.disa-registration.host=localhost
-        |microservice.services.disa-registration.port=1201
-      """.stripMargin)
-
-  private val validServicesConfiguration = Configuration(validConfig)
-
-  val validAppConfig: FrontendAppConfig = new FrontendAppConfig(validServicesConfiguration)
+  val appConfig = app.injector.instanceOf[FrontendAppConfig]
 
   "FrontendAppConfig" - {
 
-    "must have valid DISA backend URL" in {
-      validAppConfig.disaRegistrationBaseUrl mustBe "http://localhost:1201"
+    "must generate DISA backend URL" in {
+      appConfig.disaRegistrationBaseUrl mustBe "http://localhost:1201"
+    }
+
+    "must return p2pLoansInformation url" in {
+      appConfig.p2pLoansInformationUrl mustBe "https://www.gov.uk/government/consultations/isa-qualifying-investments-consultation-on-including-peer-to-peer-loans/isa-qualifying-investments-consultation-on-including-peer-to-peer-loans#:~:text=Peer%2Dto%2Dpeer%20loans%20are,terms%20agreed%20between%20the%20parties."
     }
   }
 }

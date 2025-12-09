@@ -23,11 +23,12 @@ import utils.JsonFormatSpec
 class IsaProductsSpec extends JsonFormatSpec[IsaProducts] {
 
   override val model =
-    IsaProducts(isaProducts = Some(Seq(CashIsas)), dataItem2 = None)
+    IsaProducts(isaProducts = Some(Seq(CashIsas)), p2pPlatform = Some(testString))
 
   override val json: JsValue = Json.parse("""
     {
-     "isaProducts": ["cashIsas"]
+     "isaProducts": ["cashIsas"],
+     "p2pPlatform": "test"
     }
   """)
 

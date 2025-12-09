@@ -97,6 +97,16 @@ isaProducts.innovativeFinanceIsas = Innovative Finance ISAs
 isaProducts.error.required = Select the ISA products your organisation offers
 isaProducts.hint = Select all that apply
 
+peerToPeerPlatform.title = Which platform does your organisation use to offer peer-to-peer loans?
+peerToPeerPlatform.heading = Which platform does your organisation use to offer peer-to-peer loans?
+peerToPeerPlatform.error.required = Enter which platform your organisation uses to offer peer-to-peer loans
+peerToPeerPlatform.details.summary = What is a peer-to-peer loan?
+peerToPeerPlatform.details.content.p1 = Peer-to-peer loans are direct transactions between investors willing to lend money and borrowers seeking loans.
+peerToPeerPlatform.details.content.p2 = These parties are brought together by an electronic platform which introduces and arranges the loan documentation between the lender and the borrower.
+peerToPeerPlatform.details.content.p3 = It then manages the payment of interest and repayment of the principal according to the terms agreed between the parties.
+peerToPeerPlatform.details.content.link = Find out more about peer-to-peer loans
+peerToPeerPlatform.change.hidden = PeerToPeerPlatform
+
 ### Signatories
 addASignatory.title = Add a signatory
 addASignatory.heading = Add a signatory
