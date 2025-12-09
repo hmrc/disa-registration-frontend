@@ -22,7 +22,6 @@ import models.journeyData.isaProducts.IsaProducts
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
-import play.api.libs.json.{JsResultException, Json}
 import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 import scala.concurrent.Future

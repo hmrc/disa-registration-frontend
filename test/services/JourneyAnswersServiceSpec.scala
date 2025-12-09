@@ -17,13 +17,11 @@
 package services
 
 import base.SpecBase
-import cats.data.EitherT
 import connectors.DisaRegistrationConnector
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
-import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 
 import scala.concurrent.Future
 
@@ -86,7 +84,7 @@ class JourneyAnswersServiceSpec extends SpecBase {
           .updateTaskListJourney(testIsaProductsAnswers, testGroupId, testIsaProductsAnswers.sectionName)
       }
 
-      "must propagate eexceptioon from connector" in {
+      "must propagate exceptioon from connector" in {
         val ex = new Exception
 
         when(

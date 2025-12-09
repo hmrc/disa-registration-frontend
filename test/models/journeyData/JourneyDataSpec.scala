@@ -35,8 +35,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       liaisonOfficers = Some(LiaisonOfficers(Some("L"), Some("LO"))),
       signatories = None,
       outsourcedAdministration = Some(OutsourcedAdministration(Some("O1"), Some("O2"))),
-      feesCommissionsAndIncentives = Some(FeesCommissionsAndIncentives(Some("F1"), Some("F2"))),
-      lastUpdated = Some(instant)
+      feesCommissionsAndIncentives = Some(FeesCommissionsAndIncentives(Some("F1"), Some("F2")))
     )
 
   override val json: JsValue = Json.parse("""
@@ -51,8 +50,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       "certificatesOfAuthority": { "dataItem": "C", "dataItem2": "D" },
       "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
       "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
-      "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" },
-      "lastUpdated": "2024-01-01T12:00:00Z"
+      "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" }
     }
   """)
 

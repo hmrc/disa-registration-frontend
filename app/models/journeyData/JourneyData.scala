@@ -19,8 +19,6 @@ package models.journeyData
 import models.journeyData.isaProducts.IsaProducts
 import play.api.libs.json.{Format, Json, Reads, Writes}
 
-import java.time.Instant
-
 case class JourneyData(
   groupId: String,
   businessVerification: Option[BusinessVerification] = None,
@@ -30,8 +28,7 @@ case class JourneyData(
   liaisonOfficers: Option[LiaisonOfficers] = None,
   signatories: Option[Signatories] = None,
   outsourcedAdministration: Option[OutsourcedAdministration] = None,
-  feesCommissionsAndIncentives: Option[FeesCommissionsAndIncentives] = None,
-  lastUpdated: Option[Instant] = None
+  feesCommissionsAndIncentives: Option[FeesCommissionsAndIncentives] = None
 )
 
 object JourneyData {

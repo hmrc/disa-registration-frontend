@@ -25,13 +25,12 @@ import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import services.JourneyAnswersService
 
 import scala.concurrent.Future
 
 class DataRequiredActionSpec extends SpecBase with MockitoSugar {
 
-  class Harness(journeyAnswersService: JourneyAnswersService) extends DataRequiredActionImpl() {
+  class Harness extends DataRequiredActionImpl() {
     def callTransform[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] = refine(request)
   }
 
@@ -41,7 +40,7 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar {
 
       "must set userAnswers to 'None' in the request" in {
         when(mockJourneyAnswersService.get(ArgumentMatchers.eq(testGroupId))(any)) thenReturn Future(None)
-        val action = new Harness(mockJourneyAnswersService)
+        val action = new Harness
 
         val result = action.callTransform(OptionalDataRequest(FakeRequest(), testGroupId, None)).futureValue
 
@@ -53,7 +52,7 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar {
 
       "must build a userAnswers object and add it to the request" in {
         when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Some(JourneyData("id")))
-        val action = new Harness(mockJourneyAnswersService)
+        val action = new Harness
 
         val Right(result) =
           action.callTransform(OptionalDataRequest(FakeRequest(), testGroupId, Some(testJourneyData))).futureValue
