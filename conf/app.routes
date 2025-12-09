@@ -34,4 +34,5 @@ GET        /change-z-reference-number                    controllers.orgdetails.
 POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
 ### LOs and Signatories
-GET        /add-liaison-officer                       controllers.AddLiaisonOfficerController.onPageLoad()
+GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
+GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()

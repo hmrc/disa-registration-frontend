@@ -57,6 +57,7 @@ pageNotFound.paragraph2 = If you pasted the web address, check you copied the en
 ## Section Titles
 
 sectionTitle.orgDetails = Organisation details
+sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
 
 ### Organisation Details
@@ -83,6 +84,12 @@ page.signOut.title = We have saved your answers and signed you out
 page.signOut.heading = We have saved your answers and signed you out
 page.signOut.answers.not.saved.title = We have signed you out
 page.signOut.answers.not.saved.heading = We have signed you out
+
+addASignatory.title = Add a signatory
+addASignatory.heading = Add a signatory
+addASignatory.p1 = You must have at least 1 signatory. The maximum is 25.
+addASignatory.details.summary = What is a signatory?
+addASignatory.details.content = A signatory is the appointed person who will act with the authority to sign formal documentation on behalf of your organisation.
 
 addLiaisonOfficer.title = Add liaison officer
 addLiaisonOfficer.heading = Add liaison officer
