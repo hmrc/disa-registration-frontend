@@ -11,7 +11,7 @@ GET         /language/:lang                              controllers.LanguageSwi
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 GET         /refresh-session                                    controllers.KeepAliveController.keepAlive()
 
-GET         /recovery                               controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
@@ -24,7 +24,7 @@ GET         /account/sign-out-answers-not-saved          controllers.auth.Signed
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 GET         /unsupported-affinity-group                  controllers.UnsupportedAffinityGroupController.onPageLoad(affinityGroup: String)
 
-GET         /there-is-a-problem                          controllers.InternalServerErrorController.onPageLoad()
+GET         /problem-with-service                        controllers.InternalServerErrorController.onPageLoad()
 
 ### Organisation Details
 GET        /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
