@@ -67,6 +67,7 @@ page.signOut.answers.not.saved.heading = We have signed you out
 ## Section Titles
 
 sectionTitle.orgDetails = Organisation details
+sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
 sectionTitle.isaProducts = ISA products
 
@@ -95,6 +96,13 @@ isaProducts.stocksAndSharesJuniorIsas = Stocks and Shares Junior ISAs
 isaProducts.innovativeFinanceIsas = Innovative Finance ISAs
 isaProducts.error.required = Select the ISA products your organisation offers
 isaProducts.hint = Select all that apply
+
+### Signatories
+addASignatory.title = Add a signatory
+addASignatory.heading = Add a signatory
+addASignatory.p1 = You must have at least 1 signatory. The maximum is 25.
+addASignatory.details.summary = What is a signatory?
+addASignatory.details.content = A signatory is the appointed person who will act with the authority to sign formal documentation on behalf of your organisation.
 
 ### LOs
 addLiaisonOfficer.title = Add liaison officer

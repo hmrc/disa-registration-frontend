@@ -38,4 +38,5 @@ GET        /change-isa-products                  controllers.IsaProductsControll
 POST       /change-isa-products                  controllers.IsaProductsController.onSubmit(mode: Mode = CheckMode)
 
 ### LOs and Signatories
-GET        /add-liaison-officer                       controllers.AddLiaisonOfficerController.onPageLoad()
+GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
+GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()
