@@ -22,6 +22,8 @@ GET         /account/sign-out-answers-not-saved          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
+GET         /problem-with-service                        controllers.InternalServerErrorController.onPageLoad()
+
 ### Organisation Details
 GET        /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
 POST       /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode)
