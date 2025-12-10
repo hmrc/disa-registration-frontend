@@ -53,7 +53,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
 
   "InnovativeFinancialProducts Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and correctly load the InnovativeFinancialProducts page"  in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
@@ -70,7 +70,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "on pageLoad must populate the InnovativeFinancialProducts page correctly when the question has previously been answered" in {
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
