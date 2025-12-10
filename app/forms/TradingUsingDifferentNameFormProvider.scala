@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package forms
 
-import play.api.libs.json.{Json, OFormat}
+import javax.inject.Inject
 
-case class OrganisationDetails(
-  registeredToManageIsa: Option[Boolean] = None,
-  zRefNumber: Option[String] = None,
-  tradingUsingDifferentName: Option[Boolean] = None,
-  fcaNumber: Option[String] = None,
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  orgTelephoneNumber: Option[String] = None
-) extends TaskListSection {
-  override def sectionName: String = "organisationDetails"
-}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-object OrganisationDetails {
-  implicit val format: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
+class TradingUsingDifferentNameFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Boolean] =
+    Form(
+      "value" -> boolean("tradingUsingDifferentName.error.required")
+    )
 }

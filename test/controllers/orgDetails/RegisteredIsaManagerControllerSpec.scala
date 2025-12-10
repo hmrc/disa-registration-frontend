@@ -14,40 +14,50 @@
  * limitations under the License.
  */
 
-package controllers.orgdetails
+package controllers.orgDetails
 
 import base.SpecBase
-import forms.ZReferenceNumberFormProvider
+import controllers.orgDetails
+import forms.RegisteredIsaManagerFormProvider
 import models.NormalMode
 import models.journeyData.isaProducts.IsaProducts
 import models.journeyData.{JourneyData, OrganisationDetails}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
+import play.api.inject.bind
+import play.api.libs.json.Writes
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.orgdetails.ZReferenceNumberView
+import views.html.orgDetails.RegisteredIsaManagerView
 
-// TODO add tests back in when next page is present and UAs are wired up
-class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
+import scala.concurrent.Future
 
-  // def onwardRoute = Call("GET", "/foo")
+class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider = new ZReferenceNumberFormProvider()
-  val form         = formProvider()
+  def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val zReferenceNumberRoute = routes.ZReferenceNumberController.onPageLoad(NormalMode).url
+  val formProvider        = new RegisteredIsaManagerFormProvider()
+  val form: Form[Boolean] = formProvider()
 
-  "ZReferenceNumber Controller" - {
+  lazy val registeredIsaManagerRoute: String =
+    orgDetails.routes.RegisteredIsaManagerController.onPageLoad(NormalMode).url
+
+  "RegisteredIsaManager Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, zReferenceNumberRoute)
+        val request = FakeRequest(GET, registeredIsaManagerRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ZReferenceNumberView]
+        val view = application.injector.instanceOf[RegisteredIsaManagerView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
@@ -56,48 +66,49 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val journeyData =
-        JourneyData(groupId = testGroupId, organisationDetails = Some(OrganisationDetails(zRefNumber = Some("zRef"))))
+      val journeyData = JourneyData(
+        groupId = testGroupId,
+        organisationDetails = Some(OrganisationDetails(registeredToManageIsa = Some(true)))
+      )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, zReferenceNumberRoute)
+        val request = FakeRequest(GET, registeredIsaManagerRoute)
 
-        val view = application.injector.instanceOf[ZReferenceNumberView]
+        val view = application.injector.instanceOf[RegisteredIsaManagerView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("zRef"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
       }
     }
 
-//    "must redirect to the next page when valid data is submitted" in {
-//
-//      val mockSessionRepository = mock[SessionRepository]
-//
-//      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-//
-//      val application =
-//        applicationBuilder(journeyData = Some(emptyJourneyData))
-//          .overrides(
-//            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-//            bind[SessionRepository].toInstance(mockSessionRepository)
-//          )
-//          .build()
-//
-//      running(application) {
-//        val request =
-//          FakeRequest(POST, zReferenceNumberRoute)
-//            .withFormUrlEncodedBody(("value", "answer"))
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual onwardRoute.url
-//      }
-//    }
+    "must redirect to the next page when valid data is submitted" in {
+
+      when(
+        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(())
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, registeredIsaManagerRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
@@ -105,12 +116,12 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, zReferenceNumberRoute)
+          FakeRequest(POST, registeredIsaManagerRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[ZReferenceNumberView]
+        val view = application.injector.instanceOf[RegisteredIsaManagerView]
 
         val result = route(application, request).value
 
@@ -118,18 +129,18 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
-
+// TODO add back in when user answer setting is in place
 //    "must redirect to Journey Recovery for a GET if no existing data is found" in {
 //
 //      val application = applicationBuilder(journeyData = None).build()
 //
 //      running(application) {
-//        val request = FakeRequest(GET, zReferenceNumberRoute)
+//        val request = FakeRequest(GET, registeredIsaManagerRoute)
 //
 //        val result = route(application, request).value
 //
 //        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+//        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 //      }
 //    }
 //
@@ -139,13 +150,13 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 //
 //      running(application) {
 //        val request =
-//          FakeRequest(POST, zReferenceNumberRoute)
-//            .withFormUrlEncodedBody(("value", "answer"))
+//          FakeRequest(POST, registeredIsaManagerRoute)
+//            .withFormUrlEncodedBody(("value", "true"))
 //
 //        val result = route(application, request).value
 //
 //        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
+//        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 //      }
 //    }
   }
