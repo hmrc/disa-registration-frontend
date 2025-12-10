@@ -22,8 +22,9 @@ import play.api.libs.json.{Json, OFormat}
 case class IsaProducts(
   isaProducts: Option[Seq[IsaProduct]] = None,
   p2pPlatform: Option[String] = None,
+  p2pPlatformNumber: Option[String] = None,
   innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
-) extends TaskListSection {
+                      ) extends TaskListSection {
   override def sectionName: String = "isaProducts"
 }
 

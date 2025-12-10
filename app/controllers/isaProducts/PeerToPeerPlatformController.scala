@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.isaProducts
 
 import controllers.actions.*
 import forms.PeerToPeerPlatformFormProvider
@@ -28,7 +28,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.PeerToPeerPlatformView
+import views.html.isaProducts.PeerToPeerPlatformView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

@@ -16,17 +16,35 @@
 
 package forms
 
+import base.SpecBase
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
+import play.api.test.Helpers
 
-class PeerToPeerPlatformFormProviderSpec extends StringFieldBehaviours {
+class PeerToPeerPlatformNumberFormProviderSpec extends SpecBase with StringFieldBehaviours {
 
-  val requiredKey = "peerToPeerPlatform.error.required"
-  val form        = new PeerToPeerPlatformFormProvider()()
+  private val requiredKey = "peerToPeerPlatformNumber.error.required"
+  private val patternKey  = "peerToPeerPlatformNumber.error.pattern"
+  private val pattern     = """^[0-9]{6,7}$""".r
+
+  val form = new PeerToPeerPlatformNumberFormProvider().apply(testString)(Helpers.stubMessages())
 
   ".value" - {
 
     val fieldName = "value"
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      numericOfLength(6, 7)
+    )
+
+    behave like fieldWithPattern(
+      form,
+      fieldName,
+      pattern = pattern,
+      error = FormError(fieldName, patternKey, Seq(pattern.toString))
+    )
 
     behave like mandatoryField(
       form,

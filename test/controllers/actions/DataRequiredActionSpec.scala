@@ -55,7 +55,9 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar {
         val action = new Harness
 
         val Right(result) =
-          action.callTransform(OptionalDataRequest(FakeRequest(), testGroupId, Some(testJourneyData))).futureValue
+          action
+            .callTransform(OptionalDataRequest(FakeRequest(), testGroupId, Some(testJourneyData)))
+            .futureValue: @unchecked
 
         result.groupId mustBe testGroupId
         result.journeyData mustBe testJourneyData

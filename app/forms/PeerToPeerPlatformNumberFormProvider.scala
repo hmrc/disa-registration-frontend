@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package forms
 
-import play.api.libs.json.{JsValue, Json, OFormat}
-import utils.JsonFormatSpec
+import javax.inject.Inject
+import forms.mappings.Mappings
+import play.api.data.Form
+import play.api.i18n.Messages
 
-class OutsourcedAdministrationFormatSpec extends JsonFormatSpec[OutsourcedAdministration] {
+class PeerToPeerPlatformNumberFormProvider @Inject() extends Mappings {
 
-  override val model =
-    OutsourcedAdministration(
-      dataItem = Some("foo"),
-      dataItem2 = Some("bar")
+  private val validPattern = """^[0-9]{6,7}$"""
+
+  def apply(platformName: String)(implicit messages: Messages): Form[String] =
+    Form(
+      "value" -> text(messages("peerToPeerPlatformNumber.error.required", platformName))
+        .verifying(regexp(validPattern, messages("peerToPeerPlatformNumber.error.pattern", platformName)))
     )
-
-  override val json: JsValue = Json.parse("""
-    {
-      "dataItem": "foo",
-      "dataItem2": "bar"
-    }
-  """)
-
-  override implicit val format: OFormat[OutsourcedAdministration] = OutsourcedAdministration.format
 }

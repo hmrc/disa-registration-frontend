@@ -14,25 +14,9 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package pages
 
-import play.api.libs.json.{JsValue, Json, OFormat}
-import utils.JsonFormatSpec
+case object PeerToPeerPlatformNumberPage extends Page {
 
-class FeesCommissionsAndIncentivesFormatSpec extends JsonFormatSpec[FeesCommissionsAndIncentives] {
-
-  override val model =
-    FeesCommissionsAndIncentives(
-      dataItem = Some("x"),
-      dataItem2 = Some("y")
-    )
-
-  override val json: JsValue = Json.parse("""
-    {
-      "dataItem": "x",
-      "dataItem2": "y"
-    }
-  """)
-
-  override implicit val format: OFormat[FeesCommissionsAndIncentives] = FeesCommissionsAndIncentives.format
+  override def toString: String = "peerToPeerPlatformNumber"
 }

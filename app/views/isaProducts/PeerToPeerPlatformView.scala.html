@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import config.FrontendAppConfig
+@import controllers.isaProducts.routes.PeerToPeerPlatformController
 
 @this(
     layout: templates.Layout,
@@ -40,7 +41,7 @@
 
 @layout(pageTitle = title(form, messages("peerToPeerPlatform.title"), Some(messages("sectionTitle.isaProducts")))) {
 
-    @formHelper(action = routes.PeerToPeerPlatformController.onSubmit(mode)) {
+    @formHelper(action = PeerToPeerPlatformController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

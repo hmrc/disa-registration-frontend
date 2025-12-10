@@ -16,6 +16,7 @@
 
 @import models.journeyData.isaProducts.IsaProduct
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+@import controllers.isaProducts.routes.IsaProductsController
 
 @this(
     layout: templates.Layout,
@@ -29,7 +30,7 @@
 
 @layout(pageTitle = title(form, messages("isaProducts.title"), Some(messages("sectionTitle.isaProducts")))) {
 
-    @formHelper(action = controllers.isaProducts.routes.IsaProductsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = IsaProductsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

@@ -17,6 +17,7 @@
 package controllers.isaProducts
 
 import base.SpecBase
+import controllers.isaProducts.routes.IsaProductsController
 import forms.IsaProductsFormProvider
 import models.NormalMode
 import models.journeyData.JourneyData
@@ -39,7 +40,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val isaProductsRoute: String = routes.IsaProductsController.onPageLoad(NormalMode).url
+  lazy val isaProductsRoute: String = IsaProductsController.onPageLoad(NormalMode).url
 
   val formProvider                = new IsaProductsFormProvider()
   val form: Form[Set[IsaProduct]] = formProvider()

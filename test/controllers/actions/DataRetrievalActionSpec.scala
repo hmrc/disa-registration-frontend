@@ -45,7 +45,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
         when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.successful(None)
         val action = new Harness(mockJourneyAnswersService)
 
-        val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
+        val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue: @unchecked
 
         result.journeyData must not be defined
       }
@@ -59,7 +59,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
         )
         val action = new Harness(mockJourneyAnswersService)
 
-        val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
+        val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue: @unchecked
 
         result.journeyData mustBe defined
       }
@@ -72,7 +72,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
         when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.failed(ex)
         val action = new Harness(mockJourneyAnswersService)
 
-        val Left(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue
+        val Left(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue: @unchecked
 
         status(Future(result)) mustBe INTERNAL_SERVER_ERROR
       }

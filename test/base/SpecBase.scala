@@ -49,7 +49,9 @@ trait SpecBase
     with BeforeAndAfterEach
     with TestData {
 
-  def messages(implicit app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+  implicit def messages(implicit app: Application): Messages   =
+    app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+  def messages(key: String)(implicit app: Application): String = messages(app).messages(key)
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()

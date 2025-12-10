@@ -16,25 +16,25 @@
 
 package viewmodels.checkAnswers
 
-import controllers.isaProducts.routes.PeerToPeerPlatformController
-import models.journeyData.JourneyData
+import controllers.isaProducts.routes.PeerToPeerPlatformNumberController
 import models.CheckMode
+import models.journeyData.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PeerToPeerPlatformSummary {
+object PeerToPeerPlatformNumberSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.isaProducts.flatMap(_.p2pPlatform).map { answer =>
+    answers.isaProducts.flatMap(_.p2pPlatformNumber).map { answer =>
       SummaryListRowViewModel(
-        key = "peerToPeerPlatform.checkYourAnswersLabel",
+        key = "peerToPeerPlatformNumber.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", PeerToPeerPlatformController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("peerToPeerPlatform.change.hidden"))
+          ActionItemViewModel("site.change", PeerToPeerPlatformNumberController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("peerToPeerPlatformNumber.change.hidden"))
         )
       )
     }

@@ -16,6 +16,7 @@
 
 package models.journeyData
 
+import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
 
@@ -30,7 +31,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       groupId = "ABC123",
       businessVerification = Some(BusinessVerification(Some("A"), Some("B"))),
       organisationDetails = Some(OrganisationDetails(Some(true), Some("Z1"), Some("F1"), None, None)),
-      isaProducts = None,
+      isaProducts = Some(IsaProducts(Some(IsaProduct.values), Some(testString), Some(testString))),
       certificatesOfAuthority = Some(CertificatesOfAuthority(Some("C"), Some("D"))),
       liaisonOfficers = Some(LiaisonOfficers(Some("L"), Some("LO"))),
       signatories = None,
@@ -46,6 +47,11 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "registeredToManageIsa": true,
         "zRefNumber": "Z1",
         "fcaNumber": "F1"
+      },
+      "isaProducts": {
+        "isaProducts" : ["cashIsas","cashJuniorIsas","stocksAndSharesIsas","stocksAndSharesJuniorIsas","innovativeFinanceIsas"],
+        "p2pPlatform": "test",
+        "p2pPlatformNumber": "test"
       },
       "certificatesOfAuthority": { "dataItem": "C", "dataItem2": "D" },
       "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
