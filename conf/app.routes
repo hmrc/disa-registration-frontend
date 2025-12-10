@@ -37,10 +37,10 @@ POST       /isa-products                        controllers.IsaProductsControlle
 GET        /change-isa-products                  controllers.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-isa-products                  controllers.IsaProductsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /peer-to-peer-platform                        controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = NormalMode)
-POST       /peer-to-peer-platform                          controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = NormalMode)
-GET        /change-peer-to-peer-platform                    controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-peer-to-peer-platform                    controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = CheckMode)
+GET        /peer-to-peer-loans                      controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = NormalMode)
+POST       /peer-to-peer-loans                        controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = NormalMode)
+GET        /change-peer-to-peer-loans                  controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-peer-to-peer-loans                  controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = CheckMode)
 
 ### LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
