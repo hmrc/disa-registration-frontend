@@ -53,7 +53,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
 
   "InnovativeFinancialProducts Controller" - {
 
-    "must return OK and correctly load the InnovativeFinancialProducts page"  in {
+    "must return OK and correctly load the InnovativeFinancialProducts page" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
