@@ -30,25 +30,25 @@
 
 @layout(pageTitle = title(form, messages("innovativeFinancialProducts.title"),Some(messages("sectionTitle.isaProducts")))) {
 
-@formHelper(action = controllers.isaProducts.routes.InnovativeFinancialProductsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.isaProducts.routes.InnovativeFinancialProductsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
-@if(form.errors.nonEmpty) {
-@govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
-}
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+        }
 
-@govukCheckboxes(
-CheckboxesViewModel(
-form   = form,
-name   = "innovativeFinancialProducts",
-hint   = Some(Hint(content = Text(messages("isaProducts.hint")))),
-legend = LegendViewModel(messages("innovativeFinancialProducts.heading")).asPageHeading(),
-items  = InnovativeFinancialProduct.checkboxItems
-)
-.withHeadingAndSectionCaption(Text(messages("innovativeFinancialProducts.heading")), Text(messages("sectionTitle.isaProducts")))
-)
+        @govukCheckboxes(
+            CheckboxesViewModel(
+                form   = form,
+                name   = "innovativeFinancialProducts",
+                hint   = Some(Hint(content = Text(messages("isaProducts.hint")))),
+                legend = LegendViewModel(messages("innovativeFinancialProducts.heading")).asPageHeading(),
+                items  = InnovativeFinancialProduct.checkboxItems
+            )
+            .withHeadingAndSectionCaption(Text(messages("innovativeFinancialProducts.heading")), Text(messages("sectionTitle.isaProducts")))
+        )
 
-@govukButton(
-ButtonViewModel(messages("site.saveAndContinue"))
-)
-}
+        @govukButton(
+            ButtonViewModel(messages("site.saveAndContinue"))
+        )
+    }
 }
