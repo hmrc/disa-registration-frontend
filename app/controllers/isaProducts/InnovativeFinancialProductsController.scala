@@ -14,51 +14,49 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.isaProducts
 
 import controllers.actions.*
-import forms.IsaProductsFormProvider
+import forms.InnovativeFinancialProductsFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.isaProducts.IsaProducts
+import models.journeyData.isaProducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.Navigator
-import pages.IsaProductsPage
+import pages.InnovativeFinancialProductsPage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IsaProductsView
+import utils.FormPreparationHelper.prepareForm
+import views.html.isaProducts.InnovativeFinancialProductsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IsaProductsController @Inject() (
+class InnovativeFinancialProductsController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  formProvider: IsaProductsFormProvider,
+  formProvider: InnovativeFinancialProductsFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
   val controllerComponents: MessagesControllerComponents,
-  view: IsaProductsView
+  view: InnovativeFinancialProductsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = (for {
-      journeyData <- request.journeyData
-      products    <- journeyData.isaProducts
-      values      <- products.isaProducts
-    } yield form.fill(values.toSet)).getOrElse(form)
-
-    Ok(view(preparedForm, mode))
-  }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData) { implicit request =>
+      val preparedForm = prepareForm(form)(_.isaProducts.flatMap(_.innovativeFinancialProducts))(_.toSet)
+      Ok(view(preparedForm, mode))
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form
@@ -68,14 +66,14 @@ class IsaProductsController @Inject() (
         answer => {
           val updatedSection =
             request.journeyData.flatMap(_.isaProducts) match {
-              case Some(existing) => existing.copy(isaProducts = Some(answer.toSeq))
-              case None           => IsaProducts(isaProducts = Some(answer.toSeq))
+              case Some(existing) => existing.copy(innovativeFinancialProducts = Some(answer.toSeq))
+              case None           => IsaProducts(isaProducts = None, innovativeFinancialProducts = Some(answer.toSeq))
             }
 
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { _ =>
-              Redirect(navigator.nextPage(IsaProductsPage, mode))
+              Redirect(navigator.nextPage(InnovativeFinancialProductsPage, mode))
             }
             .recoverWith { case e =>
               logger.warn(

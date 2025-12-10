@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package utils
+package pages
 
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+case object InnovativeFinancialProductsPage extends Page {
 
-trait TestData {
-  val testGroupId: String           = "id"
-  def emptyJourneyData: JourneyData = JourneyData(testGroupId)
-
-  val testIsaProductsAnswers: IsaProducts.this.IsaProducts = IsaProducts(Some(IsaProduct.values), None)
-  val testJourneyData: JourneyData = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
-  val testString             = "test"
+  override def toString: String = "innovativeFinancialProducts"
 }

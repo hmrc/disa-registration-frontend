@@ -17,13 +17,21 @@
 package utils
 
 import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.requests.OptionalDataRequest
+import play.api.data.Form
 
-trait TestData {
-  val testGroupId: String           = "id"
-  def emptyJourneyData: JourneyData = JourneyData(testGroupId)
+object FormPreparationHelper {
 
-  val testIsaProductsAnswers: IsaProducts.this.IsaProducts = IsaProducts(Some(IsaProduct.values), None)
-  val testJourneyData: JourneyData = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
-  val testString             = "test"
+  def prepareForm[T, A](
+    form: Form[A]
+  )(extractor: JourneyData => Option[T])(toFillValue: T => A)(implicit request: OptionalDataRequest[_]): Form[A] =
+    request.journeyData match {
+      case Some(journey) =>
+        extractor(journey) match {
+          case Some(value) => form.fill(toFillValue(value))
+          case None        => form
+        }
+      case None          =>
+        form
+    }
 }

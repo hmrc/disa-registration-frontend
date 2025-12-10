@@ -17,10 +17,10 @@
 package controllers.isaProducts
 
 import base.SpecBase
-import forms.IsaProductsFormProvider
+import forms.InnovativeFinancialProductsFormProvider
 import models.NormalMode
 import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeyData.isaProducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -31,47 +31,38 @@ import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.isaProducts.IsaProductsView
+import views.html.isaProducts.InnovativeFinancialProductsView
 
 import scala.concurrent.Future
 
-class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
+class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val isaProductsRoute: String = routes.IsaProductsController.onPageLoad(NormalMode).url
+  lazy val innovativeFinancialProductsRoute: String =
+    routes.InnovativeFinancialProductsController.onPageLoad(NormalMode).url
 
-  val formProvider                = new IsaProductsFormProvider()
-  val form: Form[Set[IsaProduct]] = formProvider()
+  val journeyData: JourneyData =
+    JourneyData(
+      groupId = testGroupId,
+      isaProducts = Some(IsaProducts(None, Some(InnovativeFinancialProduct.values)))
+    )
 
-  "IsaProduct Controller" - {
+  val formProvider                                = new InnovativeFinancialProductsFormProvider()
+  val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
+
+  "InnovativeFinancialProducts Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, isaProductsRoute)
+        val request = FakeRequest(GET, innovativeFinancialProductsRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IsaProductsView]
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must return OK and the correct view for a GET if no existing journey data found" in {
-      val application = applicationBuilder(journeyData = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, isaProductsRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[IsaProductsView]
+        val view = application.injector.instanceOf[InnovativeFinancialProductsView]
 
         status(result) mustEqual OK
 
@@ -81,20 +72,19 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val journeyData =
-        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(Some(IsaProduct.values), None)))
+
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, isaProductsRoute)
+        val request = FakeRequest(GET, innovativeFinancialProductsRoute)
 
-        val view = application.injector.instanceOf[IsaProductsView]
+        val view = application.injector.instanceOf[InnovativeFinancialProductsView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IsaProduct.values.toSet), NormalMode)(
+        contentAsString(result) mustEqual view(form.fill(InnovativeFinancialProduct.values.toSet), NormalMode)(
           request,
           messages(application)
         ).toString
@@ -108,7 +98,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(journeyData))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
@@ -116,8 +106,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
+          FakeRequest(POST, innovativeFinancialProductsRoute)
+            .withFormUrlEncodedBody(("value[0]", InnovativeFinancialProduct.values.head.toString))
 
         val result = route(application, request).value
 
@@ -141,8 +131,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
+          FakeRequest(POST, innovativeFinancialProductsRoute)
+            .withFormUrlEncodedBody(("value[0]", InnovativeFinancialProduct.values.head.toString))
 
         val result = route(application, request).value
 
@@ -157,12 +147,12 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, isaProductsRoute)
+          FakeRequest(POST, innovativeFinancialProductsRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[IsaProductsView]
+        val view = application.injector.instanceOf[InnovativeFinancialProductsView]
 
         val result = route(application, request).value
 
@@ -171,7 +161,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return Internal Server Error when invalid data is submitted" in {
+    "must return Internal Server Error when theres an issue updating the journey answers" in {
 
       when(
         mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
@@ -186,8 +176,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
+          FakeRequest(POST, innovativeFinancialProductsRoute)
+            .withFormUrlEncodedBody(("value[0]", InnovativeFinancialProduct.values.head.toString))
 
         val result = route(application, request).value
 

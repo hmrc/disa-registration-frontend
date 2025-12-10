@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package utils
+package forms
 
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import javax.inject.Inject
+import forms.mappings.Mappings
+import play.api.data.Form
+import play.api.data.Forms.set
+import models.journeyData.isaProducts.InnovativeFinancialProduct
 
-trait TestData {
-  val testGroupId: String           = "id"
-  def emptyJourneyData: JourneyData = JourneyData(testGroupId)
+class InnovativeFinancialProductsFormProvider @Inject() extends Mappings {
 
-  val testIsaProductsAnswers: IsaProducts.this.IsaProducts = IsaProducts(Some(IsaProduct.values), None)
-  val testJourneyData: JourneyData = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
-  val testString             = "test"
+  def apply(): Form[Set[InnovativeFinancialProduct]] =
+    Form(
+      "value" -> set(enumerable[InnovativeFinancialProduct]("innovativeFinancialProducts.error.required"))
+        .verifying(nonEmptySet("innovativeFinancialProducts.error.required"))
+    )
 }

@@ -22,13 +22,18 @@ import utils.JsonFormatSpec
 
 class IsaProductsSpec extends JsonFormatSpec[IsaProducts] {
 
-  override val model =
-    IsaProducts(isaProducts = Some(Seq(CashIsas)), p2pPlatform = Some(testString))
+  override val model: IsaProducts =
+    IsaProducts(
+      isaProducts = Some(Seq(CashIsas)),
+      p2pPlatform = Some(testString))
+      innovativeFinancialProducts = Some(InnovativeFinancialProduct.values)
+    )
 
   override val json: JsValue = Json.parse("""
     {
      "isaProducts": ["cashIsas"],
      "p2pPlatform": "test"
+     "innovativeFinancialProducts": ["peerToPeerLoansAndHave36HPermissions","peerToPeerLoansUsingAPlatformWith36HPermissions","crowdfundedDebentures","longTermAssetFunds"]
     }
   """)
 
