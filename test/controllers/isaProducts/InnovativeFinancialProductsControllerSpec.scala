@@ -72,8 +72,6 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-
-
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
