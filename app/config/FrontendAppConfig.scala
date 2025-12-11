@@ -59,4 +59,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val listOfRegisteredIsaManagersUrl: String =
     configuration.get[String]("urls.external.listOfRegisteredIsaManagers")
+
+  lazy val p2pLoansInformationUrl: String = configuration.get[String]("urls.external.p2pLoansInformation")
 }

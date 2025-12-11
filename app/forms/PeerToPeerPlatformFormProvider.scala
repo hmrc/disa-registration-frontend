@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package utils
+package forms
 
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import javax.inject.Inject
 
-trait TestData {
-  val testGroupId: String           = "id"
-  def emptyJourneyData: JourneyData = JourneyData(testGroupId)
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  val testIsaProductsAnswers = IsaProducts(Some(IsaProduct.values), None)
-  val testJourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
-  val testString             = "test"
+class PeerToPeerPlatformFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("peerToPeerPlatform.error.required")
+    )
 }

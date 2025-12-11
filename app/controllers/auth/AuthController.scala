@@ -29,8 +29,7 @@ class AuthController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   config: FrontendAppConfig,
   identify: IdentifierAction
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
   def signOut(): Action[AnyContent] = identify.async { implicit request =>
