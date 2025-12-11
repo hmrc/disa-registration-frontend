@@ -20,8 +20,9 @@ import models.journeyData.TaskListSection
 import play.api.libs.json.{Json, OFormat}
 
 case class IsaProducts(
-  isaProducts: Option[Seq[IsaProduct]],
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]]
+  isaProducts: Option[Seq[IsaProduct]] = None,
+  p2pPlatform: Option[String] = None,
+  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
 ) extends TaskListSection {
   override def sectionName: String = "isaProducts"
 }

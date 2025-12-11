@@ -45,7 +45,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
   val journeyData: JourneyData =
     JourneyData(
       groupId = testGroupId,
-      isaProducts = Some(IsaProducts(None, Some(InnovativeFinancialProduct.values)))
+      isaProducts = Some(IsaProducts(None, None, Some(InnovativeFinancialProduct.values)))
     )
 
   val formProvider                                = new InnovativeFinancialProductsFormProvider()
