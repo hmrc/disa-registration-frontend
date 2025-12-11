@@ -23,13 +23,13 @@ import java.time.Instant
 
 class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
 
-  val instant = Instant.parse("2024-01-01T12:00:00Z")
+  val instant: Instant = Instant.parse("2024-01-01T12:00:00Z")
 
-  override val model =
+  override val model: JourneyData =
     JourneyData(
       groupId = "ABC123",
       businessVerification = Some(BusinessVerification(Some("A"), Some("B"))),
-      organisationDetails = Some(OrganisationDetails(Some(true), Some("Z1"), Some("F1"), None, None)),
+      organisationDetails = Some(OrganisationDetails(Some(true), Some("Z1"), Some(true), Some("F1"), None, None)),
       isaProducts = None,
       certificatesOfAuthority = Some(CertificatesOfAuthority(Some("C"), Some("D"))),
       liaisonOfficers = Some(LiaisonOfficers(Some("L"), Some("LO"))),
@@ -45,6 +45,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       "organisationDetails": {
         "registeredToManageIsa": true,
         "zRefNumber": "Z1",
+        "tradingUsingDifferentName": true,
         "fcaNumber": "F1"
       },
       "certificatesOfAuthority": { "dataItem": "C", "dataItem2": "D" },

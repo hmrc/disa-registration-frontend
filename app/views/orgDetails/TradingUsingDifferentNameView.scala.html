@@ -14,8 +14,8 @@
  * limitations under the License.
  *@
 
-@import controllers.orgdetails.routes.RegisteredIsaManagerController
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+
 
 @this(
     layout: templates.Layout,
@@ -27,9 +27,9 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("registeredIsaManager.title"), Some(messages("sectionTitle.orgDetails")))) {
+@layout(pageTitle = title(form, messages("tradingUsingDifferentName.title"),Some(messages("sectionTitle.orgDetails")))) {
 
-    @formHelper(action = RegisteredIsaManagerController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.orgDetails.routes.TradingUsingDifferentNameController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -38,8 +38,8 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("registeredIsaManager.heading")).asPageHeading()
-            ).withHeadingAndSectionCaption(Text(messages("registeredIsaManager.heading")), Text(messages("sectionTitle.orgDetails")))
+                legend = LegendViewModel(messages("tradingUsingDifferentName.heading")).asPageHeading()
+            ).withHeadingAndSectionCaption(Text(messages("tradingUsingDifferentName.heading")), Text(messages("sectionTitle.orgDetails")))
         )
 
         @govukButton(
