@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.isaProducts
+package controllers.isaproducts
 
 import controllers.actions.*
 import forms.InnovativeFinancialProductsFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.isaProducts.{InnovativeFinancialProduct, IsaProducts}
+import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.Navigator
 import pages.InnovativeFinancialProductsPage
 import play.api.Logging
@@ -30,7 +30,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormPreparationHelper.prepareForm
-import views.html.isaProducts.InnovativeFinancialProductsView
+import views.html.isaproducts.InnovativeFinancialProductsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

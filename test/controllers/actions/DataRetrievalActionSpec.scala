@@ -17,23 +17,24 @@
 package controllers.actions
 
 import base.SpecBase
+import handlers.ErrorHandler
 import models.journeydata.JourneyData
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.http.Status.INTERNAL_SERVER_ERROR
-import play.api.mvc.Result
+import play.api.mvc.{RequestHeader, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{defaultAwaitTimeout, status}
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import services.JourneyAnswersService
 
 import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
-  class Harness(journeyAnswersService: JourneyAnswersService) extends DataRetrievalActionImpl(journeyAnswersService) {
+  class Harness(journeyAnswersService: JourneyAnswersService, errorHandler: ErrorHandler)
+      extends DataRetrievalActionImpl(journeyAnswersService, errorHandler) {
     def callRefine[A](request: IdentifierRequest[A]): Future[Either[Result, OptionalDataRequest[A]]] = refine(request)
   }
 
@@ -43,7 +44,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
       "must set userAnswers to 'None' in the request" in {
         when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.successful(None)
-        val action = new Harness(mockJourneyAnswersService)
+        val action = new Harness(mockJourneyAnswersService, mockErrorHandler)
 
         val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue: @unchecked
 
@@ -57,7 +58,7 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
         when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.successful(
           Some(JourneyData("id"))
         )
-        val action = new Harness(mockJourneyAnswersService)
+        val action = new Harness(mockJourneyAnswersService, mockErrorHandler)
 
         val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue: @unchecked
 
@@ -70,11 +71,11 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
       "must give an InternalServerError result" in {
         val ex     = new Exception
         when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.failed(ex)
-        val action = new Harness(mockJourneyAnswersService)
+        val action = new Harness(mockJourneyAnswersService, mockErrorHandler)
 
-        val Left(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue: @unchecked
+        await(action.callRefine(IdentifierRequest(FakeRequest(), "id")))
 
-        status(Future(result)) mustBe INTERNAL_SERVER_ERROR
+        verify(mockErrorHandler).internalServerError(any[RequestHeader])
       }
     }
   }

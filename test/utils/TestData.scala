@@ -24,7 +24,7 @@ trait TestData {
   def emptyJourneyData: JourneyData = JourneyData(testGroupId)
 
   val testIsaProductsAnswers: IsaProducts =
-    IsaProducts(Some(IsaProduct.values), None, Some(InnovativeFinancialProduct.values))
+    IsaProducts(Some(IsaProduct.values), None, None, Some(InnovativeFinancialProduct.values))
   val testJourneyData: JourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
   val testString                          = "test"
 }

@@ -121,7 +121,7 @@ peerToPeerPlatformNumber.title = What is the FCA, FRN of {0}?
 peerToPeerPlatformNumber.heading = What is the FCA, FRN of {0}?
 peerToPeerPlatformNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 peerToPeerPlatformNumber.error.required = You must tell us your {0} reference number
-peerToPeerPlatformNumber.error.pattern = Enter the {0} reference number in the correct format. It''s usually 6 or 7 numbers
+peerToPeerPlatformNumber.error.pattern = Enter the {0} reference number in the correct format. It’s usually 6 or 7 numbers
 peerToPeerPlatformNumber.change.hidden = PeerToPeerPlatformNumber
 peerToPeerPlatformNumber.checkYourAnswersLabel = peerToPeerPlatformNumber
 

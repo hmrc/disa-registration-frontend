@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.isaProducts
+package controllers.isaproducts
 
 import base.SpecBase
 import forms.InnovativeFinancialProductsFormProvider
 import models.NormalMode
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{InnovativeFinancialProduct, IsaProducts}
+import models.journeydata.JourneyData
+import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -31,7 +31,7 @@ import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.isaProducts.InnovativeFinancialProductsView
+import views.html.isaproducts.InnovativeFinancialProductsView
 
 import scala.concurrent.Future
 
@@ -45,7 +45,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
   val journeyData: JourneyData =
     JourneyData(
       groupId = testGroupId,
-      isaProducts = Some(IsaProducts(None, None, Some(InnovativeFinancialProduct.values)))
+      isaProducts = Some(IsaProducts(None, None, None, Some(InnovativeFinancialProduct.values)))
     )
 
   val formProvider                                = new InnovativeFinancialProductsFormProvider()

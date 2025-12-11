@@ -32,7 +32,7 @@ import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.*
-import views.html.isaProducts.PeerToPeerPlatformNumberView
+import views.html.isaproducts.PeerToPeerPlatformNumberView
 
 import scala.concurrent.Future
 

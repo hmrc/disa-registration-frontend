@@ -24,7 +24,7 @@ case class IsaProducts(
   p2pPlatform: Option[String] = None,
   p2pPlatformNumber: Option[String] = None,
   innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
-                      ) extends TaskListSection {
+) extends TaskListSection {
   override def sectionName: String = "isaProducts"
 }
 

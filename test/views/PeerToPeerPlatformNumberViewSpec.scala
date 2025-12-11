@@ -21,7 +21,7 @@ import models.NormalMode
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
-import views.html.isaProducts.PeerToPeerPlatformNumberView
+import views.html.isaproducts.PeerToPeerPlatformNumberView
 
 class PeerToPeerPlatformNumberViewSpec extends ViewSpecBase {
 

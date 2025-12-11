@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.journeyData.isaProducts.InnovativeFinancialProduct
+@import models.journeydata.isaproducts.InnovativeFinancialProduct
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 
 
@@ -30,7 +30,7 @@
 
 @layout(pageTitle = title(form, messages("innovativeFinancialProducts.title"),Some(messages("sectionTitle.isaProducts")))) {
 
-    @formHelper(action = controllers.isaProducts.routes.InnovativeFinancialProductsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.isaproducts.routes.InnovativeFinancialProductsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

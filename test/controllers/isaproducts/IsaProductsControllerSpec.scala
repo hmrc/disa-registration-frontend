@@ -32,7 +32,7 @@ import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.isaProducts.IsaProductsView
+import views.html.isaproducts.IsaProductsView
 
 import scala.concurrent.Future
 
