@@ -17,11 +17,11 @@
 package controllers
 
 import base.SpecBase
-import controllers.isaProducts.routes.PeerToPeerPlatformNumberController
+import controllers.isaproducts.routes.PeerToPeerPlatformNumberController
 import forms.PeerToPeerPlatformNumberFormProvider
 import models.NormalMode
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.IsaProducts
+import models.journeydata.JourneyData
+import models.journeydata.isaproducts.IsaProducts
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any

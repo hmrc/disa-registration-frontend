@@ -32,25 +32,25 @@ GET        /change-z-reference-number                    controllers.orgdetails.
 POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
 ### ISA Products
-GET        /isa-products                                 controllers.isaProducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
-POST       /isa-products                                 controllers.isaProducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
-GET        /change-isa-products                          controllers.isaProducts.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-isa-products                          controllers.isaProducts.IsaProductsController.onSubmit(mode: Mode = CheckMode)
+GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-isa-products                          controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-isa-products                          controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /innovative-financial-products                controllers.isaProducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = NormalMode)
-POST       /innovative-financial-products                controllers.isaProducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = NormalMode)
-GET        /change-innovative-financial-products         controllers.isaProducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-innovative-financial-products         controllers.isaProducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = CheckMode)
+GET        /innovative-financial-products                controllers.isaproducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /innovative-financial-products                controllers.isaproducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-innovative-financial-products         controllers.isaproducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-innovative-financial-products         controllers.isaproducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = CheckMode)
 
-GET        /peer-to-peer-loans                           controllers.isaProducts.PeerToPeerPlatformController.onPageLoad(mode: Mode = NormalMode)
-POST       /peer-to-peer-loans                           controllers.isaProducts.PeerToPeerPlatformController.onSubmit(mode: Mode = NormalMode)
-GET        /change-peer-to-peer-loans                    controllers.isaProducts.PeerToPeerPlatformController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-peer-to-peer-loans                    controllers.isaProducts.PeerToPeerPlatformController.onSubmit(mode: Mode = CheckMode)
+GET        /peer-to-peer-loans                           controllers.isaproducts.PeerToPeerPlatformController.onPageLoad(mode: Mode = NormalMode)
+POST       /peer-to-peer-loans                           controllers.isaproducts.PeerToPeerPlatformController.onSubmit(mode: Mode = NormalMode)
+GET        /change-peer-to-peer-loans                    controllers.isaproducts.PeerToPeerPlatformController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-peer-to-peer-loans                    controllers.isaproducts.PeerToPeerPlatformController.onSubmit(mode: Mode = CheckMode)
 
-GET        /fca-platform-number                          controllers.isaProducts.PeerToPeerPlatformNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /fca-platform-number                          controllers.isaProducts.PeerToPeerPlatformNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /change-fca-platform-number                   controllers.isaProducts.PeerToPeerPlatformNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-fca-platform-number                   controllers.isaProducts.PeerToPeerPlatformNumberController.onSubmit(mode: Mode = CheckMode)
+GET        /fca-platform-number                          controllers.isaproducts.PeerToPeerPlatformNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /fca-platform-number                          controllers.isaproducts.PeerToPeerPlatformNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /change-fca-platform-number                   controllers.isaproducts.PeerToPeerPlatformNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-fca-platform-number                   controllers.isaproducts.PeerToPeerPlatformNumberController.onSubmit(mode: Mode = CheckMode)
 
 ### LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()

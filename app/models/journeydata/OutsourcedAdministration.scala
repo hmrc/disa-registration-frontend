@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
-trait TaskListSection {
-  def sectionName: String
+import play.api.libs.json.{Json, OFormat}
+
+case class OutsourcedAdministration(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
+  override def sectionName: String = "outsourcedAdministration"
+}
+
+object OutsourcedAdministration {
+  implicit val format: OFormat[OutsourcedAdministration] = Json.format[OutsourcedAdministration]
 }

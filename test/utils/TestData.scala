@@ -16,8 +16,8 @@
 
 package utils
 
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import models.journeydata.JourneyData
+import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 
 trait TestData {
   val testGroupId: String           = "id"

@@ -18,7 +18,7 @@ package base
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.journeyData.JourneyData
+import models.journeydata.JourneyData
 import org.mockito.Mockito
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec

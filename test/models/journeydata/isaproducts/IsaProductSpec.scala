@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.journeyData.isaProducts
+package models.journeydata.isaproducts
 
 import generators.{ModelGenerators, arbitraryIsaProducts}
 import org.scalacheck.Arbitrary.arbitrary

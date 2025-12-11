@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.isaProducts
+package controllers.isaproducts
 
 import controllers.actions.*
 import forms.PeerToPeerPlatformFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.isaProducts.IsaProducts
+import models.journeydata.isaproducts.IsaProducts
 import navigation.Navigator
 import pages.PeerToPeerPlatformPage
 import play.api.Logging

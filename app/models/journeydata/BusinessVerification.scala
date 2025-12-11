@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
 import play.api.libs.json.{Json, OFormat}
 
-case class OutsourcedAdministration(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "outsourcedAdministration"
+case class BusinessVerification(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
+  override def sectionName: String = "businessVerification"
 }
 
-object OutsourcedAdministration {
-  implicit val format: OFormat[OutsourcedAdministration] = Json.format[OutsourcedAdministration]
+object BusinessVerification {
+  implicit val format: OFormat[BusinessVerification] = Json.format[BusinessVerification]
 }

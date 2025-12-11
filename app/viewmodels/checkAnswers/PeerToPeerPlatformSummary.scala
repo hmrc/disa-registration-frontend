@@ -16,8 +16,8 @@
 
 package viewmodels.checkAnswers
 
-import controllers.isaProducts.routes.PeerToPeerPlatformController
-import models.journeyData.JourneyData
+import controllers.isaproducts.routes.PeerToPeerPlatformController
+import models.journeydata.JourneyData
 import models.CheckMode
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat

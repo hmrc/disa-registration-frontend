@@ -16,9 +16,9 @@
 
 package viewmodels.checkAnswers
 
-import controllers.isaProducts.routes.PeerToPeerPlatformNumberController
+import controllers.isaproducts.routes.PeerToPeerPlatformNumberController
 import models.CheckMode
-import models.journeyData.JourneyData
+import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow

@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata.isaproducts
 
+import models.journeydata.TaskListSection
 import play.api.libs.json.{Json, OFormat}
 
-case class Signatories(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "signatories"
+case class IsaProducts(
+  isaProducts: Option[Seq[IsaProduct]] = None,
+  p2pPlatform: Option[String] = None,
+  p2pPlatformNumber: Option[String] = None,
+  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
+                      ) extends TaskListSection {
+  override def sectionName: String = "isaProducts"
 }
 
-object Signatories {
-  implicit val format: OFormat[Signatories] = Json.format[Signatories]
+object IsaProducts {
+  implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]
 }

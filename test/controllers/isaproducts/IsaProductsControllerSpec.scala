@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.isaProducts
+package controllers.isaproducts
 
 import base.SpecBase
-import controllers.isaProducts.routes.IsaProductsController
+import controllers.isaproducts.routes.IsaProductsController
 import forms.IsaProductsFormProvider
 import models.NormalMode
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeydata.JourneyData
+import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

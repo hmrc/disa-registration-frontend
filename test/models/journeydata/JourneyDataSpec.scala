@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
 

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
 import play.api.libs.json.{Json, OFormat}
 
-case class LiaisonOfficers(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "liaisonOfficers"
+case class CertificatesOfAuthority(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
+  override def sectionName: String = "certificatesOfAuthority"
 }
 
-object LiaisonOfficers {
-  implicit val format: OFormat[LiaisonOfficers] = Json.format[LiaisonOfficers]
+object CertificatesOfAuthority {
+  implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
 }

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
-import models.journeyData.isaProducts.IsaProducts
+import models.journeydata.isaproducts.IsaProducts
 import play.api.libs.json.{Format, Json, Reads, Writes}
 
 case class JourneyData(

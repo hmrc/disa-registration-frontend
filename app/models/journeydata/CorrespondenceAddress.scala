@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
 import play.api.libs.json.{Json, OFormat}
 
-case class FeesCommissionsAndIncentives(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "feesCommissionsAndIncentives"
-}
+case class CorrespondenceAddress(useThisAddress: Boolean, address: Option[String])
 
-object FeesCommissionsAndIncentives {
-  implicit val format: OFormat[FeesCommissionsAndIncentives] = Json.format[FeesCommissionsAndIncentives]
+object CorrespondenceAddress {
+  implicit val format: OFormat[CorrespondenceAddress] = Json.format[CorrespondenceAddress]
 }

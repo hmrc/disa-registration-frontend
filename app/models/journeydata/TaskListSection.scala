@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
-import play.api.libs.json.{Json, OFormat}
-
-case class CertificatesOfAuthority(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "certificatesOfAuthority"
-}
-
-object CertificatesOfAuthority {
-  implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
+trait TaskListSection {
+  def sectionName: String
 }

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.isaProducts
+package controllers.isaproducts
 
 import controllers.actions.*
 import forms.IsaProductsFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeyData.isaproducts.{IsaProduct, IsaProducts}
 import navigation.Navigator
 import pages.IsaProductsPage
 import play.api.Logging
