@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsValue, Json, OFormat}
+import utils.JsonFormatSpec
 
-case class CertificatesOfAuthority(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "certificatesOfAuthority"
-}
+class CorrespondenceAddressFormatSpec extends JsonFormatSpec[CorrespondenceAddress] {
 
-object CertificatesOfAuthority {
-  implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
+  override val model =
+    CorrespondenceAddress(
+      useThisAddress = true,
+      address = Some("123 Main Street")
+    )
+
+  override val json: JsValue = Json.parse("""
+    {
+      "useThisAddress": true,
+      "address": "123 Main Street"
+    }
+  """)
+
+  override implicit val format: OFormat[CorrespondenceAddress] = CorrespondenceAddress.format
 }

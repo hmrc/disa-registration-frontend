@@ -14,34 +14,25 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
 import play.api.libs.json.{JsValue, Json, OFormat}
 import utils.JsonFormatSpec
 
-class OrganisationDetailsFormatSpec extends JsonFormatSpec[OrganisationDetails] {
+class CertificatesOfAuthorityFormatSpec extends JsonFormatSpec[CertificatesOfAuthority] {
 
   override val model =
-    OrganisationDetails(
-      registeredToManageIsa = Some(true),
-      zRefNumber = Some("Z999"),
-      fcaNumber = Some("F123"),
-      correspondenceAddress = Some(CorrespondenceAddress(true, Some("123 Road"))),
-      orgTelephoneNumber = Some("01111 222333")
+    CertificatesOfAuthority(
+      dataItem = Some("foo"),
+      dataItem2 = Some("bar")
     )
 
   override val json: JsValue = Json.parse("""
     {
-      "registeredToManageIsa": true,
-      "zRefNumber": "Z999",
-      "fcaNumber": "F123",
-      "correspondenceAddress": {
-        "useThisAddress": true,
-        "address": "123 Road"
-      },
-      "orgTelephoneNumber": "01111 222333"
+      "dataItem": "foo",
+      "dataItem2": "bar"
     }
   """)
 
-  override implicit val format: OFormat[OrganisationDetails] = OrganisationDetails.format
+  override implicit val format: OFormat[CertificatesOfAuthority] = CertificatesOfAuthority.format
 }

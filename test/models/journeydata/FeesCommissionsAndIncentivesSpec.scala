@@ -14,16 +14,25 @@
  * limitations under the License.
  */
 
-package models.journeyData.isaProducts
+package models.journeydata
 
-import models.journeyData.TaskListSection
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsValue, Json, OFormat}
+import utils.JsonFormatSpec
 
-case class IsaProducts(isaProducts: Option[Seq[IsaProduct]] = None, p2pPlatform: Option[String] = None)
-    extends TaskListSection {
-  override def sectionName: String = "isaProducts"
-}
+class FeesCommissionsAndIncentivesFormatSpec extends JsonFormatSpec[FeesCommissionsAndIncentives] {
 
-object IsaProducts {
-  implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]
+  override val model =
+    FeesCommissionsAndIncentives(
+      dataItem = Some("x"),
+      dataItem2 = Some("y")
+    )
+
+  override val json: JsValue = Json.parse("""
+    {
+      "dataItem": "x",
+      "dataItem2": "y"
+    }
+  """)
+
+  override implicit val format: OFormat[FeesCommissionsAndIncentives] = FeesCommissionsAndIncentives.format
 }

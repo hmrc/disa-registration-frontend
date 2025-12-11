@@ -17,7 +17,7 @@
 package forms
 
 import forms.behaviours.CheckboxFieldBehaviours
-import models.journeyData.isaProducts.IsaProduct
+import models.journeydata.isaProducts.IsaProduct
 import play.api.data.FormError
 
 class IsaProductsFormProviderSpec extends CheckboxFieldBehaviours {

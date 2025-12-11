@@ -14,36 +14,34 @@
  * limitations under the License.
  *@
 
-@import models.journeydata.isaProducts.IsaProduct
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+@import viewmodels.InputWidth._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
-    govukCheckboxes: GovukCheckboxes,
+    govukInput: GovukInput,
     govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("isaProducts.title"), Some(messages("sectionTitle.isaProducts")))) {
+@layout(pageTitle = title(form, messages("tradingName.title"), Some(messages("sectionTitle.orgDetails")))) {
 
-    @formHelper(action = routes.IsaProductsController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.TradingNameController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
-            @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
+            @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukCheckboxes(
-            CheckboxesViewModel(
-                form   = form,
-                name   = "isaProducts",
-                hint   = Some(Hint(content = Text(messages("isaProducts.hint")))),
-                legend = LegendViewModel(messages("isaProducts.heading")).asPageHeading(),
-                items  = IsaProduct.checkboxItems
+        @govukInput(
+            InputViewModel(
+                field = form("value"),
+                label = LabelViewModel(messages("tradingName.heading")).asPageHeading()
             )
-            .withHeadingAndSectionCaption(Text(messages("isaProducts.heading")), Text(messages("sectionTitle.isaProducts")))
+            .withWidth(Full)
+            .withHeadingAndSectionCaption(Text(messages("tradingName.heading")), Text(messages("sectionTitle.orgDetails")))
         )
 
         @govukButton(

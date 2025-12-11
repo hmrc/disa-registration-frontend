@@ -16,7 +16,7 @@
 
 package generators
 
-import models.journeyData.isaProducts.IsaProduct
+import models.journeydata.isaProducts.IsaProduct
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {}

@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
 import play.api.libs.json.{JsValue, Json, OFormat}
 import utils.JsonFormatSpec
 
-class LiaisonOfficersFormatSpec extends JsonFormatSpec[LiaisonOfficers] {
+class SignatoriesFormatSpec extends JsonFormatSpec[Signatories] {
 
   override val model =
-    LiaisonOfficers(
-      dataItem = Some("a"),
-      dataItem2 = Some("b")
+    Signatories(
+      dataItem = Some("x"),
+      dataItem2 = Some("y")
     )
 
   override val json: JsValue = Json.parse("""
     {
-      "dataItem": "a",
-      "dataItem2": "b"
+      "dataItem": "x",
+      "dataItem2": "y"
     }
   """)
 
-  override implicit val format: OFormat[LiaisonOfficers] = LiaisonOfficers.format
+  override implicit val format: OFormat[Signatories] = Signatories.format
 }

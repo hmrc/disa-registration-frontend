@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.PeerToPeerPlatformFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.isaProducts.IsaProducts
+import models.journeydata.isaProducts.IsaProducts
 import navigation.Navigator
 import pages.PeerToPeerPlatformPage
 import play.api.Logging

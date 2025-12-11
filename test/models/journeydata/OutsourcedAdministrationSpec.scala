@@ -14,8 +14,25 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
-trait TaskListSection {
-  def sectionName: String
+import play.api.libs.json.{JsValue, Json, OFormat}
+import utils.JsonFormatSpec
+
+class OutsourcedAdministrationFormatSpec extends JsonFormatSpec[OutsourcedAdministration] {
+
+  override val model =
+    OutsourcedAdministration(
+      dataItem = Some("foo"),
+      dataItem2 = Some("bar")
+    )
+
+  override val json: JsValue = Json.parse("""
+    {
+      "dataItem": "foo",
+      "dataItem2": "bar"
+    }
+  """)
+
+  override implicit val format: OFormat[OutsourcedAdministration] = OutsourcedAdministration.format
 }

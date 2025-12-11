@@ -16,9 +16,9 @@
 
 package connectors
 
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.IsaProduct.CashJuniorIsas
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeydata.JourneyData
+import models.journeydata.isaProducts.IsaProduct.CashJuniorIsas
+import models.journeydata.isaProducts.{IsaProduct, IsaProducts}
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK, UNAUTHORIZED}
 import play.api.libs.json.Json
 import play.api.test.Helpers.await

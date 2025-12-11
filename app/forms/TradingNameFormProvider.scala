@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package forms
 
-import play.api.libs.json.{Json, OFormat}
+import javax.inject.Inject
 
-case class LiaisonOfficers(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "liaisonOfficers"
-}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-object LiaisonOfficers {
-  implicit val format: OFormat[LiaisonOfficers] = Json.format[LiaisonOfficers]
+class TradingNameFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("tradingName.error.required")
+    )
 }

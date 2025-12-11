@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
-import play.api.libs.json.{JsValue, Json, OFormat}
-import utils.JsonFormatSpec
+import play.api.libs.json.{Json, OFormat}
 
-class FeesCommissionsAndIncentivesFormatSpec extends JsonFormatSpec[FeesCommissionsAndIncentives] {
+case class CorrespondenceAddress(useThisAddress: Boolean, address: Option[String])
 
-  override val model =
-    FeesCommissionsAndIncentives(
-      dataItem = Some("x"),
-      dataItem2 = Some("y")
-    )
-
-  override val json: JsValue = Json.parse("""
-    {
-      "dataItem": "x",
-      "dataItem2": "y"
-    }
-  """)
-
-  override implicit val format: OFormat[FeesCommissionsAndIncentives] = FeesCommissionsAndIncentives.format
+object CorrespondenceAddress {
+  implicit val format: OFormat[CorrespondenceAddress] = Json.format[CorrespondenceAddress]
 }

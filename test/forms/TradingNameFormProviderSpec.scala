@@ -14,12 +14,31 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package forms
 
-import play.api.libs.json.{Json, OFormat}
+import forms.behaviours.StringFieldBehaviours
+import play.api.data.FormError
 
-case class CorrespondenceAddress(useThisAddress: Boolean, address: Option[String])
+class TradingNameFormProviderSpec extends StringFieldBehaviours {
 
-object CorrespondenceAddress {
-  implicit val format: OFormat[CorrespondenceAddress] = Json.format[CorrespondenceAddress]
+  val requiredKey = "tradingName.error.required"
+
+  val form = new TradingNameFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      nonEmptyString
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

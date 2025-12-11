@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import models.journeyData.JourneyData
+import models.journeydata.JourneyData
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import play.api.mvc.Result
 

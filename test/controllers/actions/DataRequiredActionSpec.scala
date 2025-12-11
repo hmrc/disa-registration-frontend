@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import models.journeyData.JourneyData
+import models.journeydata.JourneyData
 import models.requests.{DataRequest, OptionalDataRequest}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any

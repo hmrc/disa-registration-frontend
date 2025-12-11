@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata.isaProducts
 
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.isaProducts.IsaProduct.CashIsas
+import play.api.libs.json.{JsValue, Json, OFormat}
+import utils.JsonFormatSpec
 
-case class OutsourcedAdministration(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "outsourcedAdministration"
-}
+class IsaProductsSpec extends JsonFormatSpec[IsaProducts] {
 
-object OutsourcedAdministration {
-  implicit val format: OFormat[OutsourcedAdministration] = Json.format[OutsourcedAdministration]
+  override val model =
+    IsaProducts(isaProducts = Some(Seq(CashIsas)), p2pPlatform = Some(testString))
+
+  override val json: JsValue = Json.parse("""
+    {
+     "isaProducts": ["cashIsas"],
+     "p2pPlatform": "test"
+    }
+  """)
+
+  override implicit val format: OFormat[IsaProducts] = IsaProducts.format
 }

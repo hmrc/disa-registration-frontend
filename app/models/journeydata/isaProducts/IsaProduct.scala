@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.journeyData.isaProducts
+package models.journeydata.isaProducts
 
 import models.{Enumerable, WithName}
 import play.api.i18n.Messages

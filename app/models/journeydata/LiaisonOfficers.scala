@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
 import play.api.libs.json.{Json, OFormat}
 
-case class OrganisationDetails(
-  registeredToManageIsa: Option[Boolean] = None,
-  zRefNumber: Option[String] = None,
-  fcaNumber: Option[String] = None,
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  orgTelephoneNumber: Option[String] = None
-) extends TaskListSection {
-  override def sectionName: String = "organisationDetails"
+case class LiaisonOfficers(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
+  override def sectionName: String = "liaisonOfficers"
 }
 
-object OrganisationDetails {
-  implicit val format: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
+object LiaisonOfficers {
+  implicit val format: OFormat[LiaisonOfficers] = Json.format[LiaisonOfficers]
 }

@@ -31,16 +31,21 @@ POST       /z-reference-number                           controllers.orgdetails.
 GET        /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
-### ISA Products
-GET        /isa-products                        controllers.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
-POST       /isa-products                        controllers.IsaProductsController.onSubmit(mode: Mode = NormalMode)
-GET        /change-isa-products                  controllers.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-isa-products                  controllers.IsaProductsController.onSubmit(mode: Mode = CheckMode)
+GET        /trading-name                                 controllers.TradingNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /trading-name                                 controllers.TradingNameController.onSubmit(mode: Mode = NormalMode)
+GET        /change-trading-name                          controllers.TradingNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-trading-name                          controllers.TradingNameController.onSubmit(mode: Mode = CheckMode)
 
-GET        /peer-to-peer-loans                      controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = NormalMode)
-POST       /peer-to-peer-loans                        controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = NormalMode)
-GET        /change-peer-to-peer-loans                  controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-peer-to-peer-loans                  controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = CheckMode)
+### ISA Products
+GET        /isa-products                                 controllers.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /isa-products                                 controllers.IsaProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-isa-products                          controllers.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-isa-products                          controllers.IsaProductsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /peer-to-peer-loans                           controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = NormalMode)
+POST       /peer-to-peer-loans                           controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = NormalMode)
+GET        /change-peer-to-peer-loans                    controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-peer-to-peer-loans                    controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = CheckMode)
 
 ### LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()

@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package pages
 
-import play.api.libs.json.{Json, OFormat}
+case object TradingNamePage extends Page {
 
-case class BusinessVerification(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "businessVerification"
-}
-
-object BusinessVerification {
-  implicit val format: OFormat[BusinessVerification] = Json.format[BusinessVerification]
+  override def toString: String = "tradingName"
 }

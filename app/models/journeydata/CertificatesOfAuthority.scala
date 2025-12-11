@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
-import play.api.libs.json.{JsValue, Json, OFormat}
-import utils.JsonFormatSpec
+import play.api.libs.json.{Json, OFormat}
 
-class SignatoriesFormatSpec extends JsonFormatSpec[Signatories] {
+case class CertificatesOfAuthority(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
+  override def sectionName: String = "certificatesOfAuthority"
+}
 
-  override val model =
-    Signatories(
-      dataItem = Some("x"),
-      dataItem2 = Some("y")
-    )
-
-  override val json: JsValue = Json.parse("""
-    {
-      "dataItem": "x",
-      "dataItem2": "y"
-    }
-  """)
-
-  override implicit val format: OFormat[Signatories] = Signatories.format
+object CertificatesOfAuthority {
+  implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
@@ -27,9 +27,10 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
 
   override val model =
     JourneyData(
-      groupId = "ABC123",
+      groupId = testGroupId,
       businessVerification = Some(BusinessVerification(Some("A"), Some("B"))),
-      organisationDetails = Some(OrganisationDetails(Some(true), Some("Z1"), Some("F1"), None, None)),
+      organisationDetails =
+        Some(OrganisationDetails(Some(true), Some("Z1"), Some(testString), Some(testString), None, None)),
       isaProducts = None,
       certificatesOfAuthority = Some(CertificatesOfAuthority(Some("C"), Some("D"))),
       liaisonOfficers = Some(LiaisonOfficers(Some("L"), Some("LO"))),
@@ -40,12 +41,13 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
 
   override val json: JsValue = Json.parse("""
     {
-      "groupId": "ABC123",
+      "groupId": "id",
       "businessVerification": { "dataItem": "A", "dataItem2": "B" },
       "organisationDetails": {
         "registeredToManageIsa": true,
         "zRefNumber": "Z1",
-        "fcaNumber": "F1"
+        "tradingName": "test",
+        "fcaNumber": "test"
       },
       "certificatesOfAuthority": { "dataItem": "C", "dataItem2": "D" },
       "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },

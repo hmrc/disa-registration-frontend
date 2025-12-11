@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-package models.journeyData
+package models.journeydata
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsValue, Json, OFormat}
+import utils.JsonFormatSpec
 
-case class FeesCommissionsAndIncentives(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "feesCommissionsAndIncentives"
-}
+class LiaisonOfficersFormatSpec extends JsonFormatSpec[LiaisonOfficers] {
 
-object FeesCommissionsAndIncentives {
-  implicit val format: OFormat[FeesCommissionsAndIncentives] = Json.format[FeesCommissionsAndIncentives]
+  override val model =
+    LiaisonOfficers(
+      dataItem = Some("a"),
+      dataItem2 = Some("b")
+    )
+
+  override val json: JsValue = Json.parse("""
+    {
+      "dataItem": "a",
+      "dataItem2": "b"
+    }
+  """)
+
+  override implicit val format: OFormat[LiaisonOfficers] = LiaisonOfficers.format
 }

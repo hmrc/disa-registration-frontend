@@ -17,32 +17,33 @@
 package controllers
 
 import controllers.actions.*
-import forms.IsaProductsFormProvider
+import forms.TradingNameFormProvider
 import handlers.ErrorHandler
+
+import javax.inject.Inject
 import models.Mode
-import models.journeydata.isaProducts.IsaProducts
+import models.journeydata.OrganisationDetails
 import navigation.Navigator
-import pages.IsaProductsPage
+import pages.TradingNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IsaProductsView
+import views.html.TradingNameView
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IsaProductsController @Inject() (
+class TradingNameController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  formProvider: IsaProductsFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  formProvider: TradingNameFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: IsaProductsView
+  view: TradingNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -53,9 +54,9 @@ class IsaProductsController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
     val preparedForm = (for {
       journeyData <- request.journeyData
-      products    <- journeyData.isaProducts
-      values      <- products.isaProducts
-    } yield form.fill(values.toSet)).getOrElse(form)
+      section     <- journeyData.organisationDetails
+      name        <- section.tradingName
+    } yield form.fill(name)).getOrElse(form)
 
     Ok(view(preparedForm, mode))
   }
@@ -67,15 +68,15 @@ class IsaProductsController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         answer => {
           val updatedSection =
-            request.journeyData.flatMap(_.isaProducts) match {
-              case Some(existing) => existing.copy(isaProducts = Some(answer.toSeq))
-              case None           => IsaProducts(isaProducts = Some(answer.toSeq))
+            request.journeyData.flatMap(_.organisationDetails) match {
+              case Some(existing) => existing.copy(tradingName = Some(answer))
+              case None           => OrganisationDetails(tradingName = Some(answer))
             }
 
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { _ =>
-              Redirect(navigator.nextPage(IsaProductsPage, mode))
+              Redirect(navigator.nextPage(TradingNamePage, mode))
             }
             .recoverWith { case e =>
               logger.warn(

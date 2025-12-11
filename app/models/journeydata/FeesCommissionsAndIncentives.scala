@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package forms
+package models.journeydata
 
-import javax.inject.Inject
-import forms.mappings.Mappings
-import models.journeydata.isaProducts.IsaProduct
-import play.api.data.Form
-import play.api.data.Forms.set
+import play.api.libs.json.{Json, OFormat}
 
-class IsaProductsFormProvider @Inject() extends Mappings {
+case class FeesCommissionsAndIncentives(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
+  override def sectionName: String = "feesCommissionsAndIncentives"
+}
 
-  def apply(): Form[Set[IsaProduct]] =
-    Form(
-      "value" -> set(enumerable[IsaProduct]("isaProducts.error.required"))
-        .verifying(nonEmptySet("isaProducts.error.required"))
-    )
+object FeesCommissionsAndIncentives {
+  implicit val format: OFormat[FeesCommissionsAndIncentives] = Json.format[FeesCommissionsAndIncentives]
 }

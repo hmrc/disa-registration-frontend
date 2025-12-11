@@ -25,16 +25,16 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PeerToPeerPlatformSummary {
+object TradingNameSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.isaProducts.flatMap(_.p2pPlatform).map { answer =>
+    answers.organisationDetails.flatMap(_.tradingName).map { answer =>
       SummaryListRowViewModel(
-        key = "peerToPeerPlatform.checkYourAnswersLabel",
+        key = "tradingName.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.PeerToPeerPlatformController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("peerToPeerPlatform.change.hidden"))
+          ActionItemViewModel("site.change", routes.TradingNameController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("tradingName.change.hidden"))
         )
       )
     }

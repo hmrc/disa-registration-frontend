@@ -86,6 +86,12 @@ zReferenceNumber.hint = This is usually a Z followed by 4 numbers, for example Z
 zReferenceNumber.error.required = You need to tell us what your organisation’s Z reference number is
 zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers
 
+tradingName.title = What is your organisation’s trading name?
+tradingName.heading = What is your organisation’s trading name?
+tradingName.checkYourAnswersLabel = tradingName
+tradingName.error.required = Enter the trading name of your organisation
+tradingName.change.hidden = TradingName
+
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
 isaProducts.heading = Which ISA products does your organisation offer?
