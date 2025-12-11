@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package models.journeyData.isaProducts
+package forms
 
-import models.journeyData.TaskListSection
-import play.api.libs.json.{Json, OFormat}
+import javax.inject.Inject
+import forms.mappings.Mappings
+import play.api.data.Form
+import play.api.data.Forms.set
+import models.journeyData.isaProducts.InnovativeFinancialProduct
 
-case class IsaProducts(
-  isaProducts: Option[Seq[IsaProduct]] = None,
-  p2pPlatform: Option[String] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
-) extends TaskListSection {
-  override def sectionName: String = "isaProducts"
-}
+class InnovativeFinancialProductsFormProvider @Inject() extends Mappings {
 
-object IsaProducts {
-  implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]
+  def apply(): Form[Set[InnovativeFinancialProduct]] =
+    Form(
+      "value" -> set(enumerable[InnovativeFinancialProduct]("innovativeFinancialProducts.error.required"))
+        .verifying(nonEmptySet("innovativeFinancialProducts.error.required"))
+    )
 }

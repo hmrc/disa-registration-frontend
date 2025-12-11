@@ -32,10 +32,15 @@ GET        /change-z-reference-number                    controllers.orgdetails.
 POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
 ### ISA Products
-GET        /isa-products                        controllers.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
-POST       /isa-products                        controllers.IsaProductsController.onSubmit(mode: Mode = NormalMode)
-GET        /change-isa-products                  controllers.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-isa-products                  controllers.IsaProductsController.onSubmit(mode: Mode = CheckMode)
+GET        /isa-products                        controllers.isaProducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /isa-products                        controllers.isaProducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-isa-products                  controllers.isaProducts.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-isa-products                  controllers.isaProducts.IsaProductsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /innovative-financial-products                        controllers.isaProducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /innovative-financial-products                        controllers.isaProducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-innovative-financial-products                  controllers.isaProducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-innovative-financial-products                  controllers.isaProducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /peer-to-peer-loans                      controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = NormalMode)
 POST       /peer-to-peer-loans                        controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = NormalMode)
