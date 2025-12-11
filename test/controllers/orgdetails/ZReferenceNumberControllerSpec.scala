@@ -19,22 +19,32 @@ package controllers.orgdetails
 import base.SpecBase
 import forms.ZReferenceNumberFormProvider
 import models.NormalMode
-import models.journeyData.isaProducts.IsaProducts
+import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
 import models.journeyData.{JourneyData, OrganisationDetails}
+import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
+import play.api.inject.bind
+import play.api.libs.json.Writes
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import views.html.IsaProductsView
 import views.html.orgdetails.ZReferenceNumberView
+
+import scala.concurrent.Future
 
 // TODO add tests back in when next page is present and UAs are wired up
 class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  // def onwardRoute = Call("GET", "/foo")
+   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new ZReferenceNumberFormProvider()
-  val form         = formProvider()
+  val formProvider: ZReferenceNumberFormProvider = new ZReferenceNumberFormProvider()
+  val form: Form[String] = formProvider()
 
-  lazy val zReferenceNumberRoute = routes.ZReferenceNumberController.onPageLoad(NormalMode).url
+  lazy val zReferenceNumberRoute: String = routes.ZReferenceNumberController.onPageLoad(NormalMode).url
 
   "ZReferenceNumber Controller" - {
 
@@ -73,31 +83,55 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-//    "must redirect to the next page when valid data is submitted" in {
-//
-//      val mockSessionRepository = mock[SessionRepository]
-//
-//      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-//
-//      val application =
-//        applicationBuilder(journeyData = Some(emptyJourneyData))
-//          .overrides(
-//            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-//            bind[SessionRepository].toInstance(mockSessionRepository)
-//          )
-//          .build()
-//
-//      running(application) {
-//        val request =
-//          FakeRequest(POST, zReferenceNumberRoute)
-//            .withFormUrlEncodedBody(("value", "answer"))
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual onwardRoute.url
-//      }
-//    }
+    "must redirect to the next page when valid data is submitted" in {
+
+      when(
+        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(())
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, zReferenceNumberRoute)
+            .withFormUrlEncodedBody(("value", "Z1234"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must redirect to the next page when valid data is submitted and no existing data was found" in {
+
+      when(
+        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(())
+
+      val application =
+        applicationBuilder(journeyData = None)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, zReferenceNumberRoute)
+            .withFormUrlEncodedBody(("value", "Z1234"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
@@ -106,9 +140,9 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, zReferenceNumberRoute)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody(("value", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value" -> "invalid value"))
 
         val view = application.injector.instanceOf[ZReferenceNumberView]
 
@@ -119,34 +153,29 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-//    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-//
-//      val application = applicationBuilder(journeyData = None).build()
-//
-//      running(application) {
-//        val request = FakeRequest(GET, zReferenceNumberRoute)
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
-//      }
-//    }
-//
-//    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-//
-//      val application = applicationBuilder(journeyData = None).build()
-//
-//      running(application) {
-//        val request =
-//          FakeRequest(POST, zReferenceNumberRoute)
-//            .withFormUrlEncodedBody(("value", "answer"))
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual JourneyRecoveryController.onPageLoad().url
-//      }
-//    }
+    "must return Internal Server Error when invalid data is submitted" in {
+
+      when(
+        mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
+      ) thenReturn Future.failed(new Exception)
+
+      val application =
+        applicationBuilder(journeyData = None)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, zReferenceNumberRoute)
+            .withFormUrlEncodedBody(("value", "Z1234"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual INTERNAL_SERVER_ERROR
+        contentAsString(result) must include(messages.messages("journeyRecovery.continue.title"))
+      }
+    }
   }
 }
