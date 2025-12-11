@@ -17,7 +17,7 @@
 package controllers.isaProducts
 
 import base.SpecBase
-import controllers.routes
+import controllers.isaproducts.routes
 import forms.IsaProductsFormProvider
 import models.NormalMode
 import models.journeyData.JourneyData
@@ -26,23 +26,24 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.IsaProductsView
+import views.html.isaproducts.IsaProductsView
 
 import scala.concurrent.Future
 
 class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val isaProductsRoute = routes.IsaProductsController.onPageLoad(NormalMode).url
+  lazy val isaProductsRoute: String = routes.IsaProductsController.onPageLoad(NormalMode).url
 
-  val formProvider = new IsaProductsFormProvider()
-  val form         = formProvider()
+  val formProvider                = new IsaProductsFormProvider()
+  val form: Form[Set[IsaProduct]] = formProvider()
 
   "IsaProduct Controller" - {
 

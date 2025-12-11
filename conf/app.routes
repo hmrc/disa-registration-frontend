@@ -21,26 +21,26 @@ GET         /account/sign-out-answers-not-saved          controllers.auth.Signed
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
 ### Organisation Details
-GET        /registered-isa-manager                       controllers.orgDetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
-POST       /registered-isa-manager                       controllers.orgDetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode)
-GET        /change-registered-isa-manager                controllers.orgDetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-registered-isa-manager                controllers.orgDetails.RegisteredIsaManagerController.onSubmit(mode: Mode = CheckMode)
+GET        /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
+POST       /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode)
+GET        /change-registered-isa-manager                controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-registered-isa-manager                controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = CheckMode)
 
-GET        /z-reference-number                           controllers.orgDetails.ZReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /z-reference-number                           controllers.orgDetails.ZReferenceNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /change-z-reference-number                    controllers.orgDetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-z-reference-number                    controllers.orgDetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
+GET        /z-reference-number                           controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /z-reference-number                           controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /trading-using-different-name                        controllers.orgDetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /trading-using-different-name                        controllers.orgDetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = NormalMode)
-GET        /change-trading-using-different-name                   controllers.orgDetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-trading-using-different-name                 controllers.orgDetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = CheckMode)
+GET        /trading-using-different-name                        controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /trading-using-different-name                        controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = NormalMode)
+GET        /change-trading-using-different-name                   controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = CheckMode)
 
 ### ISA Products
-GET        /isa-products                        controllers.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
-POST       /isa-products                        controllers.IsaProductsController.onSubmit(mode: Mode = NormalMode)
-GET        /change-isa-products                  controllers.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-isa-products                  controllers.IsaProductsController.onSubmit(mode: Mode = CheckMode)
+GET        /isa-products                        controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /isa-products                        controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-isa-products                  controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-isa-products                  controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = CheckMode)
 
 ### LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()

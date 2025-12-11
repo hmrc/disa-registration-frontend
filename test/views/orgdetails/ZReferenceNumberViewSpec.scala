@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.orgDetails
+package views.orgdetails
 
 import forms.ZReferenceNumberFormProvider
 import models.NormalMode
@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
 import views.ViewSpecBase
-import views.html.orgDetails.ZReferenceNumberView
+import views.html.orgdetails.ZReferenceNumberView
 
 class ZReferenceNumberViewSpec extends ViewSpecBase {
 
@@ -58,7 +58,7 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
 
       val formEl = doc.selectFirst("form")
       Option(formEl) mustBe defined
-      formEl.attr("action") mustBe controllers.orgDetails.routes.ZReferenceNumberController.onSubmit(NormalMode).url
+      formEl.attr("action") mustBe controllers.orgdetails.routes.ZReferenceNumberController.onSubmit(NormalMode).url
       formEl.attr("method").toLowerCase mustBe "post"
 
       val input = doc.selectFirst("input[name=value]")

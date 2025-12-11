@@ -14,55 +14,46 @@
  * limitations under the License.
  */
 
-package controllers.orgDetails
+package controllers.orgdetails
 
-import controllers.actions.*
-import forms.RegisteredIsaManagerFormProvider
+import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import forms.ZReferenceNumberFormProvider
 import models.Mode
-import navigation.Navigator
-import pages.RegisteredIsaManagerPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.orgDetails.RegisteredIsaManagerView
+import views.html.orgdetails.ZReferenceNumberView
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class RegisteredIsaManagerController @Inject() (
-  override val messagesApi: MessagesApi,
-  navigator: Navigator,
+class ZReferenceNumberController @Inject() (
+  val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  formProvider: RegisteredIsaManagerFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: RegisteredIsaManagerView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+  formProvider: ZReferenceNumberFormProvider,
+  view: ZReferenceNumberView
+) extends FrontendBaseController
     with I18nSupport {
 
-  val form: Form[Boolean] = formProvider()
+  private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.registeredToManageIsa match {
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.zRefNumber match {
       case None        => form
       case Some(value) => form.fill(value)
     }))
 
-    Ok(view(preparedForm, mode))
+    Future.successful(Ok(view(preparedForm, mode)))
   }
 
+  // TODO implement answer setting
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        // TODO implement user answer setting
-        _ =>
-          request.journeyData.fold(Future.successful(NotFound))(ua =>
-            Future.successful(Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode)))
-          )
+        value => Future.successful(NotFound)
       )
   }
 }

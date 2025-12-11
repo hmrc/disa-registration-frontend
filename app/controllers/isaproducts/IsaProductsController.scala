@@ -14,51 +14,49 @@
  * limitations under the License.
  */
 
-package controllers.orgDetails
+package controllers.isaproducts
 
 import controllers.actions.*
-import forms.TradingUsingDifferentNameFormProvider
+import forms.IsaProductsFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.OrganisationDetails
+import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
 import navigation.Navigator
-import pages.TradingUsingDifferentNamePage
+import pages.IsaProductsPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.orgDetails.TradingUsingDifferentNameView
+import views.html.isaproducts.IsaProductsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class TradingUsingDifferentNameController @Inject() (
+class IsaProductsController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  formProvider: TradingUsingDifferentNameFormProvider,
+  formProvider: IsaProductsFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
   val controllerComponents: MessagesControllerComponents,
-  view: TradingUsingDifferentNameView
+  view: IsaProductsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  val form: Form[Boolean] = formProvider()
+  val form: Form[Set[IsaProduct]] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    // TODO Tap to replace with helper function when merged
-    val preparedForm = request.journeyData
-      .flatMap(_.organisationDetails)
-      .flatMap(_.tradingUsingDifferentName) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
+    val preparedForm = (for {
+      journeyData <- request.journeyData
+      products    <- journeyData.isaProducts
+      values      <- products.isaProducts
+    } yield form.fill(values.toSet)).getOrElse(form)
 
     Ok(view(preparedForm, mode))
   }
@@ -70,14 +68,15 @@ class TradingUsingDifferentNameController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         answer => {
           val updatedSection =
-            request.journeyData.flatMap(_.organisationDetails) match {
-              case Some(existing) => existing.copy(tradingUsingDifferentName = Some(answer))
-              case None           => OrganisationDetails(tradingUsingDifferentName = Some(answer))
+            request.journeyData.flatMap(_.isaProducts) match {
+              case Some(existing) => existing.copy(isaProducts = Some(answer.toSeq))
+              case None           => IsaProducts(isaProducts = Some(answer.toSeq), dataItem2 = None)
             }
+
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { _ =>
-              Redirect(navigator.nextPage(TradingUsingDifferentNamePage, mode))
+              Redirect(navigator.nextPage(IsaProductsPage, mode))
             }
             .recoverWith { case e =>
               logger.warn(

@@ -29,7 +29,7 @@
 
 @layout(pageTitle = title(form, messages("tradingUsingDifferentName.title"),Some(messages("sectionTitle.orgDetails")))) {
 
-    @formHelper(action = controllers.orgDetails.routes.TradingUsingDifferentNameController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.orgdetails.routes.TradingUsingDifferentNameController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

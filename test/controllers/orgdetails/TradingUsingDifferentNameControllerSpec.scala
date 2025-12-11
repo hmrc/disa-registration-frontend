@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.orgDetails
+package controllers.orgdetails
 
 import base.SpecBase
-import controllers.orgDetails
-import forms.RegisteredIsaManagerFormProvider
+import controllers.orgdetails.routes
+import forms.TradingUsingDifferentNameFormProvider
 import models.NormalMode
-import models.journeyData.isaProducts.IsaProducts
 import models.journeyData.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -32,51 +31,52 @@ import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.orgDetails.RegisteredIsaManagerView
+import views.html.orgdetails.TradingUsingDifferentNameView
 
 import scala.concurrent.Future
 
-class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
+class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider        = new RegisteredIsaManagerFormProvider()
+  val formProvider        = new TradingUsingDifferentNameFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val registeredIsaManagerRoute: String =
-    orgDetails.routes.RegisteredIsaManagerController.onPageLoad(NormalMode).url
+  val journeyData: JourneyData =
+    JourneyData(
+      groupId = testGroupId,
+      organisationDetails = Some(OrganisationDetails(tradingUsingDifferentName = Some(true)))
+    )
 
-  "RegisteredIsaManager Controller" - {
+  lazy val tradingUsingDifferentNameRoute: String =
+    routes.TradingUsingDifferentNameController.onPageLoad(NormalMode).url
 
-    "must return OK and the correct view for a GET" in {
+  "TradingUsingDifferentName Controller" - {
+
+    "must return OK and correctly load the TradingUsingDifferentName page" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, registeredIsaManagerRoute)
+        val request = FakeRequest(GET, tradingUsingDifferentNameRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[RegisteredIsaManagerView]
+        val view = application.injector.instanceOf[TradingUsingDifferentNameView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val journeyData = JourneyData(
-        groupId = testGroupId,
-        organisationDetails = Some(OrganisationDetails(registeredToManageIsa = Some(true)))
-      )
+    "on pageLoad must populate the TradingUsingDifferentName page when the question has previously been answered" in {
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, registeredIsaManagerRoute)
+        val request = FakeRequest(GET, tradingUsingDifferentNameRoute)
 
-        val view = application.injector.instanceOf[RegisteredIsaManagerView]
+        val view = application.injector.instanceOf[TradingUsingDifferentNameView]
 
         val result = route(application, request).value
 
@@ -88,11 +88,11 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted" in {
 
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
       ) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(journeyData))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
@@ -100,7 +100,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, registeredIsaManagerRoute)
+          FakeRequest(POST, tradingUsingDifferentNameRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -116,12 +116,12 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, registeredIsaManagerRoute)
+          FakeRequest(POST, tradingUsingDifferentNameRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[RegisteredIsaManagerView]
+        val view = application.injector.instanceOf[TradingUsingDifferentNameView]
 
         val result = route(application, request).value
 
@@ -129,35 +129,31 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
-// TODO add back in when user answer setting is in place
-//    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-//
-//      val application = applicationBuilder(journeyData = None).build()
-//
-//      running(application) {
-//        val request = FakeRequest(GET, registeredIsaManagerRoute)
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-//      }
-//    }
-//
-//    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-//
-//      val application = applicationBuilder(journeyData = None).build()
-//
-//      running(application) {
-//        val request =
-//          FakeRequest(POST, registeredIsaManagerRoute)
-//            .withFormUrlEncodedBody(("value", "true"))
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-//      }
-//    }
+
+    "must return Internal Server Error when theres an issue updating the journey answers" in {
+
+      when(
+        mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
+      ) thenReturn Future.failed(new Exception)
+
+      val application =
+        applicationBuilder(journeyData = None)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, tradingUsingDifferentNameRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual INTERNAL_SERVER_ERROR
+        contentAsString(result) must include(messages.messages("journeyRecovery.continue.title"))
+      }
+    }
   }
+
 }

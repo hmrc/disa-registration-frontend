@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers
 
-import controllers.orgDetails.routes
+import controllers.orgdetails.routes
 import models.journeyData.JourneyData
 import models.CheckMode
 import pages.TradingUsingDifferentNamePage
