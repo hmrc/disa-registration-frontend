@@ -35,7 +35,7 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.inject.{Injector, bind}
 import play.api.mvc.RequestHeader
-import play.api.mvc.Results.InternalServerError
+import play.api.mvc.Results.{BadRequest, InternalServerError}
 import play.api.test.FakeRequest
 import services.JourneyAnswersService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -72,8 +72,9 @@ trait SpecBase
   protected val mockErrorHandler: ErrorHandler                   = mock[ErrorHandler]
 
   override def beforeEach(): Unit = {
-    Mockito.reset()
+    Mockito.reset(mockErrorHandler)
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
+    when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))
   }
 
   protected def applicationBuilder(journeyData: Option[JourneyData] = None): GuiceApplicationBuilder =
@@ -82,7 +83,8 @@ trait SpecBase
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
-        bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
+        bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
+        bind[ErrorHandler].toInstance(mockErrorHandler)
       )
 
   def injector: Injector = app.injector

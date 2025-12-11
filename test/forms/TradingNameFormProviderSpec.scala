@@ -14,9 +14,31 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-case object TradingUsingDifferentNamePage extends Page {
+import forms.behaviours.StringFieldBehaviours
+import play.api.data.FormError
 
-  override def toString: String = "tradingUsingDifferentName"
+class TradingNameFormProviderSpec extends StringFieldBehaviours {
+
+  val requiredKey = "tradingName.error.required"
+
+  val form = new TradingNameFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like fieldThatBindsValidData(
+      form,
+      fieldName,
+      nonEmptyString
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

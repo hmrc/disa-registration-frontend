@@ -24,11 +24,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.*
 
-import java.net.URLEncoder.encode
-import java.nio.charset.StandardCharsets
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
-
 class AuthActionSpec extends SpecBase {
 
   class Harness(authAction: IdentifierAction) {

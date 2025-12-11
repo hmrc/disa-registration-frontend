@@ -17,39 +17,36 @@
 package controllers
 
 import base.SpecBase
-import controllers.isaproducts.routes.PeerToPeerPlatformNumberController
-import forms.PeerToPeerPlatformNumberFormProvider
+import controllers.orgdetails.routes.TradingNameController
+import forms.TradingNameFormProvider
 import models.NormalMode
-import models.journeydata.JourneyData
-import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
-import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call, RequestHeader}
-import play.api.test.{FakeRequest, Helpers}
+import play.api.mvc.{Call, RequestHeader}
+import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.isaproducts.PeerToPeerPlatformNumberView
+import views.html.TradingNameView
 
 import scala.concurrent.Future
 
-class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
+class TradingNameControllerSpec extends SpecBase {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute = Call("GET", "/foo")
 
-  val formProvider       = new PeerToPeerPlatformNumberFormProvider()
-  val form: Form[String] = formProvider.apply(testString)
+  val formProvider = new TradingNameFormProvider()
+  val form         = formProvider()
 
-  lazy val peerToPeerPlatformNumberRoute: String = PeerToPeerPlatformNumberController.onPageLoad(NormalMode).url
+  lazy val tradingNameRoute = TradingNameController.onPageLoad(NormalMode).url
 
-  val validAnswer                   = "123456"
-  val validJourneyData: JourneyData =
-    JourneyData(testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
+  val validAnswer      = testString
+  val validJourneyData = JourneyData(testGroupId, organisationDetails = Some(OrganisationDetails(tradingName = None)))
 
-  "PeerToPeerPlatformNumber Controller" - {
+  "TradingName Controller" - {
 
     "GET" - {
 
@@ -58,52 +55,37 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
         val application = applicationBuilder(journeyData = Some(validJourneyData)).build()
 
         running(application) {
-          val request = FakeRequest(GET, peerToPeerPlatformNumberRoute)
+          val request = FakeRequest(GET, tradingNameRoute)
 
           val result = route(application, request).value
 
-          val view = application.injector.instanceOf[PeerToPeerPlatformNumberView]
+          val view = application.injector.instanceOf[TradingNameView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, testString, NormalMode)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
         }
       }
 
       "must populate the view correctly on a GET when the question has previously been answered" in {
 
-        val journeyData = validJourneyData.copy(isaProducts =
-          validJourneyData.isaProducts.map(_.copy(p2pPlatformNumber = Some(validAnswer)))
+        val journeyData = validJourneyData.copy(organisationDetails =
+          validJourneyData.organisationDetails.map(_.copy(tradingName = Some(validAnswer)))
         )
 
         val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
         running(application) {
-          implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, peerToPeerPlatformNumberRoute)
+          implicit val request = FakeRequest(GET, tradingNameRoute)
 
-          val view = application.injector.instanceOf[PeerToPeerPlatformNumberView]
+          val view = application.injector.instanceOf[TradingNameView]
 
           val result = route(application, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form.fill(validAnswer), testString, NormalMode)(
+          contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(
             request,
             messages(application)
           ).toString
-        }
-      }
-
-      "must return a Bad Request for a GET if no platform name found" in {
-
-        val dataMissingName = validJourneyData.copy(isaProducts = Some(IsaProducts(p2pPlatform = None)))
-
-        val application = applicationBuilder(journeyData = Some(dataMissingName)).build()
-
-        running(application) {
-          val request = FakeRequest(GET, peerToPeerPlatformNumberRoute)
-
-          await(route(application, request).value)
-
-          verify(mockErrorHandler).badRequest(any[RequestHeader])
         }
       }
     }
@@ -114,7 +96,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
 
         when(
           mockJourneyAnswersService
-            .update(any[IsaProducts], ArgumentMatchers.eq(testGroupId))(any[Writes[IsaProducts]], any)
+            .update(any[OrganisationDetails], ArgumentMatchers.eq(testGroupId))(any[Writes[OrganisationDetails]], any)
         ) thenReturn Future.successful(())
 
         val application =
@@ -126,7 +108,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(POST, peerToPeerPlatformNumberRoute)
+            FakeRequest(POST, tradingNameRoute)
               .withFormUrlEncodedBody(("value", validAnswer))
 
           val result = route(application, request).value
@@ -141,40 +123,25 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
         val application = applicationBuilder(journeyData = Some(validJourneyData)).build()
 
         running(application) {
-          implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
-            FakeRequest(POST, peerToPeerPlatformNumberRoute)
+          implicit val request =
+            FakeRequest(POST, tradingNameRoute)
               .withFormUrlEncodedBody(("value", ""))
 
           val boundForm = form.bind(Map("value" -> ""))
 
-          val view = application.injector.instanceOf[PeerToPeerPlatformNumberView]
+          val view = application.injector.instanceOf[TradingNameView]
 
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(boundForm, testString, NormalMode).toString
-        }
-      }
-
-      "must return a Bad Request if no platform name found" in {
-
-        val dataMissingName = validJourneyData.copy(isaProducts = Some(IsaProducts(p2pPlatform = None)))
-
-        val application = applicationBuilder(journeyData = Some(dataMissingName)).build()
-
-        running(application) {
-          val request = FakeRequest(POST, peerToPeerPlatformNumberRoute)
-
-          await(route(application, request).value)
-
-          verify(mockErrorHandler).badRequest(any[RequestHeader])
+          contentAsString(result) mustEqual view(boundForm, NormalMode).toString
         }
       }
 
       "must return Internal Server Error when there is an issue storing the answer" in {
 
         when(
-          mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+          mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
         ) thenReturn Future.failed(new Exception)
 
         val application =
@@ -185,8 +152,8 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
             .build()
 
         running(application) {
-          val request =
-            FakeRequest(POST, peerToPeerPlatformNumberRoute)
+          implicit val request =
+            FakeRequest(POST, tradingNameRoute)
               .withFormUrlEncodedBody(("value", validAnswer))
 
           await(route(application, request).value)

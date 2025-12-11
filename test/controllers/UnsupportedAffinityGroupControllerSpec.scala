@@ -23,7 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
-import views.html.{UnauthorisedView, UnsupportedAffinityGroupView}
+import views.html.UnsupportedAffinityGroupView
 
 class UnsupportedAffinityGroupControllerSpec extends SpecBase {
 

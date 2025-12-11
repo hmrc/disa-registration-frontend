@@ -17,12 +17,9 @@
 package controllers.isaproducts
 
 import controllers.actions.*
-import handlers.ErrorHandler
-import navigation.Navigator
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.*
 import viewmodels.checkAnswers.isaproducts.{InnovativeFinancialProductsSummary, IsaProductsSummary, PeerToPeerPlatformNumberSummary, PeerToPeerPlatformSummary}
@@ -30,7 +27,6 @@ import viewmodels.govuk.summarylist.*
 import views.html.isaproducts.IsaProductsCheckYourAnswersView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class IsaProductsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -38,8 +34,7 @@ class IsaProductsCheckYourAnswersController @Inject() (
   getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
   view: IsaProductsCheckYourAnswersView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
