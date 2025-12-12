@@ -39,7 +39,7 @@ import utils.TestData
 import scala.concurrent.ExecutionContext
 
 trait SpecBase
-  extends AnyFreeSpec
+    extends AnyFreeSpec
     with Matchers
     with TryValues
     with OptionValues
@@ -50,20 +50,16 @@ trait SpecBase
     with BeforeAndAfterEach
     with TestData {
 
-  val userAnswersId: String = "id"
-
-  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
-
   def messages(implicit app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   // Mocks
   protected val mockJourneyAnswersService: JourneyAnswersService = mock[JourneyAnswersService]
-  protected val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
-  protected val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
-  protected val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
+  protected val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
+  protected val mockAppConfig: FrontendAppConfig                 = mock[FrontendAppConfig]
+  protected val mockRequestBuilder: RequestBuilder               = mock[RequestBuilder]
 
   override def beforeEach(): Unit = Mockito.reset()
 

@@ -20,23 +20,14 @@ import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
-<<<<<<< HEAD
+import play.api.Logging
 import play.api.mvc.*
 import play.api.mvc.Results.*
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions, NoActiveSession}
-import uk.gov.hmrc.http.HeaderCarrier
-=======
-import play.api.Logging
-import play.api.mvc.*
-import play.api.mvc.Results.*
 import uk.gov.hmrc.auth.core.*
-import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
->>>>>>> main
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,7 +49,6 @@ class AuthenticatedIdentifierAction @Inject() (
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-<<<<<<< HEAD
     authorised().retrieve(Retrievals.groupIdentifier and Retrievals.affinityGroup) {
       case Some(groupId) ~ Some(Organisation) =>
         block(IdentifierRequest(request, groupId))
@@ -74,19 +64,5 @@ class AuthenticatedIdentifierAction @Inject() (
       Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
     case _: AuthorisationException =>
       Redirect(routes.UnauthorisedController.onPageLoad())
-=======
-    authorised(Organisation).retrieve(Retrievals.groupIdentifier) {
-      _.map { groupId =>
-        block(IdentifierRequest(request, groupId))
-      }.getOrElse(throw new UnauthorizedException("Unable to retrieve group Id"))
-    } recover {
-      case ex @ (_: UnsupportedAffinityGroup | _: NoActiveSession) =>
-        logger.warn(s"Authorization failed. Error: ${ex.reason}")
-        Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
-      case ex: AuthorisationException                              =>
-        logger.warn(s"Auth request failed with unexpected exception: $ex")
-        Redirect(routes.UnauthorisedController.onPageLoad())
-    }
->>>>>>> main
   }
 }

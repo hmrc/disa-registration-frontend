@@ -200,7 +200,7 @@ class AuthActionSpec extends SpecBase {
 
       "must redirect the user to the unsupported affinity group page" in {
 
-        val application = applicationBuilder(userAnswers = None).build()
+        val application = applicationBuilder(journeyData = None).build()
 
         running(application) {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]

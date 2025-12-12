@@ -17,6 +17,7 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
+import controllers.auth.routes
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
@@ -35,18 +36,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
-<<<<<<< HEAD
   val loginUrl: String              = configuration.get[String]("urls.login")
   val loginContinueUrl: String      = configuration.get[String]("urls.loginContinue")
   val signOutUrl: String            = configuration.get[String]("urls.signOut")
   val isaManagerGuidanceUrl: String =
     configuration.get[String]("urls.isaManagerGuidance")
   val ggSignInUrl: String           = s"$loginUrl?continue=${URLEncoder.encode(loginContinueUrl, "UTF-8")}"
-=======
-  lazy val loginUrl: String         = configuration.get[String]("urls.login")
-  lazy val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
-  lazy val signOutUrl: String       = configuration.get[String]("urls.signOut")
->>>>>>> main
 
   lazy val disaRegistrationBaseUrl: String =
     configuration.get[Service]("microservice.services.disa-registration").baseUrl

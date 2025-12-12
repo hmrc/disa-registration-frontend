@@ -66,7 +66,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
 
     "must redirect Agent users to Unsupported Affinity Group page" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val bodyParsers = application.injector.instanceOf[BodyParsers.Default]

@@ -33,12 +33,6 @@ class DataRetrievalActionImpl @Inject() (
     extends DataRetrievalAction
     with Logging {
 
-<<<<<<< HEAD
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    sessionRepository.get(request.groupId).map {
-      OptionalDataRequest(request.request, request.groupId, _)
-    }
-=======
   protected def refine[A](
     request: IdentifierRequest[A]
   ): Future[Either[Result, OptionalDataRequest[A]]] = {
@@ -53,7 +47,6 @@ class DataRetrievalActionImpl @Inject() (
         Left(InternalServerError)
       }
   }
->>>>>>> main
 }
 
 trait DataRetrievalAction extends ActionRefiner[IdentifierRequest, OptionalDataRequest]

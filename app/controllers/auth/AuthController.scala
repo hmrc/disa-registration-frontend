@@ -28,23 +28,16 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   config: FrontendAppConfig,
-  identify: IdentifierAction) extends FrontendBaseController
+  identify: IdentifierAction
+) extends FrontendBaseController
     with I18nSupport {
 
   def signOut(): Action[AnyContent] = identify.async { implicit request =>
-    sessionRepository
-      .clear(request.groupId)
-      .map { _ =>
-        Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
-      }
+    Future.successful(Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl))))
   }
 
   def signOutNoSurvey(): Action[AnyContent] = identify.async { implicit request =>
     val signOutServiceUrl = config.host + routes.SignedOutController.onPageLoad().url
-    sessionRepository
-      .clear(request.groupId)
-      .map { _ =>
-        Redirect(config.signOutUrl, Map("continue" -> Seq(signOutServiceUrl)))
-      }
+    Future.successful(Redirect(config.signOutUrl, Map("continue" -> Seq(signOutServiceUrl))))
   }
 }
