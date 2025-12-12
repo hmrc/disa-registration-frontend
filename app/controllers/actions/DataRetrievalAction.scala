@@ -16,10 +16,10 @@
 
 package controllers.actions
 
+import handlers.ErrorHandler
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import play.api.Logging
-import play.api.mvc.Results.InternalServerError
-import play.api.mvc.{ActionRefiner, Result, Results}
+import play.api.mvc.{ActionRefiner, Result}
 import services.JourneyAnswersService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -28,7 +28,8 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataRetrievalActionImpl @Inject() (
-  journeyAnswersService: JourneyAnswersService
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler
 )(implicit val executionContext: ExecutionContext)
     extends DataRetrievalAction
     with Logging {
@@ -39,12 +40,12 @@ class DataRetrievalActionImpl @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
     journeyAnswersService
       .get(request.groupId)
-      .map { journeyData =>
-        Right(OptionalDataRequest(request.request, request.groupId, journeyData))
+      .flatMap { journeyData =>
+        Future.successful(Right(OptionalDataRequest(request.request, request.groupId, journeyData)))
       }
-      .recover { case e: Throwable =>
+      .recoverWith { case e: Throwable =>
         logger.warn(s"Failed to retrieve answers for user with groupId: [${request.groupId}] with error: [$e]")
-        Left(InternalServerError)
+        errorHandler.internalServerError(request).map(Left.apply)
       }
   }
 }

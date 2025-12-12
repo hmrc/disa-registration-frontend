@@ -18,6 +18,8 @@ package forms.behaviours
 
 import play.api.data.{Form, FormError}
 
+import scala.util.matching.Regex
+
 trait StringFieldBehaviours extends FieldBehaviours {
 
   def fieldWithMaxLength(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
@@ -26,6 +28,15 @@ trait StringFieldBehaviours extends FieldBehaviours {
       forAll(stringsLongerThan(maxLength) -> "longString") { (string: String) =>
         val result = form.bind(Map(fieldName -> string)).apply(fieldName)
         result.errors must contain only lengthError
+      }
+    }
+
+  def fieldWithPattern(form: Form[_], fieldName: String, pattern: Regex, error: FormError): Unit =
+    s"not bind strings not matching regex pattern [$pattern]" in {
+
+      forAll(stringsNotMatching(pattern) -> "notMatchingString") { (string: String) =>
+        val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+        result.errors must contain only error
       }
     }
 }

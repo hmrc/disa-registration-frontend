@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import models.journeyData.JourneyData
+import models.journeydata.JourneyData
 import models.requests.{DataRequest, OptionalDataRequest}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -55,7 +55,9 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar {
         val action = new Harness
 
         val Right(result) =
-          action.callTransform(OptionalDataRequest(FakeRequest(), testGroupId, Some(testJourneyData))).futureValue
+          action
+            .callTransform(OptionalDataRequest(FakeRequest(), testGroupId, Some(testJourneyData)))
+            .futureValue: @unchecked
 
         result.groupId mustBe testGroupId
         result.journeyData mustBe testJourneyData

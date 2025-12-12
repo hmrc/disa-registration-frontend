@@ -16,7 +16,7 @@
 
 package generators
 
-import models.journeyData.isaProducts.{InnovativeFinancialProduct, IsaProduct}
+import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {}
