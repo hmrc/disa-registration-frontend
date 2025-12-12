@@ -24,8 +24,15 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.mvc.{AnyContent, Request}
 import play.api.test.FakeRequest
+import utils.TestData
 
-trait ViewSpecBase extends AnyWordSpec with GuiceOneAppPerSuite with Matchers with MockitoSugar with ScalaFutures {
+trait ViewSpecBase
+    extends AnyWordSpec
+    with GuiceOneAppPerSuite
+    with Matchers
+    with MockitoSugar
+    with ScalaFutures
+    with TestData {
 
   implicit val ec: scala.concurrent.ExecutionContext = scala.concurrent.ExecutionContext.global
   implicit val request: Request[AnyContent]          = FakeRequest()

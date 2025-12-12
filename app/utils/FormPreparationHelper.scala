@@ -16,7 +16,7 @@
 
 package utils
 
-import models.journeyData.JourneyData
+import models.journeydata.JourneyData
 import models.requests.OptionalDataRequest
 import play.api.data.Form
 

@@ -18,7 +18,7 @@ package forms
 
 import javax.inject.Inject
 import forms.mappings.Mappings
-import models.journeyData.isaProducts.IsaProduct
+import models.journeydata.isaproducts.IsaProduct
 import play.api.data.Form
 import play.api.data.Forms.set
 

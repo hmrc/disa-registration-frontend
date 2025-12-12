@@ -17,11 +17,13 @@
 package controllers
 
 import base.SpecBase
+import controllers.isaproducts.routes.PeerToPeerPlatformController
 import forms.PeerToPeerPlatformFormProvider
 import models.NormalMode
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.IsaProducts
+import models.journeydata.JourneyData
+import models.journeydata.isaproducts.IsaProducts
 import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
@@ -30,7 +32,7 @@ import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.PeerToPeerPlatformView
+import views.html.isaproducts.PeerToPeerPlatformView
 
 import scala.concurrent.Future
 
@@ -40,9 +42,8 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new PeerToPeerPlatformFormProvider()
   val form         = formProvider()
-  val testAnswer   = "test"
 
-  lazy val peerToPeerPlatformRoute = routes.PeerToPeerPlatformController.onPageLoad(NormalMode).url
+  lazy val peerToPeerPlatformRoute = PeerToPeerPlatformController.onPageLoad(NormalMode).url
 
   "PeerToPeerPlatform Controller" - {
 
@@ -82,7 +83,7 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testAnswer))))
+        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
@@ -94,7 +95,7 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(testAnswer), NormalMode)(
+        contentAsString(result) mustEqual view(form.fill(testString), NormalMode)(
           request,
           messages(application)
         ).toString
@@ -117,7 +118,7 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, peerToPeerPlatformRoute)
-            .withFormUrlEncodedBody(("value", testAnswer))
+            .withFormUrlEncodedBody(("value", testString))
 
         val result = route(application, request).value
 
@@ -142,7 +143,7 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, peerToPeerPlatformRoute)
-            .withFormUrlEncodedBody(("value", testAnswer))
+            .withFormUrlEncodedBody(("value", testString))
 
         val result = route(application, request).value
 
@@ -171,14 +172,15 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return Internal Server Error when invalid data is submitted" in {
+    "must return Internal Server Error when there is an issue storing the answer" in {
 
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService
+          .update(any[IsaProducts], ArgumentMatchers.eq(testGroupId))(any[Writes[IsaProducts]], any)
       ) thenReturn Future.failed(new Exception)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyData))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
@@ -187,12 +189,12 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, peerToPeerPlatformRoute)
-            .withFormUrlEncodedBody(("value", testAnswer))
+            .withFormUrlEncodedBody(("value", testString))
 
         val result = route(application, request).value
 
         status(result) mustEqual INTERNAL_SERVER_ERROR
-        contentAsString(result) must include(messages.messages("journeyRecovery.continue.title"))
+        contentAsString(result) must include(messages("journeyRecovery.continue.title"))
       }
     }
   }

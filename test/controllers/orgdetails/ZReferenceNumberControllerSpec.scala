@@ -19,8 +19,8 @@ package controllers.orgdetails
 import base.SpecBase
 import forms.ZReferenceNumberFormProvider
 import models.NormalMode
-import models.journeyData.isaProducts.IsaProducts
-import models.journeyData.{JourneyData, OrganisationDetails}
+import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.{JourneyData, OrganisationDetails}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

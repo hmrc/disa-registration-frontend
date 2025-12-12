@@ -17,7 +17,7 @@
 package forms
 
 import forms.behaviours.CheckboxFieldBehaviours
-import models.journeyData.isaProducts.InnovativeFinancialProduct
+import models.journeydata.isaproducts.InnovativeFinancialProduct
 import play.api.data.FormError
 
 class InnovativeFinancialProductsFormProviderSpec extends CheckboxFieldBehaviours {

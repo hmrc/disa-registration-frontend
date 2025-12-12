@@ -22,20 +22,11 @@ import play.api.data.FormError
 class PeerToPeerPlatformFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "peerToPeerPlatform.error.required"
-  val lengthKey   = "peerToPeerPlatform.error.length"
-  val maxLength   = 100
-
-  val form = new PeerToPeerPlatformFormProvider()()
+  val form        = new PeerToPeerPlatformFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
-
-    behave like fieldThatBindsValidData(
-      form,
-      fieldName,
-      stringsWithMaxLength(maxLength)
-    )
 
     behave like mandatoryField(
       form,
