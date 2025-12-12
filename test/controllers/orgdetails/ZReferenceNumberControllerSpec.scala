@@ -19,7 +19,7 @@ package controllers.orgdetails
 import base.SpecBase
 import forms.ZReferenceNumberFormProvider
 import models.NormalMode
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeyData.isaProducts.IsaProducts
 import models.journeyData.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -31,7 +31,6 @@ import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.IsaProductsView
 import views.html.orgdetails.ZReferenceNumberView
 
 import scala.concurrent.Future

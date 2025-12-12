@@ -22,7 +22,7 @@ import handlers.ErrorHandler
 import models.Mode
 import models.journeyData.OrganisationDetails
 import navigation.Navigator
-import pages.IsaProductsPage
+import pages._
 import play.api.i18n.I18nSupport
 import play.api.i18n.Lang.logger
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -72,7 +72,7 @@ class ZReferenceNumberController @Inject() (
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { _ =>
-              Redirect(navigator.nextPage(IsaProductsPage, mode))
+              Redirect(navigator.nextPage(ZReferenceNumberPage, mode))
             }
             .recoverWith { case e =>
               logger.warn(

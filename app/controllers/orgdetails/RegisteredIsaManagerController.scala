@@ -22,7 +22,7 @@ import handlers.ErrorHandler
 import models.Mode
 import models.journeyData.OrganisationDetails
 import navigation.Navigator
-import pages.{IsaProductsPage, RegisteredIsaManagerPage}
+import pages.*
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -73,7 +73,7 @@ class RegisteredIsaManagerController @Inject() (
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { _ =>
-              Redirect(navigator.nextPage(IsaProductsPage, mode))
+              Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode))
             }
             .recoverWith { case e =>
               logger.warn(
