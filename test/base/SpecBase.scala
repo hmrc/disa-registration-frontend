@@ -32,8 +32,8 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.{Injector, bind}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.inject.{Injector, bind}
 import play.api.mvc.RequestHeader
 import play.api.mvc.Results.InternalServerError
 import play.api.test.FakeRequest
@@ -52,6 +52,7 @@ trait SpecBase
     with ScalaFutures
     with IntegrationPatience
     with GuiceOneAppPerSuite
+    with AuthTestSupport
     with BeforeAndAfterEach
     with TestData
     with MockitoSugar {
@@ -85,4 +86,5 @@ trait SpecBase
       )
 
   def injector: Injector = app.injector
+
 }
