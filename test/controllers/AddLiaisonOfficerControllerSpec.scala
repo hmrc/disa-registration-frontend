@@ -18,11 +18,11 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.AuthenticatedIdentifierAction
+import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.mvc.BodyParsers
-import views.html.AddLiaisonOfficerView
 import uk.gov.hmrc.auth.core.AffinityGroup
+import views.html.AddLiaisonOfficerView
 
 import scala.concurrent.ExecutionContext
 
@@ -33,7 +33,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
 
     "must return OK for Organisation users" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val bodyParsers = application.injector.instanceOf[BodyParsers.Default]

@@ -17,10 +17,10 @@
 package models.requests
 
 import play.api.mvc.{Request, WrappedRequest}
-import models.UserAnswers
+import models.journeyData.JourneyData
 
-case class OptionalDataRequest[A](request: Request[A], userId: String, userAnswers: Option[UserAnswers])
+case class OptionalDataRequest[A](request: Request[A], groupId: String, journeyData: Option[JourneyData])
     extends WrappedRequest[A](request)
 
-case class DataRequest[A](request: Request[A], userId: String, userAnswers: UserAnswers)
+case class DataRequest[A](request: Request[A], groupId: String, journeyData: JourneyData)
     extends WrappedRequest[A](request)

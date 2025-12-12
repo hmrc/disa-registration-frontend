@@ -23,7 +23,6 @@ import navigation.Navigator
 import pages.RegisteredIsaManagerPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.orgdetails.RegisteredIsaManagerView
 
@@ -32,11 +31,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RegisteredIsaManagerController @Inject() (
   override val messagesApi: MessagesApi,
-  sessionRepository: SessionRepository,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   formProvider: RegisteredIsaManagerFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: RegisteredIsaManagerView
@@ -47,10 +44,10 @@ class RegisteredIsaManagerController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = request.userAnswers.fold(form)(_.get(RegisteredIsaManagerPage) match {
+    val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.registeredToManageIsa match {
       case None        => form
       case Some(value) => form.fill(value)
-    })
+    }))
 
     Ok(view(preparedForm, mode))
   }
@@ -62,8 +59,8 @@ class RegisteredIsaManagerController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         // TODO implement user answer setting
         _ =>
-          request.userAnswers.fold(Future.successful(NotFound))(ua =>
-            Future.successful(Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode, ua)))
+          request.journeyData.fold(Future.successful(NotFound))(ua =>
+            Future.successful(Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode)))
           )
       )
   }

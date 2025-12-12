@@ -63,10 +63,22 @@ unsupportedAffinityGroup.linkText = sign in to Government Gateway with an organi
 unsupportedAffinityGroup.fullStop = .
 unsupportedAffinityGroup.linkText2 = Read more about who can use this service in the Applications for ISA manager status guidance (opens in new tab)
 
+page.signOut.paragraph1 = This is a new service and we want to know what you think of it.
+page.signOut.feedback.link.text = Send us your feedback
+page.signOut.paragraph2 = Your thoughts and ideas will help us to make improvements.
+page.signOut.govuk.text = Back to GOV.UK
+govuk.link = https://www.gov.uk/
+page.signOut.title = We have saved your answers and signed you out
+page.signOut.heading = We have saved your answers and signed you out
+page.signOut.answers.not.saved.title = We have signed you out
+page.signOut.answers.not.saved.heading = We have signed you out
+
 ## Section Titles
 
 sectionTitle.orgDetails = Organisation details
+sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
+sectionTitle.isaProducts = ISA products
 
 ### Organisation Details
 
@@ -83,16 +95,45 @@ zReferenceNumber.hint = This is usually a Z followed by 4 numbers, for example Z
 zReferenceNumber.error.required = You need to tell us what your organisation’s Z reference number is
 zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers
 
-page.signOut.paragraph1 = This is a new service and we want to know what you think of it.
-page.signOut.feedback.link.text = Send us your feedback
-page.signOut.paragraph2 = Your thoughts and ideas will help us to make improvements.
-page.signOut.govuk.text = Back to GOV.UK
-govuk.link = https://www.gov.uk/
-page.signOut.title = We have saved your answers and signed you out
-page.signOut.heading = We have saved your answers and signed you out
-page.signOut.answers.not.saved.title = We have signed you out
-page.signOut.answers.not.saved.heading = We have signed you out
+### ISA Products
+isaProducts.title = Which ISA products does your organisation offer?
+isaProducts.heading = Which ISA products does your organisation offer?
+isaProducts.cashIsas = Cash ISAs
+isaProducts.cashJuniorIsas = Cash Junior ISAs
+isaProducts.stocksAndSharesIsas = Stocks and Shares ISAs
+isaProducts.stocksAndSharesJuniorIsas = Stocks and Shares Junior ISAs
+isaProducts.innovativeFinanceIsas = Innovative Finance ISAs
+isaProducts.error.required = Select the ISA products your organisation offers
+isaProducts.hint = Select all that apply
 
+peerToPeerPlatform.title = Which platform does your organisation use to offer peer-to-peer loans?
+peerToPeerPlatform.heading = Which platform does your organisation use to offer peer-to-peer loans?
+peerToPeerPlatform.error.required = Enter which platform your organisation uses to offer peer-to-peer loans
+peerToPeerPlatform.details.summary = What is a peer-to-peer loan?
+peerToPeerPlatform.details.content.p1 = Peer-to-peer loans are direct transactions between investors willing to lend money and borrowers seeking loans.
+peerToPeerPlatform.details.content.p2 = These parties are brought together by an electronic platform which introduces and arranges the loan documentation between the lender and the borrower.
+peerToPeerPlatform.details.content.p3 = It then manages the payment of interest and repayment of the principal according to the terms agreed between the parties.
+peerToPeerPlatform.details.content.link = Find out more about peer-to-peer loans
+peerToPeerPlatform.change.hidden = PeerToPeerPlatform
+
+innovativeFinancialProducts.title = Which types of innovative finance products will your organisation offer?
+innovativeFinancialProducts.heading = Which types of innovative finance products will your organisation offer?
+innovativeFinancialProducts.peerToPeerLoansAndHave36HPermissions = Peer-to-peer loans and have 36H permissions
+innovativeFinancialProducts.peerToPeerLoansUsingAPlatformWith36HPermissions = Peer-to-peer loans using a platform with 36H permissions
+innovativeFinancialProducts.crowdfundedDebentures = Crowdfunded debentures
+innovativeFinancialProducts.longTermAssetFunds = Long-Term Asset Funds (LTAFs) and other funds with extended redemption periods
+innovativeFinancialProducts.checkYourAnswersLabel = Which types of innovative finance products will your organisation offer?
+innovativeFinancialProducts.error.required = Select which types of innovative finance products your organisation will offer
+innovativeFinancialProducts.change.hidden = InnovativeFinancialProducts
+
+### Signatories
+addASignatory.title = Add a signatory
+addASignatory.heading = Add a signatory
+addASignatory.p1 = You must have at least 1 signatory. The maximum is 25.
+addASignatory.details.summary = What is a signatory?
+addASignatory.details.content = A signatory is the appointed person who will act with the authority to sign formal documentation on behalf of your organisation.
+
+### LOs
 addLiaisonOfficer.title = Add liaison officer
 addLiaisonOfficer.heading = Add liaison officer
 addLiaisonOfficer.p1 = You must have at least 1 liaison officer to register your organisation as an ISA manager.

@@ -8,8 +8,6 @@ GET         /assets/*file                                       controllers.Asse
 
 GET         /language/:lang                                     controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                                    controllers.KeepAliveController.keepAlive()
-
 GET         /there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
 GET         /check-your-answers                                 controllers.CheckYourAnswersController.onPageLoad()
@@ -34,5 +32,22 @@ POST       /z-reference-number                           controllers.orgdetails.
 GET        /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
+### ISA Products
+GET        /isa-products                        controllers.isaProducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /isa-products                        controllers.isaProducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-isa-products                  controllers.isaProducts.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-isa-products                  controllers.isaProducts.IsaProductsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /innovative-financial-products                        controllers.isaProducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /innovative-financial-products                        controllers.isaProducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-innovative-financial-products                  controllers.isaProducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-innovative-financial-products                  controllers.isaProducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /peer-to-peer-loans                      controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = NormalMode)
+POST       /peer-to-peer-loans                        controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = NormalMode)
+GET        /change-peer-to-peer-loans                  controllers.PeerToPeerPlatformController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-peer-to-peer-loans                  controllers.PeerToPeerPlatformController.onSubmit(mode: Mode = CheckMode)
+
 ### LOs and Signatories
-GET        /add-liaison-officer                       controllers.AddLiaisonOfficerController.onPageLoad()
+GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
+GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()

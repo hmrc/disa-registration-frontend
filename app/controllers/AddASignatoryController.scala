@@ -16,27 +16,22 @@
 
 package controllers
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-
+import controllers.actions._
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.AddASignatoryView
 
-class KeepAliveController @Inject() (
-  val controllerComponents: MessagesControllerComponents,
+class AddASignatoryController @Inject() (
+  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  sessionRepository: SessionRepository
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController {
+  val controllerComponents: MessagesControllerComponents,
+  view: AddASignatoryView
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def keepAlive(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    request.userAnswers
-      .map { answers =>
-        sessionRepository.keepAlive(answers.id).map(_ => Ok)
-      }
-      .getOrElse(Future.successful(Ok))
+  def onPageLoad: Action[AnyContent] = (Action andThen identify) { implicit request =>
+    Ok(view())
   }
 }
