@@ -17,7 +17,7 @@
 package models.requests
 
 import play.api.mvc.{Request, WrappedRequest}
-import models.journeyData.JourneyData
+import models.journeydata.JourneyData
 
 case class OptionalDataRequest[A](request: Request[A], groupId: String, journeyData: Option[JourneyData])
     extends WrappedRequest[A](request)

@@ -20,7 +20,7 @@ import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 import play.api.data.Forms.set
-import models.journeyData.isaProducts.InnovativeFinancialProduct
+import models.journeydata.isaproducts.InnovativeFinancialProduct
 
 class InnovativeFinancialProductsFormProvider @Inject() extends Mappings {
 

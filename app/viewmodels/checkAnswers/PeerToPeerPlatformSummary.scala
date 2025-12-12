@@ -16,10 +16,9 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
-import models.journeyData.JourneyData
+import controllers.isaproducts.routes.PeerToPeerPlatformController
+import models.journeydata.JourneyData
 import models.CheckMode
-import pages.PeerToPeerPlatformPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -34,7 +33,7 @@ object PeerToPeerPlatformSummary {
         key = "peerToPeerPlatform.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.PeerToPeerPlatformController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", PeerToPeerPlatformController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("peerToPeerPlatform.change.hidden"))
         )
       )
