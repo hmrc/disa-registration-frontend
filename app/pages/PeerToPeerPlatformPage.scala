@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package models.journeyData.isaProducts
+package pages
 
-import models.journeyData.TaskListSection
-import play.api.libs.json.{Json, OFormat}
+case object PeerToPeerPlatformPage extends Page {
 
-case class IsaProducts(
-  isaProducts: Option[Seq[IsaProduct]] = None,
-  p2pPlatform: Option[String] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
-) extends TaskListSection {
-  override def sectionName: String = "isaProducts"
-}
-
-object IsaProducts {
-  implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]
+  override def toString: String = "peerToPeerPlatform"
 }

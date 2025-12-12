@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package models.journeyData.isaProducts
+package utils
 
-import models.journeyData.TaskListSection
-import play.api.libs.json.{Json, OFormat}
+import models.journeyData.JourneyData
+import models.requests.OptionalDataRequest
+import play.api.data.Form
 
-case class IsaProducts(
-  isaProducts: Option[Seq[IsaProduct]] = None,
-  p2pPlatform: Option[String] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
-) extends TaskListSection {
-  override def sectionName: String = "isaProducts"
-}
+object FormPreparationHelper {
 
-object IsaProducts {
-  implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]
+  def prepareForm[T, A](
+    form: Form[A]
+  )(extractor: JourneyData => Option[T])(toFillValue: T => A)(implicit request: OptionalDataRequest[_]): Form[A] =
+    request.journeyData match {
+      case Some(journey) =>
+        extractor(journey) match {
+          case Some(value) => form.fill(toFillValue(value))
+          case None        => form
+        }
+      case None          =>
+        form
+    }
 }

@@ -14,48 +14,48 @@
  * limitations under the License.
  */
 
-package controllers.isaProducts
+package controllers
 
 import base.SpecBase
-import forms.IsaProductsFormProvider
+import forms.PeerToPeerPlatformFormProvider
 import models.NormalMode
 import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeyData.isaProducts.IsaProducts
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.isaProducts.IsaProductsView
+import views.html.PeerToPeerPlatformView
 
 import scala.concurrent.Future
 
-class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
+class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute = Call("GET", "/foo")
 
-  lazy val isaProductsRoute: String = routes.IsaProductsController.onPageLoad(NormalMode).url
+  val formProvider = new PeerToPeerPlatformFormProvider()
+  val form         = formProvider()
+  val testAnswer   = "test"
 
-  val formProvider                = new IsaProductsFormProvider()
-  val form: Form[Set[IsaProduct]] = formProvider()
+  lazy val peerToPeerPlatformRoute = routes.PeerToPeerPlatformController.onPageLoad(NormalMode).url
 
-  "IsaProduct Controller" - {
+  "PeerToPeerPlatform Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, isaProductsRoute)
+        val request = FakeRequest(GET, peerToPeerPlatformRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IsaProductsView]
+        val view = application.injector.instanceOf[PeerToPeerPlatformView]
 
         status(result) mustEqual OK
 
@@ -67,11 +67,11 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       val application = applicationBuilder(journeyData = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, isaProductsRoute)
+        val request = FakeRequest(GET, peerToPeerPlatformRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IsaProductsView]
+        val view = application.injector.instanceOf[PeerToPeerPlatformView]
 
         status(result) mustEqual OK
 
@@ -82,19 +82,19 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(Some(IsaProduct.values), None)))
+        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testAnswer))))
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, isaProductsRoute)
+        val request = FakeRequest(GET, peerToPeerPlatformRoute)
 
-        val view = application.injector.instanceOf[IsaProductsView]
+        val view = application.injector.instanceOf[PeerToPeerPlatformView]
 
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(IsaProduct.values.toSet), NormalMode)(
+        contentAsString(result) mustEqual view(form.fill(testAnswer), NormalMode)(
           request,
           messages(application)
         ).toString
@@ -116,8 +116,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
+          FakeRequest(POST, peerToPeerPlatformRoute)
+            .withFormUrlEncodedBody(("value", testAnswer))
 
         val result = route(application, request).value
 
@@ -141,8 +141,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
+          FakeRequest(POST, peerToPeerPlatformRoute)
+            .withFormUrlEncodedBody(("value", testAnswer))
 
         val result = route(application, request).value
 
@@ -157,12 +157,12 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
+          FakeRequest(POST, peerToPeerPlatformRoute)
+            .withFormUrlEncodedBody(("value", ""))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
+        val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[IsaProductsView]
+        val view = application.injector.instanceOf[PeerToPeerPlatformView]
 
         val result = route(application, request).value
 
@@ -186,8 +186,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, isaProductsRoute)
-            .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
+          FakeRequest(POST, peerToPeerPlatformRoute)
+            .withFormUrlEncodedBody(("value", testAnswer))
 
         val result = route(application, request).value
 

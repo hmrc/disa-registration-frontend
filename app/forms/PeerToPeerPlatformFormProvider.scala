@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package models.journeyData.isaProducts
+package forms
 
-import models.journeyData.TaskListSection
-import play.api.libs.json.{Json, OFormat}
+import javax.inject.Inject
 
-case class IsaProducts(
-  isaProducts: Option[Seq[IsaProduct]] = None,
-  p2pPlatform: Option[String] = None,
-  innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
-) extends TaskListSection {
-  override def sectionName: String = "isaProducts"
-}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-object IsaProducts {
-  implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]
+class PeerToPeerPlatformFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("peerToPeerPlatform.error.required")
+    )
 }

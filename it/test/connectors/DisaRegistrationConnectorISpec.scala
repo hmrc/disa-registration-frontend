@@ -22,11 +22,9 @@ import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK, UNAUTHORIZED}
 import play.api.libs.json.Json
 import play.api.test.Helpers.await
-import uk.gov.hmrc.http.{JsValidationException, NotFoundException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{JsValidationException, UpstreamErrorResponse}
 import utils.BaseIntegrationSpec
 import utils.WiremockHelper.{stubGet, stubPost}
-
-import scala.concurrent.Future
 
 class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
 
