@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.RegisteredIsaManagerFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.OrganisationDetails
+import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.*
 import play.api.i18n.Lang.logger
