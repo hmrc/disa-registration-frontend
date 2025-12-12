@@ -39,10 +39,10 @@ import scala.concurrent.Future
 // TODO add tests back in when next page is present and UAs are wired up
 class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-   def onwardRoute = Call("GET", "/foo")
+  def onwardRoute = Call("GET", "/foo")
 
   val formProvider: ZReferenceNumberFormProvider = new ZReferenceNumberFormProvider()
-  val form: Form[String] = formProvider()
+  val form: Form[String]                         = formProvider()
 
   lazy val zReferenceNumberRoute: String = routes.ZReferenceNumberController.onPageLoad(NormalMode).url
 
@@ -153,7 +153,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return Internal Server Error when invalid data is submitted" in {
+    "must return Internal Server Error when updateJourneyAnswers returns a fail exception" in {
 
       when(
         mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)

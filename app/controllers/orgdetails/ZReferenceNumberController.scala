@@ -21,7 +21,6 @@ import forms.ZReferenceNumberFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeyData.OrganisationDetails
-import models.journeyData.isaProducts.IsaProducts
 import navigation.Navigator
 import pages.IsaProductsPage
 import play.api.i18n.I18nSupport
@@ -42,7 +41,9 @@ class ZReferenceNumberController @Inject() (
   view: ZReferenceNumberView,
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
-  errorHandler: ErrorHandler)(implicit executionContext: ExecutionContext) extends FrontendBaseController
+  errorHandler: ErrorHandler
+)(implicit executionContext: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   private val form = formProvider()
@@ -50,8 +51,8 @@ class ZReferenceNumberController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     val preparedForm = (for {
       journeyData <- request.journeyData
-      orgDetails <- journeyData.organisationDetails
-      values <- orgDetails.zRefNumber
+      orgDetails  <- journeyData.organisationDetails
+      values      <- orgDetails.zRefNumber
     } yield form.fill(values)).getOrElse(form)
     Future.successful(Ok(view(preparedForm, mode)))
   }
@@ -61,13 +62,12 @@ class ZReferenceNumberController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer =>
-        {
+        answer => {
           val updatedSection =
-          request.journeyData.flatMap(_.organisationDetails) match {
-            case Some(existing) => existing.copy(zRefNumber = Some(answer))
-            case None => OrganisationDetails(zRefNumber = Some(answer))
-          }
+            request.journeyData.flatMap(_.organisationDetails) match {
+              case Some(existing) => existing.copy(zRefNumber = Some(answer))
+              case None           => OrganisationDetails(zRefNumber = Some(answer))
+            }
 
           journeyAnswersService
             .update(updatedSection, request.groupId)

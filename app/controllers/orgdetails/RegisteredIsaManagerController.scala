@@ -63,12 +63,11 @@ class RegisteredIsaManagerController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer =>
-        {
+        answer => {
           val updatedSection =
             request.journeyData.flatMap(_.organisationDetails) match {
               case Some(existing) => existing.copy(registeredToManageIsa = Some(answer))
-              case None => OrganisationDetails(registeredToManageIsa = Some(answer))
+              case None           => OrganisationDetails(registeredToManageIsa = Some(answer))
             }
 
           journeyAnswersService
