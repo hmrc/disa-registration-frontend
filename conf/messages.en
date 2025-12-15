@@ -80,6 +80,8 @@ sectionTitle.orgDetails = Organisation details
 sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
 sectionTitle.isaProducts = ISA products
+section.caption.hidden = This section is
+
 
 ### Organisation Details
 
@@ -108,7 +110,6 @@ isaProducts.error.required = Select the ISA products your organisation offers
 isaProducts.checkYourAnswersLabel = Products
 isaProducts.hint = Select all that apply
 isaProducts.change.hidden = Change ISA products
-isaProducts.caption.hidden = This section is ISA products
 
 
 innovativeFinancialProducts.title = Which types of innovative finance products will your organisation offer?
