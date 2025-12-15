@@ -52,8 +52,8 @@ class ZReferenceNumberController @Inject() (
     val preparedForm = (for {
       journeyData <- request.journeyData
       orgDetails  <- journeyData.organisationDetails
-      values      <- orgDetails.zRefNumber
-    } yield form.fill(values)).getOrElse(form)
+      value       <- orgDetails.zRefNumber
+    } yield form.fill(value)).getOrElse(form)
     Future.successful(Ok(view(preparedForm, mode)))
   }
 
