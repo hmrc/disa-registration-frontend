@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package navigation
+package pages
 
-import javax.inject.{Inject, Singleton}
+import base.SpecBase
 
-import play.api.mvc.Call
-import controllers.routes
-import pages._
-import models._
+class PeerToPeerPlatformPageSpec extends SpecBase {
 
-@Singleton
-class Navigator @Inject() () {
+  "PeerToPeerPlatformPage" - {
 
-  private val normalRoutes: Page => Call = _ => routes.IndexController.onPageLoad()
-
-  private val checkRouteMap: Page => Call = _ => routes.CheckYourAnswersController.onPageLoad()
-
-  def nextPage(page: Page, mode: Mode): Call = mode match {
-    case NormalMode =>
-      normalRoutes(page)
-    case CheckMode  =>
-      checkRouteMap(page)
+    "must have the correct string representation" in {
+      PeerToPeerPlatformPage.toString mustBe "peerToPeerPlatform"
+    }
   }
 }

@@ -14,27 +14,38 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.isaproducts
 
-import controllers.isaproducts.routes.PeerToPeerPlatformNumberController
+import controllers.isaproducts.routes.IsaProductsController
 import models.CheckMode
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PeerToPeerPlatformNumberSummary {
+object IsaProductsSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.isaProducts.flatMap(_.p2pPlatformNumber).map { answer =>
+    answers.isaProducts.flatMap(_.isaProducts).map { answers =>
+      val value = ValueViewModel(
+        HtmlContent(
+          answers
+            .map { answer =>
+              HtmlFormat.escape(messages(s"isaProducts.$answer")).toString
+            }
+            .mkString(",<br>")
+        )
+      )
+
       SummaryListRowViewModel(
-        key = "peerToPeerPlatformNumber.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = "isaProducts.checkYourAnswersLabel",
+        value = value,
         actions = Seq(
-          ActionItemViewModel("site.change", PeerToPeerPlatformNumberController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("peerToPeerPlatformNumber.change.hidden"))
+          ActionItemViewModel("site.change", IsaProductsController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("isaProducts.change.hidden"))
         )
       )
     }

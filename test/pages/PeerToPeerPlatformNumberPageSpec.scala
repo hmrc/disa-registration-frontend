@@ -16,8 +16,14 @@
 
 package pages
 
-import play.api.libs.json.JsPath
+import base.SpecBase
 
-object PageConstants {
-  val organisationDetailsSection = JsPath \ "organisationDetails"
+class PeerToPeerPlatformNumberPageSpec extends SpecBase {
+
+  "PeerToPeerPlatformNumberPage" - {
+
+    "must have the correct string representation" in {
+      PeerToPeerPlatformNumberPage.toString mustBe "peerToPeerPlatformNumber"
+    }
+  }
 }
