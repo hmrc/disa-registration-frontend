@@ -107,7 +107,8 @@ isaProducts.innovativeFinanceIsas = Innovative Finance ISAs
 isaProducts.error.required = Select the ISA products your organisation offers
 isaProducts.checkYourAnswersLabel = Products
 isaProducts.hint = Select all that apply
-isaProducts.change.hidden = IsaProducts
+isaProducts.change.hidden = Change ISA products
+isaProducts.caption.hidden = This section is ISA products
 
 
 innovativeFinancialProducts.title = Which types of innovative finance products will your organisation offer?
@@ -118,7 +119,7 @@ innovativeFinancialProducts.crowdfundedDebentures = Crowdfunded debentures
 innovativeFinancialProducts.longTermAssetFunds = Long-Term Asset Funds (LTAFs) and other funds with extended redemption periods
 innovativeFinancialProducts.checkYourAnswersLabel = Innovative finance product
 innovativeFinancialProducts.error.required = Select which types of innovative finance products your organisation will offer
-innovativeFinancialProducts.change.hidden = InnovativeFinancialProducts
+innovativeFinancialProducts.change.hidden = Change innovative finance product
 
 peerToPeerPlatform.title = Which platform does your organisation use to offer peer-to-peer loans?
 peerToPeerPlatform.heading = Which platform does your organisation use to offer peer-to-peer loans?
@@ -128,7 +129,7 @@ peerToPeerPlatform.details.content.p1 = Peer-to-peer loans are direct transactio
 peerToPeerPlatform.details.content.p2 = These parties are brought together by an electronic platform which introduces and arranges the loan documentation between the lender and the borrower.
 peerToPeerPlatform.details.content.p3 = It then manages the payment of interest and repayment of the principal according to the terms agreed between the parties.
 peerToPeerPlatform.details.content.link = Find out more about peer-to-peer loans
-peerToPeerPlatform.change.hidden = PeerToPeerPlatform
+peerToPeerPlatform.change.hidden = Change platform name
 peerToPeerPlatform.checkYourAnswersLabel = Platform name
 
 
@@ -137,7 +138,7 @@ peerToPeerPlatformNumber.heading = What is the FCA, FRN of {0}?
 peerToPeerPlatformNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 peerToPeerPlatformNumber.error.required = You must tell us your {0} reference number
 peerToPeerPlatformNumber.error.pattern = Enter the {0} reference number in the correct format. It’s usually 6 or 7 numbers
-peerToPeerPlatformNumber.change.hidden = PeerToPeerPlatformNumber
+peerToPeerPlatformNumber.change.hidden = Change platform FCA
 peerToPeerPlatformNumber.checkYourAnswersLabel = Platform FCA FRN
 
 ### Signatories

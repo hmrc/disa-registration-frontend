@@ -24,7 +24,11 @@
 @(list: SummaryList)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"),Some(messages("sectionTitle.isaProducts")))) {
-    <span class="govuk-caption-l">@messages("sectionTitle.isaProducts")</span>
+    <span class="govuk-caption-xl">
+        <span class="govuk-visually-hidden">
+            @messages("isaProducts.caption.hidden")
+        </span>
+    </span>
     <h1 class="govuk-heading-l">@messages("checkYourAnswers.heading")</h1>
         @formHelper(action = routes.IndexController.onPageLoad(), Symbol("autoComplete") -> "off") {
 
