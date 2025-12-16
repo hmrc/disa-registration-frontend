@@ -16,13 +16,21 @@
 
 package utils
 
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeydata.JourneyData
+import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 
 trait TestData {
-  val testGroupId: String           = "id"
+  val testGroupId: String = "id"
+
   def emptyJourneyData: JourneyData = JourneyData(testGroupId)
 
-  val testIsaProductsAnswers = IsaProducts(Some(IsaProduct.values), None)
-  val testJourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
+  val testIsaProductsAnswers: IsaProducts =
+    IsaProducts(
+      isaProducts = Some(IsaProduct.values),
+      p2pPlatform = Some("Test Platform"),
+      p2pPlatformNumber = Some("1234567"),
+      innovativeFinancialProducts = Some(InnovativeFinancialProduct.values)
+    )
+  val testJourneyData: JourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
+  val testString                          = "test"
 }

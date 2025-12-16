@@ -23,9 +23,10 @@ import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.mvc.*
 import play.api.mvc.Results.*
-import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -48,17 +49,20 @@ class AuthenticatedIdentifierAction @Inject() (
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised(Organisation).retrieve(Retrievals.groupIdentifier) {
-      _.map { groupId =>
+    authorised().retrieve(Retrievals.groupIdentifier and Retrievals.affinityGroup) {
+      case Some(groupId) ~ Some(Organisation) =>
         block(IdentifierRequest(request, groupId))
-      }.getOrElse(throw new UnauthorizedException("Unable to retrieve group Id"))
-    } recover {
-      case ex @ (_: UnsupportedAffinityGroup | _: NoActiveSession) =>
-        logger.warn(s"Authorization failed. Error: ${ex.reason}")
-        Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
-      case ex: AuthorisationException                              =>
-        logger.warn(s"Auth request failed with unexpected exception: $ex")
-        Redirect(routes.UnauthorisedController.onPageLoad())
+      case Some(_) ~ Some(affinity)           =>
+        Future.successful(
+          Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString))
+        )
+      case _                                  =>
+        Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     }
+  } recover {
+    case _: NoActiveSession        =>
+      Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
+    case _: AuthorisationException =>
+      Redirect(routes.UnauthorisedController.onPageLoad())
   }
 }

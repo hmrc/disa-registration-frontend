@@ -21,7 +21,7 @@ import play.api.mvc.Results.{BadRequest, InternalServerError}
 import play.api.mvc.{Request, RequestHeader, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
-import views.html.{ErrorTemplate, NotFoundView}
+import views.html.{ErrorTemplate, InternalServerErrorView, NotFoundView}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,7 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class ErrorHandler @Inject() (
   val messagesApi: MessagesApi,
   view: ErrorTemplate,
-  notFoundView: NotFoundView
+  notFoundView: NotFoundView,
+  internalServerErrorView: InternalServerErrorView
 )(override implicit val ec: ExecutionContext)
     extends FrontendErrorHandler
     with I18nSupport {
@@ -47,6 +48,14 @@ class ErrorHandler @Inject() (
     Future.successful(notFoundView())
   }
 
+  override def internalServerErrorTemplate(implicit rh: RequestHeader): Future[Html] = {
+    implicit val request: Request[_] = Request(rh, "")
+    Future.successful(internalServerErrorView())
+  }
+
   def internalServerError(implicit request: RequestHeader): Future[Result] =
     internalServerErrorTemplate.map(InternalServerError(_))
+
+  def badRequest(implicit request: RequestHeader): Future[Result] =
+    badRequestTemplate.map(BadRequest(_))
 }

@@ -1,16 +1,16 @@
 # microservice specific routes
 
-->          /hmrc-frontend                                      hmrcfrontend.Routes
+->          /hmrc-frontend                               hmrcfrontend.Routes
 
-GET         /                                                   controllers.IndexController.onPageLoad()
+GET         /                                            controllers.IndexController.onPageLoad()
 
-GET         /assets/*file                                       controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                                     controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
 GET         /there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /check-your-answers                                 controllers.CheckYourAnswersController.onPageLoad()
+GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
 GET         /account/sign-out-no-survey                  controllers.auth.AuthController.signOutNoSurvey()
@@ -19,6 +19,9 @@ GET         /account/sign-out                            controllers.auth.Signed
 GET         /account/sign-out-answers-not-saved          controllers.auth.SignedOutController.signOutAnswersNotSaved()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
+GET         /unsupported-affinity-group                  controllers.UnsupportedAffinityGroupController.onPageLoad(affinityGroup: String)
+
+GET         /problem-with-service                        controllers.InternalServerErrorController.onPageLoad()
 
 ### Organisation Details
 GET        /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
@@ -37,12 +40,28 @@ GET        /change-trading-using-different-name                   controllers.or
 POST       /change-trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = CheckMode)
 
 ### ISA Products
-GET        /isa-products                        controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
-POST       /isa-products                        controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
-GET        /change-isa-products                  controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-isa-products                  controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = CheckMode)
+GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-isa-products                          controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-isa-products                          controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /innovative-financial-products                controllers.isaproducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = NormalMode)
+POST       /innovative-financial-products                controllers.isaproducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-innovative-financial-products         controllers.isaproducts.InnovativeFinancialProductsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-innovative-financial-products         controllers.isaproducts.InnovativeFinancialProductsController.onSubmit(mode: Mode = CheckMode)
+
+GET        /peer-to-peer-loans                           controllers.isaproducts.PeerToPeerPlatformController.onPageLoad(mode: Mode = NormalMode)
+POST       /peer-to-peer-loans                           controllers.isaproducts.PeerToPeerPlatformController.onSubmit(mode: Mode = NormalMode)
+GET        /change-peer-to-peer-loans                    controllers.isaproducts.PeerToPeerPlatformController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-peer-to-peer-loans                    controllers.isaproducts.PeerToPeerPlatformController.onSubmit(mode: Mode = CheckMode)
+
+GET        /fca-platform-number                          controllers.isaproducts.PeerToPeerPlatformNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /fca-platform-number                          controllers.isaproducts.PeerToPeerPlatformNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /change-fca-platform-number                   controllers.isaproducts.PeerToPeerPlatformNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-fca-platform-number                   controllers.isaproducts.PeerToPeerPlatformNumberController.onSubmit(mode: Mode = CheckMode)
+
+GET        /isa-products-check-your-answers              controllers.isaproducts.IsaProductsCheckYourAnswersController.onPageLoad()
 
 ### LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
 GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()
-

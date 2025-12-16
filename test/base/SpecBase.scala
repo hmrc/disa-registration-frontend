@@ -18,25 +18,31 @@ package base
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import models.journeyData.JourneyData
+import handlers.ErrorHandler
+import models.journeydata.JourneyData
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{BeforeAndAfterEach, OptionValues, TryValues}
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.{Injector, bind}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.inject.{Injector, bind}
+import play.api.mvc.RequestHeader
+import play.api.mvc.Results.InternalServerError
 import play.api.test.FakeRequest
 import services.JourneyAnswersService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.TestData
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 trait SpecBase
     extends AnyFreeSpec
@@ -46,10 +52,14 @@ trait SpecBase
     with ScalaFutures
     with IntegrationPatience
     with GuiceOneAppPerSuite
+    with AuthTestSupport
     with BeforeAndAfterEach
-    with TestData {
+    with TestData
+    with MockitoSugar {
 
-  def messages(implicit app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+  implicit def messages(implicit app: Application): Messages   =
+    app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+  def messages(key: String)(implicit app: Application): String = messages(app).messages(key)
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
@@ -59,8 +69,12 @@ trait SpecBase
   protected val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
   protected val mockAppConfig: FrontendAppConfig                 = mock[FrontendAppConfig]
   protected val mockRequestBuilder: RequestBuilder               = mock[RequestBuilder]
+  protected val mockErrorHandler: ErrorHandler                   = mock[ErrorHandler]
 
-  override def beforeEach(): Unit = Mockito.reset()
+  override def beforeEach(): Unit = {
+    Mockito.reset()
+    when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
+  }
 
   protected def applicationBuilder(journeyData: Option[JourneyData] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
@@ -72,4 +86,5 @@ trait SpecBase
       )
 
   def injector: Injector = app.injector
+
 }

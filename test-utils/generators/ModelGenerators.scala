@@ -16,10 +16,15 @@
 
 package generators
 
-import models.journeyData.isaProducts.IsaProduct
+import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {}
+
+implicit lazy val arbitraryInnovativeFinancialProducts: Arbitrary[InnovativeFinancialProduct] =
+  Arbitrary {
+    Gen.oneOf(InnovativeFinancialProduct.values)
+  }
 
 implicit lazy val arbitraryIsaProducts: Arbitrary[IsaProduct] =
   Arbitrary {

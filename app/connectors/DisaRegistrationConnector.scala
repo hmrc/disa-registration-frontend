@@ -17,7 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.journeyData.{JourneyData, TaskListSection}
+import models.journeydata.{JourneyData, TaskListSection}
 import play.api.Logging
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.libs.json.{Json, Writes}

@@ -16,11 +16,11 @@
 
 package utils
 
+import base.SpecBase
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import play.api.libs.json._
+import play.api.libs.json.*
 
-trait JsonFormatSpec[A] extends AnyFreeSpec with Matchers {
+trait JsonFormatSpec[A] extends SpecBase {
 
   def model: A
   def json: JsValue

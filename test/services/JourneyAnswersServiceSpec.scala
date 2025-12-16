@@ -77,14 +77,14 @@ class JourneyAnswersServiceSpec extends SpecBase {
           )(any(), any())
         ).thenReturn(Future.successful(()))
 
-        val result = service.update(testIsaProductsAnswers, testGroupId).futureValue
+        val result: Unit = service.update(testIsaProductsAnswers, testGroupId).futureValue
 
         result mustBe ()
         verify(mockConnector)
           .updateTaskListJourney(testIsaProductsAnswers, testGroupId, testIsaProductsAnswers.sectionName)
       }
 
-      "must propagate exceptioon from connector" in {
+      "must propagate exception from connector" in {
         val ex = new Exception
 
         when(

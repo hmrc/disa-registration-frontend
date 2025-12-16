@@ -17,28 +17,84 @@
 package controllers
 
 import base.SpecBase
-
+import controllers.actions.AuthenticatedIdentifierAction
+import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.AddLiaisonOfficerView
 
+import scala.concurrent.ExecutionContext
+
 class AddLiaisonOfficerControllerSpec extends SpecBase {
+  implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-  "AddLiaisonOfficer Controller" - {
+  "AddLiaisonOfficerController" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK for Organisation users" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
+        val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+
+        val authAction = new AuthenticatedIdentifierAction(
+          successfulAuthConnector(
+            groupId = Some("group-id"),
+            affinityGroup = Some(AffinityGroup.Organisation)
+          ),
+          application.injector.instanceOf[config.FrontendAppConfig],
+          bodyParsers
+        )
+
+        val controller = new AddLiaisonOfficerController(
+          messagesApi = application.injector.instanceOf[play.api.i18n.MessagesApi],
+          identify = authAction,
+          controllerComponents = application.injector.instanceOf[play.api.mvc.MessagesControllerComponents],
+          view = application.injector.instanceOf[AddLiaisonOfficerView]
+        )
+
         val request = FakeRequest(GET, routes.AddLiaisonOfficerController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[AddLiaisonOfficerView]
+        val result  = controller.onPageLoad()(request)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) must include(
+          "Add liaison officer - Liaison officers - disa-registration-frontend - GOV.UK"
+        )
+      }
+    }
+
+    "must redirect Agent users to Unsupported Affinity Group page" in {
+
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+
+      running(application) {
+        val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+
+        val authAction = new AuthenticatedIdentifierAction(
+          successfulAuthConnector(
+            groupId = Some("group-id"),
+            affinityGroup = Some(AffinityGroup.Agent)
+          ),
+          application.injector.instanceOf[config.FrontendAppConfig],
+          bodyParsers
+        )
+
+        val controller = new AddLiaisonOfficerController(
+          messagesApi = application.injector.instanceOf[play.api.i18n.MessagesApi],
+          identify = authAction,
+          controllerComponents = application.injector.instanceOf[play.api.mvc.MessagesControllerComponents],
+          view = application.injector.instanceOf[AddLiaisonOfficerView]
+        )
+
+        val request = FakeRequest(GET, routes.AddLiaisonOfficerController.onPageLoad().url)
+        val result  = controller.onPageLoad()(request)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          controllers.routes.UnsupportedAffinityGroupController
+            .onPageLoad(AffinityGroup.Agent.toString)
+            .url
       }
     }
   }

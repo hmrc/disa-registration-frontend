@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.TradingUsingDifferentNameFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.OrganisationDetails
+import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.TradingUsingDifferentNamePage
 import play.api.Logging
@@ -29,6 +29,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FormPreparationHelper.prepareForm
 import views.html.orgdetails.TradingUsingDifferentNameView
 
 import javax.inject.Inject
@@ -52,14 +53,7 @@ class TradingUsingDifferentNameController @Inject() (
   val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    // TODO Tap to replace with helper function when merged
-    val preparedForm = request.journeyData
-      .flatMap(_.organisationDetails)
-      .flatMap(_.tradingUsingDifferentName) match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }
-
+    val preparedForm = prepareForm(form)(_.organisationDetails.flatMap(_.tradingUsingDifferentName))(identity)
     Ok(view(preparedForm, mode))
   }
 

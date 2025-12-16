@@ -17,7 +17,7 @@
 package services
 
 import connectors.DisaRegistrationConnector
-import models.journeyData.{JourneyData, TaskListSection}
+import models.journeydata.{JourneyData, TaskListSection}
 import play.api.Logging
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.HeaderCarrier

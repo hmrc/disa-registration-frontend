@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.orgdetails.routes
-import models.journeyData.JourneyData
+import models.journeydata.JourneyData
 import models.CheckMode
 import pages.TradingUsingDifferentNamePage
 import play.api.i18n.Messages

@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.IsaProductsFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import navigation.Navigator
 import pages.IsaProductsPage
 import play.api.Logging
@@ -70,7 +70,7 @@ class IsaProductsController @Inject() (
           val updatedSection =
             request.journeyData.flatMap(_.isaProducts) match {
               case Some(existing) => existing.copy(isaProducts = Some(answer.toSeq))
-              case None           => IsaProducts(isaProducts = Some(answer.toSeq), dataItem2 = None)
+              case None           => IsaProducts(isaProducts = Some(answer.toSeq))
             }
 
           journeyAnswersService

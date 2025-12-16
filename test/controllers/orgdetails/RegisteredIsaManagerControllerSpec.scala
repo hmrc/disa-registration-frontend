@@ -20,8 +20,8 @@ import base.SpecBase
 import controllers.orgdetails
 import forms.RegisteredIsaManagerFormProvider
 import models.NormalMode
-import models.journeyData.isaProducts.IsaProducts
-import models.journeyData.{JourneyData, OrganisationDetails}
+import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -46,7 +46,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
   lazy val registeredIsaManagerRoute: String =
     orgdetails.routes.RegisteredIsaManagerController.onPageLoad(NormalMode).url
 
-  "RegisteredIsaManager Controller" - {
+  "RegisteredIsaManager Controller onPageload" - {
 
     "must return OK and the correct view for a GET" in {
 
@@ -84,11 +84,13 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
       }
     }
+  }
+  "RegisteredIsaManager Controller onSubmit" - {
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must redirect to the next page when valid data is submitted and stored" in {
 
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
       ) thenReturn Future.successful(())
 
       val application =
@@ -129,35 +131,30 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
-// TODO add back in when user answer setting is in place
-//    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-//
-//      val application = applicationBuilder(journeyData = None).build()
-//
-//      running(application) {
-//        val request = FakeRequest(GET, registeredIsaManagerRoute)
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-//      }
-//    }
-//
-//    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-//
-//      val application = applicationBuilder(journeyData = None).build()
-//
-//      running(application) {
-//        val request =
-//          FakeRequest(POST, registeredIsaManagerRoute)
-//            .withFormUrlEncodedBody(("value", "true"))
-//
-//        val result = route(application, request).value
-//
-//        status(result) mustEqual SEE_OTHER
-//        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-//      }
-//    }
+
+    "must return Internal Server Error when updateJourneyAnswers returns a fail exception" in {
+
+      when(
+        mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
+      ) thenReturn Future.failed(new Exception)
+
+      val application =
+        applicationBuilder(journeyData = None)
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, registeredIsaManagerRoute)
+            .withFormUrlEncodedBody(("value", "true"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual INTERNAL_SERVER_ERROR
+        contentAsString(result) must include(messages.messages("journeyRecovery.continue.title"))
+      }
+    }
   }
 }

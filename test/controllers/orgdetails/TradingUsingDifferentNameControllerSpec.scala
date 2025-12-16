@@ -17,10 +17,9 @@
 package controllers.orgdetails
 
 import base.SpecBase
-import controllers.orgdetails.routes
 import forms.TradingUsingDifferentNameFormProvider
 import models.NormalMode
-import models.journeyData.{JourneyData, OrganisationDetails}
+import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

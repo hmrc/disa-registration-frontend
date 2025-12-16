@@ -17,8 +17,8 @@
 package connectors
 
 import base.SpecBase
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.IsaProducts
+import models.journeydata.JourneyData
+import models.journeydata.isaproducts.IsaProducts
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
@@ -80,7 +80,7 @@ class DisaRegistrationConnectorSpec extends SpecBase {
         when(mockRequestBuilder.execute[JourneyData](any(), any()))
           .thenReturn(Future.failed(upstreamErrorResponse))
 
-        val thrown = connector.getJourneyData(testGroupId).failed.futureValue
+        val thrown: Throwable = connector.getJourneyData(testGroupId).failed.futureValue
         thrown mustBe upstreamErrorResponse
       }
 

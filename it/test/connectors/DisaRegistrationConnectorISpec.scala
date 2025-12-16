@@ -16,17 +16,15 @@
 
 package connectors
 
-import models.journeyData.JourneyData
-import models.journeyData.isaProducts.IsaProduct.CashJuniorIsas
-import models.journeyData.isaProducts.{IsaProduct, IsaProducts}
+import models.journeydata.JourneyData
+import models.journeydata.isaproducts.IsaProduct.CashJuniorIsas
+import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK, UNAUTHORIZED}
 import play.api.libs.json.Json
 import play.api.test.Helpers.await
-import uk.gov.hmrc.http.{JsValidationException, NotFoundException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{JsValidationException, UpstreamErrorResponse}
 import utils.BaseIntegrationSpec
 import utils.WiremockHelper.{stubGet, stubPost}
-
-import scala.concurrent.Future
 
 class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
 
@@ -80,7 +78,7 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
     "return Unit when backend returns 204 NoContent" in {
       stubPost(updateTaskListJourneyUrl, NO_CONTENT, "")
 
-      val response =
+      val response: Unit =
         await(connector.updateTaskListJourney(testSectionAnswers, testGroupId, testSectionAnswers.sectionName))
 
       response shouldBe ()
