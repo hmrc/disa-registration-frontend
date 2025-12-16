@@ -8,7 +8,7 @@ GET         /assets/*file                                controllers.Assets.vers
 
 GET         /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
@@ -20,6 +20,8 @@ GET         /account/sign-out-answers-not-saved          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 GET         /unsupported-affinity-group                  controllers.UnsupportedAffinityGroupController.onPageLoad(affinityGroup: String)
+
+GET         /problem-with-service                        controllers.InternalServerErrorController.onPageLoad()
 
 ### Organisation Details
 GET        /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)

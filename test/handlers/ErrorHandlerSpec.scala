@@ -18,14 +18,15 @@ package handlers
 
 import play.twirl.api.Html
 import views.ViewSpecBase
-import views.html.{ErrorTemplate, NotFoundView}
+import views.html.{ErrorTemplate, InternalServerErrorView, NotFoundView}
 
 class ErrorHandlerSpec extends ViewSpecBase {
 
-  private val errorTemplate = app.injector.instanceOf[ErrorTemplate]
-  private val notFoundView  = app.injector.instanceOf[NotFoundView]
+  private val errorTemplate           = app.injector.instanceOf[ErrorTemplate]
+  private val notFoundView            = app.injector.instanceOf[NotFoundView]
+  private val internalServerErrorView = app.injector.instanceOf[InternalServerErrorView]
 
-  private val errorHandler = new ErrorHandler(messagesApi, errorTemplate, notFoundView)
+  private val errorHandler = new ErrorHandler(messagesApi, errorTemplate, notFoundView, internalServerErrorView)
 
   "ErrorHandler" should {
 
@@ -38,6 +39,18 @@ class ErrorHandlerSpec extends ViewSpecBase {
         content must include(messages("pageNotFound.heading"))
         content must include(messages("pageNotFound.paragraph1"))
         content must include(messages("pageNotFound.paragraph2"))
+      }
+    }
+
+    "render internal server error template correctly" in {
+      val result = errorHandler.internalServerErrorTemplate
+
+      whenReady(result) { html =>
+        val content = html.body
+
+        content must include(messages("internalServerError.heading"))
+        content must include(messages("internalServerError.paragraph1"))
+        content must include(messages("internalServerError.paragraph2"))
       }
     }
   }
