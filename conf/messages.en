@@ -107,7 +107,7 @@ tradingUsingDifferentName.title = Does your organisation trade using a different
 tradingUsingDifferentName.heading = Does your organisation trade using a different name?
 tradingUsingDifferentName.checkYourAnswersLabel = Does your organisation trade using a different name?
 tradingUsingDifferentName.error.required = Select yes if your organisation trades using a different name
-tradingUsingDifferentName.change.hidden = Trading using different a name
+tradingUsingDifferentName.change.hidden = Change trading using different a name
 
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
