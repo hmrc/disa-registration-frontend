@@ -18,11 +18,15 @@ package controllers.orgdetails
 
 import controllers.actions.*
 import forms.RegisteredIsaManagerFormProvider
+import handlers.ErrorHandler
 import models.Mode
+import models.journeydata.OrganisationDetails
 import navigation.Navigator
-import pages.RegisteredIsaManagerPage
+import pages.*
+import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.orgdetails.RegisteredIsaManagerView
 
@@ -35,6 +39,8 @@ class RegisteredIsaManagerController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   formProvider: RegisteredIsaManagerFormProvider,
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler,
   val controllerComponents: MessagesControllerComponents,
   view: RegisteredIsaManagerView
 )(implicit ec: ExecutionContext)
@@ -57,11 +63,25 @@ class RegisteredIsaManagerController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        // TODO implement user answer setting
-        _ =>
-          request.journeyData.fold(Future.successful(NotFound))(ua =>
-            Future.successful(Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode)))
-          )
+        answer => {
+          val updatedSection =
+            request.journeyData.flatMap(_.organisationDetails) match {
+              case Some(existing) => existing.copy(registeredToManageIsa = Some(answer))
+              case None           => OrganisationDetails(registeredToManageIsa = Some(answer))
+            }
+
+          journeyAnswersService
+            .update(updatedSection, request.groupId)
+            .map { _ =>
+              Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode))
+            }
+            .recoverWith { case e =>
+              logger.warn(
+                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+              )
+              errorHandler.internalServerError
+            }
+        }
       )
   }
 }
