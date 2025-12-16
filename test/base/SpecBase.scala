@@ -88,5 +88,4 @@ trait SpecBase
       )
 
   def injector: Injector = app.injector
-
 }

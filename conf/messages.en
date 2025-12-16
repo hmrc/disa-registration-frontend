@@ -113,7 +113,7 @@ tradingName.title = What is your organisation’s trading name?
 tradingName.heading = What is your organisation’s trading name?
 tradingName.checkYourAnswersLabel = tradingName
 tradingName.error.required = Enter the trading name of your organisation
-tradingName.change.hidden = TradingName
+tradingName.change.hidden = Change trading name
 
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
