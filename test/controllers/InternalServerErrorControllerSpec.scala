@@ -27,7 +27,7 @@ class InternalServerErrorControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.InternalServerErrorController.onPageLoad().url)
