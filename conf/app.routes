@@ -53,6 +53,8 @@ POST       /fca-platform-number                          controllers.isaproducts
 GET        /change-fca-platform-number                   controllers.isaproducts.PeerToPeerPlatformNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-fca-platform-number                   controllers.isaproducts.PeerToPeerPlatformNumberController.onSubmit(mode: Mode = CheckMode)
 
+GET        /isa-products-check-your-answers              controllers.isaproducts.IsaProductsCheckYourAnswersController.onPageLoad()
+
 ### LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
 GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()

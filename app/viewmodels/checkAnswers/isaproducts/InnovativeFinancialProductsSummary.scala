@@ -14,27 +14,38 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.isaproducts
 
-import controllers.isaproducts.routes.PeerToPeerPlatformController
-import models.journeydata.JourneyData
+import controllers.isaproducts.routes.InnovativeFinancialProductsController
 import models.CheckMode
+import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object PeerToPeerPlatformSummary {
+object InnovativeFinancialProductsSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.isaProducts.flatMap(_.p2pPlatform).map { answer =>
+    answers.isaProducts.flatMap(_.innovativeFinancialProducts).map { answers =>
+      val value = ValueViewModel(
+        HtmlContent(
+          answers
+            .map { answer =>
+              HtmlFormat.escape(messages(s"innovativeFinancialProducts.$answer")).toString
+            }
+            .mkString(",<br>")
+        )
+      )
+
       SummaryListRowViewModel(
-        key = "peerToPeerPlatform.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = "innovativeFinancialProducts.checkYourAnswersLabel",
+        value = value,
         actions = Seq(
-          ActionItemViewModel("site.change", PeerToPeerPlatformController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("peerToPeerPlatform.change.hidden"))
+          ActionItemViewModel("site.change", InnovativeFinancialProductsController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("innovativeFinancialProducts.change.hidden"))
         )
       )
     }

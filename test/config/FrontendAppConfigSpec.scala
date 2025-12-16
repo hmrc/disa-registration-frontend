@@ -17,10 +17,12 @@
 package config
 
 import base.SpecBase
+import play.api.i18n.Lang
+import uk.gov.hmrc.hmrcfrontend.config.SupportedLanguagesConfig.{cy, en}
 
 class FrontendAppConfigSpec extends SpecBase {
 
-  val appConfig = app.injector.instanceOf[FrontendAppConfig]
+  val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
   "FrontendAppConfig" - {
 
@@ -30,6 +32,18 @@ class FrontendAppConfigSpec extends SpecBase {
 
     "must return p2pLoansInformation url" in {
       appConfig.p2pLoansInformationUrl mustBe "https://www.gov.uk/government/consultations/isa-qualifying-investments-consultation-on-including-peer-to-peer-loans/isa-qualifying-investments-consultation-on-including-peer-to-peer-loans#:~:text=Peer%2Dto%2Dpeer%20loans%20are,terms%20agreed%20between%20the%20parties."
+    }
+
+    "must return cacheTtl value " in {
+      appConfig.cacheTtl mustBe 900
+    }
+
+    "must return appName" in {
+      appConfig.appName mustBe "disa-registration-frontend"
+    }
+
+    "must return language Map" in {
+      appConfig.languageMap mustBe Map("en" -> Lang(en), "cy" -> Lang(cy))
     }
   }
 }

@@ -56,4 +56,4 @@ lazy val it =
 
 addCommandAlias("prePrChecks", ";scalafmtCheckAll;scalafmtSbtCheck")
 
-addCommandAlias("precommit", ";scalafmtAll;coverage;test;it/test;coverageReport")
+addCommandAlias("precommit", ";scalafmtAll;scalafmtSbt;coverage;test;it/test;coverageReport")
