@@ -30,7 +30,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
-import play.api.mvc.Call
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
 import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.*
 import views.html.isaproducts.PeerToPeerPlatformNumberView
@@ -41,13 +41,14 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase with MockitoSugar 
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new PeerToPeerPlatformNumberFormProvider()
+  val formProvider       = new PeerToPeerPlatformNumberFormProvider()
   val form: Form[String] = formProvider.apply(testString)
 
   lazy val peerToPeerPlatformNumberRoute: String = PeerToPeerPlatformNumberController.onPageLoad(NormalMode).url
 
-  val validAnswer      = "123456"
-  val validJourneyData: JourneyData = JourneyData(testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
+  val validAnswer                   = "123456"
+  val validJourneyData: JourneyData =
+    JourneyData(testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
 
   "PeerToPeerPlatformNumber Controller" - {
 
@@ -78,7 +79,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase with MockitoSugar 
         val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
         running(application) {
-          implicit val request = FakeRequest(GET, peerToPeerPlatformNumberRoute)
+          implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, peerToPeerPlatformNumberRoute)
 
           val view = application.injector.instanceOf[PeerToPeerPlatformNumberView]
 
@@ -142,7 +143,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase with MockitoSugar 
         val application = applicationBuilder(journeyData = Some(validJourneyData)).build()
 
         running(application) {
-          implicit val request =
+          implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
             FakeRequest(POST, peerToPeerPlatformNumberRoute)
               .withFormUrlEncodedBody(("value", ""))
 

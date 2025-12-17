@@ -41,7 +41,7 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new PeerToPeerPlatformFormProvider()
+  val formProvider       = new PeerToPeerPlatformFormProvider()
   val form: Form[String] = formProvider()
 
   lazy val peerToPeerPlatformRoute: String = PeerToPeerPlatformController.onPageLoad(NormalMode).url
