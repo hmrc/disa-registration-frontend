@@ -27,6 +27,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
 import play.api.mvc.Call
@@ -38,12 +39,12 @@ import scala.concurrent.Future
 
 class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider = new PeerToPeerPlatformFormProvider()
-  val form         = formProvider()
+  val formProvider       = new PeerToPeerPlatformFormProvider()
+  val form: Form[String] = formProvider()
 
-  lazy val peerToPeerPlatformRoute = PeerToPeerPlatformController.onPageLoad(NormalMode).url
+  lazy val peerToPeerPlatformRoute: String = PeerToPeerPlatformController.onPageLoad(NormalMode).url
 
   "PeerToPeerPlatform Controller" - {
 

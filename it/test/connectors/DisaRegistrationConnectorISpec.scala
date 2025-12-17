@@ -78,7 +78,7 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
     "return Unit when backend returns 204 NoContent" in {
       stubPost(updateTaskListJourneyUrl, NO_CONTENT, "")
 
-      val response =
+      val response: Unit =
         await(connector.updateTaskListJourney(testSectionAnswers, testGroupId, testSectionAnswers.sectionName))
 
       response shouldBe ()

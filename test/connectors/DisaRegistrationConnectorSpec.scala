@@ -80,7 +80,7 @@ class DisaRegistrationConnectorSpec extends SpecBase {
         when(mockRequestBuilder.execute[JourneyData](any(), any()))
           .thenReturn(Future.failed(upstreamErrorResponse))
 
-        val thrown = connector.getJourneyData(testGroupId).failed.futureValue
+        val thrown: Throwable = connector.getJourneyData(testGroupId).failed.futureValue
         thrown mustBe upstreamErrorResponse
       }
 

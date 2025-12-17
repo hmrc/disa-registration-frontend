@@ -16,34 +16,24 @@
 
 package forms
 
-import base.SpecBase
-import forms.behaviours.StringFieldBehaviours
-import play.api.data.{Form, FormError}
-import play.api.test.Helpers
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-class PeerToPeerPlatformNumberFormProviderSpec extends SpecBase with StringFieldBehaviours {
+class TradingUsingDifferentNameFormProviderSpec extends BooleanFieldBehaviours {
 
-  private val requiredKey = "peerToPeerPlatformNumber.error.required"
-  private val patternKey  = "peerToPeerPlatformNumber.error.pattern"
-  private val pattern     = """^[0-9]{6,7}$""".r
+  val requiredKey = "tradingUsingDifferentName.error.required"
+  val invalidKey  = "error.boolean"
 
-  val form: Form[String] = new PeerToPeerPlatformNumberFormProvider().apply(testString)(Helpers.stubMessages())
+  val form = new TradingUsingDifferentNameFormProvider()()
 
   ".value" - {
 
     val fieldName = "value"
 
-    behave like fieldThatBindsValidData(
+    behave like booleanField(
       form,
       fieldName,
-      numericOfLength(6, 7)
-    )
-
-    behave like fieldWithPattern(
-      form,
-      fieldName,
-      pattern = pattern,
-      error = FormError(fieldName, patternKey, Seq(pattern.toString))
+      invalidError = FormError(fieldName, invalidKey)
     )
 
     behave like mandatoryField(

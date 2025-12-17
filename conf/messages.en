@@ -103,6 +103,12 @@ zReferenceNumber.hint = This is usually a Z followed by 4 numbers, for example Z
 zReferenceNumber.error.required = You need to tell us what your organisation’s Z reference number is
 zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers
 
+tradingUsingDifferentName.title = Does your organisation trade using a different name?
+tradingUsingDifferentName.heading = Does your organisation trade using a different name?
+tradingUsingDifferentName.checkYourAnswersLabel = Does your organisation trade using a different name?
+tradingUsingDifferentName.error.required = Select yes if your organisation trades using a different name
+tradingUsingDifferentName.change.hidden = Change trading using different a name
+
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
 isaProducts.heading = Which ISA products does your organisation offer?

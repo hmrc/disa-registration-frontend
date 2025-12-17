@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package pages
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.JsPath
 
-case class OrganisationDetails(
-  registeredToManageIsa: Option[Boolean] = None,
-  zRefNumber: Option[String] = None,
-  tradingUsingDifferentName: Option[Boolean] = None,
-  fcaNumber: Option[String] = None,
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  orgTelephoneNumber: Option[String] = None
-) extends TaskListSection {
-  override def sectionName: String = "organisationDetails"
-}
+case object TradingUsingDifferentNamePage extends Page {
 
-object OrganisationDetails {
-  implicit val format: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
+  override def toString: String = "tradingUsingDifferentName"
 }

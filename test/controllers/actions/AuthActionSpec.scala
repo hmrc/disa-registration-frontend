@@ -35,7 +35,7 @@ class AuthActionSpec extends SpecBase {
     def onPageLoad(): Action[AnyContent] = authAction(_ => Results.Ok)
   }
 
-  val config = injector.instanceOf[FrontendAppConfig]
+  val config: FrontendAppConfig = injector.instanceOf[FrontendAppConfig]
 
   "Auth Action" - {
 

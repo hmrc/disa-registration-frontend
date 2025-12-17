@@ -17,10 +17,8 @@
 package controllers.orgdetails
 
 import base.SpecBase
-import controllers.orgdetails
-import forms.RegisteredIsaManagerFormProvider
+import forms.TradingUsingDifferentNameFormProvider
 import models.NormalMode
-import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -32,51 +30,52 @@ import play.api.libs.json.Writes
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.orgdetails.RegisteredIsaManagerView
+import views.html.orgdetails.TradingUsingDifferentNameView
 
 import scala.concurrent.Future
 
-class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
+class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider        = new RegisteredIsaManagerFormProvider()
+  val formProvider        = new TradingUsingDifferentNameFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val registeredIsaManagerRoute: String =
-    orgdetails.routes.RegisteredIsaManagerController.onPageLoad(NormalMode).url
+  val journeyData: JourneyData =
+    JourneyData(
+      groupId = testGroupId,
+      organisationDetails = Some(OrganisationDetails(tradingUsingDifferentName = Some(true)))
+    )
 
-  "RegisteredIsaManager Controller onPageload" - {
+  lazy val tradingUsingDifferentNameRoute: String =
+    routes.TradingUsingDifferentNameController.onPageLoad(NormalMode).url
 
-    "must return OK and the correct view for a GET" in {
+  "TradingUsingDifferentName Controller" - {
+
+    "must return OK and correctly load the TradingUsingDifferentName page" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, registeredIsaManagerRoute)
+        val request = FakeRequest(GET, tradingUsingDifferentNameRoute)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[RegisteredIsaManagerView]
+        val view = application.injector.instanceOf[TradingUsingDifferentNameView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val journeyData = JourneyData(
-        groupId = testGroupId,
-        organisationDetails = Some(OrganisationDetails(registeredToManageIsa = Some(true)))
-      )
+    "on pageLoad must populate the TradingUsingDifferentName page when the question has previously been answered" in {
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, registeredIsaManagerRoute)
+        val request = FakeRequest(GET, tradingUsingDifferentNameRoute)
 
-        val view = application.injector.instanceOf[RegisteredIsaManagerView]
+        val view = application.injector.instanceOf[TradingUsingDifferentNameView]
 
         val result = route(application, request).value
 
@@ -84,17 +83,15 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
       }
     }
-  }
-  "RegisteredIsaManager Controller onSubmit" - {
 
-    "must redirect to the next page when valid data is submitted and stored" in {
+    "must redirect to the next page when valid data is submitted" in {
 
       when(
         mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
       ) thenReturn Future.successful(())
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(journeyData))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
@@ -102,7 +99,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, registeredIsaManagerRoute)
+          FakeRequest(POST, tradingUsingDifferentNameRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -118,12 +115,12 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, registeredIsaManagerRoute)
+          FakeRequest(POST, tradingUsingDifferentNameRoute)
             .withFormUrlEncodedBody(("value", ""))
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[RegisteredIsaManagerView]
+        val view = application.injector.instanceOf[TradingUsingDifferentNameView]
 
         val result = route(application, request).value
 
@@ -132,7 +129,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return Internal Server Error when updateJourneyAnswers returns a fail exception" in {
+    "must return Internal Server Error when theres an issue updating the journey answers" in {
 
       when(
         mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
@@ -147,7 +144,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
         val request =
-          FakeRequest(POST, registeredIsaManagerRoute)
+          FakeRequest(POST, tradingUsingDifferentNameRoute)
             .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
@@ -157,4 +154,5 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       }
     }
   }
+
 }

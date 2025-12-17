@@ -14,50 +14,46 @@
  * limitations under the License.
  */
 
-package controllers.isaproducts
+package controllers.orgdetails
 
 import controllers.actions.*
-import forms.PeerToPeerPlatformFormProvider
+import forms.TradingUsingDifferentNameFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.OrganisationDetails
 import navigation.Navigator
-import pages.PeerToPeerPlatformPage
+import pages.TradingUsingDifferentNamePage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.isaproducts.PeerToPeerPlatformView
+import utils.FormPreparationHelper.prepareForm
+import views.html.orgdetails.TradingUsingDifferentNameView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PeerToPeerPlatformController @Inject() (
+class TradingUsingDifferentNameController @Inject() (
   override val messagesApi: MessagesApi,
-  journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
-  errorHandler: ErrorHandler,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  formProvider: PeerToPeerPlatformFormProvider,
+  formProvider: TradingUsingDifferentNameFormProvider,
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler,
   val controllerComponents: MessagesControllerComponents,
-  view: PeerToPeerPlatformView
+  view: TradingUsingDifferentNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  val form: Form[String] = formProvider()
+  val form: Form[Boolean] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = (for {
-      journeyData <- request.journeyData
-      section     <- journeyData.isaProducts
-      name        <- section.p2pPlatform
-    } yield form.fill(name)).getOrElse(form)
-
+    val preparedForm = prepareForm(form)(_.organisationDetails.flatMap(_.tradingUsingDifferentName))(identity)
     Ok(view(preparedForm, mode))
   }
 
@@ -68,15 +64,14 @@ class PeerToPeerPlatformController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         answer => {
           val updatedSection =
-            request.journeyData.flatMap(_.isaProducts) match {
-              case Some(existing) => existing.copy(p2pPlatform = Some(answer))
-              case None           => IsaProducts(p2pPlatform = Some(answer))
+            request.journeyData.flatMap(_.organisationDetails) match {
+              case Some(existing) => existing.copy(tradingUsingDifferentName = Some(answer))
+              case None           => OrganisationDetails(tradingUsingDifferentName = Some(answer))
             }
-
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { _ =>
-              Redirect(navigator.nextPage(PeerToPeerPlatformPage, mode))
+              Redirect(navigator.nextPage(TradingUsingDifferentNamePage, mode))
             }
             .recoverWith { case e =>
               logger.warn(

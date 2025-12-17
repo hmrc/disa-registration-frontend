@@ -34,6 +34,11 @@ POST       /z-reference-number                           controllers.orgdetails.
 GET        /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
+GET        /trading-using-different-name                        controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /trading-using-different-name                        controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = NormalMode)
+GET        /change-trading-using-different-name                   controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = CheckMode)
+
 ### ISA Products
 GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
 POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)

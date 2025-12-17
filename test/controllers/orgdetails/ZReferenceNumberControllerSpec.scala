@@ -38,7 +38,7 @@ import scala.concurrent.Future
 // TODO add tests back in when next page is present and UAs are wired up
 class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
   val formProvider: ZReferenceNumberFormProvider = new ZReferenceNumberFormProvider()
   val form: Form[String]                         = formProvider()
