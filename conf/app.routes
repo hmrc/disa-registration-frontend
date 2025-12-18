@@ -44,6 +44,11 @@ POST       /trading-name                                 controllers.orgdetails.
 GET        /change-trading-name                          controllers.orgdetails.TradingNameController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-trading-name                          controllers.orgdetails.TradingNameController.onSubmit(mode: Mode = CheckMode)
 
+GET        /firm-reference-number                        controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /firm-reference-number                         controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /change-firm-reference-number                controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-firm-reference-number                   controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = CheckMode)
+
 ### ISA Products
 GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
 POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
