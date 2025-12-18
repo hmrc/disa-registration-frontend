@@ -27,8 +27,6 @@ class FirmReferenceNumberFormProviderSpec extends StringFieldBehaviours {
   val patternKey     = "firmReferenceNumber.error.pattern"
   val pattern: Regex = """^[0-9]{6,7}$""".r
 
-  val maxLength = 7
-
   val form = new FirmReferenceNumberFormProvider()()
 
   ".value" - {
