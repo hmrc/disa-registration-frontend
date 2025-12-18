@@ -16,7 +16,7 @@
 
 package pages
 
-case object TradingUsingDifferentNamePage extends Page {
+case object TradingNamePage extends Page {
 
-  override def toString: String = "tradingUsingDifferentName"
+  override def toString: String = "tradingName"
 }

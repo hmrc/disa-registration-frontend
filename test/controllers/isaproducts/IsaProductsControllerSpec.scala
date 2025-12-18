@@ -24,12 +24,12 @@ import models.journeydata.JourneyData
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
-import play.api.mvc.Call
+import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.isaproducts.IsaProductsView
@@ -190,10 +190,9 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, isaProductsRoute)
             .withFormUrlEncodedBody(("value[0]", IsaProduct.values.head.toString))
 
-        val result = route(application, request).value
+        await(route(application, request).value)
 
-        status(result) mustEqual INTERNAL_SERVER_ERROR
-        contentAsString(result) must include(messages.messages("journeyRecovery.continue.title"))
+        verify(mockErrorHandler).internalServerError(any[RequestHeader])
       }
     }
   }

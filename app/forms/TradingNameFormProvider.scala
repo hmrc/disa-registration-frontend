@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-case object TradingUsingDifferentNamePage extends Page {
+import javax.inject.Inject
 
-  override def toString: String = "tradingUsingDifferentName"
+import forms.mappings.Mappings
+import play.api.data.Form
+
+class TradingNameFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("tradingName.error.required")
+    )
 }

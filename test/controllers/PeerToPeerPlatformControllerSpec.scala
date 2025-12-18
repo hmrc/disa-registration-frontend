@@ -25,12 +25,12 @@ import models.journeydata.isaproducts.IsaProducts
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
-import play.api.mvc.Call
+import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.isaproducts.PeerToPeerPlatformView
@@ -192,10 +192,9 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, peerToPeerPlatformRoute)
             .withFormUrlEncodedBody(("value", testString))
 
-        val result = route(application, request).value
+        await(route(application, request).value)
 
-        status(result) mustEqual INTERNAL_SERVER_ERROR
-        contentAsString(result) must include(messages("journeyRecovery.continue.title"))
+        verify(mockErrorHandler).internalServerError(any[RequestHeader])
       }
     }
   }

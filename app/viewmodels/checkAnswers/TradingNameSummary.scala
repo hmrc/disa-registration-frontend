@@ -16,26 +16,25 @@
 
 package viewmodels.checkAnswers
 
-import controllers.orgdetails.routes
+import controllers.orgdetails.routes.TradingNameController
 import models.journeydata.JourneyData
 import models.CheckMode
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TradingUsingDifferentNameSummary {
+object TradingNameSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.organisationDetails.flatMap(_.tradingUsingDifferentName).map { answer =>
-      val value = if (answer) "site.yes" else "site.no"
-
+    answers.organisationDetails.flatMap(_.tradingName).map { answer =>
       SummaryListRowViewModel(
-        key = "tradingUsingDifferentName.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        key = "tradingName.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.TradingUsingDifferentNameController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("tradingUsingDifferentName.change.hidden"))
+          ActionItemViewModel("site.change", TradingNameController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("tradingName.change.hidden"))
         )
       )
     }

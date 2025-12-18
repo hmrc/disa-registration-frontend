@@ -16,7 +16,14 @@
 
 package pages
 
-case object TradingUsingDifferentNamePage extends Page {
+import base.SpecBase
 
-  override def toString: String = "tradingUsingDifferentName"
+class TradingNamePageSpec extends SpecBase {
+
+  "TradingNamePage" - {
+
+    "must have the correct string representation" in {
+      TradingNamePage.toString mustBe "tradingName"
+    }
+  }
 }
