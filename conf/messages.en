@@ -115,6 +115,20 @@ tradingName.checkYourAnswersLabel = tradingName
 tradingName.error.required = Enter the trading name of your organisation
 tradingName.change.hidden = Change trading name
 
+firmReferenceNumber.title = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
+firmReferenceNumber.heading = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
+firmReferenceNumber.label = What is your organisation’s FCA, FRN?
+firmReferenceNumber.p1 = The FCA, FRN is a unique identification number assigned to each financial organisation and is crucial for verifying the legitimacy and authorisation status of organisations operating in the financial sector.
+firmReferenceNumber.p2 = The number is used to track and manage regulated financial organisations.
+firmReferenceNumber.p3 = The FRN is commonly referred to as the FCA number.
+firmReferenceNumber.p4 = If you're already registered as an ISA manager with HMRC but have forgotten or can't find your FCA number,
+firmReferenceNumber.checkYourAnswersLabel = FCA number
+firmReferenceNumber.error.required = You must tell us your organisation reference number
+firmReferenceNumber.error.pattern = Enter the organisation reference number in the correct format. It's usually 6 or 7 numbers
+firmReferenceNumber.change.hidden = Change FCA number
+firmReferenceNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
+firmReferenceNumber.link.text = you can check the ISA managers list to find your number
+
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
 isaProducts.heading = Which ISA products does your organisation offer?
@@ -174,18 +188,4 @@ addLiaisonOfficer.p2 = You can add up to 15 liaison officers.
 addLiaisonOfficer.details.summary = What is a liaison officer?
 addLiaisonOfficer.details.content.p1 = Liaison officers act as a point of contact between the ISA manager and HMRC.
 addLiaisonOfficer.details.content.p2 = They provide their name, telephone number and email address and are individuals an organisation appoints to provide day-to-day contact with HMRC.
-
-firmReferenceNumber.title = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
-firmReferenceNumber.heading = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
-firmReferenceNumber.label = What is your organisation's FCA, FRN?
-firmReferenceNumber.p1 = The FCA, FRN is a unique identification number assigned to each financial organisation and is crucial for verifying the legitimacy and authorisation status of organisations operating in the financial sector.
-firmReferenceNumber.p2 = The number is used to track and manage regulated financial organisations.
-firmReferenceNumber.p3 = The FRN is commonly referred to as the FCA number.
-firmReferenceNumber.p4 = If you're already registered as an ISA manager with HMRC but have forgotten or can't find your FCA number,
-firmReferenceNumber.checkYourAnswersLabel = FCA number
-firmReferenceNumber.error.required = You must tell us your organisation reference number
-firmReferenceNumber.error.pattern = Enter the organisation reference number in the correct format. It's usually 6 or 7 numbers
-firmReferenceNumber.change.hidden = Change FCA number
-firmReferenceNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
-firmReferenceNumber.link.text = you can check the ISA managers list to find your number
 
