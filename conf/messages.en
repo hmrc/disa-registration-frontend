@@ -43,6 +43,7 @@ journeyRecovery.startAgain.title = Sorry, there is a problem with the service
 journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
 journeyRecovery.startAgain.guidance = [Add content to explain why the user needs to start again.]
 
+fullStop = .
 signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
 signedOut.guidance = We saved your answers.
@@ -66,7 +67,6 @@ unsupportedAffinityGroup.paragraph1.individual = You’ve signed in with an indi
 unsupportedAffinityGroup.paragraph1.agent = You’ve signed in using an agent services Government Gateway user ID. Only users with an organisation account can register to use this service.
 unsupportedAffinityGroup.paragraph2 = If the group still needs to register,
 unsupportedAffinityGroup.linkText = sign in to Government Gateway with an organisation account
-unsupportedAffinityGroup.fullStop = .
 unsupportedAffinityGroup.linkText2 = Read more about who can use this service in the Applications for ISA manager status guidance (opens in new tab)
 
 page.signOut.paragraph1 = This is a new service and we want to know what you think of it.
@@ -115,6 +115,20 @@ tradingName.checkYourAnswersLabel = tradingName
 tradingName.error.required = Enter the trading name of your organisation
 tradingName.change.hidden = Change trading name
 
+firmReferenceNumber.title = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
+firmReferenceNumber.heading = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
+firmReferenceNumber.label = What is your organisation’s FCA, FRN?
+firmReferenceNumber.p1 = The FCA, FRN is a unique identification number assigned to each financial organisation and is crucial for verifying the legitimacy and authorisation status of organisations operating in the financial sector.
+firmReferenceNumber.p2 = The number is used to track and manage regulated financial organisations.
+firmReferenceNumber.p3 = The FRN is commonly referred to as the FCA number.
+firmReferenceNumber.p4 = If you’re already registered as an ISA manager with HMRC but have forgotten or can’t find your FCA number,
+firmReferenceNumber.checkYourAnswersLabel = FCA number
+firmReferenceNumber.error.required = You must tell us your organisation reference number
+firmReferenceNumber.error.pattern = Enter the organisation reference number in the correct format. It’s usually 6 or 7 numbers
+firmReferenceNumber.change.hidden = Change FCA number
+firmReferenceNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
+firmReferenceNumber.link.text = you can check the ISA managers list to find your number
+
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
 isaProducts.heading = Which ISA products does your organisation offer?
@@ -127,7 +141,6 @@ isaProducts.error.required = Select the ISA products your organisation offers
 isaProducts.checkYourAnswersLabel = Products
 isaProducts.hint = Select all that apply
 isaProducts.change.hidden = Change ISA products
-
 
 innovativeFinancialProducts.title = Which types of innovative finance products will your organisation offer?
 innovativeFinancialProducts.heading = Which types of innovative finance products will your organisation offer?
