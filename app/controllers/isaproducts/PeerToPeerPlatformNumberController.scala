@@ -72,8 +72,8 @@ class PeerToPeerPlatformNumberController @Inject() (
 
               journeyAnswersService
                 .update(updatedSection, request.groupId)
-                .map { _ =>
-                  Redirect(navigator.nextPage(PeerToPeerPlatformNumberPage, mode))
+                .map { updatedSection =>
+                  Redirect(navigator.nextPage(PeerToPeerPlatformNumberPage, updatedSection, mode))
                 }
                 .recoverWith { case e =>
                   logger.warn(

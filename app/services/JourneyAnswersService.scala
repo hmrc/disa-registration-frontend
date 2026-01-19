@@ -32,7 +32,7 @@ class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector) ext
 
   def update[A <: TaskListSection: Writes](taskListSection: A, groupId: String)(implicit
     hc: HeaderCarrier
-  ): Future[Unit] = {
+  ): Future[A] = {
     val sectionName = taskListSection.sectionName
     connector.updateTaskListJourney(taskListSection, groupId, sectionName)
   }

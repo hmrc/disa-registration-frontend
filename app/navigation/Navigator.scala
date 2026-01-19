@@ -17,31 +17,38 @@
 package navigation
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc.Call
 import controllers.routes
-import pages._
-import models._
+import controllers.isaproducts.routes.*
+import pages.*
+import models.*
+import models.journeydata.TaskListSection
+import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
+import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
+import models.journeydata.isaproducts.IsaProducts
 
 @Singleton
 class Navigator @Inject() () {
 
-  private val normalRoutes: Page => Call = {
-    case RegisteredIsaManagerPage => ???
-    case ZReferenceNumberPage     => ???
-    case _                        => routes.IndexController.onPageLoad()
+  def nextPage[A <: TaskListSection](page: Page[A], answers: A, mode: Mode): Call = page match {
+    case RegisteredIsaManagerPage        => ???
+    case ZReferenceNumberPage            => ???
+    case IsaProductsPage                 => isaProductsNextPage(answers, mode)
+    case InnovativeFinancialProductsPage => innovativeFinancialProductsNextPage(answers, mode)
+    case PeerToPeerPlatformPage          => PeerToPeerPlatformNumberController.onPageLoad(mode)
+    case PeerToPeerPlatformNumberPage    => IsaProductsCheckYourAnswersController.onPageLoad()
+    case _                               => routes.IndexController.onPageLoad()
   }
 
-  private val checkRouteMap: Page => Call = {
-    case RegisteredIsaManagerPage => ???
-    case ZReferenceNumberPage     => ???
-    case _                        => routes.CheckYourAnswersController.onPageLoad()
-  }
+  private def isaProductsNextPage(answers: IsaProducts, mode: Mode): Call =
+    answers.isaProducts.fold(routes.IndexController.onPageLoad()) { isaProducts =>
+      if (isaProducts.contains(InnovativeFinanceIsas)) InnovativeFinancialProductsController.onPageLoad(mode)
+      else IsaProductsCheckYourAnswersController.onPageLoad()
+    }
 
-  def nextPage(page: Page, mode: Mode): Call = mode match {
-    case NormalMode =>
-      normalRoutes(page)
-    case CheckMode  =>
-      checkRouteMap(page)
-  }
+  private def innovativeFinancialProductsNextPage(answers: IsaProducts, mode: Mode): Call =
+    answers.innovativeFinancialProducts.fold(routes.IndexController.onPageLoad()) { ifps =>
+      if (ifps.contains(PeertopeerLoansUsingAPlatformWith36hPermissions)) PeerToPeerPlatformController.onPageLoad(mode)
+      else IsaProductsCheckYourAnswersController.onPageLoad()
+    }
 }

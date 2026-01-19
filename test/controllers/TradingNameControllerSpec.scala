@@ -24,6 +24,7 @@ import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.inject.bind
 import play.api.libs.json.Writes
@@ -94,10 +95,12 @@ class TradingNameControllerSpec extends SpecBase {
 
       "must redirect to the next page when valid data is submitted" in {
 
+        val expectedJourneyData = OrganisationDetails(tradingName = Some(validAnswer))
+
         when(
           mockJourneyAnswersService
-            .update(any[OrganisationDetails], ArgumentMatchers.eq(testGroupId))(any[Writes[OrganisationDetails]], any)
-        ) thenReturn Future.successful(())
+            .update(eqTo(expectedJourneyData), eqTo(testGroupId))(any[Writes[OrganisationDetails]], any)
+        ) thenReturn Future.successful(expectedJourneyData)
 
         val application =
           applicationBuilder(journeyData = Some(validJourneyData))

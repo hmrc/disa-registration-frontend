@@ -20,11 +20,12 @@ import base.SpecBase
 import controllers.isaproducts.routes.PeerToPeerPlatformController
 import forms.PeerToPeerPlatformFormProvider
 import models.NormalMode
-import models.journeydata.JourneyData
+import models.journeydata.{JourneyData, OrganisationDetails}
 import models.journeydata.isaproducts.IsaProducts
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -105,9 +106,11 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
+      val expectedJourneyData = IsaProducts(p2pPlatform = Some(testString))
+
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(())
+        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
@@ -130,9 +133,11 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted and no existing data was found" in {
 
+      val expectedJourneyData = IsaProducts(p2pPlatform = Some(testString))
+
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(())
+        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
         applicationBuilder(journeyData = None)
@@ -177,7 +182,7 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
 
       when(
         mockJourneyAnswersService
-          .update(any[IsaProducts], ArgumentMatchers.eq(testGroupId))(any[Writes[IsaProducts]], any)
+          .update(any[IsaProducts], eqTo(testGroupId))(any[Writes[IsaProducts]], any)
       ) thenReturn Future.failed(new Exception)
 
       val application =

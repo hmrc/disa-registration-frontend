@@ -22,6 +22,7 @@ import models.NormalMode
 import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -86,9 +87,11 @@ class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar
 
     "must redirect to the next page when valid data is submitted" in {
 
+      val expectedJourneyData = OrganisationDetails(tradingUsingDifferentName = Some(true))
+
       when(
-        mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
-      ) thenReturn Future.successful(())
+        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[OrganisationDetails]], any)
+      ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))

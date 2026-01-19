@@ -73,8 +73,8 @@ class RegisteredIsaManagerController @Inject() (
 
           journeyAnswersService
             .update(updatedSection, request.groupId)
-            .map { _ =>
-              Redirect(navigator.nextPage(RegisteredIsaManagerPage, mode))
+            .map { updatedSection =>
+              Redirect(navigator.nextPage(RegisteredIsaManagerPage, updatedSection, mode))
             }
             .recoverWith { case e =>
               logger.warn(

@@ -20,9 +20,11 @@ import base.SpecBase
 import forms.InnovativeFinancialProductsFormProvider
 import models.NormalMode
 import models.journeydata.JourneyData
+import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansAndHave36hPermissions
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -91,9 +93,12 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
 
     "must redirect to the next page when valid data is submitted" in {
 
+      val expectedJourneyData =
+        IsaProducts(innovativeFinancialProducts = Some(Seq(PeertopeerLoansAndHave36hPermissions)))
+
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(())
+        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
@@ -116,9 +121,12 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
 
     "must redirect to the next page when valid data is submitted and no existing data was found" in {
 
+      val expectedJourneyData =
+        IsaProducts(innovativeFinancialProducts = Some(Seq(PeertopeerLoansAndHave36hPermissions)))
+
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(())
+        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
         applicationBuilder(journeyData = None)

@@ -53,7 +53,7 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
     taskListJourney: String
   )(implicit
     hc: HeaderCarrier
-  ): Future[Unit] = {
+  ): Future[A] = {
     val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/store/$groupId/$taskListJourney"
     http
       .post(url"$url")
@@ -61,7 +61,7 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
       .execute[HttpResponse]
       .flatMap(response =>
         response.status match {
-          case s if s == NO_CONTENT => Future.successful(())
+          case s if s == NO_CONTENT => Future.successful(data)
           case status               =>
             logger.error(s"Unexpected status from backend updating journey: [$status] for groupId: [$groupId]")
             Future.failed(

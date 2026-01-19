@@ -23,6 +23,7 @@ import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -35,7 +36,6 @@ import views.html.orgdetails.ZReferenceNumberView
 
 import scala.concurrent.Future
 
-// TODO add tests back in when next page is present and UAs are wired up
 class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
@@ -84,9 +84,11 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
+      val expectedJourneyData = OrganisationDetails(zRefNumber = Some(testZRef))
+
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(())
+        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[OrganisationDetails]], any)
+      ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
@@ -98,7 +100,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, zReferenceNumberRoute)
-            .withFormUrlEncodedBody(("value", "Z1234"))
+            .withFormUrlEncodedBody(("value", testZRef))
 
         val result = route(application, request).value
 
@@ -109,9 +111,11 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted and no existing data was found" in {
 
+      val expectedJourneyData = OrganisationDetails(zRefNumber = Some(testZRef))
+
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(())
+        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[OrganisationDetails]], any)
+      ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
         applicationBuilder(journeyData = None)
@@ -123,7 +127,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       running(application) {
         val request =
           FakeRequest(POST, zReferenceNumberRoute)
-            .withFormUrlEncodedBody(("value", "Z1234"))
+            .withFormUrlEncodedBody(("value", testZRef))
 
         val result = route(application, request).value
 

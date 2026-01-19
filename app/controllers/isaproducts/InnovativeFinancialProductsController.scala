@@ -72,8 +72,8 @@ class InnovativeFinancialProductsController @Inject() (
 
           journeyAnswersService
             .update(updatedSection, request.groupId)
-            .map { _ =>
-              Redirect(navigator.nextPage(InnovativeFinancialProductsPage, mode))
+            .map { updatedSection =>
+              Redirect(navigator.nextPage(InnovativeFinancialProductsPage, updatedSection, mode))
             }
             .recoverWith { case e =>
               logger.warn(
