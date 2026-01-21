@@ -17,13 +17,21 @@
 package utils
 
 import play.api.http.Status.{OK, UNAUTHORIZED}
-import utils.WiremockHelper.{stubGet, stubPost}
+import utils.WiremockHelper.stubPost
 
 trait CommonStubs {
 
-  def stubAuth(): Unit = stubPost(url = "/auth/authorise", status = OK, responseBody = "{}")
+  def stubAuth(): Unit = {
+    val body =
+      s"""{
+          "groupIdentifier": "123456",
+          "affinityGroup": "Organisation"
+          }"""
+
+    stubPost("/auth/authorise", status = OK, responseBody = body)
+  }
 
   def stubAuthFail(): Unit = stubPost(url = "/auth/authorise", status = UNAUTHORIZED, responseBody = "{}")
 
-  val testHeaders: Seq[(String, String)] = Seq("Authorization" -> "mock-bearer-token")
+  val testHeaders: Seq[(String, String)] = Seq("Authorization" -> "Bearer mock-bearer-token")
 }

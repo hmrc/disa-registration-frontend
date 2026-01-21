@@ -76,6 +76,8 @@ trait BaseIntegrationSpec
     super.beforeEach()
   }
 
+  def url(path: String): String = s"http://localhost:$port/obligations/enrolment/isa$path/"
+
   implicit val mat: Materializer                  = app.injector.instanceOf[Materializer]
   implicit val ws: WSClient                       = app.injector.instanceOf[WSClient]
   implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
