@@ -18,6 +18,7 @@ package controllers.isaproducts
 
 import controllers.actions.*
 import forms.IsaProductsFormProvider
+import handlers.PageChangeHandler.{clearStalePages, determineMode}
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
@@ -67,16 +68,17 @@ class IsaProductsController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         answer => {
+          val existingSection = request.journeyData.flatMap(_.isaProducts)
           val updatedSection =
-            request.journeyData.flatMap(_.isaProducts) match {
-              case Some(existing) => existing.copy(isaProducts = Some(answer.toSeq))
+            existingSection match {
+              case Some(existing) => clearStalePages(IsaProductsPage, existing, existing.copy(isaProducts = Some(answer.toSeq)))
               case None           => IsaProducts(isaProducts = Some(answer.toSeq))
             }
 
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { updatedSection =>
-              Redirect(navigator.nextPage(IsaProductsPage, updatedSection, mode))
+              Redirect(navigator.nextPage(IsaProductsPage, updatedSection, determineMode(mode, IsaProductsPage, existingSection, updatedSection))
             }
             .recoverWith { case e =>
               logger.warn(

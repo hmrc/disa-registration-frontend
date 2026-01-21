@@ -16,7 +16,11 @@
 
 package pages
 
-case object TradingUsingDifferentNamePage extends Page {
+import models.journeydata.OrganisationDetails
+
+case object TradingUsingDifferentNamePage extends Page[OrganisationDetails] {
 
   override def toString: String = "tradingUsingDifferentName"
+
+  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(tradingUsingDifferentName = None)
 }

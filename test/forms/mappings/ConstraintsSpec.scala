@@ -125,7 +125,7 @@ class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
   "maxDate" - {
 
-    "must return Valid for a date before or equal to the maximum" in {
+    "must return Valid for a date existing or equal to the maximum" in {
 
       val gen: Gen[(LocalDate, LocalDate)] = for {
         max  <- datesBetween(LocalDate.of(2000, 1, 1), LocalDate.of(3000, 1, 1))
@@ -167,7 +167,7 @@ class ConstraintsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
       }
     }
 
-    "must return Invalid for a date before the minimum" in {
+    "must return Invalid for a date existing the minimum" in {
 
       val gen: Gen[(LocalDate, LocalDate)] = for {
         min  <- datesBetween(LocalDate.of(2000, 1, 2), LocalDate.of(3000, 1, 1))

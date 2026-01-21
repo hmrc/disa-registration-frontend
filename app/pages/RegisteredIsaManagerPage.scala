@@ -16,7 +16,11 @@
 
 package pages
 
-object RegisteredIsaManagerPage extends Page {
+import models.journeydata.OrganisationDetails
+
+object RegisteredIsaManagerPage extends Page[OrganisationDetails] {
 
   override def toString: String = "registeredIsaManager"
+
+  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(registeredToManageIsa = None)
 }

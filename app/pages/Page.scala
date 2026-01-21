@@ -20,7 +20,15 @@ import models.journeydata.TaskListSection
 
 import scala.language.implicitConversions
 
-trait Page[A <: TaskListSection]
+trait Page[A <: TaskListSection] {
+  def clearAnswer(sectionAnswers: A): A
+}
+
+trait PageWithDependents[A <: TaskListSection] extends Page[A] {
+  def pagesToClear(before: A, after: A): List[Page[A]]
+
+  def resumeNormalMode(before: A, after: A): Boolean
+}
 
 object Page {
 

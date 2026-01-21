@@ -16,7 +16,11 @@
 
 package pages
 
-case object ZReferenceNumberPage extends Page {
+import models.journeydata.OrganisationDetails
+
+case object ZReferenceNumberPage extends Page[OrganisationDetails] {
 
   override def toString: String = "zReferenceNumber"
+
+  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(zRefNumber = None)
 }

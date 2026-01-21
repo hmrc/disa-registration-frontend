@@ -19,6 +19,7 @@ package controllers.isaproducts
 import controllers.actions.*
 import forms.InnovativeFinancialProductsFormProvider
 import handlers.ErrorHandler
+import handlers.PageChangeHandler.{clearStalePages, determineMode}
 import models.Mode
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.Navigator
@@ -64,16 +65,19 @@ class InnovativeFinancialProductsController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         answer => {
+          val existingSection = request.journeyData.flatMap(_.isaProducts)
           val updatedSection =
-            request.journeyData.flatMap(_.isaProducts) match {
-              case Some(existing) => existing.copy(innovativeFinancialProducts = Some(answer.toSeq))
+            existingSection match {
+              case Some(existing) =>
+                val withUpdate = existing.copy(innovativeFinancialProducts = Some(answer.toSeq))
+                clearStalePages(InnovativeFinancialProductsPage, existing, withUpdate)
               case None           => IsaProducts(isaProducts = None, innovativeFinancialProducts = Some(answer.toSeq))
             }
 
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { updatedSection =>
-              Redirect(navigator.nextPage(InnovativeFinancialProductsPage, updatedSection, mode))
+              Redirect(navigator.nextPage(InnovativeFinancialProductsPage, updatedSection, determineMode(mode, InnovativeFinancialProductsPage, existingSection, updatedSection)))
             }
             .recoverWith { case e =>
               logger.warn(

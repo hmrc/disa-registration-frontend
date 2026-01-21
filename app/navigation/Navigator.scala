@@ -40,11 +40,21 @@ class Navigator @Inject() () {
     case _                               => routes.IndexController.onPageLoad()
   }
 
-  private def isaProductsNextPage(answers: IsaProducts, mode: Mode): Call =
-    answers.isaProducts.fold(routes.IndexController.onPageLoad()) { isaProducts =>
-      if (isaProducts.contains(InnovativeFinanceIsas)) InnovativeFinancialProductsController.onPageLoad(mode)
-      else IsaProductsCheckYourAnswersController.onPageLoad()
+  private def isaProductsNextPage(answers: IsaProducts, mode: Mode): Call = {
+    mode match {
+      case NormalMode =>
+        answers.isaProducts.fold(routes.IndexController.onPageLoad()) { isaProducts =>
+        if (isaProducts.contains(InnovativeFinanceIsas)) InnovativeFinancialProductsController.onPageLoad(mode)
+        else IsaProductsCheckYourAnswersController.onPageLoad()
+      }
+      case CheckMode =>
+        answers.isaProducts.fold(routes.IndexController.onPageLoad()) { isaProducts =>
+          if (isaProducts.contains(InnovativeFinanceIsas)) InnovativeFinancialProductsController.onPageLoad(mode)
+          else IsaProductsCheckYourAnswersController.onPageLoad()
+        }
     }
+
+  }
 
   private def innovativeFinancialProductsNextPage(answers: IsaProducts, mode: Mode): Call =
     answers.innovativeFinancialProducts.fold(routes.IndexController.onPageLoad()) { ifps =>
