@@ -80,8 +80,9 @@ class InnovativeFinancialProductsController @Inject() (
               Redirect(
                 navigator.nextPage(
                   InnovativeFinancialProductsPage,
+                  existingSection,
                   updatedSection,
-                  navigator.determineMode(mode, InnovativeFinancialProductsPage, existingSection, updatedSection)
+                  mode
                 )
               )
             }

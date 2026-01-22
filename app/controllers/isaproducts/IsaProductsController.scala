@@ -82,8 +82,9 @@ class IsaProductsController @Inject() (
               Redirect(
                 navigator.nextPage(
                   IsaProductsPage,
+                  existingSection,
                   updatedSection,
-                  navigator.determineMode(mode, IsaProductsPage, existingSection, updatedSection)
+                  mode
                 )
               )
             }

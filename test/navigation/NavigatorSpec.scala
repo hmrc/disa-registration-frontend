@@ -17,13 +17,17 @@
 package navigation
 
 import base.SpecBase
-import controllers.isaproducts.routes._
+import controllers.isaproducts.routes.*
 import controllers.routes.IndexController
 import pages.*
 import models.*
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
-import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
+import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{spy, verify, when}
+import org.scalatest.matchers.should.Matchers.{should, shouldBe}
+import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
 
@@ -47,105 +51,181 @@ class NavigatorSpec extends SpecBase {
       innovativeFinancialProducts = None
     )
 
-  "Navigator.nextPage" - {
+  "Navigator.nextPage(PageWithDependents)" - {
 
-    "must go from a page that doesn't exist in the route map to Index" in {
-      case object UnknownPage extends Page[IsaProducts] {
-        def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers
-      }
+    "resume to NormalMode when in CheckMode and resumeNormalMode is true" in {
+      val pageMock              = mock[PageWithDependents[IsaProducts]]
+      val answerWithIfpSelected = answersWithIsaProducts(Seq(InnovativeFinanceIsas))
 
-      navigator.nextPage(UnknownPage, emptyAnswers, NormalMode) mustBe
-        IndexController.onPageLoad()
-    }
+      when(pageMock.resumeNormalMode(any, any)).thenReturn(true)
 
-    "when on IsaProductsPage" - {
-
-      "must redirect to Index when there is no ISA products data" in {
-        navigator.nextPage(IsaProductsPage, emptyAnswers, NormalMode) mustBe
-          IndexController.onPageLoad()
-      }
-
-      "must go to InnovativeFinancialProducts when Innovative Finance ISAs is selected (NormalMode)" in {
-        val answers = answersWithIsaProducts(Seq(InnovativeFinanceIsas))
-
-        navigator.nextPage(IsaProductsPage, answers, NormalMode) mustBe
-          InnovativeFinancialProductsController.onPageLoad(NormalMode)
-      }
-
-      "must go to Check Your Answers when Innovative Finance ISAs is NOT selected (NormalMode)" in {
-        val answers = answersWithIsaProducts(Seq(IsaProduct.CashIsas))
-
-        navigator.nextPage(IsaProductsPage, answers, NormalMode) mustBe
-          IsaProductsCheckYourAnswersController.onPageLoad()
-      }
-
-      "must respect mode when routing to InnovativeFinancialProducts (CheckMode)" in {
-        val answers = answersWithIsaProducts(Seq(InnovativeFinanceIsas))
-
-        navigator.nextPage(IsaProductsPage, answers, CheckMode) mustBe
-          InnovativeFinancialProductsController.onPageLoad(CheckMode)
-      }
-    }
-
-    "when on InnovativeFinancialProductsPage" - {
-
-      "must redirect to Index when there is no innovative financial products data" in {
-        navigator.nextPage(InnovativeFinancialProductsPage, emptyAnswers, NormalMode) mustBe
-          IndexController.onPageLoad()
-      }
-
-      "must go to PeerToPeerPlatform when 36H peer-to-peer option is selected (NormalMode)" in {
-        val answers = answersWithInnovativeFinancialProducts(
-          Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)
+      val result: Call =
+        navigator.nextPage(
+          page = IsaProductsPage,
+          existing = Some(emptyAnswers),
+          updated = answerWithIfpSelected,
+          mode = CheckMode
         )
 
-        navigator.nextPage(InnovativeFinancialProductsPage, answers, NormalMode) mustBe
-          PeerToPeerPlatformController.onPageLoad(NormalMode)
-      }
-
-      "must go to Check Your Answers when 36H peer-to-peer option is NOT selected (NormalMode)" in {
-        val answers = answersWithInnovativeFinancialProducts(
-          Seq(CrowdFundedDebentures)
-        )
-
-        navigator.nextPage(InnovativeFinancialProductsPage, answers, NormalMode) mustBe
-          IsaProductsCheckYourAnswersController.onPageLoad()
-      }
-
-      "must respect mode when routing to PeerToPeerPlatform (CheckMode)" in {
-        val answers = answersWithInnovativeFinancialProducts(
-          Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)
-        )
-
-        navigator.nextPage(InnovativeFinancialProductsPage, answers, CheckMode) mustBe
-          PeerToPeerPlatformController.onPageLoad(CheckMode)
-      }
+      result shouldBe InnovativeFinancialProductsController.onPageLoad(NormalMode)
     }
 
-    "when on PeerToPeerPlatformPage" - {
+    "stay in CheckMode when resumeNormalMode is false" in {
+      val pageMock = mock[PageWithDependents[IsaProducts]]
 
-      "must go to PeerToPeerPlatformNumberController (NormalMode)" in {
-        navigator.nextPage(PeerToPeerPlatformPage, emptyAnswers, NormalMode) mustBe
-          PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
-      }
+      when(pageMock.resumeNormalMode(any, any)).thenReturn(false)
 
-      "must go to PeerToPeerPlatformNumberController (CheckMode)" in {
-        navigator.nextPage(PeerToPeerPlatformPage, emptyAnswers, CheckMode) mustBe
-          PeerToPeerPlatformNumberController.onPageLoad(CheckMode)
-      }
+      val result =
+        navigator.nextPage(
+          page = InnovativeFinancialProductsPage,
+          existing = Some(emptyAnswers),
+          updated = emptyAnswers,
+          mode = CheckMode
+        )
+
+      result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
-    "when on PeerToPeerPlatformNumberPage" - {
+    "default to NormalMode when no existing data is present" in {
+      val result =
+        navigator.nextPage(
+          page = IsaProductsPage,
+          existing = None,
+          updated = answersWithIsaProducts(Seq(InnovativeFinanceIsas)),
+          mode = CheckMode
+        )
 
-      "must go to Check Your Answers (NormalMode)" in {
-        navigator.nextPage(PeerToPeerPlatformNumberPage, emptyAnswers, NormalMode) mustBe
-          IsaProductsCheckYourAnswersController.onPageLoad()
+      result shouldBe InnovativeFinancialProductsController.onPageLoad(NormalMode)
+    }
+  }
+
+  "Navigator.nextPage(PageWithoutDependents)" - {
+
+    "look up normal routes in Normal Mode" in {
+      val spiedNav = spy(new Navigator())
+
+      spiedNav.nextPage(
+        page = PeerToPeerPlatformPage,
+        updated = emptyAnswers,
+        mode = NormalMode
+      )
+
+      verify(spiedNav).normalRoutes(any, any)
+    }
+
+    "lookup check routes in Check Mode" in {
+      val spiedNav = spy(new Navigator())
+
+      spiedNav.nextPage(
+        page = PeerToPeerPlatformPage,
+        updated = emptyAnswers,
+        mode = CheckMode
+      )
+
+      verify(spiedNav).checkRouteMap(any)
+    }
+  }
+
+  "Navigator.normalRoutes" - {
+
+    "route IsaProductsPage  to IF products when IF ISA selected" in {
+      val answers = answersWithIsaProducts(Seq(InnovativeFinanceIsas))
+
+      val result: Call = navigator.normalRoutes(IsaProductsPage, answers)
+
+      result shouldBe InnovativeFinancialProductsController.onPageLoad(NormalMode)
+    }
+
+    "route IsaProductsPage to CYA when IF ISA not selected" in {
+      val answers = answersWithIsaProducts(Seq(CashIsas))
+
+      val result: Call = navigator.normalRoutes(IsaProductsPage, answers)
+
+      result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route IsaProductsPage to Index when isaProducts is missing" in {
+      val answers = emptyAnswers.copy(isaProducts = None)
+
+      val result: Call = navigator.normalRoutes(IsaProductsPage, answers)
+
+      result shouldBe IndexController.onPageLoad()
+    }
+
+    "route InnovativeFinancialProductsPage to P2P platform when 36H selected" in {
+      val answers = answersWithInnovativeFinancialProducts(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions))
+
+      val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers)
+
+      result shouldBe PeerToPeerPlatformController.onPageLoad(NormalMode)
+    }
+
+    "route InnovativeFinancialProductsPage to CYA when 36H not selected" in {
+      val answers = answersWithInnovativeFinancialProducts(Seq(CrowdFundedDebentures))
+
+      val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers)
+
+      result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route InnovativeFinancialProductsPage to Index when innovativeFinancialProducts is missing" in {
+      val answers = emptyAnswers.copy(innovativeFinancialProducts = None)
+
+      val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers)
+
+      result shouldBe IndexController.onPageLoad()
+    }
+
+    "route PeerToPeerPlatformPage to PeerToPeerPlatformNumberPage" in {
+      val result: Call = navigator.normalRoutes(PeerToPeerPlatformPage, emptyAnswers)
+
+      result shouldBe PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
+    }
+
+    "route PeerToPeerPlatformNumberPage to ISA products CYA" in {
+      val result: Call = navigator.normalRoutes(PeerToPeerPlatformNumberPage, emptyAnswers)
+
+      result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route unknown page to Index" in {
+      case object UnknownPage extends PageWithoutDependents[IsaProducts] {
+        override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers
       }
 
-      "must go to Check Your Answers (CheckMode)" in {
-        navigator.nextPage(PeerToPeerPlatformNumberPage, emptyAnswers, CheckMode) mustBe
-          IsaProductsCheckYourAnswersController.onPageLoad()
+      val result: Call = navigator.normalRoutes(UnknownPage, emptyAnswers)
+
+      result shouldBe IndexController.onPageLoad()
+    }
+  }
+
+  "Navigator.checkRouteMap" - {
+
+    "route IsaProductsPage to ISA products CYA" in {
+      navigator.checkRouteMap(IsaProductsPage) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route InnovativeFinancialProductsPage to ISA products CYA" in {
+      navigator.checkRouteMap(InnovativeFinancialProductsPage) shouldBe IsaProductsCheckYourAnswersController
+        .onPageLoad()
+    }
+
+    "route PeerToPeerPlatformPage to ISA products CYA" in {
+      navigator.checkRouteMap(PeerToPeerPlatformPage) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route PeerToPeerPlatformNumberPage to ISA products CYA" in {
+      navigator.checkRouteMap(PeerToPeerPlatformNumberPage) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route unknown page to Index" in {
+      case object UnknownPage extends PageWithoutDependents[IsaProducts] {
+        override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers
       }
+
+      val result: Call = navigator.checkRouteMap(UnknownPage)
+
+      result shouldBe IndexController.onPageLoad()
     }
   }
 }

@@ -18,7 +18,7 @@ package pages
 
 import models.journeydata.OrganisationDetails
 
-object RegisteredIsaManagerPage extends Page[OrganisationDetails] {
+object RegisteredIsaManagerPage extends PageWithoutDependents[OrganisationDetails] {
 
   override def toString: String = "registeredIsaManager"
 

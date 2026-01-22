@@ -23,5 +23,12 @@ import models.journeydata.TaskListSection
 
 class FakeNavigator(desiredRoute: Call) extends Navigator {
 
-  override def nextPage[A <: TaskListSection](page: Page[A], answers: A, mode: Mode): Call = desiredRoute
+  override def nextPage[A <: TaskListSection](
+    page: PageWithDependents[A],
+    existing: Option[A],
+    updated: A,
+    mode: Mode
+  ): Call = desiredRoute
+  override def nextPage[A <: TaskListSection](page: PageWithoutDependents[A], updated: A, mode: Mode): Call =
+    desiredRoute
 }

@@ -16,27 +16,42 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
-import controllers.routes
 import controllers.isaproducts.routes.*
-import pages.*
+import controllers.routes
 import models.*
 import models.journeydata.TaskListSection
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
+import pages.*
+import play.api.mvc.Call
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() () {
 
-  def nextPage[A <: TaskListSection](page: Page[A], answers: A, mode: Mode): Call = mode match {
-    case NormalMode =>
-      normalRoutes(page, answers)
-    case CheckMode  =>
-      checkRouteMap(page, answers)
+  def nextPage[A <: TaskListSection](page: PageWithDependents[A], existing: Option[A], updated: A, mode: Mode): Call = {
+    val onwardMode: Mode =
+      existing.fold(NormalMode)(existing => if (page.resumeNormalMode(existing, updated)) NormalMode else mode)
+
+    onwardMode match {
+      case NormalMode =>
+        normalRoutes(page, updated)
+      case CheckMode  =>
+        checkRouteMap(page)
+    }
   }
-  private def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
+
+  def nextPage[A <: TaskListSection](page: PageWithoutDependents[A], updated: A, mode: Mode): Call =
+    mode match {
+      case NormalMode =>
+        normalRoutes(page, updated)
+      case CheckMode  =>
+        checkRouteMap(page)
+    }
+
+  private[navigation] def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
     case RegisteredIsaManagerPage        => ???
     case ZReferenceNumberPage            => ???
     case IsaProductsPage                 => isaProductsNextPage(answers)
@@ -46,7 +61,7 @@ class Navigator @Inject() () {
     case _                               => routes.IndexController.onPageLoad()
   }
 
-  private def checkRouteMap[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
+  private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
     case RegisteredIsaManagerPage        => ???
     case ZReferenceNumberPage            => ???
     case IsaProductsPage                 => IsaProductsCheckYourAnswersController.onPageLoad()
@@ -55,17 +70,6 @@ class Navigator @Inject() () {
     case PeerToPeerPlatformNumberPage    => IsaProductsCheckYourAnswersController.onPageLoad()
     case _                               => routes.IndexController.onPageLoad()
   }
-
-  def determineMode[A <: TaskListSection](
-                                           currentMode: Mode,
-                                           changedPage: PageWithDependents[A],
-                                           existing: Option[A],
-                                           updated: A
-                                         ): Mode =
-    existing.fold(NormalMode) { existing =>
-      if (changedPage.resumeNormalMode(existing, updated)) NormalMode
-      else currentMode
-    }
 
   private def isaProductsNextPage(answers: IsaProducts): Call =
     answers.isaProducts.fold(routes.IndexController.onPageLoad()) { isaProducts =>

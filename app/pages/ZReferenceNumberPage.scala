@@ -18,7 +18,7 @@ package pages
 
 import models.journeydata.OrganisationDetails
 
-case object ZReferenceNumberPage extends Page[OrganisationDetails] {
+case object ZReferenceNumberPage extends PageWithoutDependents[OrganisationDetails] {
 
   override def toString: String = "zReferenceNumber"
 

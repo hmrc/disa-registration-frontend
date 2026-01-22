@@ -18,7 +18,7 @@ package pages
 
 import models.journeydata.OrganisationDetails
 
-case object TradingNamePage extends Page[OrganisationDetails] {
+case object TradingNamePage extends PageWithoutDependents[OrganisationDetails] {
 
   override def toString: String = "tradingName"
 

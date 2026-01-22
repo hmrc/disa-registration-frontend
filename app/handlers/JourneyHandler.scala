@@ -16,9 +16,8 @@
 
 package handlers
 
-import models.{Mode, NormalMode}
 import models.journeydata.TaskListSection
-import pages.{Page, PageWithDependents}
+import pages.PageWithDependents
 
 object JourneyHandler {
   def clearStalePages[A <: TaskListSection](
