@@ -18,7 +18,7 @@ package controllers.isaproducts
 
 import controllers.actions.*
 import forms.IsaProductsFormProvider
-import handlers.PageChangeHandler.{clearStalePages, determineMode}
+import handlers.JourneyHandler.clearStalePages
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
@@ -83,7 +83,7 @@ class IsaProductsController @Inject() (
                 navigator.nextPage(
                   IsaProductsPage,
                   updatedSection,
-                  determineMode(mode, IsaProductsPage, existingSection, updatedSection)
+                  navigator.determineMode(mode, IsaProductsPage, existingSection, updatedSection)
                 )
               )
             }

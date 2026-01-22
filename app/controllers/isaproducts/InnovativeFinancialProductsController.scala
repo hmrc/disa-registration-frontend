@@ -19,7 +19,7 @@ package controllers.isaproducts
 import controllers.actions.*
 import forms.InnovativeFinancialProductsFormProvider
 import handlers.ErrorHandler
-import handlers.PageChangeHandler.{clearStalePages, determineMode}
+import handlers.JourneyHandler.clearStalePages
 import models.Mode
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.Navigator
@@ -81,7 +81,7 @@ class InnovativeFinancialProductsController @Inject() (
                 navigator.nextPage(
                   InnovativeFinancialProductsPage,
                   updatedSection,
-                  determineMode(mode, InnovativeFinancialProductsPage, existingSection, updatedSection)
+                  navigator.determineMode(mode, InnovativeFinancialProductsPage, existingSection, updatedSection)
                 )
               )
             }

@@ -20,7 +20,7 @@ import models.{Mode, NormalMode}
 import models.journeydata.TaskListSection
 import pages.{Page, PageWithDependents}
 
-object PageChangeHandler {
+object JourneyHandler {
   def clearStalePages[A <: TaskListSection](
     changedPage: PageWithDependents[A],
     existing: A,
@@ -32,15 +32,4 @@ object PageChangeHandler {
       page.clearAnswer(acc)
     }
   }
-
-  def determineMode[A <: TaskListSection](
-    currentMode: Mode,
-    changedPage: PageWithDependents[A],
-    existing: Option[A],
-    updated: A
-  ): Mode =
-    existing.fold(NormalMode) { existing =>
-      if (changedPage.resumeNormalMode(existing, updated)) NormalMode
-      else currentMode
-    }
 }
