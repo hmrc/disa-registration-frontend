@@ -66,7 +66,7 @@ class InnovativeFinancialProductsController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         answer => {
           val existingSection = request.journeyData.flatMap(_.isaProducts)
-          val updatedSection =
+          val updatedSection  =
             existingSection match {
               case Some(existing) =>
                 val withUpdate = existing.copy(innovativeFinancialProducts = Some(answer.toSeq))
@@ -77,7 +77,13 @@ class InnovativeFinancialProductsController @Inject() (
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { updatedSection =>
-              Redirect(navigator.nextPage(InnovativeFinancialProductsPage, updatedSection, determineMode(mode, InnovativeFinancialProductsPage, existingSection, updatedSection)))
+              Redirect(
+                navigator.nextPage(
+                  InnovativeFinancialProductsPage,
+                  updatedSection,
+                  determineMode(mode, InnovativeFinancialProductsPage, existingSection, updatedSection)
+                )
+              )
             }
             .recoverWith { case e =>
               logger.warn(

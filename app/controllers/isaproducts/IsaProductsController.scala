@@ -69,16 +69,23 @@ class IsaProductsController @Inject() (
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         answer => {
           val existingSection = request.journeyData.flatMap(_.isaProducts)
-          val updatedSection =
+          val updatedSection  =
             existingSection match {
-              case Some(existing) => clearStalePages(IsaProductsPage, existing, existing.copy(isaProducts = Some(answer.toSeq)))
+              case Some(existing) =>
+                clearStalePages(IsaProductsPage, existing, existing.copy(isaProducts = Some(answer.toSeq)))
               case None           => IsaProducts(isaProducts = Some(answer.toSeq))
             }
 
           journeyAnswersService
             .update(updatedSection, request.groupId)
             .map { updatedSection =>
-              Redirect(navigator.nextPage(IsaProductsPage, updatedSection, determineMode(mode, IsaProductsPage, existingSection, updatedSection))
+              Redirect(
+                navigator.nextPage(
+                  IsaProductsPage,
+                  updatedSection,
+                  determineMode(mode, IsaProductsPage, existingSection, updatedSection)
+                )
+              )
             }
             .recoverWith { case e =>
               logger.warn(

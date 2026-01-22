@@ -22,10 +22,10 @@ import pages.{Page, PageWithDependents}
 
 object PageChangeHandler {
   def clearStalePages[A <: TaskListSection](
-                                             changedPage: PageWithDependents[A],
-                                             existing: A,
-                                             updated: A
-                                    ): A = {
+    changedPage: PageWithDependents[A],
+    existing: A,
+    updated: A
+  ): A = {
     val pagesToClear = changedPage.pagesToClear(existing, updated)
 
     pagesToClear.foldLeft(updated) { (acc, page) =>
@@ -34,14 +34,13 @@ object PageChangeHandler {
   }
 
   def determineMode[A <: TaskListSection](
-                                           currentMode: Mode,
-                                           changedPage: PageWithDependents[A],
-                                           existing: Option[A],
-                                           updated: A
-                                         ): Mode = {
+    currentMode: Mode,
+    changedPage: PageWithDependents[A],
+    existing: Option[A],
+    updated: A
+  ): Mode =
     existing.fold(NormalMode) { existing =>
       if (changedPage.resumeNormalMode(existing, updated)) NormalMode
       else currentMode
     }
-  }
 }

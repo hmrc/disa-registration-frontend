@@ -22,5 +22,6 @@ object RegisteredIsaManagerPage extends Page[OrganisationDetails] {
 
   override def toString: String = "registeredIsaManager"
 
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(registeredToManageIsa = None)
+  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
+    sectionAnswers.copy(registeredToManageIsa = None)
 }

@@ -22,7 +22,8 @@ case object InnovativeFinancialProductsPage extends PageWithDependents[IsaProduc
 
   override def toString: String = "innovativeFinancialProducts"
 
-  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers.copy(innovativeFinancialProducts = None)
+  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts =
+    sectionAnswers.copy(innovativeFinancialProducts = None)
 
   override def pagesToClear(before: IsaProducts, after: IsaProducts): List[Page[IsaProducts]] = {
     val dependenciesNeedClearing = hasP2pWith36H(before) && !hasP2pWith36H(after)
@@ -36,5 +37,7 @@ case object InnovativeFinancialProductsPage extends PageWithDependents[IsaProduc
     !hasP2pWith36H(before) && hasP2pWith36H(after)
 
   private def hasP2pWith36H(sectionAnswers: IsaProducts): Boolean =
-    sectionAnswers.innovativeFinancialProducts.exists(_.contains(InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions))
+    sectionAnswers.innovativeFinancialProducts.exists(
+      _.contains(InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions)
+    )
 }

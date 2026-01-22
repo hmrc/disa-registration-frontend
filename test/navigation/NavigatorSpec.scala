@@ -50,7 +50,9 @@ class NavigatorSpec extends SpecBase {
   "Navigator.nextPage" - {
 
     "must go from a page that doesn't exist in the route map to Index" in {
-      case object UnknownPage extends Page[IsaProducts]
+      case object UnknownPage extends Page[IsaProducts] {
+        def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers
+      }
 
       navigator.nextPage(UnknownPage, emptyAnswers, NormalMode) mustBe
         IndexController.onPageLoad()
