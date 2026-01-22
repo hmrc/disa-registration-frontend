@@ -17,6 +17,9 @@
 package pages
 
 import base.SpecBase
+import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
+import models.journeydata.isaproducts.IsaProducts
+import org.scalatest.matchers.should.Matchers.shouldBe
 
 class IsaProductsPageSpec extends SpecBase {
 
@@ -25,5 +28,55 @@ class IsaProductsPageSpec extends SpecBase {
     "must have the correct string representation" in {
       IsaProductsPage.toString mustBe "isaProducts"
     }
+
+    "clearAnswer should clear isaProducts" in {
+      val before = withIfIsa
+      val after  = IsaProductsPage.clearAnswer(before)
+
+      after.isaProducts shouldBe None
+    }
+
+    "pagesToClear should return dependents when IF ISA is removed" in {
+      val before = withIfIsa
+      val after  = withoutIfIsa
+
+      val pages = IsaProductsPage.pagesToClear(before, after)
+
+      pages shouldBe List(
+        InnovativeFinancialProductsPage,
+        PeerToPeerPlatformPage,
+        PeerToPeerPlatformNumberPage
+      )
+    }
+
+    "pagesToClear should return Nil when IF ISA is not removed" in {
+      IsaProductsPage.pagesToClear(withIfIsa, withIfIsa) shouldBe Nil
+
+      IsaProductsPage.pagesToClear(withoutIfIsa, withoutIfIsa) shouldBe Nil
+
+      IsaProductsPage.pagesToClear(withoutIfIsa, withIfIsa) shouldBe Nil
+    }
+
+    "resumeNormalMode should be true only when IF ISA is added" in {
+      IsaProductsPage.resumeNormalMode(withoutIfIsa, withIfIsa) shouldBe true
+
+      IsaProductsPage.resumeNormalMode(withIfIsa, withoutIfIsa)    shouldBe false
+      IsaProductsPage.resumeNormalMode(withIfIsa, withIfIsa)       shouldBe false
+      IsaProductsPage.resumeNormalMode(withoutIfIsa, withoutIfIsa) shouldBe false
+    }
   }
+
+  private val empty: IsaProducts =
+    IsaProducts(
+      isaProducts = None,
+      innovativeFinancialProducts = None,
+      p2pPlatform = None,
+      p2pPlatformNumber = None
+    )
+
+  private def withIfIsa: IsaProducts =
+    empty.copy(isaProducts = Some(Seq(InnovativeFinanceIsas)))
+
+  private def withoutIfIsa: IsaProducts =
+    empty.copy(isaProducts = Some(Seq(CashIsas)))
 }
