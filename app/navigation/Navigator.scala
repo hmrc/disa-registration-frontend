@@ -33,7 +33,7 @@ class Navigator @Inject() () {
 
   def nextPage[A <: TaskListSection](page: PageWithDependents[A], existing: Option[A], updated: A, mode: Mode): Call = {
     val onwardMode: Mode =
-      existing.fold(NormalMode)(existing => if (page.resumeNormalMode(existing, updated)) NormalMode else mode)
+      existing.fold(NormalMode)(existing => if (page.resumeNormalMode(updated)) NormalMode else mode)
 
     onwardMode match {
       case NormalMode =>

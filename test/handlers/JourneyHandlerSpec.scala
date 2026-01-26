@@ -32,15 +32,14 @@ class JourneyHandlerSpec extends SpecBase {
 
     "return updated unchanged when pagesToClear is empty" in {
       val changedPage = mock[PageWithDependents[TestSection]]
-      val existing    = TestSection("before")
       val updated     = TestSection("after")
 
-      when(changedPage.pagesToClear(existing, updated)).thenReturn(Nil)
+      when(changedPage.pagesToClear(updated)).thenReturn(Nil)
 
-      val result = JourneyHandler.clearStalePages(changedPage, existing, updated)
+      val result = JourneyHandler.clearStalePages(changedPage, updated)
 
       result shouldBe updated
-      verify(changedPage).pagesToClear(existing, updated)
+      verify(changedPage).pagesToClear(updated)
     }
 
     "apply clearAnswer for each page returned by pagesToClear" in {
@@ -48,22 +47,21 @@ class JourneyHandlerSpec extends SpecBase {
       val page1       = mock[PageWithDependents[TestSection]]
       val page2       = mock[PageWithDependents[TestSection]]
 
-      val existing = TestSection("before")
-      val updated  = TestSection("after")
+      val updated = TestSection("after")
 
       val afterPage1 = TestSection("after-1")
       val afterPage2 = TestSection("after-2")
 
-      when(changedPage.pagesToClear(existing, updated)).thenReturn(List(page1, page2))
+      when(changedPage.pagesToClear(updated)).thenReturn(List(page1, page2))
 
       when(page1.clearAnswer(updated)).thenReturn(afterPage1)
       when(page2.clearAnswer(afterPage1)).thenReturn(afterPage2)
 
-      val result = JourneyHandler.clearStalePages(changedPage, existing, updated)
+      val result = JourneyHandler.clearStalePages(changedPage, updated)
 
       result shouldBe afterPage2
 
-      verify(changedPage).pagesToClear(existing, updated)
+      verify(changedPage).pagesToClear(updated)
       verify(page1).clearAnswer(updated)
       verify(page2).clearAnswer(afterPage1)
     }
@@ -72,15 +70,14 @@ class JourneyHandlerSpec extends SpecBase {
       val changedPage = mock[PageWithDependents[TestSection]]
       val page1       = mock[PageWithDependents[TestSection]]
 
-      val existing = TestSection("before")
-      val updated  = TestSection("after")
+      val updated = TestSection("after")
 
       val cleared = TestSection("cleared")
 
-      when(changedPage.pagesToClear(existing, updated)).thenReturn(List(page1))
+      when(changedPage.pagesToClear(updated)).thenReturn(List(page1))
       when(page1.clearAnswer(updated)).thenReturn(cleared)
 
-      val result = JourneyHandler.clearStalePages(changedPage, existing, updated)
+      val result = JourneyHandler.clearStalePages(changedPage, updated)
 
       result shouldBe cleared
       verify(page1).clearAnswer(updated)

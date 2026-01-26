@@ -22,10 +22,9 @@ import pages.PageWithDependents
 object JourneyHandler {
   def clearStalePages[A <: TaskListSection](
     changedPage: PageWithDependents[A],
-    existing: A,
     updated: A
   ): A = {
-    val pagesToClear = changedPage.pagesToClear(existing, updated)
+    val pagesToClear = changedPage.pagesToClear(updated)
 
     pagesToClear.foldLeft(updated) { (acc, page) =>
       page.clearAnswer(acc)

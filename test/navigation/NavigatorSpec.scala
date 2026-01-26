@@ -57,7 +57,7 @@ class NavigatorSpec extends SpecBase {
       val pageMock              = mock[PageWithDependents[IsaProducts]]
       val answerWithIfpSelected = answersWithIsaProducts(Seq(InnovativeFinanceIsas))
 
-      when(pageMock.resumeNormalMode(any, any)).thenReturn(true)
+      when(pageMock.resumeNormalMode(any)).thenReturn(true)
 
       val result: Call =
         navigator.nextPage(
@@ -73,7 +73,7 @@ class NavigatorSpec extends SpecBase {
     "stay in CheckMode when resumeNormalMode is false" in {
       val pageMock = mock[PageWithDependents[IsaProducts]]
 
-      when(pageMock.resumeNormalMode(any, any)).thenReturn(false)
+      when(pageMock.resumeNormalMode(any)).thenReturn(false)
 
       val result =
         navigator.nextPage(

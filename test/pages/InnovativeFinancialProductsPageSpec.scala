@@ -30,33 +30,27 @@ class InnovativeFinancialProductsPageSpec extends SpecBase {
     }
 
     "clearAnswer should clear innovativeFinancialProducts" in {
-      val before = withP2p36h
-      val after  = InnovativeFinancialProductsPage.clearAnswer(before)
+      val after = InnovativeFinancialProductsPage.clearAnswer(withP2p36h)
 
       after.innovativeFinancialProducts shouldBe None
     }
 
-    "pagesToClear should return P2P dependents when 36H P2P is removed" in {
-      val before = withP2p36h
-      val after  = withoutP2p36h
-
-      val pages = InnovativeFinancialProductsPage.pagesToClear(before, after)
+    "pagesToClear should return P2P dependents when 36H P2P is not present and there is an existing dependent answer" in {
+      val pages = InnovativeFinancialProductsPage.pagesToClear(withoutP2p36hWithExistingDependentAnswer)
 
       pages shouldBe List(PeerToPeerPlatformPage, PeerToPeerPlatformNumberPage)
     }
 
-    "pagesToClear should return Nil when 36H P2P is not removed" in {
-      InnovativeFinancialProductsPage.pagesToClear(withP2p36h, withP2p36h)       shouldBe Nil
-      InnovativeFinancialProductsPage.pagesToClear(withoutP2p36h, withoutP2p36h) shouldBe Nil
-      InnovativeFinancialProductsPage.pagesToClear(withoutP2p36h, withP2p36h)    shouldBe Nil
+    "pagesToClear should return Nil when there is no stale answers" in {
+      InnovativeFinancialProductsPage.pagesToClear(withP2p36hWithExistingDependentAnswer)       shouldBe Nil
+      InnovativeFinancialProductsPage.pagesToClear(withP2p36hWithoutExistingDependentAnswer)    shouldBe Nil
+      InnovativeFinancialProductsPage.pagesToClear(withoutP2p36hWithoutExistingDependentAnswer) shouldBe Nil
     }
 
-    "resumeNormalMode should be true only when 36H P2P is added" in {
-      InnovativeFinancialProductsPage.resumeNormalMode(withoutP2p36h, withP2p36h) shouldBe true
+    "resumeNormalMode should be true only when 36H P2P is present and there is no existing dependent answer" in {
+      InnovativeFinancialProductsPage.resumeNormalMode(withP2p36hWithoutExistingDependentAnswer) shouldBe true
 
-      InnovativeFinancialProductsPage.resumeNormalMode(withP2p36h, withoutP2p36h)    shouldBe false
-      InnovativeFinancialProductsPage.resumeNormalMode(withP2p36h, withP2p36h)       shouldBe false
-      InnovativeFinancialProductsPage.resumeNormalMode(withoutP2p36h, withoutP2p36h) shouldBe false
+      InnovativeFinancialProductsPage.resumeNormalMode(withP2p36hWithExistingDependentAnswer) shouldBe false
     }
   }
 
@@ -75,4 +69,10 @@ class InnovativeFinancialProductsPageSpec extends SpecBase {
     empty.copy(innovativeFinancialProducts =
       Some(Seq(InnovativeFinancialProduct.values.filterNot(_ == PeertopeerLoansUsingAPlatformWith36hPermissions).head))
     )
+
+  private def withP2p36hWithExistingDependentAnswer: IsaProducts    = withP2p36h.copy(p2pPlatform = Some(testString))
+  private def withP2p36hWithoutExistingDependentAnswer: IsaProducts = withP2p36h.copy(p2pPlatform = None)
+
+  private def withoutP2p36hWithExistingDependentAnswer: IsaProducts    = withoutP2p36h.copy(p2pPlatform = Some(testString))
+  private def withoutP2p36hWithoutExistingDependentAnswer: IsaProducts = withoutP2p36h.copy(p2pPlatform = None)
 }

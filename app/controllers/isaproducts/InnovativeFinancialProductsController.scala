@@ -70,7 +70,7 @@ class InnovativeFinancialProductsController @Inject() (
             existingSection match {
               case Some(existing) =>
                 val withUpdate = existing.copy(innovativeFinancialProducts = Some(answer.toSeq))
-                clearStalePages(InnovativeFinancialProductsPage, existing, withUpdate)
+                clearStalePages(InnovativeFinancialProductsPage, withUpdate)
               case None           => IsaProducts(isaProducts = None, innovativeFinancialProducts = Some(answer.toSeq))
             }
 

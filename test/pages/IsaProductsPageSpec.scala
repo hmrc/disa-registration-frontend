@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.IsaProducts
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -30,17 +31,13 @@ class IsaProductsPageSpec extends SpecBase {
     }
 
     "clearAnswer should clear isaProducts" in {
-      val before = withIfIsa
-      val after  = IsaProductsPage.clearAnswer(before)
+      val after = IsaProductsPage.clearAnswer(withIfIsa)
 
       after.isaProducts shouldBe None
     }
 
     "pagesToClear should return dependents when IF ISA is removed" in {
-      val before = withIfIsa
-      val after  = withoutIfIsa
-
-      val pages = IsaProductsPage.pagesToClear(before, after)
+      val pages = IsaProductsPage.pagesToClear(withoutIfIsaWithExistingDependentAnswer)
 
       pages shouldBe List(
         InnovativeFinancialProductsPage,
@@ -49,20 +46,15 @@ class IsaProductsPageSpec extends SpecBase {
       )
     }
 
-    "pagesToClear should return Nil when IF ISA is not removed" in {
-      IsaProductsPage.pagesToClear(withIfIsa, withIfIsa) shouldBe Nil
-
-      IsaProductsPage.pagesToClear(withoutIfIsa, withoutIfIsa) shouldBe Nil
-
-      IsaProductsPage.pagesToClear(withoutIfIsa, withIfIsa) shouldBe Nil
+    "pagesToClear should return Nil when there are no stale answers" in {
+      IsaProductsPage.pagesToClear(withIfIsaWithExistingDependentAnswer)       shouldBe Nil
+      IsaProductsPage.pagesToClear(withIfIsaWithoutExistingDependentAnswer)    shouldBe Nil
+      IsaProductsPage.pagesToClear(withoutIfIsaWithoutExistingDependentAnswer) shouldBe Nil
     }
 
-    "resumeNormalMode should be true only when IF ISA is added" in {
-      IsaProductsPage.resumeNormalMode(withoutIfIsa, withIfIsa) shouldBe true
-
-      IsaProductsPage.resumeNormalMode(withIfIsa, withoutIfIsa)    shouldBe false
-      IsaProductsPage.resumeNormalMode(withIfIsa, withIfIsa)       shouldBe false
-      IsaProductsPage.resumeNormalMode(withoutIfIsa, withoutIfIsa) shouldBe false
+    "resumeNormalMode should be true only when IF ISA is present and there is no existing dependent answer" in {
+      IsaProductsPage.resumeNormalMode(withIfIsaWithoutExistingDependentAnswer) shouldBe true
+      IsaProductsPage.resumeNormalMode(withIfIsaWithExistingDependentAnswer)    shouldBe false
     }
   }
 
@@ -79,4 +71,14 @@ class IsaProductsPageSpec extends SpecBase {
 
   private def withoutIfIsa: IsaProducts =
     empty.copy(isaProducts = Some(Seq(CashIsas)))
+
+  private def withIfIsaWithExistingDependentAnswer: IsaProducts    =
+    withIfIsa.copy(innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)))
+  private def withIfIsaWithoutExistingDependentAnswer: IsaProducts = withIfIsa.copy(innovativeFinancialProducts = None)
+
+  private def withoutIfIsaWithExistingDependentAnswer: IsaProducts =
+    withoutIfIsa.copy(innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)))
+
+  private def withoutIfIsaWithoutExistingDependentAnswer: IsaProducts =
+    withoutIfIsa.copy(innovativeFinancialProducts = None)
 }

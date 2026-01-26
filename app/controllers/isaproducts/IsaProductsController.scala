@@ -72,7 +72,7 @@ class IsaProductsController @Inject() (
           val updatedSection  =
             existingSection match {
               case Some(existing) =>
-                clearStalePages(IsaProductsPage, existing, existing.copy(isaProducts = Some(answer.toSeq)))
+                clearStalePages(IsaProductsPage, existing.copy(isaProducts = Some(answer.toSeq)))
               case None           => IsaProducts(isaProducts = Some(answer.toSeq))
             }
 

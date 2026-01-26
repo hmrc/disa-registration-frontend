@@ -23,8 +23,8 @@ case object IsaProductsPage extends PageWithDependents[IsaProducts] {
 
   override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers.copy(isaProducts = None)
 
-  override def pagesToClear(before: IsaProducts, after: IsaProducts): List[Page[IsaProducts]] =
-    val dependenciesNeedClearing = hasIfIsa(before) && !hasIfIsa(after)
+  override def pagesToClear(currentAnswers: IsaProducts): List[Page[IsaProducts]] =
+    val dependenciesNeedClearing = !hasIfIsa(currentAnswers) && hasExistingDependentAnswer(currentAnswers)
 
     if (dependenciesNeedClearing)
       List(
@@ -34,9 +34,12 @@ case object IsaProductsPage extends PageWithDependents[IsaProducts] {
       )
     else Nil
 
-  def resumeNormalMode(before: IsaProducts, after: IsaProducts): Boolean =
-    !hasIfIsa(before) && hasIfIsa(after)
+  def resumeNormalMode(currentAnswers: IsaProducts): Boolean =
+    hasIfIsa(currentAnswers) && !hasExistingDependentAnswer(currentAnswers)
 
   private def hasIfIsa(sectionAnswers: IsaProducts): Boolean =
     sectionAnswers.isaProducts.exists(_.contains(IsaProduct.InnovativeFinanceIsas))
+
+  private def hasExistingDependentAnswer(sectionAnswers: IsaProducts): Boolean =
+    sectionAnswers.innovativeFinancialProducts.exists(_.nonEmpty)
 }
