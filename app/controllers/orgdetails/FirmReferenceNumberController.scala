@@ -70,8 +70,8 @@ class FirmReferenceNumberController @Inject() (
             }
           journeyAnswersService
             .update(updatedSection, request.groupId)
-            .map { _ =>
-              Redirect(navigator.nextPage(FirmReferenceNumberPage, mode))
+            .map { updatedSection =>
+              Redirect(navigator.nextPage(FirmReferenceNumberPage, updatedSection, mode))
             }
             .recoverWith { case e =>
               logger.warn(

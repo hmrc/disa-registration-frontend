@@ -21,6 +21,7 @@ import controllers.isaproducts.routes.IsaProductsController
 import forms.IsaProductsFormProvider
 import models.NormalMode
 import models.journeydata.JourneyData
+import models.journeydata.isaproducts.IsaProduct.CashIsas
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -33,6 +34,7 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.isaproducts.IsaProductsView
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 
 import scala.concurrent.Future
 
@@ -104,9 +106,11 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted" in {
 
+      val expectedJourneyData = IsaProducts(Some(Seq(CashIsas)))
+
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(())
+        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
@@ -129,9 +133,11 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
     "must redirect to the next page when valid data is submitted and no existing data was found" in {
 
+      val expectedJourneyData = IsaProducts(Some(Seq(CashIsas)))
+
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
-      ) thenReturn Future.successful(())
+        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+      ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
         applicationBuilder(journeyData = None)

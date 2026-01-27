@@ -16,7 +16,9 @@
 
 package pages
 
-case object IsaProductsPage extends Page {
+import models.journeydata.isaproducts.IsaProducts
+
+case object IsaProductsPage extends Page[IsaProducts] {
 
   override def toString: String = "isaProducts"
 

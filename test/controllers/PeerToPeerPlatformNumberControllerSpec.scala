@@ -25,6 +25,7 @@ import models.journeydata.isaproducts.IsaProducts
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.data.Form
 import play.api.inject.bind
@@ -112,10 +113,12 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
 
       "must redirect to the next page when valid data is submitted" in {
 
+        val expectedJourneyData = IsaProducts(p2pPlatform = Some(testString), p2pPlatformNumber = Some(validAnswer))
+
         when(
           mockJourneyAnswersService
-            .update(any[IsaProducts], ArgumentMatchers.eq(testGroupId))(any[Writes[IsaProducts]], any)
-        ) thenReturn Future.successful(())
+            .update(eqTo(expectedJourneyData), eqTo(testGroupId))(any[Writes[IsaProducts]], any)
+        ) thenReturn Future.successful(expectedJourneyData)
 
         val application =
           applicationBuilder(journeyData = Some(validJourneyData))

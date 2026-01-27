@@ -70,8 +70,8 @@ class TradingUsingDifferentNameController @Inject() (
             }
           journeyAnswersService
             .update(updatedSection, request.groupId)
-            .map { _ =>
-              Redirect(navigator.nextPage(TradingUsingDifferentNamePage, mode))
+            .map { updatedSection =>
+              Redirect(navigator.nextPage(TradingUsingDifferentNamePage, updatedSection, mode))
             }
             .recoverWith { case e =>
               logger.warn(

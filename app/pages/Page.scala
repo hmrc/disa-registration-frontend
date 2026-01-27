@@ -16,12 +16,14 @@
 
 package pages
 
+import models.journeydata.TaskListSection
+
 import scala.language.implicitConversions
 
-trait Page
+trait Page[A <: TaskListSection]
 
 object Page {
 
-  implicit def toString(page: Page): String =
+  implicit def toString[A <: TaskListSection](page: Page[A]): String =
     page.toString
 }

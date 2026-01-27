@@ -33,4 +33,5 @@ trait TestData {
     )
   val testJourneyData: JourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
   val testString                          = "test"
+  val testZRef                            = "Z1234"
 }
