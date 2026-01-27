@@ -16,39 +16,71 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
-import controllers.routes
 import controllers.isaproducts.routes.*
-import pages.*
+import controllers.routes
 import models.*
 import models.journeydata.TaskListSection
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
+import pages.*
+import play.api.mvc.Call
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject() () {
 
-  def nextPage[A <: TaskListSection](page: Page[A], answers: A, mode: Mode): Call = page match {
+  def nextPage[A <: TaskListSection](page: PageWithDependents[A], existing: Option[A], updated: A, mode: Mode): Call = {
+    val onwardMode: Mode =
+      existing.fold(NormalMode)(existing => if (page.resumeNormalMode(updated)) NormalMode else mode)
+
+    onwardMode match {
+      case NormalMode =>
+        normalRoutes(page, updated)
+      case CheckMode  =>
+        checkRouteMap(page)
+    }
+  }
+
+  def nextPage[A <: TaskListSection](page: PageWithoutDependents[A], updated: A, mode: Mode): Call =
+    mode match {
+      case NormalMode =>
+        normalRoutes(page, updated)
+      case CheckMode  =>
+        checkRouteMap(page)
+    }
+
+  private[navigation] def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
     case RegisteredIsaManagerPage        => ???
     case ZReferenceNumberPage            => ???
-    case IsaProductsPage                 => isaProductsNextPage(answers, mode)
-    case InnovativeFinancialProductsPage => innovativeFinancialProductsNextPage(answers, mode)
-    case PeerToPeerPlatformPage          => PeerToPeerPlatformNumberController.onPageLoad(mode)
+    case IsaProductsPage                 => isaProductsNextPage(answers)
+    case InnovativeFinancialProductsPage => innovativeFinancialProductsNextPage(answers)
+    case PeerToPeerPlatformPage          => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
     case PeerToPeerPlatformNumberPage    => IsaProductsCheckYourAnswersController.onPageLoad()
     case _                               => routes.IndexController.onPageLoad()
   }
 
-  private def isaProductsNextPage(answers: IsaProducts, mode: Mode): Call =
+  private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
+    case RegisteredIsaManagerPage        => ???
+    case ZReferenceNumberPage            => ???
+    case IsaProductsPage                 => IsaProductsCheckYourAnswersController.onPageLoad()
+    case InnovativeFinancialProductsPage => IsaProductsCheckYourAnswersController.onPageLoad()
+    case PeerToPeerPlatformPage          => IsaProductsCheckYourAnswersController.onPageLoad()
+    case PeerToPeerPlatformNumberPage    => IsaProductsCheckYourAnswersController.onPageLoad()
+    case _                               => routes.IndexController.onPageLoad()
+  }
+
+  private def isaProductsNextPage(answers: IsaProducts): Call =
     answers.isaProducts.fold(routes.IndexController.onPageLoad()) { isaProducts =>
-      if (isaProducts.contains(InnovativeFinanceIsas)) InnovativeFinancialProductsController.onPageLoad(mode)
+      if (isaProducts.contains(InnovativeFinanceIsas)) InnovativeFinancialProductsController.onPageLoad(NormalMode)
       else IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
-  private def innovativeFinancialProductsNextPage(answers: IsaProducts, mode: Mode): Call =
+  private def innovativeFinancialProductsNextPage(answers: IsaProducts): Call =
     answers.innovativeFinancialProducts.fold(routes.IndexController.onPageLoad()) { ifps =>
-      if (ifps.contains(PeertopeerLoansUsingAPlatformWith36hPermissions)) PeerToPeerPlatformController.onPageLoad(mode)
+      if (ifps.contains(PeertopeerLoansUsingAPlatformWith36hPermissions))
+        PeerToPeerPlatformController.onPageLoad(NormalMode)
       else IsaProductsCheckYourAnswersController.onPageLoad()
     }
 }

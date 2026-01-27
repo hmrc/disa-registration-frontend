@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package handlers
 
-import models.journeydata.OrganisationDetails
+import models.journeydata.TaskListSection
+import pages.PageWithDependents
 
-case object ZReferenceNumberPage extends PageWithoutDependents[OrganisationDetails] {
+object JourneyHandler {
+  def clearStalePages[A <: TaskListSection](
+    changedPage: PageWithDependents[A],
+    updated: A
+  ): A = {
+    val pagesToClear = changedPage.pagesToClear(updated)
 
-  override def toString: String = "zReferenceNumber"
-
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(zRefNumber = None)
+    pagesToClear.foldLeft(updated) { (acc, page) =>
+      page.clearAnswer(acc)
+    }
+  }
 }

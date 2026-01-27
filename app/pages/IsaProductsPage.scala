@@ -16,10 +16,30 @@
 
 package pages
 
-import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 
-case object IsaProductsPage extends Page[IsaProducts] {
-
+case object IsaProductsPage extends PageWithDependents[IsaProducts] {
   override def toString: String = "isaProducts"
 
+  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers.copy(isaProducts = None)
+
+  override def pagesToClear(currentAnswers: IsaProducts): List[Page[IsaProducts]] =
+    val dependenciesNeedClearing = !hasIfIsa(currentAnswers) && hasExistingDependentAnswer(currentAnswers)
+
+    if (dependenciesNeedClearing)
+      List(
+        InnovativeFinancialProductsPage,
+        PeerToPeerPlatformPage,
+        PeerToPeerPlatformNumberPage
+      )
+    else Nil
+
+  def resumeNormalMode(currentAnswers: IsaProducts): Boolean =
+    hasIfIsa(currentAnswers) && !hasExistingDependentAnswer(currentAnswers)
+
+  private def hasIfIsa(sectionAnswers: IsaProducts): Boolean =
+    sectionAnswers.isaProducts.exists(_.contains(IsaProduct.InnovativeFinanceIsas))
+
+  private def hasExistingDependentAnswer(sectionAnswers: IsaProducts): Boolean =
+    sectionAnswers.innovativeFinancialProducts.exists(_.nonEmpty)
 }

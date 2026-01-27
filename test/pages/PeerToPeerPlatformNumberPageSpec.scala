@@ -17,6 +17,8 @@
 package pages
 
 import base.SpecBase
+import models.journeydata.isaproducts.IsaProducts
+import org.scalatest.matchers.should.Matchers.shouldBe
 
 class PeerToPeerPlatformNumberPageSpec extends SpecBase {
 
@@ -25,5 +27,20 @@ class PeerToPeerPlatformNumberPageSpec extends SpecBase {
     "must have the correct string representation" in {
       PeerToPeerPlatformNumberPage.toString mustBe "peerToPeerPlatformNumber"
     }
+
+    "clearAnswer should clear p2pPlatformNumber" in {
+      val before = empty.copy(p2pPlatformNumber = Some("123456"))
+      val after  = PeerToPeerPlatformNumberPage.clearAnswer(before)
+
+      after.p2pPlatformNumber shouldBe None
+    }
   }
+
+  private val empty: IsaProducts =
+    IsaProducts(
+      isaProducts = None,
+      innovativeFinancialProducts = None,
+      p2pPlatform = None,
+      p2pPlatformNumber = None
+    )
 }

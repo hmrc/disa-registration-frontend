@@ -18,7 +18,9 @@ package pages
 
 import models.journeydata.isaproducts.IsaProducts
 
-case object PeerToPeerPlatformNumberPage extends Page[IsaProducts] {
+case object PeerToPeerPlatformNumberPage extends PageWithoutDependents[IsaProducts] {
 
   override def toString: String = "peerToPeerPlatformNumber"
+
+  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers.copy(p2pPlatformNumber = None)
 }

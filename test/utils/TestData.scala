@@ -16,10 +16,13 @@
 
 package utils
 
+import generators.Generators
 import models.journeydata.JourneyData
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 
-trait TestData {
+import scala.util.Random
+
+trait TestData extends Generators {
   val testGroupId: String = "id"
 
   def emptyJourneyData: JourneyData = JourneyData(testGroupId)
@@ -33,5 +36,5 @@ trait TestData {
     )
   val testJourneyData: JourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
   val testString                          = "test"
-  val testZRef                            = "Z1234"
+  val testZRef                            = s"Z${(1 to 4).map(_ => Random.nextInt(10)).mkString}"
 }
