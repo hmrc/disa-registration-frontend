@@ -47,6 +47,7 @@ class DeclarationForIsaManagersController @Inject() (
 
     showJuniorContent.fold {
       logger.warn(s"User with groupId [${request.groupId}] did not have requisite data to make a declaration")
+      // TODO Repoint to task list when built
       Redirect(IndexController.onPageLoad())
     } { showJuniorContent =>
       Ok(view(showJuniorContent))
