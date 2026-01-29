@@ -19,7 +19,7 @@ package connectors
 import config.FrontendAppConfig
 import models.journeydata.{JourneyData, TaskListSection}
 import play.api.Logging
-import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
+import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -67,6 +67,29 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
             Future.failed(
               UpstreamErrorResponse(
                 "updateTaskListJourney failed",
+                status,
+                status,
+                response.headers
+              )
+            )
+        }
+      )
+  }
+
+  def declareAndSubmit(groupId: String)(implicit hc: HeaderCarrier): Future[String] = {
+    val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/$groupId/declare-and-submit"
+    http
+      .post(url"$url")
+      .execute[HttpResponse]
+      .flatMap(response =>
+        response.status match {
+          case OK => Future.successful(response.body)
+          case status               =>
+            logger
+              .error(s"Unexpected status from backend on declaration and submission: [$status] for groupId: [$groupId]")
+            Future.failed(
+              UpstreamErrorResponse(
+                "declareAndSubmit failed",
                 status,
                 status,
                 response.headers

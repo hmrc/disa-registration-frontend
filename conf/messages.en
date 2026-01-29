@@ -205,3 +205,6 @@ declarationForIsaManagers.li6 = I understand that if my circumstances change Iâ€
 declarationForIsaManagers.p2 = By continuing, I confirm that I have understood all of the statements.
 declarationForIsaManagers.action = I agree, submit
 
+## Confirmation
+confirmation.title = confirmation dummy
+confirmation.heading = confirmation dummy

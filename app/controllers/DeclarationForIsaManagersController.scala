@@ -16,17 +16,19 @@
 
 package controllers
 
+import connectors.DisaRegistrationConnector
 import controllers.actions.*
+import controllers.routes.{ConfirmationController, IndexController}
 import handlers.ErrorHandler
 import models.journeydata.isaproducts.IsaProduct.{CashJuniorIsas, StocksAndShareJuniorIsas}
 import play.api.Logging
-
-import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DeclarationForIsaManagersView
-import controllers.routes.IndexController
+
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class DeclarationForIsaManagersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -35,8 +37,10 @@ class DeclarationForIsaManagersController @Inject() (
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: DeclarationForIsaManagersView,
+  connector: DisaRegistrationConnector,
   errorHandler: ErrorHandler
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -52,5 +56,18 @@ class DeclarationForIsaManagersController @Inject() (
     } { showJuniorContent =>
       Ok(view(showJuniorContent))
     }
+  }
+
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    connector
+      .declareAndSubmit(request.groupId)
+      .map { submissionId =>
+        logger.info(s"Successful submission by IM with groupId [${request.groupId}]")
+        Redirect(ConfirmationController.onPageLoad(submissionId))
+      }
+      .recoverWith { case e: Throwable =>
+        logger.warn(s"Failed submission for IM with groupId [${request.groupId}] with error from backend: [$e]")
+        errorHandler.internalServerError(request)
+      }
   }
 }
