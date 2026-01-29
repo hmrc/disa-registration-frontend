@@ -20,11 +20,12 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.net.URLEncoder
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration) {
+class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
   lazy val host: String    = configuration.get[String]("host")
   lazy val appName: String = configuration.get[String]("appName")
@@ -42,11 +43,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     configuration.get[String]("urls.isaManagerGuidance")
   val ggSignInUrl: String           = s"$loginUrl?continue=${URLEncoder.encode(loginContinueUrl, "UTF-8")}"
 
-  lazy val disaRegistrationBaseUrl: String =
-    configuration.get[Service]("microservice.services.disa-registration").baseUrl
+  lazy val disaRegistrationBaseUrl: String = servicesConfig.baseUrl("disa-registration")
 
-  private lazy val exitSurveyBaseUrl: String =
-    configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
+  private lazy val exitSurveyBaseUrl: String = servicesConfig.baseUrl("feedback-frontend")
+  
   lazy val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/disa-registration-frontend"
 
   lazy val languageTranslationEnabled: Boolean =
@@ -66,4 +66,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     configuration.get[String]("urls.external.listOfRegisteredIsaManagers")
 
   lazy val p2pLoansInformationUrl: String = configuration.get[String]("urls.external.p2pLoansInformation")
+
+
+  private lazy val incorporatedEntityIdentificationHost: String = servicesConfig.baseUrl("incorporated-entity-identification-frontend")
+
 }

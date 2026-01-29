@@ -1,0 +1,108 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers
+
+import connectors.GenericRegistrationService
+import controllers.actions.*
+import forms.InnovativeFinancialProductsFormProvider
+import handlers.ErrorHandler
+import models.Mode
+import models.grs.{BvPass, FailedStatus, NotCalledStatus, RegisteredStatus}
+import models.journeydata.{BusinessVerification, JourneyData}
+import models.journeydata.isaproducts.InnovativeFinancialProduct
+import navigation.Navigator
+import play.api.Logging
+import play.api.data.Form
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.JourneyAnswersService
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.TaskListView
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+
+class BusinessRegistrationController @Inject()(
+                                                override val messagesApi: MessagesApi,
+                                                navigator: Navigator,
+                                                identify: IdentifierAction,
+                                                getData: DataRetrievalAction,
+                                                formProvider: InnovativeFinancialProductsFormProvider,
+                                                journeyAnswersService: JourneyAnswersService,
+                                                errorHandler: ErrorHandler,
+                                                val controllerComponents: MessagesControllerComponents,
+                                                view: TaskListView,
+                                                genericRegistrationService: GenericRegistrationService
+                                              )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
+    with I18nSupport
+    with Logging {
+
+  val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
+
+
+  def grsCallback(journeyId: String): Action[AnyContent] =
+    (identify andThen getData).async { implicit request =>
+      genericRegistrationService.fetchGRSJourneyData(journeyId).flatMap { grsResponse =>
+
+        val businessVerificationPassed: Option[Boolean] =
+          grsResponse.businessVerificationStatus.map {
+            case BvPass => true
+            case _ => false
+          }
+        val businessRegistrationPassed: Option[Boolean] =
+          Some(grsResponse.businessRegistrationStatus == RegisteredStatus)
+
+        val updatedJourneyData: Option[BusinessVerification] = for {
+          journeyData <- request.journeyData
+          businessVerification <- journeyData.businessVerification
+        } yield
+          businessVerification.copy(
+            businessRegistrationPassed = businessRegistrationPassed,
+            businessVerificationPassed = businessVerificationPassed,
+            ctUtr = grsResponse.ctutr)
+
+        updatedJourneyData match {
+          case Some(updatedData) =>
+            journeyAnswersService.update(updatedData, request.groupId).flatMap { _ =>
+              (businessRegistrationPassed, businessVerificationPassed) match {
+                case (Some(true), Some(true)) =>
+                  Future.successful(
+                    Redirect(controllers.routes.TaskListController.onPageLoad())
+                      .withSession(request.session)
+                  )
+                case (_, Some(false)) =>
+                  Future.successful(
+                    Redirect(controllers.routes.StartController.onPageLoad())
+                      .withSession(request.session)
+                  )
+                case _ =>
+                  Future.successful(
+                    Redirect(controllers.routes.StartController.onPageLoad())
+                      .withSession(request.session)
+                  )
+              }
+            }
+          case None =>
+            Future.successful(
+              Redirect(controllers.routes.StartController.onPageLoad())
+                .withSession(request.session)
+            )
+        }
+      }
+    }
+}
