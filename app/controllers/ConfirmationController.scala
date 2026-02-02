@@ -33,7 +33,7 @@ class ConfirmationController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(submissionId: String): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    Ok(view(submissionId))
+  def onPageLoad(submissionReceiptId: String): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    Ok(view(submissionReceiptId))
   }
 }

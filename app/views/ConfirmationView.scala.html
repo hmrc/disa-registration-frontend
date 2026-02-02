@@ -19,10 +19,10 @@
         govukButton: GovukButton
 )
 
-@(submissionId: String)(implicit request: Request[_], messages: Messages)
+@(submissionReceiptId: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("confirmation.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("confirmation.heading")</h1>
-   <p>submissionId is @submissionId</p>
+  <h1 class="govuk-heading-xl">@messages("confirmation.heading")</h1>
+  <p class="govuk-body">submissionReceiptId is @submissionReceiptId</p>
 }

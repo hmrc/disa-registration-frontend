@@ -61,9 +61,9 @@ class DeclarationForIsaManagersController @Inject() (
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     connector
       .declareAndSubmit(request.groupId)
-      .map { submissionId =>
+      .map { submissionReceiptId =>
         logger.info(s"Successful submission by IM with groupId [${request.groupId}]")
-        Redirect(ConfirmationController.onPageLoad(submissionId))
+        Redirect(ConfirmationController.onPageLoad(submissionReceiptId))
       }
       .recoverWith { case e: Throwable =>
         logger.warn(s"Failed submission for IM with groupId [${request.groupId}] with error from backend: [$e]")
