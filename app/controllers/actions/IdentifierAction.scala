@@ -26,7 +26,8 @@ import play.api.mvc.Results.*
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.*
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -49,14 +50,14 @@ class AuthenticatedIdentifierAction @Inject() (
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised().retrieve(Retrievals.groupIdentifier and Retrievals.affinityGroup) {
-      case Some(groupId) ~ Some(Organisation) =>
-        block(IdentifierRequest(request, groupId))
-      case Some(_) ~ Some(affinity)           =>
+    authorised().retrieve(groupIdentifier and affinityGroup and credentials and credentialRole) {
+      case Some(groupId) ~ Some(Organisation) ~ Some(credentials) ~ Some(role) =>
+        block(IdentifierRequest(request, groupId, credentials, role))
+      case Some(_) ~ Some(affinity) ~ _ ~ _                                    =>
         Future.successful(
           Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString))
         )
-      case _                                  =>
+      case _                                                                   =>
         Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     }
   } recover {

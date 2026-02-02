@@ -41,7 +41,17 @@ class DataRetrievalActionImpl @Inject() (
     journeyAnswersService
       .get(request.groupId)
       .flatMap { journeyData =>
-        Future.successful(Right(OptionalDataRequest(request.request, request.groupId, journeyData)))
+        Future.successful(
+          Right(
+            OptionalDataRequest(
+              request.request,
+              request.groupId,
+              request.credentials,
+              request.credentialRole,
+              journeyData
+            )
+          )
+        )
       }
       .recoverWith { case e: Throwable =>
         logger.warn(s"Failed to retrieve answers for user with groupId: [${request.groupId}] with error: [$e]")

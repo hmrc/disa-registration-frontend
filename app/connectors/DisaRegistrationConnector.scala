@@ -83,8 +83,8 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
       .execute[HttpResponse]
       .flatMap(response =>
         response.status match {
-          case OK => Future.successful(response.body)
-          case status               =>
+          case OK     => Future.successful(response.body)
+          case status =>
             logger
               .error(s"Unexpected status from backend on declaration and submission: [$status] for groupId: [$groupId]")
             Future.failed(
