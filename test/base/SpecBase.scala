@@ -40,7 +40,7 @@ import play.api.test.FakeRequest
 import services.JourneyAnswersService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.TestData
+import utils.{JourneyDataBuilder, TestData}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -55,7 +55,8 @@ trait SpecBase
     with AuthTestSupport
     with BeforeAndAfterEach
     with TestData
-    with MockitoSugar {
+    with MockitoSugar
+    with JourneyDataBuilder {
 
   implicit def messages(implicit app: Application): Messages   =
     app.injector.instanceOf[MessagesApi].preferred(FakeRequest())

@@ -85,6 +85,7 @@ sectionTitle.orgDetails = Organisation details
 sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
 sectionTitle.isaProducts = ISA products
+sectionTitle.submit = Submit answers
 section.caption.hidden = This section is
 
 
@@ -187,3 +188,20 @@ addLiaisonOfficer.p2 = You can add up to 15 liaison officers.
 addLiaisonOfficer.details.summary = What is a liaison officer?
 addLiaisonOfficer.details.content.p1 = Liaison officers act as a point of contact between the ISA manager and HMRC.
 addLiaisonOfficer.details.content.p2 = They provide their name, telephone number and email address and are individuals an organisation appoints to provide day-to-day contact with HMRC.
+
+## Declaration
+
+declarationForIsaManagers.title = Declaration for registering and enrolling ISA managers
+declarationForIsaManagers.heading = Declaration for registering and enrolling ISA managers
+declarationForIsaManagers.junior.li1 = I’m applying to manage Junior ISA accounts, I undertake to publicise (and update where appropriate) statements of the minimum amount that may be subscribed to a Junior ISA account on a single occasion, and the permitted means of payment on subscriptions
+declarationForIsaManagers.junior.li2 = I’m applying to manage Junior ISA accounts, I undertake to inform persons proposing to make a subscription to a Junior ISA account (other than the named child) that the subscription is a gift to the child
+declarationForIsaManagers.p1 = Do you agree to the following statements:
+declarationForIsaManagers.li1 = the ISA products and investments will meet the qualifying criteria as described in the ISA regulations and ISA managers’ guidance
+declarationForIsaManagers.li2 = the ISAs opened and subscriptions made under my management will comply with the ISA regulations
+declarationForIsaManagers.li3 = all HMRC ISA returns and reporting obligations will be accurate and made in accordance with the ISA regulations and ISA managers’ guidance
+declarationForIsaManagers.li4 = I’m not subject to any requirement or prohibition imposed by or under any rules made by the Financial Conduct Authority or the Prudential Regulation Authority under Part 4A of FISMA 2000 which would prevent me from acting as an account manager
+declarationForIsaManagers.li5 = the information I’ve provided in this application is, to the best of my knowledge and belief, is correct and true
+declarationForIsaManagers.li6 = I understand that if my circumstances change I’ll notify HM Revenue and Customs immediately
+declarationForIsaManagers.p2 = By continuing, I confirm that I have understood all of the statements.
+declarationForIsaManagers.action = I agree, submit
+
