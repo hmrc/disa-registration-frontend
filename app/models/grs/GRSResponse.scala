@@ -16,21 +16,51 @@
 
 package models.grs
 
-import play.api.libs.json.{Format, JsResult, JsString, JsValue, Json, OFormat}
+import play.api.libs.json.*
 
 import java.time.LocalDate
 
-case class GRSResponse(companyNumber: String,
-                       companyName: Option[String],
-                       ctutr: Option[String] = None,
-                       chrn: Option[String] = None,
-                       dateOfIncorporation: Option[LocalDate],
-                       countryOfIncorporation: String = "GB",
-                       identifiersMatch: Boolean,
-                       businessRegistrationStatus: BusinessRegistrationStatus,
-                       businessVerificationStatus: Option[BusinessVerificationStatus],
-                       bpSafeId: Option[String])
+case class GRSResponse(
+  companyNumber: String,
+  companyName: Option[String],
+  ctutr: Option[String] = None,
+  chrn: Option[String] = None,
+  dateOfIncorporation: Option[LocalDate],
+  countryOfIncorporation: String = "GB",
+  identifiersMatch: Boolean,
+  businessRegistrationStatus: BusinessRegistrationStatus,
+  businessVerificationStatus: Option[BusinessVerificationStatus],
+  bpSafeId: Option[String]
+)
 
 object GRSResponse {
-  implicit val format: OFormat[GRSResponse] = Json.format[GRSResponse]
+
+  implicit val writes: OWrites[GRSResponse] = Json.writes[GRSResponse]
+
+  implicit val reads: Reads[GRSResponse] = for {
+    companyNumber              <- (JsPath \ "companyProfile" \ "companyNumber").read[String]
+    companyName                <- (JsPath \ "companyProfile" \ "companyName").readNullable[String]
+    dateOfIncorporation        <- (JsPath \ "companyProfile" \ "dateOfIncorporation").readNullable[LocalDate]
+    identifiersMatch           <- (JsPath \ "identifiersMatch").read[Boolean]
+    businessRegistrationStatus <-
+      (JsPath \ "registration" \ "registrationStatus").read[BusinessRegistrationStatus]
+    bpSafeId                   <-
+      (JsPath \ "registration" \ "registeredBusinessPartnerId").readNullable[String]
+    ctutr                      <- (JsPath \ "ctutr").readNullable[String]
+    businessVerificationStatus <-
+      (JsPath \ "businessVerification" \ "verificationStatus")
+        .readNullable[BusinessVerificationStatus]
+
+  } yield GRSResponse(
+    companyNumber = companyNumber,
+    companyName = companyName,
+    ctutr = ctutr,
+    chrn = None,
+    dateOfIncorporation = dateOfIncorporation,
+    countryOfIncorporation = "GB",
+    identifiersMatch = identifiersMatch,
+    businessRegistrationStatus = businessRegistrationStatus,
+    businessVerificationStatus = businessVerificationStatus,
+    bpSafeId = bpSafeId
+  )
 }

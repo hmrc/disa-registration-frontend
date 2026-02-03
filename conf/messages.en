@@ -191,3 +191,17 @@ addLiaisonOfficer.details.content.p2 = They provide their name, telephone number
 ### Task List
 taskList.title = Task List
 taskList.heading = Task List
+
+
+### Business Verification Lockout
+bvLockout.title = The details you’ve entered do not match our records
+bvLockout.heading = The details you’ve entered do not match our records
+bvLockout.p1 = Check your company’s Corporation Tax records and try again after 4 hours.
+bvLockout.p2 = If you’re still having problems, contact the Corporation Tax helpline.
+bvLockout.telephone = Telephone:
+bvLockout.telephone.value = 0300 200 3410
+bvLockout.telephoneNonUk = Outside UK:
+bvLockout.telephoneNonUk.value = +44 161 931 9070
+bvLockout.OpeningTimes = Opening times:
+bvLockout.OpeningTimes.value = Monday to Friday: 8am to 6pm
+bvLockout.p3 = Closed on weekends and bank holidays.

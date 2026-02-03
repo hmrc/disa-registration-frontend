@@ -16,18 +16,18 @@
 
 package models.grs
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, OFormat, OWrites}
 
-case class LabelsLanguage(optServiceName: String)
+case class ServiceLabel(optServiceName: String)
 
-object LabelsLanguage {
-  implicit val format: OFormat[LabelsLanguage] = Json.format[LabelsLanguage]
+object ServiceLabel {
+  implicit val format: OFormat[ServiceLabel] = Json.format[ServiceLabel]
 }
 
 case class Labels(
-                   cy: LabelsLanguage,
-                   en: LabelsLanguage
-                 )
+  cy: Option[ServiceLabel] = None,
+  en: Option[ServiceLabel]
+)
 object Labels {
   implicit val format: OFormat[Labels] = Json.format[Labels]
 }

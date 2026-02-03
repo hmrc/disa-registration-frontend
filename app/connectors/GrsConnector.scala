@@ -29,48 +29,41 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GenericRegistrationServiceConnector @Inject()(http: HttpClientV2, appConfig: FrontendAppConfig)
-                                                   (implicit val ec: ExecutionContext) extends HttpErrorFunctions
-  with Logging {
+class GrsConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(implicit val ec: ExecutionContext)
+    extends HttpErrorFunctions
+    with Logging {
 
   def createJourney(
-                     grsJourneyRequest: GrsCreateJourneyRequest
-                   )(implicit hc: HeaderCarrier): Future[CreateJourneyResponse] = {
+    grsJourneyRequest: GrsCreateJourneyRequest
+  )(implicit hc: HeaderCarrier): Future[CreateJourneyResponse] = {
 
     val url =
-      s"${appConfig.disaRegistrationBaseUrl}incorporated-entity-identification/api/limited-company-journey"
+      s"${appConfig.incorporatedEntityIdentificationHost}/incorporated-entity-identification/api/limited-company-journey"
 
     http
       .post(url"$url")
       .withBody(Json.toJson(grsJourneyRequest))
       .setHeader("Content-Type" -> "application/json")
       .execute[CreateJourneyResponse]
-      .recoverWith {
-        case e: UpstreamErrorResponse =>
-          logger.error(
-            s"Create GRS journey failed - Status: ${e.statusCode}, Body: ${e.message}"
-          )
-          Future.failed(e)
+      .recoverWith { case errResponse: UpstreamErrorResponse =>
+        logger.error(
+          s"Create GRS journey failed - Status: ${errResponse.statusCode}, Body: ${errResponse.message}"
+        )
+        Future.failed(errResponse)
       }
   }
 
-  def fetchJourneyData(journeyId: String)
-                      (implicit hc: HeaderCarrier): Future[GRSResponse] = {
+  def fetchJourneyData(journeyId: String)(implicit hc: HeaderCarrier): Future[GRSResponse] = {
     val url =
-      s"http://localhost:9718/identify-your-incorporated-business/test-only/retrieve-journey?journeyId=$journeyId"
+      s"${appConfig.incorporatedEntityIdentificationHost}/identify-your-incorporated-business/test-only/retrieve-journey?journeyId=$journeyId"
     http
       .get(url"$url")
       .execute[GRSResponse]
-      .recoverWith {
-        case e: UpstreamErrorResponse =>
-          logger.error(
-            s"Fetch GRS journey data failed - Status: ${e.statusCode}, Body: ${e.message}"
-          )
-          Future.failed(e)
+      .recoverWith { case errResponse: UpstreamErrorResponse =>
+        logger.error(
+          s"Fetch GRS journey data failed - Status: ${errResponse.statusCode}, Body: ${errResponse.message}"
+        )
+        Future.failed(errResponse)
       }
   }
-
-
 }
-
-

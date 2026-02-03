@@ -19,15 +19,14 @@ package models.grs
 import play.api.libs.json.{Json, OFormat}
 
 case class GrsCreateJourneyRequest(
-                              continueUrl: String,
-                              businessVerificationCheck: Boolean,
-                              optServiceName: Option[String],
-                              deskProServiceId: String,
-                              signOutUrl: String,
-                              regime: String,
-                              accessibilityUrl: String,
-                              labels: Option[Labels]
-                            )
+  continueUrl: String,
+  businessVerificationCheck: Boolean,
+  deskProServiceId: String,
+  signOutUrl: String,
+  regime: String,
+  accessibilityUrl: String,
+  labels: Option[Labels]
+)
 
 object GrsCreateJourneyRequest {
   implicit val format: OFormat[GrsCreateJourneyRequest] = Json.format[GrsCreateJourneyRequest]

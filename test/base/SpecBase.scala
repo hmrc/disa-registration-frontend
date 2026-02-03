@@ -37,7 +37,7 @@ import play.api.inject.{Injector, bind}
 import play.api.mvc.RequestHeader
 import play.api.mvc.Results.{BadRequest, InternalServerError}
 import play.api.test.FakeRequest
-import services.JourneyAnswersService
+import services.{GrsService, JourneyAnswersService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import utils.TestData
@@ -57,8 +57,9 @@ trait SpecBase
     with TestData
     with MockitoSugar {
 
-  implicit def messages(implicit app: Application): Messages   =
+  implicit def messages(implicit app: Application): Messages =
     app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+
   def messages(key: String)(implicit app: Application): String = messages(app).messages(key)
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
@@ -66,6 +67,7 @@ trait SpecBase
 
   // Mocks
   protected val mockJourneyAnswersService: JourneyAnswersService = mock[JourneyAnswersService]
+  protected val mockGrsService: GrsService                       = mock[GrsService]
   protected val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
   protected val mockAppConfig: FrontendAppConfig                 = mock[FrontendAppConfig]
   protected val mockRequestBuilder: RequestBuilder               = mock[RequestBuilder]
@@ -84,6 +86,7 @@ trait SpecBase
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
         bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
+        bind[GrsService].toInstance(mockGrsService),
         bind[ErrorHandler].toInstance(mockErrorHandler)
       )
 

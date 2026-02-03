@@ -16,22 +16,23 @@
 
 package controllers
 
-import controllers.actions.IdentifierAction
-import play.api.i18n.I18nSupport
+import controllers.actions.*
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.InternalServerErrorView
+import views.html.BusinessVerificationLockOutView
 
 import javax.inject.Inject
 
-class InternalServerErrorController @Inject() (
-  val controllerComponents: MessagesControllerComponents,
+class BusinessVerificationController @Inject()(
+  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
-  view: InternalServerErrorView
+  val controllerComponents: MessagesControllerComponents,
+  view: BusinessVerificationLockOutView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify { implicit request =>
-    InternalServerError(view())
+  def lockout: Action[AnyContent] = (Action andThen identify) { implicit request =>
+    Ok(view())
   }
 }

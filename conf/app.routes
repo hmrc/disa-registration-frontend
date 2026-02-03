@@ -14,7 +14,9 @@ GET         /start                                       controllers.StartContro
 
 GET         /task-list                                   controllers.TaskListController.onPageLoad()
 
-GET         /incorporated-identity-callback              controllers.GRSController.grsCallback(journeyId: String)
+GET         /incorporated-identity-callback              controllers.GrsController.grsCallback(journeyId: String)
+
+GET         /business-verification-lockout               controllers.BusinessVerificationController.lockout()
 
 
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()

@@ -16,40 +16,28 @@
 
 package controllers
 
-import connectors.GenericRegistrationService
 import controllers.actions.*
 import forms.InnovativeFinancialProductsFormProvider
-import handlers.ErrorHandler
-import handlers.JourneyHandler.clearStalePages
-import models.Mode
-import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
-import navigation.Navigator
-import pages.InnovativeFinancialProductsPage
+import models.journeydata.isaproducts.InnovativeFinancialProduct
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.JourneyAnswersService
+import services.GrsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormPreparationHelper.prepareForm
-import views.html.isaproducts.InnovativeFinancialProductsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class StartController @Inject()(
-                                 override val messagesApi: MessagesApi,
-                                 navigator: Navigator,
-                                 identify: IdentifierAction,
-                                 getData: DataRetrievalAction,
-                                 formProvider: InnovativeFinancialProductsFormProvider,
-                                 journeyAnswersService: JourneyAnswersService,
-                                 errorHandler: ErrorHandler,
-                                 val controllerComponents: MessagesControllerComponents,
-                                 genericRegistrationService: GenericRegistrationService,
-                                 view: InnovativeFinancialProductsView
-                               )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class StartController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  formProvider: InnovativeFinancialProductsFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  genericRegistrationService: GrsService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -57,26 +45,21 @@ class StartController @Inject()(
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
-
       request.journeyData
         .flatMap(_.businessVerification)
-        .flatMap(_.verificationPassed) match {
-        case Some(true) =>
-          // verification passed → Fake taskList
+        .flatMap(_.businessVerificationPassed) match {
+        case Some(true)  =>
           Future.successful(Redirect(routes.TaskListController.onPageLoad()))
         case Some(false) =>
-          ???
-        // verification failed → if(lockedOut) kick out page
-        // else start GRS again
-
-        case None =>
-          // no verification info yet → Start GRS
+          // Implement logic to check kick out time from BV failed timestamp?
+          // Not sure if we can add ttl to sub objects in mongo doc? probs not?
+          Future.successful(Redirect(controllers.routes.BusinessVerificationController.lockout()))
+        case _           =>
           genericRegistrationService.getGRSJourneyStartUrl
             .map(url => Redirect(url))
-            .recover {
-              case ex =>
-                logger.error("Failed to fetch GRS journey URL", ex)
-                InternalServerError("Failed to start business verification")
+            .recover { case ex =>
+              logger.error("Failed to fetch GRS journey URL", ex)
+              Redirect(controllers.routes.InternalServerErrorController.onPageLoad())
             }
       }
     }

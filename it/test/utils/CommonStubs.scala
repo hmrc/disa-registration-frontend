@@ -16,8 +16,6 @@
 
 package utils
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor}
-import org.apache.pekko.http.scaladsl.model.HttpHeader
 import play.api.http.Status.{OK, UNAUTHORIZED}
 import utils.WiremockHelper.stubPost
 
