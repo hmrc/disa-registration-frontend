@@ -28,15 +28,13 @@ import utils.WiremockHelper.{stubGet, stubPost}
 
 class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
 
-  val testGroupId = "123456"
-
   val connector: DisaRegistrationConnector = app.injector.instanceOf[DisaRegistrationConnector]
 
   "DisaRegistrationConnector.getJourneyData" should {
 
     val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
     val testIsaProductsAnswers = IsaProducts(Some(IsaProduct.values), None)
-    val testJourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
+    val testJourneyData        = JourneyData(groupId = testGroupId, enrolmentId = testString, isaProducts = Some(testIsaProductsAnswers))
     
     "return Some(journeyData) when backend returns 200 OK" in {
       stubGet(getJourneyDataUrl, OK, Json.toJson(testJourneyData).toString)

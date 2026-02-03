@@ -26,8 +26,6 @@ import views.html.ConfirmationView
 class ConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: ConfirmationView
 ) extends FrontendBaseController

@@ -28,8 +28,6 @@ import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
 class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
 
-  private val testGroupId = "123456"
-
   private val controllerEndpoint = "/obligations/enrolment/isa/isa-products"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   private val updateJourneyUrl = s"/disa-registration/store/$testGroupId/isaProducts"
@@ -41,6 +39,7 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
         s"""
           |{
           | "groupId": "$testGroupId",
+          | "enrolmentId": "$testString",
           | "isaProducts": {
           |   "isaProducts": ["cashJuniorIsas", "cashIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"]
           | }

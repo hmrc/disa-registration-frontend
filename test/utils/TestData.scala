@@ -19,7 +19,7 @@ package utils
 import generators.Generators
 import models.journeydata.JourneyData
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
-import uk.gov.hmrc.auth.core.{Admin, CredentialRole, User}
+import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import scala.util.Random
