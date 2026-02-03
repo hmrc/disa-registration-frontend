@@ -87,4 +87,4 @@ GET        /declaration-for-isa-managers                       controllers.Decla
 POST       /declaration-for-isa-managers                       controllers.DeclarationForIsaManagersController.onSubmit()
 
 ### Confirmation
-GET        /confirmation                       controllers.ConfirmationController.onPageLoad(submissionId: String)
+GET        /confirmation                       controllers.ConfirmationController.onPageLoad(receiptId: String)

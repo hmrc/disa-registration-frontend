@@ -17,6 +17,7 @@
 package services
 
 import connectors.DisaRegistrationConnector
+import models.EnrolmentSubmissionResponse
 import models.SubmissionResult.{Failure, Success}
 import models.journeydata.JourneyData
 import uk.gov.hmrc.auth.core.CredentialRole
@@ -34,10 +35,10 @@ class SubmissionService @Inject() (connector: DisaRegistrationConnector, auditSe
   ): Future[String] =
     connector
       .declareAndSubmit(journeyData.groupId)
-      .map(receiptId =>
+      .map { case EnrolmentSubmissionResponse(receiptId) =>
         auditService.auditEnrolmentSubmission(Success, credentials, credentialRole, journeyData, None)
         receiptId
-      )
+      }
       .recoverWith { case e: Throwable =>
         auditService.auditEnrolmentSubmission(Failure, credentials, credentialRole, journeyData, Some(e.getMessage))
         Future.failed(e)

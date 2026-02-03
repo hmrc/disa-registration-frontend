@@ -17,6 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
+import models.EnrolmentSubmissionResponse
 import models.journeydata.{JourneyData, TaskListSection}
 import play.api.Logging
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
@@ -76,26 +77,10 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
       )
   }
 
-  def declareAndSubmit(groupId: String)(implicit hc: HeaderCarrier): Future[String] = {
+  def declareAndSubmit(groupId: String)(implicit hc: HeaderCarrier): Future[EnrolmentSubmissionResponse] = {
     val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/$groupId/declare-and-submit"
     http
       .post(url"$url")
-      .execute[HttpResponse]
-      .flatMap(response =>
-        response.status match {
-          case OK     => Future.successful(response.body)
-          case status =>
-            logger
-              .error(s"Unexpected status from backend on declaration and submission: [$status] for groupId: [$groupId]")
-            Future.failed(
-              UpstreamErrorResponse(
-                "declareAndSubmit failed",
-                status,
-                status,
-                response.headers
-              )
-            )
-        }
-      )
+      .execute[EnrolmentSubmissionResponse]
   }
 }
