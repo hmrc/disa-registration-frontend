@@ -45,7 +45,8 @@ class TradingNameControllerSpec extends SpecBase {
   lazy val tradingNameRoute = TradingNameController.onPageLoad(NormalMode).url
 
   val validAnswer      = testString
-  val validJourneyData = JourneyData(testGroupId, organisationDetails = Some(OrganisationDetails(tradingName = None)))
+  val validJourneyData =
+    JourneyData(testGroupId, testString, organisationDetails = Some(OrganisationDetails(tradingName = None)))
 
   "TradingName Controller" - {
 

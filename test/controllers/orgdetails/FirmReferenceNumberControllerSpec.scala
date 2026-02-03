@@ -45,6 +45,7 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
   val journeyData: JourneyData =
     JourneyData(
       groupId = testGroupId,
+      enrolmentId = testString,
       organisationDetails = Some(OrganisationDetails(fcaNumber = Some(fcaNumber)))
     )
 

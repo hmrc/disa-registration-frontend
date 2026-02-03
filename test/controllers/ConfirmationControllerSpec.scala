@@ -30,14 +30,14 @@ class ConfirmationControllerSpec extends SpecBase {
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad(testString).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ConfirmationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(testString)(request, messages(application)).toString
       }
     }
   }

@@ -45,6 +45,7 @@ class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar
   val journeyData: JourneyData =
     JourneyData(
       groupId = testGroupId,
+      enrolmentId = testString,
       organisationDetails = Some(OrganisationDetails(tradingUsingDifferentName = Some(true)))
     )
 

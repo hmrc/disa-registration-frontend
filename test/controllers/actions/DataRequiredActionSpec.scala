@@ -42,7 +42,9 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar {
         when(mockJourneyAnswersService.get(ArgumentMatchers.eq(testGroupId))(any)) thenReturn Future(None)
         val action = new Harness
 
-        val result = action.callTransform(OptionalDataRequest(FakeRequest(), testGroupId, None)).futureValue
+        val result = action
+          .callTransform(OptionalDataRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser, None))
+          .futureValue
 
         result.isLeft mustBe true
       }
@@ -51,12 +53,22 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar {
     "when there is data in the cache" - {
 
       "must build a userAnswers object and add it to the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(Some(JourneyData("id")))
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future(
+          Some(JourneyData(testGroupId, testString))
+        )
         val action = new Harness
 
         val Right(result) =
           action
-            .callTransform(OptionalDataRequest(FakeRequest(), testGroupId, Some(testJourneyData)))
+            .callTransform(
+              OptionalDataRequest(
+                FakeRequest(),
+                testGroupId,
+                testCredentials,
+                testCredentialRoleUser,
+                Some(testJourneyData)
+              )
+            )
             .futureValue: @unchecked
 
         result.groupId mustBe testGroupId

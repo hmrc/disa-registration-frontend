@@ -172,7 +172,9 @@ class AuthActionSpec extends SpecBase {
           val authAction = new AuthenticatedIdentifierAction(
             successfulAuthConnector(
               affinityGroup = Some(AffinityGroup.Agent),
-              groupId = Some("group-id-123")
+              groupId = Some(testGroupId),
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser)
             ),
             appConfig,
             bodyParsers

@@ -69,6 +69,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
       val journeyData = JourneyData(
         groupId = testGroupId,
+        enrolmentId = testString,
         organisationDetails = Some(OrganisationDetails(registeredToManageIsa = Some(true)))
       )
 

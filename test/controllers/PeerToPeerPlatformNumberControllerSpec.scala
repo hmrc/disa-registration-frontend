@@ -48,7 +48,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
 
   val validAnswer                   = "123456"
   val validJourneyData: JourneyData =
-    JourneyData(testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
+    JourneyData(testGroupId, testString, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
 
   "PeerToPeerPlatformNumber Controller" - {
 

@@ -85,7 +85,11 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          isaProducts = Some(IsaProducts(p2pPlatform = Some(testString)))
+        )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 

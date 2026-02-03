@@ -66,7 +66,11 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, organisationDetails = Some(OrganisationDetails(zRefNumber = Some("zRef"))))
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          organisationDetails = Some(OrganisationDetails(zRefNumber = Some("zRef")))
+        )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
