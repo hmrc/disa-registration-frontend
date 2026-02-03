@@ -84,3 +84,8 @@ GET        /isa-products-check-your-answers              controllers.isaproducts
 ### LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
 GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()
+
+
+
+## Declaration
+GET        /declaration-for-isa-managers                       controllers.DeclarationForIsaManagersController.onPageLoad()

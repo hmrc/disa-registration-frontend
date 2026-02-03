@@ -1,0 +1,54 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton
+)
+
+@(showJuniorContent: Boolean)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("declarationForIsaManagers.title"), Some(messages("sectionTitle.submit")))) {
+
+    <span class="govuk-caption-l">
+        <span class="govuk-visually-hidden">
+            @messages("section.caption.hidden")
+        </span>
+        @messages("sectionTitle.submit")
+    </span>
+    <h1 class="govuk-heading-l">@messages("declarationForIsaManagers.heading")</h1>
+
+    <p class="govuk-body">@messages("declarationForIsaManagers.p1")</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      @if(showJuniorContent) {
+        <li>@messages("declarationForIsaManagers.junior.li1")</li>
+        <li>@messages("declarationForIsaManagers.junior.li2")</li>
+      }
+      <li>@messages("declarationForIsaManagers.li1")</li>
+      <li>@messages("declarationForIsaManagers.li2")</li>
+      <li>@messages("declarationForIsaManagers.li3")</li>
+      <li>@messages("declarationForIsaManagers.li4")</li>
+      <li>@messages("declarationForIsaManagers.li5")</li>
+      <li>@messages("declarationForIsaManagers.li6")</li>
+    </ul>
+
+    <p class="govuk-body">@messages("declarationForIsaManagers.p2")</p>
+
+    @govukButton(
+      ButtonViewModel(messages("declarationForIsaManagers.action")).preventingDoubleClick()
+    )
+}
