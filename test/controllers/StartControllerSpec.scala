@@ -55,7 +55,7 @@ class StartControllerSpec extends SpecBase {
         running(application) {
           val result = route(application, fakeRequest).value
 
-          status(result) shouldBe SEE_OTHER
+          status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe
             controllers.routes.TaskListController.onPageLoad().url
         }
@@ -79,7 +79,7 @@ class StartControllerSpec extends SpecBase {
         running(application) {
           val result = route(application, fakeRequest).value
 
-          status(result) shouldBe SEE_OTHER
+          status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe
             controllers.routes.BusinessVerificationController.lockout().url
         }
@@ -95,7 +95,7 @@ class StartControllerSpec extends SpecBase {
         running(application) {
           val result = route(application, fakeRequest).value
 
-          status(result) shouldBe SEE_OTHER
+          status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe "http://grs-start-url"
         }
       }
@@ -121,7 +121,7 @@ class StartControllerSpec extends SpecBase {
         running(application) {
           val result = route(application, fakeRequest).value
 
-          status(result) shouldBe SEE_OTHER
+          status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe "http://grs-start-url"
         }
       }
@@ -136,7 +136,7 @@ class StartControllerSpec extends SpecBase {
         running(application) {
           val result = route(application, fakeRequest).value
 
-          status(result) shouldBe SEE_OTHER
+          status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe
             controllers.routes.InternalServerErrorController.onPageLoad().url
         }
@@ -144,4 +144,3 @@ class StartControllerSpec extends SpecBase {
     }
   }
 }
-

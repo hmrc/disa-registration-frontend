@@ -26,16 +26,14 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import java.net.URLEncoder
 
 @Singleton
-class FrontendAppConfig @Inject() (
-  configuration: Configuration,
-  servicesConfig: ServicesConfig) {
+class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
   private def loadConfig(key: String) = servicesConfig.getString(key)
 
   lazy val host: String    = loadConfig("host")
   lazy val appName: String = loadConfig("appName")
 
-  private lazy val contactHost          = loadConfig("contact-frontend.host")
+  private lazy val contactHost                  = loadConfig("contact-frontend.host")
   private lazy val contactFormServiceIdentifier = "disa-registration-frontend"
 
   def feedbackUrl(implicit request: RequestHeader): String =

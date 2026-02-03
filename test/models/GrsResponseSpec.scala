@@ -24,11 +24,10 @@ import play.api.libs.json.*
 
 import java.time.LocalDate
 
-
 class GrsResponseSpec extends SpecBase {
 
-    private val testGRSJsonResponse: JsValue = Json.parse(
-      """
+  private val testGRSJsonResponse: JsValue = Json.parse(
+    """
         |{
         |  "companyProfile": {
         |    "companyName": "Test Company Ltd",
@@ -46,32 +45,32 @@ class GrsResponseSpec extends SpecBase {
         |  }
         |}
         |""".stripMargin
-    )
+  )
 
-    "GRSResponse Reads" - {
+  "GRSResponse Reads" - {
 
-      "successfully read a full GRS response" in {
-        val result = testGRSJsonResponse.validate[GRSResponse]
+    "successfully read a full GRS response" in {
+      val result = testGRSJsonResponse.validate[GRSResponse]
 
-        result.isSuccess shouldBe true
+      result.isSuccess shouldBe true
 
-        val grsResponse = result.get
+      val grsResponse = result.get
 
-        grsResponse.companyNumber shouldBe "01234567"
-        grsResponse.companyName shouldBe Some("Test Company Ltd")
-        grsResponse.ctutr shouldBe Some("1234567890")
-        grsResponse.chrn shouldBe None
-        grsResponse.dateOfIncorporation shouldBe Some(LocalDate.of(2020, 1, 1))
-        grsResponse.countryOfIncorporation shouldBe "GB"
-        grsResponse.identifiersMatch shouldBe true
-        grsResponse.businessRegistrationStatus shouldBe RegisteredStatus
-        grsResponse.businessVerificationStatus shouldBe Some(BvPass)
-        grsResponse.bpSafeId shouldBe Some("X00000123456789")
-      }
+      grsResponse.companyNumber              shouldBe "01234567"
+      grsResponse.companyName                shouldBe Some("Test Company Ltd")
+      grsResponse.ctutr                      shouldBe Some("1234567890")
+      grsResponse.chrn                       shouldBe None
+      grsResponse.dateOfIncorporation        shouldBe Some(LocalDate.of(2020, 1, 1))
+      grsResponse.countryOfIncorporation     shouldBe "GB"
+      grsResponse.identifiersMatch           shouldBe true
+      grsResponse.businessRegistrationStatus shouldBe RegisteredStatus
+      grsResponse.businessVerificationStatus shouldBe Some(BvPass)
+      grsResponse.bpSafeId                   shouldBe Some("X00000123456789")
+    }
 
-      "successfully read when optional fields are missing" in {
-        val minimalJson = Json.parse(
-          """
+    "successfully read when optional fields are missing" in {
+      val minimalJson = Json.parse(
+        """
             |{
             |  "companyProfile": {
             |    "companyNumber": "01234567"
@@ -82,65 +81,65 @@ class GrsResponseSpec extends SpecBase {
             |  }
             |}
             |""".stripMargin
-        )
+      )
 
-        val result = minimalJson.validate[GRSResponse]
+      val result = minimalJson.validate[GRSResponse]
 
-        result.isSuccess shouldBe true
+      result.isSuccess shouldBe true
 
-        val grsResponse = result.get
+      val grsResponse = result.get
 
-        grsResponse.companyNumber shouldBe "01234567"
-        grsResponse.companyName shouldBe None
-        grsResponse.ctutr shouldBe None
-        grsResponse.dateOfIncorporation shouldBe None
-        grsResponse.identifiersMatch shouldBe false
-        grsResponse.businessVerificationStatus shouldBe None
-        grsResponse.bpSafeId shouldBe None
-      }
+      grsResponse.companyNumber              shouldBe "01234567"
+      grsResponse.companyName                shouldBe None
+      grsResponse.ctutr                      shouldBe None
+      grsResponse.dateOfIncorporation        shouldBe None
+      grsResponse.identifiersMatch           shouldBe false
+      grsResponse.businessVerificationStatus shouldBe None
+      grsResponse.bpSafeId                   shouldBe None
+    }
 
-      "fail when mandatory fields are missing" in {
-        val invalidJson = Json.parse(
-          """
+    "fail when mandatory fields are missing" in {
+      val invalidJson = Json.parse(
+        """
             |{
             |  "companyProfile": {
             |    "companyName": "Test Company Ltd"
             |  }
             |}
             |""".stripMargin
-        )
+      )
 
-        val result = invalidJson.validate[GRSResponse]
+      val result = invalidJson.validate[GRSResponse]
 
-        result.isError shouldBe true
-      }
+      result.isError shouldBe true
     }
+  }
 
-    "GRSResponse Writes" - {
+  "GRSResponse Writes" - {
 
-      "write a GRSResponse to JSON" in {
-        val grsResponse = GRSResponse(
-          companyNumber = "01234567",
-          companyName = Some("Test Company Ltd"),
-          ctutr = Some("1234567890"),
-          chrn = None,
-          dateOfIncorporation = Some(LocalDate.of(2020, 1, 1)),
-          countryOfIncorporation = "GB",
-          identifiersMatch = true,
-          businessRegistrationStatus = RegisteredStatus,
-          businessVerificationStatus = Some(BvPass),
-          bpSafeId = Some("X00000123456789")
-        )
+    "write a GRSResponse to JSON" in {
+      val grsResponse = GRSResponse(
+        companyNumber = "01234567",
+        companyName = Some("Test Company Ltd"),
+        ctutr = Some("1234567890"),
+        chrn = None,
+        dateOfIncorporation = Some(LocalDate.of(2020, 1, 1)),
+        countryOfIncorporation = "GB",
+        identifiersMatch = true,
+        businessRegistrationStatus = RegisteredStatus,
+        businessVerificationStatus = Some(BvPass),
+        bpSafeId = Some("X00000123456789")
+      )
 
-        val json = Json.toJson(grsResponse)
+      val json = Json.toJson(grsResponse)
 
-        (json \ "companyNumber").as[String] shouldBe "01234567"
-        (json \ "companyName").as[String] shouldBe "Test Company Ltd"
-        (json \ "ctutr").as[String] shouldBe "1234567890"
-        (json \ "identifiersMatch").as[Boolean] shouldBe true
-        (json \ "businessRegistrationStatus").as[String] shouldBe "REGISTERED"
-        (json \ "businessVerificationStatus").as[String] shouldBe "PASS"
-        (json \ "bpSafeId").as[String] shouldBe "X00000123456789"
-      }
+      (json \ "companyNumber").as[String]              shouldBe "01234567"
+      (json \ "companyName").as[String]                shouldBe "Test Company Ltd"
+      (json \ "ctutr").as[String]                      shouldBe "1234567890"
+      (json \ "identifiersMatch").as[Boolean]          shouldBe true
+      (json \ "businessRegistrationStatus").as[String] shouldBe "REGISTERED"
+      (json \ "businessVerificationStatus").as[String] shouldBe "PASS"
+      (json \ "bpSafeId").as[String]                   shouldBe "X00000123456789"
     }
+  }
 }

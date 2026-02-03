@@ -34,9 +34,9 @@ import scala.concurrent.Future
 
 class GrsServiceSpec extends SpecBase {
 
-  val mockConnector: GrsConnector = mock[GrsConnector]
+  val mockConnector: GrsConnector  = mock[GrsConnector]
   val mockMessagesApi: MessagesApi = app.injector.instanceOf[MessagesApi]
-  val service = new GrsService(mockConnector, app.injector.instanceOf[FrontendAppConfig], mockMessagesApi)
+  val service                      = new GrsService(mockConnector, app.injector.instanceOf[FrontendAppConfig], mockMessagesApi)
 
   implicit val request: Request[AnyContent] = FakeRequest()
 
@@ -57,7 +57,7 @@ class GrsServiceSpec extends SpecBase {
       }
 
       "must propagate exception from connector" in {
-        val ex = new Exception("GRS failed")
+        val ex              = new Exception("GRS failed")
         val expectedRequest = ArgumentMatchers.any[GrsCreateJourneyRequest]
 
         when(mockConnector.createJourney(expectedRequest)(any[HeaderCarrier]))
@@ -71,7 +71,7 @@ class GrsServiceSpec extends SpecBase {
 
     "fetchGRSJourneyData" - {
 
-      val testJourneyId = "testJourneyId"
+      val testJourneyId   = "testJourneyId"
       val testGRSResponse = GRSResponse(
         companyNumber = "01234567",
         companyName = Some("Test Company Ltd"),

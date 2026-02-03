@@ -29,14 +29,14 @@ import views.html.TaskListView
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class TaskListController @Inject()(
-                                    override val messagesApi: MessagesApi,
-                                    identify: IdentifierAction,
-                                    getData: DataRetrievalAction,
-                                    formProvider: InnovativeFinancialProductsFormProvider,
-                                    val controllerComponents: MessagesControllerComponents,
-                                    view: TaskListView)
-  extends FrontendBaseController
+class TaskListController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  formProvider: InnovativeFinancialProductsFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: TaskListView
+) extends FrontendBaseController
     with I18nSupport
     with Logging {
 

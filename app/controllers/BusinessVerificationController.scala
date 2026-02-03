@@ -24,7 +24,7 @@ import views.html.BusinessVerificationLockOutView
 
 import javax.inject.Inject
 
-class BusinessVerificationController @Inject()(
+class BusinessVerificationController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   val controllerComponents: MessagesControllerComponents,
