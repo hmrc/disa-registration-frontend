@@ -73,7 +73,7 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
   private def logResponse(result: AuditResult, auditType: String): Unit = result match {
     case Success         => logger.info(s"$auditType audit successful")
     case Failure(err, _) => logger.warn(s"$auditType Audit Error, message: $err")
-    case Disabled        => logger.warn(s"Auditing Disabled")
+    case Disabled        => logger.warn(s"$auditType failure - auditing disabled")
   }
 }
 

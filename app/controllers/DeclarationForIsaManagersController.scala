@@ -66,7 +66,9 @@ class DeclarationForIsaManagersController @Inject() (
         Redirect(ConfirmationController.onPageLoad(submissionReceiptId))
       }
       .recoverWith { case e: Throwable =>
-        logger.error(s"Unexpected response from the backend submitting declarartion for groupId [${request.groupId}")
+        logger.error(
+          s"Unexpected response from the backend submitting declaration for groupId [${request.groupId}] with error: [${e.getMessage}]"
+        )
         errorHandler.internalServerError(request)
       }
   }

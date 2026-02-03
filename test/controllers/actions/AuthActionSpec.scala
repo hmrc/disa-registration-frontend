@@ -23,6 +23,8 @@ import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.*
+import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 class AuthActionSpec extends SpecBase {
 
@@ -237,6 +239,56 @@ class AuthActionSpec extends SpecBase {
 
           val authAction = new AuthenticatedIdentifierAction(
             failingAuthConnector(new UnsupportedCredentialRole),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+        }
+      }
+    }
+
+    "the user doesn't have a credential role" - {
+
+      "must redirect the user to the unauthorised page" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            successfulAuthConnector(Some(testGroupId), Some(Organisation), Some(Credentials("", "")), None),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+        }
+      }
+    }
+
+    "the user doesn't have credentials" - {
+
+      "must redirect the user to the unauthorised page" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            successfulAuthConnector(Some(testGroupId), Some(Organisation), None, Some(User)),
             appConfig,
             bodyParsers
           )

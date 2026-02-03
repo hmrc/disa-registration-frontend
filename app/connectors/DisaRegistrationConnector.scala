@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import models.EnrolmentSubmissionResponse
 import models.journeydata.{JourneyData, TaskListSection}
 import play.api.Logging
-import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK}
+import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*

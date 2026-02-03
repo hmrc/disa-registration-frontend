@@ -33,7 +33,7 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
 
       "must render the unsupported affinity group view with the correct affinity group - Agent" in {
 
-        val application = applicationBuilder().build()
+        val application = applicationBuilder(None).build()
 
         running(application) {
 
@@ -66,7 +66,7 @@ class UnsupportedAffinityGroupControllerSpec extends SpecBase {
 
       "must render the unsupported affinity group view with the correct affinity group - Individual" in {
 
-        val application = applicationBuilder().build()
+        val application = applicationBuilder(None).build()
 
         running(application) {
 

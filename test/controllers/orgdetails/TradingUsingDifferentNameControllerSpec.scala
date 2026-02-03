@@ -22,7 +22,7 @@ import models.NormalMode
 import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -31,6 +31,7 @@ import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.JourneyAnswersService
 import views.html.orgdetails.TradingUsingDifferentNameView
 
 import scala.concurrent.Future
@@ -97,7 +98,8 @@ class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar
       val application =
         applicationBuilder(journeyData = Some(journeyData))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
           )
           .build()
 

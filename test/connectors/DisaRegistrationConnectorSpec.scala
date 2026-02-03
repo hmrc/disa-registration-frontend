@@ -17,12 +17,14 @@
 package connectors
 
 import base.SpecBase
+import config.FrontendAppConfig
 import models.EnrolmentSubmissionResponse
 import models.journeydata.JourneyData
-import models.journeydata.isaproducts.IsaProducts
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.matchers.should.Matchers.{should, shouldBe}
+import org.scalatest.matchers.should.Matchers.shouldBe
+import play.api.inject
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 import scala.concurrent.Future
@@ -30,8 +32,11 @@ import scala.concurrent.Future
 class DisaRegistrationConnectorSpec extends SpecBase {
 
   trait TestSetup {
-    val connector: DisaRegistrationConnector = new DisaRegistrationConnector(mockHttpClient, mockAppConfig)
-    val testGroupId: String                  = "123456"
+    val connector: DisaRegistrationConnector = applicationBuilder(
+      None,
+      inject.bind[HttpClientV2].toInstance(mockHttpClient),
+      inject.bind[FrontendAppConfig].toInstance(mockAppConfig)
+    ).build().injector.instanceOf[DisaRegistrationConnector]
     val testUrl: String                      = "http://localhost:1201"
 
     when(mockAppConfig.disaRegistrationBaseUrl).thenReturn(testUrl)

@@ -24,13 +24,14 @@ import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.{verify, when}
 import play.api.inject.bind
 import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.JourneyAnswersService
 import views.html.TradingNameView
 
 import scala.concurrent.Future
@@ -106,7 +107,8 @@ class TradingNameControllerSpec extends SpecBase {
         val application =
           applicationBuilder(journeyData = Some(validJourneyData))
             .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
             )
             .build()
 
@@ -151,7 +153,8 @@ class TradingNameControllerSpec extends SpecBase {
         val application =
           applicationBuilder(journeyData = Some(validJourneyData))
             .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+              bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
             )
             .build()
 
