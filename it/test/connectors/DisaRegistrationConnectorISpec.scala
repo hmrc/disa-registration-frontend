@@ -16,6 +16,7 @@
 
 package connectors
 
+import models.EnrolmentSubmissionResponse
 import models.journeydata.JourneyData
 import models.journeydata.isaproducts.IsaProduct.CashJuniorIsas
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
@@ -102,6 +103,36 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
       intercept[UpstreamErrorResponse] {
         await(connector.updateTaskListJourney(testSectionAnswers, testGroupId, testSectionAnswers.sectionName))
       }
+    }
+  }
+
+  "DisaRegistrationConnector.declareAndSubmit" should {
+
+    val declareAndSubmitUrl = s"/disa-registration/$testGroupId/declare-and-submit"
+
+    "return EnrolmentSubmissionResponse when backend returns 200 OK" in {
+      val responseBody = Json.toJson(EnrolmentSubmissionResponse(testString)).toString
+      stubPost(declareAndSubmitUrl, OK, responseBody)
+
+      val response = await(connector.declareAndSubmit(testGroupId))
+
+      response shouldBe EnrolmentSubmissionResponse(testString)
+    }
+
+    "propagate exception when backend returns an error status (401)" in {
+      stubPost(declareAndSubmitUrl, UNAUTHORIZED, """{"code":"UNAUTHORIZED", "message":"Unauthorised"}""")
+
+      val err = await(connector.declareAndSubmit(testGroupId).failed)
+
+      err shouldBe an[UpstreamErrorResponse]
+    }
+
+    "propagate exception when the call fails with bad json" in {
+      stubPost(declareAndSubmitUrl, OK, """{"json":"bad"}""")
+
+      val err = await(connector.declareAndSubmit(testGroupId).failed)
+
+      err shouldBe an[JsValidationException]
     }
   }
 }

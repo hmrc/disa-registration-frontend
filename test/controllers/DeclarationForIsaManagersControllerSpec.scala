@@ -26,7 +26,7 @@ import play.api.inject.bind
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.{JourneyAnswersService, SubmissionService}
+import services.SubmissionService
 import views.html.DeclarationForIsaManagersView
 
 import scala.concurrent.Future
