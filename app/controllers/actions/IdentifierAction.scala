@@ -53,6 +53,9 @@ class AuthenticatedIdentifierAction @Inject() (
     authorised().retrieve(groupIdentifier and affinityGroup and credentials and credentialRole) {
       case Some(groupId) ~ Some(Organisation) ~ Some(credentials) ~ Some(role) =>
         block(IdentifierRequest(request, groupId, credentials, role))
+      case _ ~ _ ~ None ~ _ | _ ~ _ ~ _ ~ None                                 =>
+        logger.warn(s"Authorisation failed due to missing credentials or credentialRole")
+        Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
       case Some(_) ~ Some(affinity) ~ _ ~ _                                    =>
         Future.successful(
           Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString))
