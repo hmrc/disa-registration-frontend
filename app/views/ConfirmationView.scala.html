@@ -1,5 +1,5 @@
-/*
- * Copyright 2025 HM Revenue & Customs
+@*
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,17 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models.requests
+@this(
+        layout: templates.Layout,
+)
 
-import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.auth.core.CredentialRole
-import uk.gov.hmrc.auth.core.retrieve.Credentials
+@(submissionReceiptId: String)(implicit request: Request[_], messages: Messages)
 
-case class IdentifierRequest[A](
-  request: Request[A],
-  groupId: String,
-  credentials: Credentials,
-  credentialRole: CredentialRole
-) extends WrappedRequest[A](request)
+@layout(pageTitle = titleNoForm(messages("confirmation.title"))) {
+
+  <h1 class="govuk-heading-xl">@messages("confirmation.heading")</h1>
+  <p class="govuk-body">submissionReceiptId is @submissionReceiptId</p>
+}

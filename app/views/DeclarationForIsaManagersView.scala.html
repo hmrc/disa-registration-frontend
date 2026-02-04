@@ -14,9 +14,12 @@
  * limitations under the License.
  *@
 
+@import controllers.routes.DeclarationForIsaManagersController
+
 @this(
         layout: templates.Layout,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        formHelper: FormWithCSRF
 )
 
 @(showJuniorContent: Boolean)(implicit request: Request[_], messages: Messages)
@@ -48,7 +51,9 @@
 
     <p class="govuk-body">@messages("declarationForIsaManagers.p2")</p>
 
+  @formHelper(action = DeclarationForIsaManagersController.onSubmit(), Symbol("autoComplete") -> "off") {
     @govukButton(
       ButtonViewModel(messages("declarationForIsaManagers.action")).preventingDoubleClick()
     )
+  }
 }

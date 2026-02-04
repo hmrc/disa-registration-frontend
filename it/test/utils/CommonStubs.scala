@@ -16,19 +16,19 @@
 
 package utils
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor}
-import org.apache.pekko.http.scaladsl.model.HttpHeader
 import play.api.http.Status.{OK, UNAUTHORIZED}
 import utils.WiremockHelper.stubPost
 
-trait CommonStubs {
+trait CommonStubs extends TestData {
 
   def stubAuth(): Unit = {
     val body =
       s"""{
-          "groupIdentifier": "123456",
-          "affinityGroup": "Organisation"
-          }"""
+         | "groupIdentifier": "$testGroupId",
+         | "affinityGroup": "Organisation",
+         | "optionalCredentials": {"providerId": "id", "providerType": "GovernmentGateway"},
+          |"credentialRole": "user"
+         | }""".stripMargin
 
     stubPost("/auth/authorise", status = OK, responseBody = body)
   }

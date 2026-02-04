@@ -34,7 +34,8 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.isaproducts.IsaProductsView
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
+import services.JourneyAnswersService
 
 import scala.concurrent.Future
 
@@ -85,7 +86,11 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(Some(IsaProduct.values), None)))
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          isaProducts = Some(IsaProducts(Some(IsaProduct.values), None))
+        )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
@@ -115,7 +120,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
           )
           .build()
 
@@ -142,7 +148,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(journeyData = None)
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
           )
           .build()
 

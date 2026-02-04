@@ -19,13 +19,18 @@ package utils
 import generators.Generators
 import models.journeydata.JourneyData
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import uk.gov.hmrc.auth.core.User
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import scala.util.Random
 
 trait TestData extends Generators {
-  val testGroupId: String = "id"
+  val testString             = "test"
+  val testGroupId: String    = "id"
+  val testCredentials        = Credentials(testString, testString)
+  val testCredentialRoleUser = User
 
-  def emptyJourneyData: JourneyData = JourneyData(testGroupId)
+  def emptyJourneyData: JourneyData = JourneyData(testGroupId, testString)
 
   val testIsaProductsAnswers: IsaProducts =
     IsaProducts(
@@ -34,7 +39,7 @@ trait TestData extends Generators {
       p2pPlatformNumber = Some("1234567"),
       innovativeFinancialProducts = Some(InnovativeFinancialProduct.values)
     )
-  val testJourneyData: JourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
-  val testString                          = "test"
+  val testJourneyData: JourneyData        =
+    JourneyData(groupId = testGroupId, enrolmentId = testString, isaProducts = Some(testIsaProductsAnswers))
   val testZRef                            = s"Z${(1 to 4).map(_ => Random.nextInt(10)).mkString}"
 }

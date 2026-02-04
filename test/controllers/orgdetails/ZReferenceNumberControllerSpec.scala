@@ -23,7 +23,7 @@ import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -32,6 +32,7 @@ import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.JourneyAnswersService
 import views.html.orgdetails.ZReferenceNumberView
 
 import scala.concurrent.Future
@@ -66,7 +67,11 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, organisationDetails = Some(OrganisationDetails(zRefNumber = Some("zRef"))))
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          organisationDetails = Some(OrganisationDetails(zRefNumber = Some("zRef")))
+        )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
@@ -93,7 +98,8 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
           )
           .build()
 
@@ -120,7 +126,8 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(journeyData = None)
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
           )
           .build()
 

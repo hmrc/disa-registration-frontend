@@ -25,7 +25,7 @@ import models.journeydata.isaproducts.IsaProducts
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -34,6 +34,7 @@ import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.JourneyAnswersService
 import views.html.isaproducts.PeerToPeerPlatformView
 
 import scala.concurrent.Future
@@ -85,7 +86,11 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          isaProducts = Some(IsaProducts(p2pPlatform = Some(testString)))
+        )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
@@ -115,7 +120,8 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
           )
           .build()
 
@@ -142,7 +148,8 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
       val application =
         applicationBuilder(journeyData = None)
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
           )
           .build()
 
