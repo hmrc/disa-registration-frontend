@@ -17,9 +17,9 @@
 package services
 
 import connectors.DisaRegistrationConnector
-import models.EnrolmentSubmissionResponse
-import models.SubmissionResult.{Failure, Success}
+import models.submission.SubmissionResult.{Failure, Success}
 import models.journeydata.JourneyData
+import models.submission.EnrolmentSubmissionResponse
 import uk.gov.hmrc.auth.core.CredentialRole
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.http.HeaderCarrier

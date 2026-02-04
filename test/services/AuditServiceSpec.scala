@@ -18,7 +18,7 @@ package services
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.SubmissionResult
+import models.submission.SubmissionResult
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -90,7 +90,7 @@ class AuditServiceSpec extends SpecBase {
       (detail \ EventData.groupId.toString).as[String] mustEqual jd.groupId
       (detail \ EventData.submissionStatus.toString).as[String] mustEqual SubmissionResult.Success.toString
 
-      (detail \ EventData.journeyData.toString).toOption.isDefined mustEqual true
+      (detail \ EventData.payload.toString).toOption.isDefined mustEqual true
 
       (detail \ EventData.failureReason.toString).toOption mustEqual None
     }

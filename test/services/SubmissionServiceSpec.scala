@@ -18,8 +18,8 @@ package services
 
 import base.SpecBase
 import connectors.DisaRegistrationConnector
-import models.EnrolmentSubmissionResponse
-import models.SubmissionResult.{Failure, Success}
+import models.submission.EnrolmentSubmissionResponse
+import models.submission.SubmissionResult.{Failure, Success}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.inject

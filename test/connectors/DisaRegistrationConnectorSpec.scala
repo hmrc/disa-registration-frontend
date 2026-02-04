@@ -18,8 +18,8 @@ package connectors
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.EnrolmentSubmissionResponse
 import models.journeydata.JourneyData
+import models.submission.EnrolmentSubmissionResponse
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.shouldBe

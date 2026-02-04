@@ -18,8 +18,8 @@ package services
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import models.SubmissionResult
 import models.journeydata.JourneyData
+import models.submission.SubmissionResult
 import play.api.Logging
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
 import services.AuditTypes.{Audit, EnrolmentSubmitted}
@@ -49,7 +49,7 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
       EventData.credentialRole.toString   -> credentialRole.toString,
       EventData.groupId.toString          -> journeyData.groupId,
       EventData.submissionStatus.toString -> status.toString,
-      EventData.journeyData.toString      -> journeyData
+      EventData.payload.toString          -> journeyData
     )
 
     val auditData: JsObject =
@@ -84,5 +84,5 @@ object AuditTypes extends Enumeration {
 
 object EventData extends Enumeration {
   type Data = Value
-  val providerType, internalRegId, credId, credentialRole, groupId, submissionStatus, failureReason, journeyData = Value
+  val providerType, internalRegId, credId, credentialRole, groupId, submissionStatus, failureReason, payload = Value
 }

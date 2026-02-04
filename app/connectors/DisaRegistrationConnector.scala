@@ -17,8 +17,8 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.EnrolmentSubmissionResponse
 import models.journeydata.{JourneyData, TaskListSection}
+import models.submission.EnrolmentSubmissionResponse
 import play.api.Logging
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.libs.json.{Json, Writes}

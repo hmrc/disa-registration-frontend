@@ -16,10 +16,10 @@
 
 package connectors
 
-import models.EnrolmentSubmissionResponse
 import models.journeydata.JourneyData
 import models.journeydata.isaproducts.IsaProduct.CashJuniorIsas
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
+import models.submission.EnrolmentSubmissionResponse
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK, UNAUTHORIZED}
 import play.api.libs.json.Json
 import play.api.test.Helpers.await

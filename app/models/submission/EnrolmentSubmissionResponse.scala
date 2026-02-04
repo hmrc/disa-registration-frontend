@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package models
+package models.submission
 
-enum SubmissionResult {
-  case Success, Failure
+import play.api.libs.json.{Json, OFormat}
+
+case class EnrolmentSubmissionResponse(receiptId: String)
+
+object EnrolmentSubmissionResponse {
+  implicit val format: OFormat[EnrolmentSubmissionResponse] = Json.format[EnrolmentSubmissionResponse]
 }
