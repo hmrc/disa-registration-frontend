@@ -27,7 +27,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.TaskListView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class TaskListController @Inject() (
   override val messagesApi: MessagesApi,

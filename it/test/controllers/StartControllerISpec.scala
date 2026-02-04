@@ -25,7 +25,6 @@ import utils.{BaseIntegrationSpec, CommonStubs}
 
 class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
 
-  private val testGroupId = "123456"
   private val controllerEndpoint = "/obligations/enrolment/isa/start"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   private val grsStartUrl = "/incorporated-entity-identification/api/limited-company-journey"

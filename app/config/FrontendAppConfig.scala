@@ -20,7 +20,6 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.hmrcfrontend.config.AccessibilityStatementConfig
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.net.URLEncoder
@@ -68,6 +67,19 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   lazy val incorporatedEntityIdentificationHost: String =
     servicesConfig.baseUrl("incorporated-entity-identification-frontend")
+
+  lazy val useGrsStub: Boolean =
+    configuration.get[Boolean]("features.use-grs-stub")
+
+  def grsRetrieveResultUrl(journeyId: String): String = {
+    val urlPath =
+      if (useGrsStub)
+        s"/identify-your-incorporated-business/test-only/retrieve-journey?journeyId=$journeyId"
+      else
+        s"/incorporated-entity-identification/api/journey/$journeyId"
+
+    s"$incorporatedEntityIdentificationHost$urlPath"
+  }
 
   lazy val grsCallback: String = s"$host/obligations/enrolment/isa/incorporated-identity-callback"
 

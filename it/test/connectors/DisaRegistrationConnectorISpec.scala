@@ -27,9 +27,7 @@ import utils.BaseIntegrationSpec
 import utils.WiremockHelper.{stubGet, stubPost}
 
 class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
-
-  val testGroupId = "123456"
-
+  
   val connector: DisaRegistrationConnector = app.injector.instanceOf[DisaRegistrationConnector]
 
   "DisaRegistrationConnector.getJourneyData" should {

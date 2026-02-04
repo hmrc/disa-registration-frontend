@@ -17,12 +17,12 @@
 package controllers
 
 import base.SpecBase
+import controllers.routes.IndexController
 import models.journeydata.isaproducts.IsaProduct
-import models.journeydata.isaproducts.IsaProduct.{CashIsas, CashJuniorIsas, InnovativeFinanceIsas, StocksAndShareJuniorIsas, StocksAndSharesIsas}
+import models.journeydata.isaproducts.IsaProduct.{CashIsas, CashJuniorIsas, StocksAndShareJuniorIsas, StocksAndSharesIsas}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.DeclarationForIsaManagersView
-import controllers.routes.IndexController
 
 class DeclarationForIsaManagersControllerSpec extends SpecBase {
 

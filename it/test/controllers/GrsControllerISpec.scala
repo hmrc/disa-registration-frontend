@@ -25,7 +25,6 @@ import utils.{BaseIntegrationSpec, CommonStubs}
 
 class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
 
-  private val testGroupId  = "123456"
   private val journeyId    = "test-journey-id"
 
   private val callbackUrl =

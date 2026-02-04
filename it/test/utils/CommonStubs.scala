@@ -34,4 +34,6 @@ trait CommonStubs {
   def stubAuthFail(): Unit = stubPost(url = "/auth/authorise", status = UNAUTHORIZED, responseBody = "{}")
 
   val testHeaders: Seq[(String, String)] = Seq("Authorization" -> "Bearer mock-bearer-token")
+  val testGroupId = "123456"
+
 }

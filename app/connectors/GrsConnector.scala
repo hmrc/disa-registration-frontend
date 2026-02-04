@@ -53,11 +53,9 @@ class GrsConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(
       }
   }
 
-  def fetchJourneyData(journeyId: String)(implicit hc: HeaderCarrier): Future[GRSResponse] = {
-    val url =
-      s"${appConfig.incorporatedEntityIdentificationHost}/identify-your-incorporated-business/test-only/retrieve-journey?journeyId=$journeyId"
+  def fetchJourneyData(journeyId: String)(implicit hc: HeaderCarrier): Future[GRSResponse] =
     http
-      .get(url"$url")
+      .get(url"${appConfig.grsRetrieveResultUrl(journeyId)}")
       .execute[GRSResponse]
       .recoverWith { case errResponse: UpstreamErrorResponse =>
         logger.error(
@@ -65,5 +63,4 @@ class GrsConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(
         )
         Future.failed(errResponse)
       }
-  }
 }

@@ -27,9 +27,7 @@ import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
 class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
-
-  private val testGroupId = "123456"
-
+  
   private val controllerEndpoint = "/obligations/enrolment/isa/innovative-financial-products"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   private val updateJourneyUrl = s"/disa-registration/store/$testGroupId/isaProducts"

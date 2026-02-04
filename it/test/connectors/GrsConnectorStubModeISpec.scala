@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,64 @@
 package connectors
 
 import models.grs.*
+import play.api.libs.json.Json
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.BaseIntegrationSpec
-import utils.WiremockHelper.stubGet
+import utils.WiremockHelper.{stubGet, stubPost}
 
 import java.time.LocalDate
 
-class GrsConnectorISpec extends BaseIntegrationSpec {
-
-  override def config: Map[String, String] =
-    super.config ++ Map(
-      "features.use-grs-stub" -> "false"
-    )
-
-  val connector: GrsConnector = app.injector.instanceOf[GrsConnector]
+class GrsConnectorStubModeISpec extends BaseIntegrationSpec {
   
+  val connector: GrsConnector = app.injector.instanceOf[GrsConnector]
+
+  "GrsConnector.createJourney" should {
+
+    val testJourneyRequest = GrsCreateJourneyRequest(
+      continueUrl = "http://localhost/continue",
+      businessVerificationCheck = true,
+      deskProServiceId = "deskProId",
+      signOutUrl = "/some/url",
+      regime = "ISA",
+      accessibilityUrl = "/some/url",
+      labels = Some(Labels(en = Some(ServiceLabel("serviceLabel"))))
+    )
+    val createJourneyUrl = "/incorporated-entity-identification/api/limited-company-journey"
+    val testCreateJourneyResponse = CreateJourneyResponse("http://localhost/journey-link")
+
+    "return CreateJourneyResponse when backend returns 200 OK" in {
+      stubPost(createJourneyUrl, 200, Json.toJson(testCreateJourneyResponse).toString)
+
+      val response = await(connector.createJourney(testJourneyRequest))
+
+      response shouldBe testCreateJourneyResponse
+    }
+
+    "propagate exception when backend returns an error status (401)" in {
+      stubPost(createJourneyUrl, 401, """{"error":"Unauthorized"}""")
+
+      val ex = intercept[UpstreamErrorResponse] {
+        await(connector.createJourney(testJourneyRequest))
+      }
+
+      ex.statusCode shouldBe 401
+      ex.getMessage should include("Unauthorized")
+    }
+
+    "propagate exception when call fails with bad JSON" in {
+      stubPost(createJourneyUrl, 200, """{"unexpected":"json"}""")
+
+      val err = await(connector.createJourney(testJourneyRequest).failed)
+
+      err shouldBe a[Exception]
+    }
+  }
+
   "GrsConnector.fetchJourneyData" should {
 
     val testJourneyId = "testJourneyId"
-    val fetchJourneyUrl =
-      s"/incorporated-entity-identification/api/journey/$testJourneyId"
+    val fetchJourneyUrl = s"/identify-your-incorporated-business/test-only/retrieve-journey?journeyId=$testJourneyId"
 
     val testGRSJsonResponse =
       """
@@ -94,6 +131,14 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
 
       ex.statusCode shouldBe 404
       ex.getMessage should include("Not Found")
+    }
+
+    "propagate exception when call fails with bad JSON" in {
+      stubGet(fetchJourneyUrl, 200, """{"unexpected":"json"}""")
+
+      val err = await(connector.fetchJourneyData(testJourneyId).failed)
+
+      err shouldBe a[Exception]
     }
   }
 }
