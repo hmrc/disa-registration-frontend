@@ -23,8 +23,7 @@ import models.journeydata.JourneyData
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansAndHave36hPermissions
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -47,6 +46,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
   val journeyData: JourneyData =
     JourneyData(
       groupId = testGroupId,
+      enrolmentId = testString,
       isaProducts = Some(IsaProducts(None, None, None, Some(InnovativeFinancialProduct.values)))
     )
 
@@ -130,9 +130,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
 
       val application =
         applicationBuilder(journeyData = None)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {

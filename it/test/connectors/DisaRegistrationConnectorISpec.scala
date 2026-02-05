@@ -19,6 +19,7 @@ package connectors
 import models.journeydata.JourneyData
 import models.journeydata.isaproducts.IsaProduct.CashJuniorIsas
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
+import models.submission.EnrolmentSubmissionResponse
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK, UNAUTHORIZED}
 import play.api.libs.json.Json
 import play.api.test.Helpers.await
@@ -27,21 +28,31 @@ import utils.BaseIntegrationSpec
 import utils.WiremockHelper.{stubGet, stubPost}
 
 class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
-  
+
   val connector: DisaRegistrationConnector = app.injector.instanceOf[DisaRegistrationConnector]
 
-  "DisaRegistrationConnector.getJourneyData" should {
+  val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
 
-    val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
-    val testIsaProductsAnswers = IsaProducts(Some(IsaProduct.values), None)
-    val testJourneyData        = JourneyData(groupId = testGroupId, isaProducts = Some(testIsaProductsAnswers))
+  val journeyDataJson =
+    s"""
+       |{
+       | "groupId": "$testGroupId",
+       | "enrolmentId": "$testString",
+       | "isaProducts": {
+       |   "isaProducts": ["cashIsas", "cashJuniorIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"]
+       |  }
+       |}
+       |""".stripMargin
+  val expectedJourneyData = JourneyData(groupId = testGroupId, enrolmentId = testString, isaProducts = Some(IsaProducts(Some(IsaProduct.values), None)))
+
+  "DisaRegistrationConnector.getJourneyData" should {
     
     "return Some(journeyData) when backend returns 200 OK" in {
-      stubGet(getJourneyDataUrl, OK, Json.toJson(testJourneyData).toString)
+      stubGet(getJourneyDataUrl, OK, journeyDataJson)
 
       val response = await(connector.getJourneyData(testGroupId))
       
-      response shouldBe Some(testJourneyData)
+      response shouldBe Some(expectedJourneyData)
     }
 
     "return None when backend returns 404 Not Found" in {
@@ -102,6 +113,39 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
       intercept[UpstreamErrorResponse] {
         await(connector.updateTaskListJourney(testSectionAnswers, testGroupId, testSectionAnswers.sectionName))
       }
+    }
+  }
+
+  "DisaRegistrationConnector.declareAndSubmit" should {
+
+    val declareAndSubmitUrl = s"/disa-registration/$testGroupId/declare-and-submit"
+
+    "return EnrolmentSubmissionResponse when backend returns 200 OK" in {
+      val responseBody =
+        s"""
+           | {"receiptId": "$testString"}
+           | """.stripMargin
+      stubPost(declareAndSubmitUrl, OK, responseBody)
+
+      val response = await(connector.declareAndSubmit(testGroupId))
+
+      response shouldBe EnrolmentSubmissionResponse(testString)
+    }
+
+    "propagate exception when backend returns an error status (401)" in {
+      stubPost(declareAndSubmitUrl, UNAUTHORIZED, """{"code":"UNAUTHORIZED", "message":"Unauthorised"}""")
+
+      val err = await(connector.declareAndSubmit(testGroupId).failed)
+
+      err shouldBe an[UpstreamErrorResponse]
+    }
+
+    "propagate exception when the call fails with bad json" in {
+      stubPost(declareAndSubmitUrl, OK, """{"json":"bad"}""")
+
+      val err = await(connector.declareAndSubmit(testGroupId).failed)
+
+      err shouldBe an[JsValidationException]
     }
   }
 }

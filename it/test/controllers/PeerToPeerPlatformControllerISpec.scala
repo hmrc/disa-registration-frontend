@@ -26,7 +26,7 @@ import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
 class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
-  
+
   private val controllerEndpoint = "/obligations/enrolment/isa/peer-to-peer-loans"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   private val updateJourneyUrl = s"/disa-registration/store/$testGroupId/isaProducts"
@@ -38,6 +38,7 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
         s"""
            |{
            | "groupId": "$testGroupId",
+           | "enrolmentId": "$testString",
            | "isaProducts": {
            |   "p2pPlatform": "platform"
            | }

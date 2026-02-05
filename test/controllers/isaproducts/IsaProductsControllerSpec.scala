@@ -24,7 +24,7 @@ import models.journeydata.JourneyData
 import models.journeydata.isaproducts.IsaProduct.CashIsas
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -34,7 +34,6 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.isaproducts.IsaProductsView
-import org.mockito.ArgumentMatchers.{eq => eqTo}
 
 import scala.concurrent.Future
 
@@ -85,7 +84,11 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, isaProducts = Some(IsaProducts(Some(IsaProduct.values), None)))
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          isaProducts = Some(IsaProducts(Some(IsaProduct.values), None))
+        )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
@@ -114,9 +117,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -141,9 +142,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = None)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {

@@ -18,6 +18,7 @@ package connectors
 
 import config.FrontendAppConfig
 import models.journeydata.{JourneyData, TaskListSection}
+import models.submission.EnrolmentSubmissionResponse
 import play.api.Logging
 import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
 import play.api.libs.json.{Json, Writes}
@@ -74,5 +75,12 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
             )
         }
       )
+  }
+
+  def declareAndSubmit(groupId: String)(implicit hc: HeaderCarrier): Future[EnrolmentSubmissionResponse] = {
+    val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/$groupId/declare-and-submit"
+    http
+      .post(url"$url")
+      .execute[EnrolmentSubmissionResponse]
   }
 }

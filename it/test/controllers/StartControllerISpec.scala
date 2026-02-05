@@ -36,6 +36,7 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
         s"""
            |{
            |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testEnrolmentId",
            |  "businessVerification": {
            |    "businessRegistrationPassed": true,
            |    "businessVerificationPassed": true,
@@ -62,6 +63,7 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
         s"""
            |{
            |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testEnrolmentId",
            |  "businessVerification": {
            |    "businessRegistrationPassed": true,
            |    "businessVerificationPassed": false,

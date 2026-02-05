@@ -23,8 +23,7 @@ import models.NormalMode
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -69,6 +68,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
       val journeyData = JourneyData(
         groupId = testGroupId,
+        enrolmentId = testString,
         organisationDetails = Some(OrganisationDetails(registeredToManageIsa = Some(true)))
       )
 
@@ -98,9 +98,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {

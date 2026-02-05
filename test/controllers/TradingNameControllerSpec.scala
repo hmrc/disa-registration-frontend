@@ -23,8 +23,7 @@ import models.NormalMode
 import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.inject.bind
 import play.api.libs.json.Writes
@@ -45,7 +44,8 @@ class TradingNameControllerSpec extends SpecBase {
   lazy val tradingNameRoute = TradingNameController.onPageLoad(NormalMode).url
 
   val validAnswer      = testString
-  val validJourneyData = JourneyData(testGroupId, organisationDetails = Some(OrganisationDetails(tradingName = None)))
+  val validJourneyData =
+    JourneyData(testGroupId, testString, organisationDetails = Some(OrganisationDetails(tradingName = None)))
 
   "TradingName Controller" - {
 
@@ -104,9 +104,7 @@ class TradingNameControllerSpec extends SpecBase {
 
         val application =
           applicationBuilder(journeyData = Some(validJourneyData))
-            .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-            )
+            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
             .build()
 
         running(application) {
@@ -149,9 +147,7 @@ class TradingNameControllerSpec extends SpecBase {
 
         val application =
           applicationBuilder(journeyData = Some(validJourneyData))
-            .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-            )
+            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
             .build()
 
         running(application) {

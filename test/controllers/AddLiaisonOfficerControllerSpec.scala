@@ -40,7 +40,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
 
         val authAction = new AuthenticatedIdentifierAction(
           successfulAuthConnector(
-            groupId = Some("group-id"),
+            groupId = Some(testGroupId),
             affinityGroup = Some(AffinityGroup.Organisation)
           ),
           application.injector.instanceOf[config.FrontendAppConfig],
@@ -73,7 +73,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
 
         val authAction = new AuthenticatedIdentifierAction(
           successfulAuthConnector(
-            groupId = Some("group-id"),
+            groupId = Some(testGroupId),
             affinityGroup = Some(AffinityGroup.Agent)
           ),
           application.injector.instanceOf[config.FrontendAppConfig],

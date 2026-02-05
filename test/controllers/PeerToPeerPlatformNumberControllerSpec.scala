@@ -23,15 +23,13 @@ import models.NormalMode
 import models.journeydata.JourneyData
 import models.journeydata.isaproducts.IsaProducts
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call, RequestHeader}
-import play.api.test.{FakeRequest, Helpers}
+import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.isaproducts.PeerToPeerPlatformNumberView
 
@@ -48,7 +46,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
 
   val validAnswer                   = "123456"
   val validJourneyData: JourneyData =
-    JourneyData(testGroupId, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
+    JourneyData(testGroupId, testString, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
 
   "PeerToPeerPlatformNumber Controller" - {
 
@@ -163,7 +161,9 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
 
         val dataMissingName = validJourneyData.copy(isaProducts = Some(IsaProducts(p2pPlatform = None)))
 
-        val application = applicationBuilder(journeyData = Some(dataMissingName)).build()
+        val application = applicationBuilder(
+          journeyData = Some(dataMissingName)
+        ).build()
 
         running(application) {
           val request = FakeRequest(POST, peerToPeerPlatformNumberRoute)

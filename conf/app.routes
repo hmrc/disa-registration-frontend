@@ -32,7 +32,9 @@ GET         /unsupported-affinity-group                  controllers.Unsupported
 
 GET         /problem-with-service                        controllers.InternalServerErrorController.onPageLoad()
 
-### Organisation Details
+# Journey Sections
+
+## Organisation Details
 GET        /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
 POST       /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode)
 GET        /change-registered-isa-manager                controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = CheckMode)
@@ -58,7 +60,7 @@ POST       /firm-reference-number                        controllers.orgdetails.
 GET        /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
-### ISA Products
+## ISA Products
 GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
 POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
 GET        /change-isa-products                          controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = CheckMode)
@@ -81,11 +83,17 @@ POST       /change-fca-platform-number                   controllers.isaproducts
 
 GET        /isa-products-check-your-answers              controllers.isaproducts.IsaProductsCheckYourAnswersController.onPageLoad()
 
-### LOs and Signatories
+## LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
 GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()
 
 
 
-## Declaration
+## Declare & Submit
+
+### Declaration
 GET        /declaration-for-isa-managers                       controllers.DeclarationForIsaManagersController.onPageLoad()
+POST       /declaration-for-isa-managers                       controllers.DeclarationForIsaManagersController.onSubmit()
+
+### Confirmation
+GET        /confirmation                       controllers.ConfirmationController.onPageLoad(receiptId: String)

@@ -17,11 +17,14 @@
 package connectors
 
 import base.SpecBase
+import config.FrontendAppConfig
 import models.journeydata.JourneyData
-import models.journeydata.isaproducts.IsaProducts
+import models.submission.EnrolmentSubmissionResponse
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
-import org.scalatest.matchers.should.Matchers.{should, shouldBe}
+import org.scalatest.matchers.should.Matchers.shouldBe
+import play.api.inject
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 import scala.concurrent.Future
@@ -29,8 +32,11 @@ import scala.concurrent.Future
 class DisaRegistrationConnectorSpec extends SpecBase {
 
   trait TestSetup {
-    val connector: DisaRegistrationConnector = new DisaRegistrationConnector(mockHttpClient, mockAppConfig)
-    val testGroupId: String                  = "123456"
+    val connector: DisaRegistrationConnector = applicationBuilder(
+      None,
+      inject.bind[HttpClientV2].toInstance(mockHttpClient),
+      inject.bind[FrontendAppConfig].toInstance(mockAppConfig)
+    ).build().injector.instanceOf[DisaRegistrationConnector]
     val testUrl: String                      = "http://localhost:1201"
 
     when(mockAppConfig.disaRegistrationBaseUrl).thenReturn(testUrl)
@@ -39,6 +45,9 @@ class DisaRegistrationConnectorSpec extends SpecBase {
     when(mockHttpClient.post(url"$testUrl/disa-registration/store/$testGroupId/${testIsaProductsAnswers.sectionName}"))
       .thenReturn(mockRequestBuilder)
     when(mockRequestBuilder.withBody(any())(any, any, any)).thenReturn(mockRequestBuilder)
+
+    when(mockHttpClient.post(url"$testUrl/disa-registration/$testGroupId/declare-and-submit"))
+      .thenReturn(mockRequestBuilder)
   }
 
   "DisaRegistrationConnector" - {
@@ -144,5 +153,45 @@ class DisaRegistrationConnectorSpec extends SpecBase {
         }
       }
     }
+
+    "declareAndSubmit" - {
+
+      "return EnrolmentSubmissionResponse on successful call" in new TestSetup {
+        val response = EnrolmentSubmissionResponse(testString)
+
+        when(mockRequestBuilder.execute[EnrolmentSubmissionResponse](any(), any()))
+          .thenReturn(Future.successful(response))
+
+        val result = connector.declareAndSubmit(testGroupId).futureValue
+
+        result shouldBe response
+      }
+
+      "propagate UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
+        val upstreamErrorResponse: UpstreamErrorResponse = UpstreamErrorResponse(
+          message = "Not authorised to access this service",
+          statusCode = 401,
+          reportAs = 401,
+          headers = Map.empty
+        )
+
+        when(mockRequestBuilder.execute[EnrolmentSubmissionResponse](any(), any()))
+          .thenReturn(Future.failed(upstreamErrorResponse))
+
+        val thrown = connector.declareAndSubmit(testGroupId).failed.futureValue
+        thrown shouldBe upstreamErrorResponse
+      }
+
+      "propagate Throwable when the call to DISA Registration fails with an unexpected exception" in new TestSetup {
+        val runtimeException = new RuntimeException("Connection timeout")
+
+        when(mockRequestBuilder.execute[EnrolmentSubmissionResponse](any(), any()))
+          .thenReturn(Future.failed(runtimeException))
+
+        val thrown = connector.declareAndSubmit(testGroupId).failed.futureValue
+        thrown shouldBe runtimeException
+      }
+    }
+
   }
 }

@@ -40,6 +40,7 @@ class StartControllerSpec extends SpecBase {
       "must redirect to TaskList when business verification has passed" in {
         val journeyData = JourneyData(
           groupId = "groupId",
+          enrolmentId = "enrolmentId",
           businessVerification = Some(
             BusinessVerification(
               businessRegistrationPassed = Some(true),
@@ -64,6 +65,7 @@ class StartControllerSpec extends SpecBase {
       "must redirect to Business Verification lockout when verification has failed" in {
         val journeyData = JourneyData(
           groupId = "groupId",
+          enrolmentId = "enrolmentId",
           businessVerification = Some(
             BusinessVerification(
               businessRegistrationPassed = Some(true),
@@ -103,6 +105,7 @@ class StartControllerSpec extends SpecBase {
       "must redirect to GRS journey start when business verification exists but is incomplete" in {
         val journeyData = JourneyData(
           groupId = "groupId",
+          enrolmentId = "enrolmentId",
           businessVerification = Some(
             BusinessVerification(
               businessRegistrationPassed = None,

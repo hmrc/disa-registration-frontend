@@ -20,14 +20,17 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.TestData
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthTestSupport {
+trait AuthTestSupport extends TestData {
 
   protected def successfulAuthConnector(
-    groupId: Option[String] = Some("group-id"),
-    affinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation)
+    groupId: Option[String] = Some(testGroupId),
+    affinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation),
+    credentials: Option[Credentials] = Some(testCredentials),
+    credentialRole: Option[CredentialRole] = Some(testCredentialRoleUser)
   ): AuthConnector =
     new AuthConnector {
 
@@ -36,8 +39,8 @@ trait AuthTestSupport {
         retrieval: Retrieval[A]
       )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
 
-        val result: Option[String] ~ Option[AffinityGroup] =
-          new ~(groupId, affinityGroup)
+        val result: Option[String] ~ Option[AffinityGroup] ~ Option[Credentials] ~ Option[CredentialRole] =
+          new ~(new ~(new ~(groupId, affinityGroup), credentials), credentialRole)
 
         Future.successful(result.asInstanceOf[A])
       }

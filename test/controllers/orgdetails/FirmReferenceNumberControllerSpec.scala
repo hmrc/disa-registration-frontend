@@ -21,8 +21,7 @@ import forms.FirmReferenceNumberFormProvider
 import models.NormalMode
 import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -45,6 +44,7 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
   val journeyData: JourneyData =
     JourneyData(
       groupId = testGroupId,
+      enrolmentId = testString,
       organisationDetails = Some(OrganisationDetails(fcaNumber = Some(fcaNumber)))
     )
 
@@ -98,9 +98,7 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -159,6 +157,5 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
       }
     }
-
   }
 }

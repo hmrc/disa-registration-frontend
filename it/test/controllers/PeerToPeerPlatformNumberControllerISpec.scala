@@ -26,7 +26,7 @@ import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
 class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
-  
+
   private val controllerEndpoint = "/obligations/enrolment/isa/fca-platform-number"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   private val updateJourneyUrl = s"/disa-registration/store/$testGroupId/isaProducts"
@@ -38,6 +38,7 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
         s"""
            |{
            | "groupId": "$testGroupId",
+           | "enrolmentId": "$testString",
            | "isaProducts": {
            |   "p2pPlatform": "platform",
            |   "p2pPlatformNumber": "1234567"
@@ -72,6 +73,7 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
         s"""
            |{
            | "groupId": "$testGroupId",
+           | "enrolmentId": "$testString",
            | "isaProducts": {
            |   "p2pPlatform": "platform"
            | }

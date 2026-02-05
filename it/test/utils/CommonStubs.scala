@@ -19,14 +19,16 @@ package utils
 import play.api.http.Status.{OK, UNAUTHORIZED}
 import utils.WiremockHelper.stubPost
 
-trait CommonStubs {
+trait CommonStubs extends TestData {
 
   def stubAuth(): Unit = {
     val body =
       s"""{
-          "groupIdentifier": "123456",
-          "affinityGroup": "Organisation"
-          }"""
+         | "groupIdentifier": "$testGroupId",
+         | "affinityGroup": "Organisation",
+         | "optionalCredentials": {"providerId": "id", "providerType": "GovernmentGateway"},
+          |"credentialRole": "user"
+         | }""".stripMargin
 
     stubPost("/auth/authorise", status = OK, responseBody = body)
   }
@@ -34,6 +36,5 @@ trait CommonStubs {
   def stubAuthFail(): Unit = stubPost(url = "/auth/authorise", status = UNAUTHORIZED, responseBody = "{}")
 
   val testHeaders: Seq[(String, String)] = Seq("Authorization" -> "Bearer mock-bearer-token")
-  val testGroupId = "123456"
 
 }

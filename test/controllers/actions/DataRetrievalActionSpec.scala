@@ -43,10 +43,12 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when NOT FOUND is returned" - {
 
       "must set userAnswers to 'None' in the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.successful(None)
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq(testGroupId))(any)) thenReturn Future.successful(None)
         val action = new Harness(mockJourneyAnswersService, mockErrorHandler)
 
-        val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue: @unchecked
+        val Right(result) = action
+          .callRefine(IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser))
+          .futureValue: @unchecked
 
         result.journeyData must not be defined
       }
@@ -55,12 +57,14 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when there is data in the cache" - {
 
       "must build a userAnswers object and add it to the request" in {
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.successful(
-          Some(JourneyData("id"))
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq(testGroupId))(any)) thenReturn Future.successful(
+          Some(JourneyData(testGroupId, testString))
         )
         val action = new Harness(mockJourneyAnswersService, mockErrorHandler)
 
-        val Right(result) = action.callRefine(IdentifierRequest(FakeRequest(), "id")).futureValue: @unchecked
+        val Right(result) = action
+          .callRefine(IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser))
+          .futureValue: @unchecked
 
         result.journeyData mustBe defined
       }
@@ -70,10 +74,10 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
       "must give an InternalServerError result" in {
         val ex     = new Exception
-        when(mockJourneyAnswersService.get(ArgumentMatchers.eq("id"))(any)) thenReturn Future.failed(ex)
+        when(mockJourneyAnswersService.get(ArgumentMatchers.eq(testGroupId))(any)) thenReturn Future.failed(ex)
         val action = new Harness(mockJourneyAnswersService, mockErrorHandler)
 
-        await(action.callRefine(IdentifierRequest(FakeRequest(), "id")))
+        await(action.callRefine(IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser)))
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
       }

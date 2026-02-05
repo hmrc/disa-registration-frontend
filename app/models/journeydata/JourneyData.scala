@@ -17,10 +17,11 @@
 package models.journeydata
 
 import models.journeydata.isaproducts.IsaProducts
-import play.api.libs.json.{Format, Json, Reads, Writes}
+import play.api.libs.json.{Format, Json}
 
 case class JourneyData(
   groupId: String,
+  enrolmentId: String,
   businessVerification: Option[BusinessVerification] = None,
   organisationDetails: Option[OrganisationDetails] = None,
   isaProducts: Option[IsaProducts] = None,

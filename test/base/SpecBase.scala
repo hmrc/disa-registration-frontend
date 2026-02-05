@@ -17,7 +17,8 @@
 package base
 
 import config.FrontendAppConfig
-import controllers.actions.*
+import connectors.DisaRegistrationConnector
+import controllers.actions.{DataRequiredAction, DataRequiredActionImpl, DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
 import handlers.ErrorHandler
 import models.journeydata.JourneyData
 import org.mockito.ArgumentMatchers.any
@@ -28,18 +29,18 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{BeforeAndAfterEach, OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.inject.{Injector, bind}
-import play.api.mvc.RequestHeader
+import play.api.inject.Injector
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.Results.{BadRequest, InternalServerError}
+import play.api.mvc.{PlayBodyParsers, RequestHeader}
 import play.api.test.FakeRequest
-import services.{GrsService, JourneyAnswersService}
+import play.api.{Application, inject}
+import services.{AuditService, GrsService, JourneyAnswersService, SubmissionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{JourneyDataBuilder, TestData}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,29 +68,49 @@ trait SpecBase
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   // Mocks
-  protected val mockJourneyAnswersService: JourneyAnswersService = mock[JourneyAnswersService]
-  protected val mockGrsService: GrsService                       = mock[GrsService]
-  protected val mockHttpClient: HttpClientV2                     = mock[HttpClientV2]
-  protected val mockAppConfig: FrontendAppConfig                 = mock[FrontendAppConfig]
-  protected val mockRequestBuilder: RequestBuilder               = mock[RequestBuilder]
-  protected val mockErrorHandler: ErrorHandler                   = mock[ErrorHandler]
+  protected val mockAuditConnector: AuditConnector                       = mock[AuditConnector]
+  protected val mockDisaRegistrationConnector: DisaRegistrationConnector = mock[DisaRegistrationConnector]
+  protected val mockJourneyAnswersService: JourneyAnswersService         = mock[JourneyAnswersService]
+  protected val mockSubmissionService: SubmissionService                 = mock[SubmissionService]
+  protected val mockGrsService: GrsService                               = mock[GrsService]
+  protected val mockAuditService: AuditService                           = mock[AuditService]
+  protected val mockHttpClient: HttpClientV2                             = mock[HttpClientV2]
+  protected val mockAppConfig: FrontendAppConfig                         = mock[FrontendAppConfig]
+  protected val mockRequestBuilder: RequestBuilder                       = mock[RequestBuilder]
+  protected val mockErrorHandler: ErrorHandler                           = mock[ErrorHandler]
 
   override def beforeEach(): Unit = {
-    Mockito.reset(mockErrorHandler)
+    Mockito.reset(
+      mockErrorHandler,
+      mockAuditConnector,
+      mockDisaRegistrationConnector,
+      mockJourneyAnswersService,
+      mockSubmissionService,
+      mockAuditService,
+      mockHttpClient,
+      mockAppConfig,
+      mockRequestBuilder
+    )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))
   }
 
-  protected def applicationBuilder(journeyData: Option[JourneyData] = None): GuiceApplicationBuilder =
+  private val parsers = injector.instanceOf[PlayBodyParsers]
+
+  protected def applicationBuilder(
+    journeyData: Option[JourneyData],
+    overrides: GuiceableModule*
+  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
-        bind[DataRequiredAction].to[DataRequiredActionImpl],
-        bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
-        bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
-        bind[GrsService].toInstance(mockGrsService),
-        bind[ErrorHandler].toInstance(mockErrorHandler)
+        inject.bind[DataRequiredAction].to[DataRequiredActionImpl],
+        inject.bind[IdentifierAction].to[FakeIdentifierAction],
+        inject.bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
+        inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
+        inject.bind[GrsService].toInstance(mockGrsService),
+        inject.bind[ErrorHandler].toInstance(mockErrorHandler)
       )
+      .overrides(overrides: _*)
 
   def injector: Injector = app.injector
 }

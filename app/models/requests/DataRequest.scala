@@ -18,9 +18,21 @@ package models.requests
 
 import play.api.mvc.{Request, WrappedRequest}
 import models.journeydata.JourneyData
+import uk.gov.hmrc.auth.core.CredentialRole
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
-case class OptionalDataRequest[A](request: Request[A], groupId: String, journeyData: Option[JourneyData])
-    extends WrappedRequest[A](request)
+case class OptionalDataRequest[A](
+  request: Request[A],
+  groupId: String,
+  credentials: Credentials,
+  credentialRole: CredentialRole,
+  journeyData: Option[JourneyData]
+) extends WrappedRequest[A](request)
 
-case class DataRequest[A](request: Request[A], groupId: String, journeyData: JourneyData)
-    extends WrappedRequest[A](request)
+case class DataRequest[A](
+  request: Request[A],
+  groupId: String,
+  credentials: Credentials,
+  credentialRole: CredentialRole,
+  journeyData: JourneyData
+) extends WrappedRequest[A](request)
