@@ -21,7 +21,7 @@ import connectors.GrsConnector
 import models.grs.{GRSResponse, GrsCreateJourneyRequest, Labels, ServiceLabel}
 import play.api.Logging
 import play.api.i18n.{Lang, MessagesApi}
-import play.api.mvc.{Request, RequestHeader}
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions}
 
 import javax.inject.{Inject, Singleton}
@@ -50,6 +50,6 @@ class GrsService @Inject() (grsConnector: GrsConnector, appConfig: FrontendAppCo
     grsConnector.createJourney(grsJourneyRequest = requestBody).map(_.journeyStartUrl)
   }
 
-  def fetchGRSJourneyData(journeyId: String)(implicit hc: HeaderCarrier, request: Request[_]): Future[GRSResponse] =
+  def fetchGRSJourneyData(journeyId: String)(implicit hc: HeaderCarrier): Future[GRSResponse] =
     grsConnector.fetchJourneyData(journeyId)
 }

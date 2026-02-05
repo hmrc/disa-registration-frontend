@@ -21,9 +21,9 @@ import models.grs.{BvPass, GRSResponse, RegisteredStatus}
 import models.journeydata.BusinessVerification
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, RequestHeader}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{GrsService, JourneyAnswersService}
-import uk.gov.hmrc.http.{HeaderCarrier, RequestId}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -44,9 +44,10 @@ class GrsController @Inject() (
 
   def grsCallback(journeyId: String): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
-      val grsHc = buildGrsHeaderCarrier(request)
-
-      grsService.fetchGRSJourneyData(journeyId)(grsHc).flatMap { grsResponse =>
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter
+        .fromRequestAndSession(request, request.session)
+        .copy(extraHeaders = request.headers.headers)
+      grsService.fetchGRSJourneyData(journeyId)(hc).flatMap { grsResponse =>
         val businessVerification =
           buildBusinessVerification(grsResponse, request.journeyData.flatMap(_.businessVerification))
         journeyAnswersService.update(businessVerification, request.groupId).map { _ =>
@@ -63,11 +64,6 @@ class GrsController @Inject() (
         }
       }
     }
-
-  private def buildGrsHeaderCarrier(request: RequestHeader): HeaderCarrier = {
-    val baseHc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
-    baseHc.copy(extraHeaders = request.headers.toSimpleMap.toSeq.filterNot(_._1.equalsIgnoreCase("Authorization")))
-  }
 
   private def buildBusinessVerification(
     grs: GRSResponse,

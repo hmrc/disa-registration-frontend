@@ -57,7 +57,7 @@ class GrsControllerSpec extends SpecBase {
       "must redirect to TaskList when both registration and verification pass" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse()
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any(), any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
         when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
           .thenReturn(Future.successful(BusinessVerification(Some(true), Some(true), Some("1234567890"))))
@@ -74,7 +74,7 @@ class GrsControllerSpec extends SpecBase {
       "must redirect to Lockout when business verification fails" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse(businessVerificationStatus = Some(BvFail))
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any(), any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
         when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
           .thenReturn(Future.successful(BusinessVerification(Some(true), Some(false), Some("1234567890"))))
@@ -91,7 +91,7 @@ class GrsControllerSpec extends SpecBase {
       "must redirect to Start when no business registration/verification data present)" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any(), any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
         when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
           .thenReturn(Future.successful(BusinessVerification(None, None, Some("1234567890"))))
@@ -108,7 +108,7 @@ class GrsControllerSpec extends SpecBase {
       "must redirect to Start when business registration fails - (Not sure how this is possible in prod)" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any(), any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
         when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
           .thenReturn(Future.successful(BusinessVerification(Some(false), Some(true), Some("1234567890"))))
@@ -125,7 +125,7 @@ class GrsControllerSpec extends SpecBase {
       "must propagate exception if journeyAnswersService fails" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse()
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any(), any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
         when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
           .thenReturn(Future.failed(new Exception("Update journeyAnswersService failed - Service Down")))
@@ -141,7 +141,7 @@ class GrsControllerSpec extends SpecBase {
       "must propagate exception if grsService fails" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any(), any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.failed(new Exception("GRS failed - Service Down")))
 
         running(application) {

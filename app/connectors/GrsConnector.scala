@@ -53,7 +53,7 @@ class GrsConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(
       }
   }
 
-  def fetchJourneyData(journeyId: String)(implicit hc: HeaderCarrier): Future[GRSResponse] =
+  def fetchJourneyData(journeyId: String)(implicit hc: HeaderCarrier): Future[GRSResponse] = {
     http
       .get(url"${appConfig.grsRetrieveResultUrl(journeyId)}")
       .execute[GRSResponse]
@@ -63,4 +63,5 @@ class GrsConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(
         )
         Future.failed(errResponse)
       }
+  }
 }
