@@ -34,7 +34,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
     s"/disa-registration/store/$testGroupId/businessVerification"
 
   private val fetchGrsJourneyUrl =
-    s"/identify-your-incorporated-business/test-only/retrieve-journey?journeyId=$journeyId"
+    s"/incorporated-entity-identification/api/journey/$journeyId"
 
   "GET /incorporated-identity-callback?journeyId=" should {
 

@@ -25,61 +25,49 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import java.net.URLEncoder
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
+class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(config) {
 
-  private def loadConfig(key: String) = servicesConfig.getString(key)
+  lazy val host: String    = getString("host")
+  lazy val appName: String = getString("appName")
 
-  lazy val host: String    = loadConfig("host")
-  lazy val appName: String = loadConfig("appName")
-
-  private lazy val contactHost                  = loadConfig("contact-frontend.host")
+  private lazy val contactHost                  = getString("contact-frontend.host")
   private lazy val contactFormServiceIdentifier = "disa-registration-frontend"
 
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
-  val loginUrl: String              = loadConfig("urls.login")
-  val loginContinueUrl: String      = loadConfig("urls.loginContinue")
-  val signOutUrl: String            = loadConfig("urls.signOut")
-  val isaManagerGuidanceUrl: String = loadConfig("urls.isaManagerGuidance")
+  val loginUrl: String              = getString("urls.login")
+  val loginContinueUrl: String      = getString("urls.loginContinue")
+  val signOutUrl: String            = getString("urls.signOut")
+  val isaManagerGuidanceUrl: String = getString("urls.isaManagerGuidance")
   val ggSignInUrl: String           = s"$loginUrl?continue=${URLEncoder.encode(loginContinueUrl, "UTF-8")}"
 
-  lazy val disaRegistrationBaseUrl: String = servicesConfig.baseUrl("disa-registration")
+  lazy val disaRegistrationBaseUrl: String = baseUrl("disa-registration")
 
-  private lazy val exitSurveyBaseUrl: String = servicesConfig.baseUrl("feedback-frontend")
+  private lazy val exitSurveyBaseUrl: String = baseUrl("feedback-frontend")
 
   lazy val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/disa-registration-frontend"
 
   lazy val languageTranslationEnabled: Boolean =
-    configuration.get[Boolean]("features.welsh-translation")
+    getBoolean("features.welsh-translation")
 
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
   )
 
-  lazy val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
-  lazy val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
-  lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+  lazy val timeout: Int   = getInt("timeout-dialog.timeout")
+  lazy val countdown: Int = getInt("timeout-dialog.countdown")
+  lazy val cacheTtl: Long = getInt("mongodb.timeToLiveInSeconds")
 
-  lazy val listOfRegisteredIsaManagersUrl: String = loadConfig("urls.external.listOfRegisteredIsaManagers")
-  lazy val p2pLoansInformationUrl: String         = loadConfig("urls.external.p2pLoansInformation")
+  lazy val listOfRegisteredIsaManagersUrl: String = getString("urls.external.listOfRegisteredIsaManagers")
+  lazy val p2pLoansInformationUrl: String         = getString("urls.external.p2pLoansInformation")
 
   lazy val incorporatedEntityIdentificationHost: String =
-    servicesConfig.baseUrl("incorporated-entity-identification-frontend")
+    baseUrl("incorporated-entity-identification-frontend")
 
-  lazy val useGrsStub: Boolean =
-    configuration.get[Boolean]("features.use-grs-stub")
-
-  def grsRetrieveResultUrl(journeyId: String): String = {
-    val urlPath =
-      if (useGrsStub)
-        s"/identify-your-incorporated-business/test-only/retrieve-journey?journeyId=$journeyId"
-      else
-        s"/incorporated-entity-identification/api/journey/$journeyId"
-
-    s"$incorporatedEntityIdentificationHost$urlPath"
-  }
+  def grsRetrieveResultUrl(journeyId: String): String =
+    s"$incorporatedEntityIdentificationHost/incorporated-entity-identification/api/journey/$journeyId"
 
   lazy val grsCallback: String = s"$host/obligations/enrolment/isa/incorporated-identity-callback"
 

@@ -23,9 +23,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{GrsService, JourneyAnswersService}
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -44,23 +42,18 @@ class GrsController @Inject() (
 
   def grsCallback(journeyId: String): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter
-        .fromRequestAndSession(request, request.session)
-        .copy(extraHeaders = request.headers.headers)
-      grsService.fetchGRSJourneyData(journeyId)(hc).flatMap { grsResponse =>
+      grsService.fetchGRSJourneyData(journeyId).flatMap { grsResponse =>
         val businessVerification =
           buildBusinessVerification(grsResponse, request.journeyData.flatMap(_.businessVerification))
+
         journeyAnswersService.update(businessVerification, request.groupId).map { _ =>
-          (businessVerification.businessRegistrationPassed, businessVerification.businessVerificationPassed) match {
-            case (Some(true), Some(true)) =>
-              Redirect(routes.TaskListController.onPageLoad()).withSession(request.session)
-
-            case (_, Some(false)) =>
-              Redirect(routes.BusinessVerificationController.lockout()).withSession(request.session)
-
-            case _ =>
-              Redirect(routes.StartController.onPageLoad()).withSession(request.session)
-          }
+          Redirect(
+            (businessVerification.businessRegistrationPassed, businessVerification.businessVerificationPassed) match {
+              case (Some(true), Some(true)) => routes.TaskListController.onPageLoad()
+              case (_, Some(false))         => routes.BusinessVerificationController.lockout()
+              case _                        => routes.StartController.onPageLoad()
+            }
+          ).withSession(request.session)
         }
       }
     }
