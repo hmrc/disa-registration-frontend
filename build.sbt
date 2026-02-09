@@ -1,5 +1,6 @@
 import play.sbt.routes.RoutesKeys
 import sbt.Def
+import sbt.Keys.scalacOptions
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
@@ -41,7 +42,8 @@ lazy val microservice = (project in file("."))
     retrieveManaged := true,
     pipelineStages := Seq(digest),
     Assets / pipelineStages := Seq(concat),
-    scalacOptions += "-Wconf:src=routes/.*:s"
+    scalacOptions += "-Wconf:src=routes/.*:s",
+    scalacOptions += "-Wconf:msg=unused import&src=html/.*:s"
   )
 
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(

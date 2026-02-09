@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package models.grs
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, OFormat, OWrites}
 
-case class BusinessVerification(
-  businessRegistrationPassed: Option[Boolean],
-  businessVerificationPassed: Option[Boolean],
-  ctUtr: Option[String]
-) extends TaskListSection {
-  override def sectionName: String = "businessVerification"
+case class ServiceLabel(optServiceName: String)
+
+object ServiceLabel {
+  implicit val format: OFormat[ServiceLabel] = Json.format[ServiceLabel]
 }
 
-object BusinessVerification {
-  implicit val format: OFormat[BusinessVerification] = Json.format[BusinessVerification]
+case class Labels(
+  cy: Option[ServiceLabel] = None,
+  en: Option[ServiceLabel]
+)
+object Labels {
+  implicit val format: OFormat[Labels] = Json.format[Labels]
 }

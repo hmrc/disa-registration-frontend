@@ -20,50 +20,57 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.net.URLEncoder
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration) {
+class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(config) {
 
-  lazy val host: String    = configuration.get[String]("host")
-  lazy val appName: String = configuration.get[String]("appName")
+  lazy val host: String    = getString("host")
+  lazy val appName: String = getString("appName")
 
-  private lazy val contactHost                  = configuration.get[String]("contact-frontend.host")
+  private lazy val contactHost                  = getString("contact-frontend.host")
   private lazy val contactFormServiceIdentifier = "disa-registration-frontend"
 
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
-  val loginUrl: String              = configuration.get[String]("urls.login")
-  val loginContinueUrl: String      = configuration.get[String]("urls.loginContinue")
-  val signOutUrl: String            = configuration.get[String]("urls.signOut")
-  val isaManagerGuidanceUrl: String =
-    configuration.get[String]("urls.isaManagerGuidance")
+  val loginUrl: String              = getString("urls.login")
+  val loginContinueUrl: String      = getString("urls.loginContinue")
+  val signOutUrl: String            = getString("urls.signOut")
+  val isaManagerGuidanceUrl: String = getString("urls.isaManagerGuidance")
   val ggSignInUrl: String           = s"$loginUrl?continue=${URLEncoder.encode(loginContinueUrl, "UTF-8")}"
 
-  lazy val disaRegistrationBaseUrl: String =
-    configuration.get[Service]("microservice.services.disa-registration").baseUrl
+  lazy val disaRegistrationBaseUrl: String = baseUrl("disa-registration")
 
-  private lazy val exitSurveyBaseUrl: String =
-    configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
-  lazy val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/disa-registration-frontend"
+  private lazy val exitSurveyBaseUrl: String = baseUrl("feedback-frontend")
+
+  lazy val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/disa-registration-frontend"
 
   lazy val languageTranslationEnabled: Boolean =
-    configuration.get[Boolean]("features.welsh-translation")
+    getBoolean("features.welsh-translation")
 
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
   )
 
-  lazy val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
-  lazy val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
+  lazy val timeout: Int   = getInt("timeout-dialog.timeout")
+  lazy val countdown: Int = getInt("timeout-dialog.countdown")
+  lazy val cacheTtl: Long = getInt("mongodb.timeToLiveInSeconds")
 
-  lazy val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+  lazy val listOfRegisteredIsaManagersUrl: String = getString("urls.external.listOfRegisteredIsaManagers")
+  lazy val p2pLoansInformationUrl: String         = getString("urls.external.p2pLoansInformation")
 
-  lazy val listOfRegisteredIsaManagersUrl: String =
-    configuration.get[String]("urls.external.listOfRegisteredIsaManagers")
+  lazy val incorporatedEntityIdentificationHost: String =
+    baseUrl("incorporated-entity-identification-frontend")
 
-  lazy val p2pLoansInformationUrl: String = configuration.get[String]("urls.external.p2pLoansInformation")
+  def grsRetrieveResultUrl(journeyId: String): String =
+    s"$incorporatedEntityIdentificationHost/incorporated-entity-identification/api/journey/$journeyId"
+
+  lazy val grsCallback: String = s"$host/obligations/enrolment/isa/incorporated-identity-callback"
+
+  lazy val accessibilityStatementUrl = s"/accessibility-statement/disa-registration-frontend"
+
 }

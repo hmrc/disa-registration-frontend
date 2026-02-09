@@ -31,7 +31,6 @@ import play.api.libs.json.Writes
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.JourneyAnswersService
 import views.html.isaproducts.PeerToPeerPlatformNumberView
 
 import scala.concurrent.Future
@@ -122,8 +121,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
         val application =
           applicationBuilder(journeyData = Some(validJourneyData))
             .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-              bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
             )
             .build()
 
@@ -164,8 +162,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
         val dataMissingName = validJourneyData.copy(isaProducts = Some(IsaProducts(p2pPlatform = None)))
 
         val application = applicationBuilder(
-          journeyData = Some(dataMissingName),
-          bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
+          journeyData = Some(dataMissingName)
         ).build()
 
         running(application) {
@@ -186,8 +183,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
         val application =
           applicationBuilder(journeyData = Some(validJourneyData))
             .overrides(
-              bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-              bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
+              bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
             )
             .build()
 

@@ -16,22 +16,33 @@
 
 package controllers
 
-import controllers.actions.IdentifierAction
-import play.api.i18n.I18nSupport
+import controllers.actions.*
+import forms.InnovativeFinancialProductsFormProvider
+import models.journeydata.isaproducts.InnovativeFinancialProduct
+import play.api.Logging
+import play.api.data.Form
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.InternalServerErrorView
+import views.html.TaskListView
 
 import javax.inject.Inject
 
-class InternalServerErrorController @Inject() (
-  val controllerComponents: MessagesControllerComponents,
+class TaskListController @Inject() (
+  override val messagesApi: MessagesApi,
   identify: IdentifierAction,
-  view: InternalServerErrorView
+  getData: DataRetrievalAction,
+  formProvider: InnovativeFinancialProductsFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: TaskListView
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad(): Action[AnyContent] = identify { implicit request =>
-    InternalServerError(view())
-  }
+  val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
+
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData) { implicit request =>
+      Ok(view())
+    }
 }

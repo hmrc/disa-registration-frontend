@@ -25,10 +25,11 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 import scala.util.Random
 
 trait TestData extends Generators {
-  val testString             = "test"
-  val testGroupId: String    = "id"
-  val testCredentials        = Credentials(testString, testString)
-  val testCredentialRoleUser = User
+  val testString              = "test"
+  val testGroupId: String     = "id"
+  val testEnrolmentId: String = "id"
+  val testCredentials         = Credentials(testString, testString)
+  val testCredentialRoleUser  = User
 
   def emptyJourneyData: JourneyData = JourneyData(testGroupId, testString)
 

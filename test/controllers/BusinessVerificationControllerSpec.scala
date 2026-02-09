@@ -19,24 +19,24 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.InternalServerErrorView
+import views.html.BusinessVerificationLockOutView
 
-class InternalServerErrorControllerSpec extends SpecBase {
+class BusinessVerificationControllerSpec extends SpecBase {
 
-  "Internal Server Error Controller" - {
+  "BusinessVerificationController" - {
 
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.InternalServerErrorController.onPageLoad().url)
+        val request = FakeRequest(GET, routes.BusinessVerificationController.lockout().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[InternalServerErrorView]
+        val view = application.injector.instanceOf[BusinessVerificationLockOutView]
 
-        status(result) mustEqual INTERNAL_SERVER_ERROR
+        status(result) mustEqual OK
 
         contentAsString(result) mustEqual view()(request, messages(application)).toString
       }

@@ -23,8 +23,7 @@ import models.journeydata.JourneyData
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansAndHave36hPermissions
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
@@ -33,7 +32,6 @@ import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.JourneyAnswersService
 import views.html.isaproducts.InnovativeFinancialProductsView
 
 import scala.concurrent.Future
@@ -105,8 +103,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
       val application =
         applicationBuilder(journeyData = Some(journeyData))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
           .build()
 
@@ -133,10 +130,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
 
       val application =
         applicationBuilder(journeyData = None)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[JourneyAnswersService].toInstance(mockJourneyAnswersService)
-          )
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {

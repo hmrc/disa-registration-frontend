@@ -18,7 +18,7 @@ package base
 
 import config.FrontendAppConfig
 import connectors.DisaRegistrationConnector
-import controllers.actions.{DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRequiredActionImpl, DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
 import handlers.ErrorHandler
 import models.journeydata.JourneyData
 import org.mockito.ArgumentMatchers.any
@@ -37,7 +37,7 @@ import play.api.mvc.Results.{BadRequest, InternalServerError}
 import play.api.mvc.{PlayBodyParsers, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.{Application, inject}
-import services.{AuditService, JourneyAnswersService, SubmissionService}
+import services.{AuditService, GrsService, JourneyAnswersService, SubmissionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -59,8 +59,9 @@ trait SpecBase
     with MockitoSugar
     with JourneyDataBuilder {
 
-  implicit def messages(implicit app: Application): Messages   =
+  implicit def messages(implicit app: Application): Messages =
     app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+
   def messages(key: String)(implicit app: Application): String = messages(app).messages(key)
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
@@ -71,6 +72,7 @@ trait SpecBase
   protected val mockDisaRegistrationConnector: DisaRegistrationConnector = mock[DisaRegistrationConnector]
   protected val mockJourneyAnswersService: JourneyAnswersService         = mock[JourneyAnswersService]
   protected val mockSubmissionService: SubmissionService                 = mock[SubmissionService]
+  protected val mockGrsService: GrsService                               = mock[GrsService]
   protected val mockAuditService: AuditService                           = mock[AuditService]
   protected val mockHttpClient: HttpClientV2                             = mock[HttpClientV2]
   protected val mockAppConfig: FrontendAppConfig                         = mock[FrontendAppConfig]
@@ -101,8 +103,11 @@ trait SpecBase
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
-        inject.bind[IdentifierAction].toInstance(new FakeIdentifierAction(parsers)),
+        inject.bind[DataRequiredAction].to[DataRequiredActionImpl],
+        inject.bind[IdentifierAction].to[FakeIdentifierAction],
         inject.bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
+        inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
+        inject.bind[GrsService].toInstance(mockGrsService),
         inject.bind[ErrorHandler].toInstance(mockErrorHandler)
       )
       .overrides(overrides: _*)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package models.grs
 
 import play.api.libs.json.{Json, OFormat}
 
-case class BusinessVerification(
-  businessRegistrationPassed: Option[Boolean],
-  businessVerificationPassed: Option[Boolean],
-  ctUtr: Option[String]
-) extends TaskListSection {
-  override def sectionName: String = "businessVerification"
-}
+case class GrsCreateJourneyRequest(
+  continueUrl: String,
+  businessVerificationCheck: Boolean,
+  deskProServiceId: String,
+  signOutUrl: String,
+  regime: String,
+  accessibilityUrl: String,
+  labels: Option[Labels]
+)
 
-object BusinessVerification {
-  implicit val format: OFormat[BusinessVerification] = Json.format[BusinessVerification]
+object GrsCreateJourneyRequest {
+  implicit val format: OFormat[GrsCreateJourneyRequest] = Json.format[GrsCreateJourneyRequest]
 }

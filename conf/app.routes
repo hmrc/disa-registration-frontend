@@ -8,7 +8,16 @@ GET         /assets/*file                                controllers.Assets.vers
 
 GET         /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /there-is-a-problem                                 controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+
+GET         /start                                       controllers.StartController.onPageLoad()
+
+GET         /task-list                                   controllers.TaskListController.onPageLoad()
+
+GET         /incorporated-identity-callback              controllers.GrsController.grsCallback(journeyId: String)
+
+GET         /business-verification-lockout               controllers.BusinessVerificationController.lockout()
+
 
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
@@ -36,10 +45,10 @@ POST       /z-reference-number                           controllers.orgdetails.
 GET        /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /trading-using-different-name                        controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /trading-using-different-name                        controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = NormalMode)
-GET        /change-trading-using-different-name                   controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = CheckMode)
+GET        /trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = NormalMode)
+POST       /trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = NormalMode)
+GET        /change-trading-using-different-name          controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-trading-using-different-name          controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = CheckMode)
 
 GET        /trading-name                                 controllers.orgdetails.TradingNameController.onPageLoad(mode: Mode = NormalMode)
 POST       /trading-name                                 controllers.orgdetails.TradingNameController.onSubmit(mode: Mode = NormalMode)
@@ -47,9 +56,9 @@ GET        /change-trading-name                          controllers.orgdetails.
 POST       /change-trading-name                          controllers.orgdetails.TradingNameController.onSubmit(mode: Mode = CheckMode)
 
 GET        /firm-reference-number                        controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /firm-reference-number                         controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /change-firm-reference-number                controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-firm-reference-number                   controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = CheckMode)
+POST       /firm-reference-number                        controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
 ## ISA Products
 GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)

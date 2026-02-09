@@ -28,9 +28,15 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
 
   override val model: JourneyData =
     JourneyData(
-      groupId = testGroupId,
       enrolmentId = testString,
-      businessVerification = Some(BusinessVerification(Some("A"), Some("B"))),
+      groupId = testGroupId,
+      businessVerification = Some(
+        BusinessVerification(
+          businessRegistrationPassed = Some(true),
+          businessVerificationPassed = Some(true),
+          ctUtr = Some("12345678")
+        )
+      ),
       isaProducts = Some(IsaProducts(Some(IsaProduct.values), Some(testString), Some(testString))),
       organisationDetails =
         Some(OrganisationDetails(Some(true), Some("Z1"), Some(true), Some(testString), Some(testString), None)),
@@ -44,8 +50,8 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
   override val json: JsValue = Json.parse("""
     {
       "groupId": "id",
+      "businessVerification": { "businessRegistrationPassed": true, "businessVerificationPassed": true, "ctUtr": "12345678"},
       "enrolmentId": "test",
-      "businessVerification": { "dataItem": "A", "dataItem2": "B" },
       "organisationDetails": {
         "registeredToManageIsa": true,
         "zRefNumber": "Z1",
