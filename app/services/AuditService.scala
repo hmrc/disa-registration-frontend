@@ -22,7 +22,7 @@ import models.journeydata.JourneyData
 import models.submission.SubmissionResult
 import play.api.Logging
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
-import services.AuditTypes.{Audit, EnrolmentSubmitted}
+import services.AuditTypes.{Audit, EnrolmentSubmitted, EnrolmentStarted}
 import uk.gov.hmrc.auth.core.CredentialRole
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,6 +35,24 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
+  def auditNewEnrolmentStarted(
+                                credentials: Credentials,
+                                credentialRole: CredentialRole,
+                                enrolmentId: String,
+                                groupId: String
+                              ) = {
+    val data = Json.obj(
+      EventData.credId.toString -> credentials.providerId,
+      EventData.providerType.toString -> credentials.providerType,
+      EventData.internalRegId.toString -> enrolmentId,
+      EventData.credentialRole.toString -> credentialRole.toString,
+      EventData.groupId.toString -> groupId,
+      EventData.journeyType.toString -> "newEnrolment"
+    )
+
+    val event = createAuditEvent(EnrolmentSubmitted, data)
+    connector.sendExtendedEvent(event).map(logResponse(_, EnrolmentStarted.toString))
+  }
   def auditEnrolmentSubmission(
     status: SubmissionResult,
     credentials: Credentials,
@@ -79,10 +97,10 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
 
 object AuditTypes extends Enumeration {
   type Audit = Value
-  val EnrolmentSubmitted = Value
+  val EnrolmentSubmitted, EnrolmentStarted = Value
 }
 
 object EventData extends Enumeration {
   type Data = Value
-  val providerType, internalRegId, credId, credentialRole, groupId, submissionStatus, failureReason, payload = Value
+  val providerType, internalRegId, credId, credentialRole, groupId, submissionStatus, failureReason, payload, journeyType = Value
 }
