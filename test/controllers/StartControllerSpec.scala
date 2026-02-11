@@ -173,7 +173,7 @@ class StartControllerSpec extends SpecBase {
         running(application) {
           val result = route(application, fakeRequest).value
 
-          status(result) shouldBe SEE_OTHER
+          status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe
             controllers.routes.InternalServerErrorController.onPageLoad().url
         }
@@ -187,6 +187,9 @@ class StartControllerSpec extends SpecBase {
 
         when(mockJourneyAnswersService.getOrCreateEnrolment(any)(any))
           .thenReturn(Future.successful(GetOrCreateEnrolmentResponse(true, journeyData)))
+
+        when(mockAuditService.auditNewEnrolmentStarted(any, any, any, any)(any))
+          .thenReturn(Future.unit)
 
         when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
           .thenReturn(Future.successful("http://grs-start-url"))

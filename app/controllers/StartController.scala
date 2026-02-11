@@ -53,14 +53,16 @@ class StartController @Inject() (
           .getOrCreateEnrolment(request.groupId)
           .map(resp =>
             if (resp.isNewEnrolment)
-              auditService.auditNewEnrolmentStarted(
-                request.credentials,
-                request.credentialRole,
-                resp.journeyData.enrolmentId,
-                request.groupId
-              ).recover { case e =>
-                logger.warn(s"Failed to audit EnrolmentStarted for groupId [${request.groupId}]", e)
-              }
+              auditService
+                .auditNewEnrolmentStarted(
+                  request.credentials,
+                  request.credentialRole,
+                  resp.journeyData.enrolmentId,
+                  request.groupId
+                )
+                .recover { case e =>
+                  logger.warn(s"Failed to audit EnrolmentStarted for groupId [${request.groupId}]", e)
+                }
             resp.journeyData
           )
 
