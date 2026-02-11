@@ -46,30 +46,38 @@ class StartController @Inject() (
 
   val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = {
+  def onPageLoad(): Action[AnyContent] =
     identify.async { implicit request =>
-      handleNewEnrolmentStarted()
-        .flatMap(_.businessVerification.map(_.businessVerificationPassed) match {
-          case Some(true) =>
+
+      def handleNewEnrolments(): Future[JourneyData] =
+        journeyAnswersService
+          .getOrCreateEnrolment(request.groupId)
+          .map(resp =>
+            if (resp.isNewEnrolment)
+              auditService.auditNewEnrolmentStarted(
+                request.credentials,
+                request.credentialRole,
+                resp.journeyData.enrolmentId,
+                request.groupId
+              )
+            resp.journeyData
+          )
+
+      handleNewEnrolments()
+        .flatMap(_.businessVerification.flatMap(_.businessVerificationPassed) match {
+          case Some(true)  =>
             Future.successful(Redirect(routes.TaskListController.onPageLoad()))
           case Some(false) =>
             // Implement logic to check kick out time from BV failed timestamp?
             // Not sure if we can add ttl to sub objects in mongo doc? probs not?
             Future.successful(Redirect(controllers.routes.BusinessVerificationController.lockout()))
-          case _ =>
+          case _           =>
             genericRegistrationService.getGRSJourneyStartUrl
               .map(url => Redirect(url))
               .recover { case ex =>
                 logger.error("Failed to fetch GRS journey URL", ex)
                 Redirect(controllers.routes.InternalServerErrorController.onPageLoad())
               }
-        }
-
-      def handleNewEnrolmentStarted(): Future[JourneyData] = {
-        journeyAnswersService.getOrCreate(request.groupId).map(resp =>
-          if (resp.isNewEnrolment) auditService.auditNewEnrolmentStarted(request.credentials, request.credentialRole, resp.journeyData.enrolmentId, request.groupId)
-          resp.journeyData
-      }
+        })
     }
-  }
 }

@@ -17,7 +17,7 @@
 package services
 
 import connectors.DisaRegistrationConnector
-import models.GetOrCreateResponse
+import models.GetOrCreateEnrolmentResponse
 import models.journeydata.{JourneyData, TaskListSection}
 import play.api.Logging
 import play.api.libs.json.Writes
@@ -38,6 +38,6 @@ class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector) ext
     connector.updateTaskListJourney(taskListSection, groupId, sectionName)
   }
 
-  def getOrCreate(groupId: String)(implicit hc: HeaderCarrier): Future[GetOrCreateResponse] =
-    connector.getOrCreate(groupId)
+  def getOrCreateEnrolment(groupId: String)(implicit hc: HeaderCarrier): Future[GetOrCreateEnrolmentResponse] =
+    connector.getOrCreateEnrolment(groupId)
 }
