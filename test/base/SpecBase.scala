@@ -18,7 +18,7 @@ package base
 
 import config.FrontendAppConfig
 import connectors.DisaRegistrationConnector
-import controllers.actions.{DataRequiredAction, DataRequiredActionImpl, DataRetrievalAction, FakeDataRetrievalAction, FakeIdentifierAction, IdentifierAction}
+import controllers.actions.*
 import handlers.ErrorHandler
 import models.journeydata.JourneyData
 import org.mockito.ArgumentMatchers.any
@@ -33,8 +33,8 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.Injector
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
+import play.api.mvc.RequestHeader
 import play.api.mvc.Results.{BadRequest, InternalServerError}
-import play.api.mvc.{PlayBodyParsers, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.{Application, inject}
 import services.{AuditService, GrsService, JourneyAnswersService, SubmissionService}
@@ -89,13 +89,12 @@ trait SpecBase
       mockAuditService,
       mockHttpClient,
       mockAppConfig,
-      mockRequestBuilder
+      mockRequestBuilder,
+      mockGrsService
     )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))
   }
-
-  private val parsers = injector.instanceOf[PlayBodyParsers]
 
   protected def applicationBuilder(
     journeyData: Option[JourneyData],

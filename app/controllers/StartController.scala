@@ -33,7 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class StartController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
-  getData: DataRetrievalAction,
   formProvider: InnovativeFinancialProductsFormProvider,
   val controllerComponents: MessagesControllerComponents,
   genericRegistrationService: GrsService,
@@ -59,7 +58,9 @@ class StartController @Inject() (
                 request.credentialRole,
                 resp.journeyData.enrolmentId,
                 request.groupId
-              )
+              ).recover { case e =>
+                logger.warn(s"Failed to audit EnrolmentStarted for groupId [${request.groupId}]", e)
+              }
             resp.journeyData
           )
 
@@ -79,5 +80,9 @@ class StartController @Inject() (
                 Redirect(controllers.routes.InternalServerErrorController.onPageLoad())
               }
         })
+        .recover { case ex =>
+          logger.error(s"Failed to getOrCreateEnrolment for groupId [$request.groupId]", ex)
+          Redirect(controllers.routes.InternalServerErrorController.onPageLoad())
+        }
     }
 }

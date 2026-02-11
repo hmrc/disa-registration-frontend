@@ -23,14 +23,15 @@ import play.api.libs.json.*
 trait JsonFormatSpec[A] extends SpecBase {
 
   def model: A
-  def json: JsValue
+  def expectedJsonFromWrites: JsValue
+  def incomingJsonToRead: JsValue = expectedJsonFromWrites
   implicit def format: Format[A]
 
   "must serialise to JSON" in {
-    Json.toJson(model) mustBe json
+    Json.toJson(model) mustBe expectedJsonFromWrites
   }
 
   "must deserialise from JSON" in {
-    json.as[A] mustBe model
+    incomingJsonToRead.as[A] mustBe model
   }
 }

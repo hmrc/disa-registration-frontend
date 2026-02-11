@@ -25,11 +25,12 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 import scala.util.Random
 
 trait TestData extends Generators {
-  val testString              = "test"
-  val testGroupId: String     = "id"
-  val testEnrolmentId: String = "id"
-  val testCredentials         = Credentials(testString, testString)
-  val testCredentialRoleUser  = User
+  val testString             = "test"
+  val testGroupId            = "3147318d-1cd9-4534-a4e8-ae268ea923ed"
+  val testEnrolmentId        = "2b2825af-d5a6-4518-a6cb-67ddb4e66952"
+  val testZRef               = s"Z${(1 to 4).map(_ => Random.nextInt(10)).mkString}"
+  val testCredentials        = Credentials(testString, testString)
+  val testCredentialRoleUser = User
 
   def emptyJourneyData: JourneyData = JourneyData(testGroupId, testString)
 
@@ -42,5 +43,4 @@ trait TestData extends Generators {
     )
   val testJourneyData: JourneyData        =
     JourneyData(groupId = testGroupId, enrolmentId = testString, isaProducts = Some(testIsaProductsAnswers))
-  val testZRef                            = s"Z${(1 to 4).map(_ => Random.nextInt(10)).mkString}"
 }

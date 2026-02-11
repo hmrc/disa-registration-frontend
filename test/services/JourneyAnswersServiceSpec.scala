@@ -22,6 +22,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar.mock
+import models.GetOrCreateEnrolmentResponse
 
 import scala.concurrent.Future
 
@@ -99,5 +100,35 @@ class JourneyAnswersServiceSpec extends SpecBase {
         thrown mustBe ex
       }
     }
+
+    "getOrCreateEnrolment" - {
+
+      "must return GetOrCreateEnrolmentResponse when connector returns a response" in {
+        val response = GetOrCreateEnrolmentResponse(
+          isNewEnrolment = true,
+          journeyData = testJourneyData
+        )
+
+        when(mockConnector.getOrCreateEnrolment(ArgumentMatchers.eq(testGroupId))(any()))
+          .thenReturn(Future.successful(response))
+
+        val result = service.getOrCreateEnrolment(testGroupId).futureValue
+
+        result mustBe response
+        verify(mockConnector).getOrCreateEnrolment(testGroupId)
+      }
+
+      "must propagate exception from connector" in {
+        val ex = new Exception
+
+        when(mockConnector.getOrCreateEnrolment(ArgumentMatchers.eq(testGroupId))(any()))
+          .thenReturn(Future.failed(ex))
+
+        val thrown = service.getOrCreateEnrolment(testGroupId).failed.futureValue
+
+        thrown mustBe ex
+      }
+    }
+
   }
 }

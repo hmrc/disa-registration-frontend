@@ -20,6 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import models.journeydata.JourneyData
 import models.submission.EnrolmentSubmissionResponse
+import models.GetOrCreateEnrolmentResponse
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -47,6 +48,8 @@ class DisaRegistrationConnectorSpec extends SpecBase {
     when(mockRequestBuilder.withBody(any())(any, any, any)).thenReturn(mockRequestBuilder)
 
     when(mockHttpClient.post(url"$testUrl/disa-registration/$testGroupId/declare-and-submit"))
+      .thenReturn(mockRequestBuilder)
+    when(mockHttpClient.post(url"$testUrl/disa-registration/$testGroupId/enrolment"))
       .thenReturn(mockRequestBuilder)
   }
 
@@ -102,6 +105,48 @@ class DisaRegistrationConnectorSpec extends SpecBase {
         intercept[Throwable] {
           connector.getJourneyData(testGroupId).futureValue
         }
+      }
+    }
+
+    "getOrCreateEnrolment" - {
+
+      "return GetOrCreateEnrolmentResponse on successful call" in new TestSetup {
+        val response = GetOrCreateEnrolmentResponse(
+          isNewEnrolment = true,
+          journeyData = testJourneyData
+        )
+
+        when(mockRequestBuilder.execute[GetOrCreateEnrolmentResponse](any(), any()))
+          .thenReturn(Future.successful(response))
+
+        val result = connector.getOrCreateEnrolment(testGroupId).futureValue
+
+        result shouldBe response
+      }
+
+      "propagate UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
+        val upstreamErrorResponse: UpstreamErrorResponse = UpstreamErrorResponse(
+          message = "Not authorised to access this service",
+          statusCode = 401,
+          reportAs = 401,
+          headers = Map.empty
+        )
+
+        when(mockRequestBuilder.execute[GetOrCreateEnrolmentResponse](any(), any()))
+          .thenReturn(Future.failed(upstreamErrorResponse))
+
+        val thrown = connector.getOrCreateEnrolment(testGroupId).failed.futureValue
+        thrown shouldBe upstreamErrorResponse
+      }
+
+      "propagate Throwable when the call fails with an unexpected exception" in new TestSetup {
+        val runtimeException = new RuntimeException("Connection timeout")
+
+        when(mockRequestBuilder.execute[GetOrCreateEnrolmentResponse](any(), any()))
+          .thenReturn(Future.failed(runtimeException))
+
+        val thrown = connector.getOrCreateEnrolment(testGroupId).failed.futureValue
+        thrown shouldBe runtimeException
       }
     }
 
@@ -192,6 +237,5 @@ class DisaRegistrationConnectorSpec extends SpecBase {
         thrown shouldBe runtimeException
       }
     }
-
   }
 }
