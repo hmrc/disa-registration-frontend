@@ -79,9 +79,9 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
   }
 
   def getOrCreateJourneyData(groupId: String)(implicit hc: HeaderCarrier): Future[GetOrCreateJourneyData] = {
-    val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/$groupId/enrolment"
+    val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/journey/$groupId"
     http
-      .post(url"$url")
+      .put(url"$url")
       .execute[HttpResponse]
       .map { response =>
         lazy val jd = response.json.as[JourneyData]

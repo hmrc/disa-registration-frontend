@@ -20,13 +20,13 @@ import play.api.http.Status.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, redirectLocation, route, status, writeableOf_AnyContentAsEmpty}
 import uk.gov.hmrc.http.SessionKeys
-import utils.WiremockHelper.stubPost
+import utils.WiremockHelper.{stubPost, stubPut}
 import utils.{BaseIntegrationSpec, CommonStubs}
 
 class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
 
   private val controllerEndpoint = "/obligations/enrolment/isa/start"
-  private val getOrCreateEnrolmentUrl = s"/disa-registration/$testGroupId/enrolment"
+  private val getOrCreateEnrolmentUrl = s"/disa-registration/journey/$testGroupId"
   private val grsStartUrl = "/incorporated-entity-identification/api/limited-company-journey"
 
   "GET /start" should {
@@ -46,7 +46,7 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
            |""".stripMargin
 
       stubAuth()
-      stubPost(getOrCreateEnrolmentUrl, CREATED, journeyData)
+      stubPut(getOrCreateEnrolmentUrl, CREATED, journeyData)
 
       val request =
         FakeRequest(GET, controllerEndpoint)
@@ -73,7 +73,7 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
            |""".stripMargin
 
       stubAuth()
-      stubPost(getOrCreateEnrolmentUrl, CREATED, journeyData)
+      stubPut(getOrCreateEnrolmentUrl, CREATED, journeyData)
 
       val request =
         FakeRequest(GET, controllerEndpoint)
@@ -95,7 +95,7 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
            |""".stripMargin
 
       stubAuth()
-      stubPost(getOrCreateEnrolmentUrl, OK, journeyData)
+      stubPut(getOrCreateEnrolmentUrl, OK, journeyData)
       stubPost(
         grsStartUrl,
         OK,
@@ -122,7 +122,7 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
            |""".stripMargin
 
       stubAuth()
-      stubPost(getOrCreateEnrolmentUrl, OK, journeyData)
+      stubPut(getOrCreateEnrolmentUrl, OK, journeyData)
       stubPost(
         grsStartUrl,
         INTERNAL_SERVER_ERROR,

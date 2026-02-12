@@ -51,7 +51,7 @@ class DisaRegistrationConnectorSpec extends SpecBase {
 
     when(mockHttpClient.post(url"$testUrl/disa-registration/$testGroupId/declare-and-submit"))
       .thenReturn(mockRequestBuilder)
-    when(mockHttpClient.post(url"$testUrl/disa-registration/$testGroupId/enrolment"))
+    when(mockHttpClient.put(url"$testUrl/disa-registration/journey/$testGroupId"))
       .thenReturn(mockRequestBuilder)
   }
 
