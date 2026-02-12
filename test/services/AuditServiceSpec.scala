@@ -174,4 +174,63 @@ class AuditServiceSpec extends SpecBase {
         .futureValue mustEqual ()
     }
   }
+
+  "AuditService.auditNewEnrolmentStarted" - {
+
+    "must send an EnrolmentStarted event with the expected base detail fields" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubAuditResult(Success)
+
+      service
+        .auditNewEnrolmentStarted(
+          credentials = credentials,
+          credentialRole = credentialRole,
+          enrolmentId = testEnrolmentId,
+          groupId = testGroupId
+        )
+        .futureValue mustEqual ()
+
+      val event = captureEvent()
+
+      event.auditSource mustEqual "disa-registration-frontend"
+      event.auditType mustEqual AuditTypes.EnrolmentStarted.toString
+
+      val detail = event.detail.as[JsObject]
+
+      (detail \ EventData.credId.toString).as[String] mustEqual credentials.providerId
+      (detail \ EventData.providerType.toString).as[String] mustEqual credentials.providerType
+      (detail \ EventData.internalRegId.toString).as[String] mustEqual testEnrolmentId
+      (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
+      (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
+      (detail \ EventData.journeyType.toString).as[String] mustEqual EventData.startEnrolment.toString
+    }
+
+    "must complete successfully even when auditing is Disabled" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubAuditResult(Disabled)
+
+      service
+        .auditNewEnrolmentStarted(
+          credentials = credentials,
+          credentialRole = credentialRole,
+          enrolmentId = testEnrolmentId,
+          groupId = testGroupId
+        )
+        .futureValue mustEqual ()
+    }
+
+    "must complete successfully even when auditing returns Failure" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubAuditResult(Failure("fubar", None))
+
+      service
+        .auditNewEnrolmentStarted(
+          credentials = credentials,
+          credentialRole = credentialRole,
+          enrolmentId = testEnrolmentId,
+          groupId = testGroupId
+        )
+        .futureValue mustEqual ()
+    }
+  }
 }

@@ -33,7 +33,7 @@ class GrsCreateJourneyRequestSpec extends JsonFormatSpec[GrsCreateJourneyRequest
 
   override val model: GrsCreateJourneyRequest = testJourneyRequest
 
-  override val json: JsValue = Json.parse("""
+  override val expectedJsonFromWrites: JsValue = Json.parse("""
     {
       "continueUrl": "http://localhost/continue",
       "businessVerificationCheck": true,

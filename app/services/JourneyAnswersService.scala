@@ -17,6 +17,7 @@
 package services
 
 import connectors.DisaRegistrationConnector
+import models.GetOrCreateJourneyData
 import models.journeydata.{JourneyData, TaskListSection}
 import play.api.Logging
 import play.api.libs.json.Writes
@@ -36,4 +37,7 @@ class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector) ext
     val sectionName = taskListSection.sectionName
     connector.updateTaskListJourney(taskListSection, groupId, sectionName)
   }
+
+  def getOrCreateJourneyData(groupId: String)(implicit hc: HeaderCarrier): Future[GetOrCreateJourneyData] =
+    connector.getOrCreateJourneyData(groupId)
 }

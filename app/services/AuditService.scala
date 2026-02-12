@@ -22,10 +22,11 @@ import models.journeydata.JourneyData
 import models.submission.SubmissionResult
 import play.api.Logging
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
-import services.AuditTypes.{Audit, EnrolmentSubmitted}
+import services.AuditTypes.{Audit, EnrolmentStarted, EnrolmentSubmitted}
 import uk.gov.hmrc.auth.core.CredentialRole
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -35,6 +36,24 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
+  def auditNewEnrolmentStarted(
+    credentials: Credentials,
+    credentialRole: CredentialRole,
+    enrolmentId: String,
+    groupId: String
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
+    val data = Json.obj(
+      EventData.credId.toString         -> credentials.providerId,
+      EventData.providerType.toString   -> credentials.providerType,
+      EventData.internalRegId.toString  -> enrolmentId,
+      EventData.credentialRole.toString -> credentialRole.toString,
+      EventData.groupId.toString        -> groupId,
+      EventData.journeyType.toString    -> EventData.startEnrolment.toString
+    )
+
+    val event = createAuditEvent(EnrolmentStarted, data)
+    connector.sendExtendedEvent(event).map(logResponse(_, EnrolmentStarted.toString))
+  }
   def auditEnrolmentSubmission(
     status: SubmissionResult,
     credentials: Credentials,
@@ -63,12 +82,18 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     connector.sendExtendedEvent(event).map(logResponse(_, EnrolmentSubmitted.toString))
   }
 
-  private def createAuditEvent(audit: Audit, auditData: JsValue): ExtendedDataEvent =
+  private def createAuditEvent(audit: Audit, auditData: JsValue)(implicit hc: HeaderCarrier): ExtendedDataEvent =
     ExtendedDataEvent(
       auditSource = appConfig.appName,
       auditType = audit.toString,
+      tags = getAuditTags,
       detail = auditData
     )
+
+  private def getAuditTags(implicit hc: HeaderCarrier): Map[String, String] =
+    AuditExtensions
+      .auditHeaderCarrier(hc)
+      .toAuditTags()
 
   private def logResponse(result: AuditResult, auditType: String): Unit = result match {
     case Success         => logger.info(s"$auditType audit successful")
@@ -79,10 +104,11 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
 
 object AuditTypes extends Enumeration {
   type Audit = Value
-  val EnrolmentSubmitted = Value
+  val EnrolmentSubmitted, EnrolmentStarted = Value
 }
 
 object EventData extends Enumeration {
   type Data = Value
-  val providerType, internalRegId, credId, credentialRole, groupId, submissionStatus, failureReason, payload = Value
+  val providerType, internalRegId, credId, credentialRole, groupId, submissionStatus, failureReason, payload,
+    journeyType, startEnrolment = Value
 }
