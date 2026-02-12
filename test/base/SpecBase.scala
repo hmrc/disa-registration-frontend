@@ -104,6 +104,9 @@ trait SpecBase
       .overrides(
         inject.bind[DataRequiredAction].to[DataRequiredActionImpl],
         inject.bind[IdentifierAction].to[FakeIdentifierAction],
+        inject
+          .bind[GetOrCreateJourneyDataAction]
+          .toInstance(new FakeGetOrCreateJourneyDataAction(journeyData.getOrElse(emptyJourneyData))),
         inject.bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
         inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
         inject.bind[GrsService].toInstance(mockGrsService),

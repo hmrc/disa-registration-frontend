@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.GetOrCreateEnrolmentResponse
+import models.GetOrCreateJourneyData
 import models.journeydata.{BusinessVerification, JourneyData}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
@@ -53,8 +53,8 @@ class StartControllerSpec extends SpecBase {
           )
         )
 
-        when(mockJourneyAnswersService.getOrCreateEnrolment(any)(any))
-          .thenReturn(Future.successful(GetOrCreateEnrolmentResponse(false, journeyData)))
+        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+          .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
 
         val application =
           applicationBuilder(journeyData = Some(journeyData)).build()
@@ -81,8 +81,8 @@ class StartControllerSpec extends SpecBase {
           )
         )
 
-        when(mockJourneyAnswersService.getOrCreateEnrolment(any)(any))
-          .thenReturn(Future.successful(GetOrCreateEnrolmentResponse(false, journeyData)))
+        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+          .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
 
         val application =
           applicationBuilder(journeyData = Some(journeyData)).build()
@@ -103,8 +103,8 @@ class StartControllerSpec extends SpecBase {
         when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
           .thenReturn(Future.successful("http://grs-start-url"))
 
-        when(mockJourneyAnswersService.getOrCreateEnrolment(any)(any))
-          .thenReturn(Future.successful(GetOrCreateEnrolmentResponse(false, emptyJourneyData)))
+        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+          .thenReturn(Future.successful(GetOrCreateJourneyData(false, emptyJourneyData)))
 
         running(application) {
           val result = route(application, fakeRequest).value
@@ -130,8 +130,8 @@ class StartControllerSpec extends SpecBase {
         val application =
           applicationBuilder(journeyData = Some(journeyData)).build()
 
-        when(mockJourneyAnswersService.getOrCreateEnrolment(any)(any))
-          .thenReturn(Future.successful(GetOrCreateEnrolmentResponse(false, journeyData)))
+        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+          .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
 
         when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
           .thenReturn(Future.successful("http://grs-start-url"))
@@ -148,8 +148,8 @@ class StartControllerSpec extends SpecBase {
         val application =
           applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
-        when(mockJourneyAnswersService.getOrCreateEnrolment(any)(any))
-          .thenReturn(Future.successful(GetOrCreateEnrolmentResponse(false, emptyJourneyData)))
+        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+          .thenReturn(Future.successful(GetOrCreateJourneyData(false, emptyJourneyData)))
 
         when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
           .thenReturn(Future.failed(new Exception("GRS down")))
@@ -160,82 +160,6 @@ class StartControllerSpec extends SpecBase {
           status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe
             controllers.routes.InternalServerErrorController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Internal Server Error page when journey service fails" in {
-        val application =
-          applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-
-        when(mockJourneyAnswersService.getOrCreateEnrolment(any)(any))
-          .thenReturn(Future.failed(new Exception("GRS down")))
-
-        running(application) {
-          val result = route(application, fakeRequest).value
-
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe
-            controllers.routes.InternalServerErrorController.onPageLoad().url
-        }
-      }
-
-      "must audit EnrolmentStarted(startEnrolment) when user is new and then redirect appropriately" in {
-        val journeyData = JourneyData(
-          groupId = testGroupId,
-          enrolmentId = testEnrolmentId
-        )
-
-        when(mockJourneyAnswersService.getOrCreateEnrolment(any)(any))
-          .thenReturn(Future.successful(GetOrCreateEnrolmentResponse(true, journeyData)))
-
-        when(mockAuditService.auditNewEnrolmentStarted(any, any, any, any)(any))
-          .thenReturn(Future.unit)
-
-        when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
-          .thenReturn(Future.successful("http://grs-start-url"))
-
-        val application =
-          applicationBuilder(journeyData = Some(journeyData), inject.bind[AuditService].toInstance(mockAuditService))
-            .build()
-
-        running(application) {
-          val result = route(application, fakeRequest).value
-
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe "http://grs-start-url"
-
-          verify(mockAuditService, times(1)).auditNewEnrolmentStarted(
-            any(),
-            any(),
-            eqTo(testEnrolmentId),
-            eqTo(testGroupId)
-          )(any)
-        }
-      }
-
-      "must not audit EnrolmentStarted(newEnrolment) when user is not new" in {
-        val journeyData = JourneyData(
-          groupId = testGroupId,
-          enrolmentId = testEnrolmentId
-        )
-
-        when(mockJourneyAnswersService.getOrCreateEnrolment(any)(any))
-          .thenReturn(Future.successful(GetOrCreateEnrolmentResponse(false, journeyData)))
-
-        when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
-          .thenReturn(Future.successful("http://grs-start-url"))
-
-        val application =
-          applicationBuilder(journeyData = Some(journeyData), inject.bind[AuditService].toInstance(mockAuditService))
-            .build()
-
-        running(application) {
-          val result = route(application, fakeRequest).value
-
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe "http://grs-start-url"
-
-          verifyNoInteractions(mockAuditService)
         }
       }
     }

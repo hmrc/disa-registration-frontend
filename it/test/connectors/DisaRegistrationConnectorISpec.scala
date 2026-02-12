@@ -20,8 +20,9 @@ import models.journeydata.JourneyData
 import models.journeydata.isaproducts.IsaProduct.CashJuniorIsas
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import models.submission.EnrolmentSubmissionResponse
-import models.GetOrCreateEnrolmentResponse
-import play.api.http.Status.{NOT_FOUND, NO_CONTENT, OK, UNAUTHORIZED, CREATED}
+import models.GetOrCreateJourneyData
+import play.api.http.Status.{CREATED, NOT_FOUND, NO_CONTENT, OK, UNAUTHORIZED}
+import play.api.libs.json.JsResultException
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{JsValidationException, UpstreamErrorResponse}
 import utils.BaseIntegrationSpec
@@ -34,21 +35,18 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
   val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   val getOrCreateEnrolmentUrl = s"/disa-registration/$testGroupId/enrolment"
 
-  val getOrCreateEnrolmentJson =
+  val getOrCreateEnrolmentJsonOnCreated =
     s"""
        |{
-       |  "isNewEnrolment": true,
-       |  "journeyData": {
-       |    "groupId": "$testGroupId",
-       |    "enrolmentId": "$testEnrolmentId",
-       |    "status": "Active"
-       |  }
+       |  "groupId": "$testGroupId",
+       |  "enrolmentId": "$testEnrolmentId",
+       |  "status": "Active"
        |}
        |""".stripMargin
 
-  val expectedGetOrCreateEnrolment =
-    GetOrCreateEnrolmentResponse(
-      isNewEnrolment = true,
+  val expectedGetOrCreateEnrolmentOnCreated =
+    GetOrCreateJourneyData(
+      isNewEnrolmentJourney = true,
       journeyData = JourneyData(
         groupId = testGroupId,
         enrolmentId = testEnrolmentId
@@ -139,12 +137,37 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
     }
   }
 
-  "DisaRegistrationConnector.getOrCreateEnrolment" should {
+  "DisaRegistrationConnector.getOrCreateJourneyData" should {
 
-    "return GetOrCreateEnrolmentResponse when backend returns 201" in {
-      stubPost(getOrCreateEnrolmentUrl, CREATED, getOrCreateEnrolmentJson)
+    "return GetOrCreateJourneyData when backend returns 201" in {
+      stubPost(getOrCreateEnrolmentUrl, CREATED, getOrCreateEnrolmentJsonOnCreated)
 
-      val response = await(connector.getOrCreateEnrolment(testGroupId))
+      val response = await(connector.getOrCreateJourneyData(testGroupId))
+
+      response shouldBe expectedGetOrCreateEnrolmentOnCreated
+    }
+
+    "return GetOrCreateJourneyData when backend returns 200" in {
+      val getOrCreateEnrolmentJson =
+        s"""
+           |{
+           |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testEnrolmentId",
+           |  "status": "Active"
+           |}
+           |""".stripMargin
+
+      val expectedGetOrCreateEnrolment =
+        GetOrCreateJourneyData(
+          isNewEnrolmentJourney = false,
+          journeyData = JourneyData(
+            groupId = testGroupId,
+            enrolmentId = testEnrolmentId
+          )
+        )
+      stubPost(getOrCreateEnrolmentUrl, OK, getOrCreateEnrolmentJson)
+
+      val response = await(connector.getOrCreateJourneyData(testGroupId))
 
       response shouldBe expectedGetOrCreateEnrolment
     }
@@ -152,7 +175,7 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
     "propagate exception when backend returns an error status (401)" in {
       stubPost(getOrCreateEnrolmentUrl, UNAUTHORIZED, """{"code":"UNAUTHORIZED", "message":"Unauthorised"}""")
 
-      val err = await(connector.getOrCreateEnrolment(testGroupId).failed)
+      val err = await(connector.getOrCreateJourneyData(testGroupId).failed)
 
       err shouldBe an[UpstreamErrorResponse]
     }
@@ -160,9 +183,9 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
     "propagate exception when the call fails with bad json" in {
       stubPost(getOrCreateEnrolmentUrl, OK, """{"json":"bad"}""")
 
-      val err = await(connector.getOrCreateEnrolment(testGroupId).failed)
+      val err = await(connector.getOrCreateJourneyData(testGroupId).failed)
 
-      err shouldBe an[JsValidationException]
+      err shouldBe an[JsResultException]
     }
   }
 

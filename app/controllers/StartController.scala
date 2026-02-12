@@ -18,13 +18,12 @@ package controllers
 
 import controllers.actions.*
 import forms.InnovativeFinancialProductsFormProvider
-import models.journeydata.JourneyData
 import models.journeydata.isaproducts.InnovativeFinancialProduct
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{AuditService, GrsService, JourneyAnswersService}
+import services.GrsService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -33,11 +32,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class StartController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  getOrCreateJourneyData: GetOrCreateJourneyDataAction,
   formProvider: InnovativeFinancialProductsFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  genericRegistrationService: GrsService,
-  auditService: AuditService,
-  journeyAnswersService: JourneyAnswersService
+  genericRegistrationService: GrsService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -46,45 +44,22 @@ class StartController @Inject() (
   val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
 
   def onPageLoad(): Action[AnyContent] =
-    identify.async { implicit request =>
-
-      def handleNewEnrolments(): Future[JourneyData] =
-        journeyAnswersService
-          .getOrCreateEnrolment(request.groupId)
-          .map(resp =>
-            if (resp.isNewEnrolment)
-              auditService
-                .auditNewEnrolmentStarted(
-                  request.credentials,
-                  request.credentialRole,
-                  resp.journeyData.enrolmentId,
-                  request.groupId
-                )
-                .recover { case e =>
-                  logger.warn(s"Failed to audit EnrolmentStarted for groupId [${request.groupId}]", e)
-                }
-            resp.journeyData
-          )
-
-      handleNewEnrolments()
-        .flatMap(_.businessVerification.flatMap(_.businessVerificationPassed) match {
-          case Some(true)  =>
-            Future.successful(Redirect(routes.TaskListController.onPageLoad()))
-          case Some(false) =>
-            // Implement logic to check kick out time from BV failed timestamp?
-            // Not sure if we can add ttl to sub objects in mongo doc? probs not?
-            Future.successful(Redirect(controllers.routes.BusinessVerificationController.lockout()))
-          case _           =>
-            genericRegistrationService.getGRSJourneyStartUrl
-              .map(url => Redirect(url))
-              .recover { case ex =>
-                logger.error("Failed to fetch GRS journey URL", ex)
-                Redirect(controllers.routes.InternalServerErrorController.onPageLoad())
-              }
-        })
-        .recover { case ex =>
-          logger.error(s"Failed to getOrCreateEnrolment for groupId [$request.groupId]", ex)
-          Redirect(controllers.routes.InternalServerErrorController.onPageLoad())
-        }
+    (identify andThen getOrCreateJourneyData).async { implicit request =>
+      request.journeyData.businessVerification
+        .flatMap(_.businessVerificationPassed) match {
+        case Some(true)  =>
+          Future.successful(Redirect(routes.TaskListController.onPageLoad()))
+        case Some(false) =>
+          // Implement logic to check kick out time from BV failed timestamp?
+          // Not sure if we can add ttl to sub objects in mongo doc? probs not?
+          Future.successful(Redirect(controllers.routes.BusinessVerificationController.lockout()))
+        case _           =>
+          genericRegistrationService.getGRSJourneyStartUrl
+            .map(url => Redirect(url))
+            .recover { case ex =>
+              logger.error("Failed to fetch GRS journey URL", ex)
+              Redirect(controllers.routes.InternalServerErrorController.onPageLoad())
+            }
+      }
     }
 }

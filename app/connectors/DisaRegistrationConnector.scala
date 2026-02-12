@@ -17,11 +17,11 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.GetOrCreateEnrolmentResponse
+import models.GetOrCreateJourneyData
 import models.journeydata.{JourneyData, TaskListSection}
 import models.submission.EnrolmentSubmissionResponse
 import play.api.Logging
-import play.api.http.Status.{NOT_FOUND, NO_CONTENT}
+import play.api.http.Status.{CREATED, NOT_FOUND, NO_CONTENT, OK}
 import play.api.libs.json.{Json, Writes}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -78,11 +78,25 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
       )
   }
 
-  def getOrCreateEnrolment(groupId: String)(implicit hc: HeaderCarrier): Future[GetOrCreateEnrolmentResponse] = {
+  def getOrCreateJourneyData(groupId: String)(implicit hc: HeaderCarrier): Future[GetOrCreateJourneyData] = {
     val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/$groupId/enrolment"
     http
       .post(url"$url")
-      .execute[GetOrCreateEnrolmentResponse]
+      .execute[HttpResponse]
+      .map { response =>
+        lazy val jd = response.json.as[JourneyData]
+        response.status match {
+          case OK      => GetOrCreateJourneyData(false, jd)
+          case CREATED => GetOrCreateJourneyData(true, jd)
+          case status  =>
+            throw new UpstreamErrorResponse(
+              "getOrCreateJourneyData failed",
+              status,
+              status,
+              response.headers
+            )
+        }
+      }
   }
 
   def declareAndSubmit(groupId: String)(implicit hc: HeaderCarrier): Future[EnrolmentSubmissionResponse] = {

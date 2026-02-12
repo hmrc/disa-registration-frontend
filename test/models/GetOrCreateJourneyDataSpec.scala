@@ -16,11 +16,22 @@
 
 package models
 
-import models.journeydata.JourneyData
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsValue, Json, OFormat}
+import utils.JsonFormatSpec
 
-case class GetOrCreateEnrolmentResponse(isNewEnrolment: Boolean, journeyData: JourneyData)
+class GetOrCreateJourneyDataSpec extends JsonFormatSpec[GetOrCreateJourneyData] {
 
-object GetOrCreateEnrolmentResponse {
-  implicit val format: OFormat[GetOrCreateEnrolmentResponse] = Json.format[GetOrCreateEnrolmentResponse]
+  override val model: GetOrCreateJourneyData =
+    GetOrCreateJourneyData(
+      isNewEnrolmentJourney = true,
+      journeyData = testJourneyData
+    )
+
+  override val expectedJsonFromWrites: JsValue =
+    Json.obj(
+      "isNewEnrolmentJourney" -> true,
+      "journeyData"           -> Json.toJson(testJourneyData)
+    )
+
+  override implicit val format: OFormat[GetOrCreateJourneyData] = GetOrCreateJourneyData.format
 }

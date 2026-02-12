@@ -35,8 +35,6 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
       val journeyData =
         s"""
            |{
-           |  "isNewEnrolment": true,
-           |  "journeyData": {
            |    "groupId": "$testGroupId",
            |    "enrolmentId": "$testEnrolmentId",
            |    "businessVerification": {
@@ -44,7 +42,6 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
            |      "businessVerificationPassed": true,
            |      "ctutr": "1234567890"
            |    }
-           |  }
            |}
            |""".stripMargin
 
@@ -65,8 +62,6 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
       val journeyData =
         s"""
            |{
-           |  "isNewEnrolment": true,
-           |  "journeyData": {
            |    "groupId": "$testGroupId",
            |    "enrolmentId": "$testEnrolmentId",
            |    "businessVerification": {
@@ -74,7 +69,6 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
            |      "businessVerificationPassed": false,
            |      "ctutr": "1234567890"
            |    }
-           |  }
            |}
            |""".stripMargin
 
@@ -95,11 +89,8 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
       val journeyData =
         s"""
            |{
-           |  "isNewEnrolment": false,
-           |  "journeyData": {
            |    "groupId": "$testGroupId",
            |    "enrolmentId": "$testEnrolmentId"
-           |  }
            |}
            |""".stripMargin
 
@@ -125,11 +116,8 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
       val journeyData =
         s"""
            |{
-           |  "isNewEnrolment": false,
-           |  "journeyData": {
            |    "groupId": "$testGroupId",
            |    "enrolmentId": "$testEnrolmentId"
-           |  }
            |}
            |""".stripMargin
 

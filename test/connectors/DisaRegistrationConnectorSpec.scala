@@ -20,11 +20,13 @@ import base.SpecBase
 import config.FrontendAppConfig
 import models.journeydata.JourneyData
 import models.submission.EnrolmentSubmissionResponse
-import models.GetOrCreateEnrolmentResponse
+import models.GetOrCreateJourneyData
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.shouldBe
+import play.api.http.Status.{CREATED, OK}
 import play.api.inject
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 
@@ -108,20 +110,42 @@ class DisaRegistrationConnectorSpec extends SpecBase {
       }
     }
 
-    "getOrCreateEnrolment" - {
+    "getOrCreateJourneyData" - {
 
-      "return GetOrCreateEnrolmentResponse on successful call" in new TestSetup {
-        val response = GetOrCreateEnrolmentResponse(
-          isNewEnrolment = true,
+      "return GetOrCreateJourneyData on CREATED" in new TestSetup {
+        val httpResponse    = HttpResponse(
+          status = CREATED,
+          body = Json.toJson(testJourneyData).toString
+        )
+        val expectedOutcome = GetOrCreateJourneyData(
+          isNewEnrolmentJourney = true,
           journeyData = testJourneyData
         )
 
-        when(mockRequestBuilder.execute[GetOrCreateEnrolmentResponse](any(), any()))
-          .thenReturn(Future.successful(response))
+        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
+          .thenReturn(Future.successful(httpResponse))
 
-        val result = connector.getOrCreateEnrolment(testGroupId).futureValue
+        val result = connector.getOrCreateJourneyData(testGroupId).futureValue
 
-        result shouldBe response
+        result shouldBe expectedOutcome
+      }
+
+      "return GetOrCreateJourneyData on OK" in new TestSetup {
+        val httpResponse    = HttpResponse(
+          status = OK,
+          body = Json.toJson(testJourneyData).toString
+        )
+        val expectedOutcome = GetOrCreateJourneyData(
+          isNewEnrolmentJourney = false,
+          journeyData = testJourneyData
+        )
+
+        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
+          .thenReturn(Future.successful(httpResponse))
+
+        val result = connector.getOrCreateJourneyData(testGroupId).futureValue
+
+        result shouldBe expectedOutcome
       }
 
       "propagate UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
@@ -132,20 +156,20 @@ class DisaRegistrationConnectorSpec extends SpecBase {
           headers = Map.empty
         )
 
-        when(mockRequestBuilder.execute[GetOrCreateEnrolmentResponse](any(), any()))
+        when(mockRequestBuilder.execute[GetOrCreateJourneyData](any(), any()))
           .thenReturn(Future.failed(upstreamErrorResponse))
 
-        val thrown = connector.getOrCreateEnrolment(testGroupId).failed.futureValue
+        val thrown = connector.getOrCreateJourneyData(testGroupId).failed.futureValue
         thrown shouldBe upstreamErrorResponse
       }
 
       "propagate Throwable when the call fails with an unexpected exception" in new TestSetup {
         val runtimeException = new RuntimeException("Connection timeout")
 
-        when(mockRequestBuilder.execute[GetOrCreateEnrolmentResponse](any(), any()))
+        when(mockRequestBuilder.execute[GetOrCreateJourneyData](any(), any()))
           .thenReturn(Future.failed(runtimeException))
 
-        val thrown = connector.getOrCreateEnrolment(testGroupId).failed.futureValue
+        val thrown = connector.getOrCreateJourneyData(testGroupId).failed.futureValue
         thrown shouldBe runtimeException
       }
     }
