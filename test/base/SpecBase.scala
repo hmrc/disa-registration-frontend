@@ -37,6 +37,7 @@ import play.api.mvc.RequestHeader
 import play.api.mvc.Results.{BadRequest, InternalServerError}
 import play.api.test.FakeRequest
 import play.api.{Application, inject}
+import repositories.SessionRepository
 import services.{AuditService, GrsService, JourneyAnswersService, SubmissionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
@@ -78,6 +79,7 @@ trait SpecBase
   protected val mockAppConfig: FrontendAppConfig                         = mock[FrontendAppConfig]
   protected val mockRequestBuilder: RequestBuilder                       = mock[RequestBuilder]
   protected val mockErrorHandler: ErrorHandler                           = mock[ErrorHandler]
+  protected val mockSessionRepository: SessionRepository                 = mock[SessionRepository]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -90,7 +92,8 @@ trait SpecBase
       mockHttpClient,
       mockAppConfig,
       mockRequestBuilder,
-      mockGrsService
+      mockGrsService,
+      mockSessionRepository
     )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))
@@ -108,6 +111,9 @@ trait SpecBase
           .bind[GetOrCreateJourneyDataAction]
           .toInstance(new FakeGetOrCreateJourneyDataAction(journeyData.getOrElse(emptyJourneyData))),
         inject.bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
+        inject
+          .bind[AuditContinuationAction]
+          .toInstance(new FakeAuditContinuationAction(journeyData.getOrElse(emptyJourneyData))),
         inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
         inject.bind[GrsService].toInstance(mockGrsService),
         inject.bind[ErrorHandler].toInstance(mockErrorHandler)

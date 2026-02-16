@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import models.NormalMode
+
 @this(
   layout: templates.Layout
 )
@@ -25,4 +27,6 @@
   <div>
     <h1 class="govuk-heading-xl">@messages("taskList.title")</h1>
   </div>
+
+  <a class="govuk-link" href="@controllers.isaproducts.routes.IsaProductsController.onPageLoad(NormalMode).url">ISA Products</a>
 }

@@ -10,6 +10,8 @@ GET         /language/:lang                              controllers.LanguageSwi
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
+GET         /keep-alive                                  controllers.KeepAliveController.keepAlive()
+
 GET         /start                                       controllers.StartController.onPageLoad()
 
 GET         /task-list                                   controllers.TaskListController.onPageLoad()

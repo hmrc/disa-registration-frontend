@@ -86,8 +86,8 @@ class AuditServiceSpec extends SpecBase {
 
       val detail = event.detail.as[JsObject]
 
-      (detail \ EventData.credId.toString).as[String] mustEqual testString
-      (detail \ EventData.providerType.toString).as[String] mustEqual testString
+      (detail \ EventData.credentialId.toString).as[String] mustEqual testString
+      (detail \ EventData.authProviderType.toString).as[String] mustEqual testString
       (detail \ EventData.internalRegId.toString).as[String] mustEqual jd.enrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual jd.groupId
@@ -198,8 +198,8 @@ class AuditServiceSpec extends SpecBase {
 
       val detail = event.detail.as[JsObject]
 
-      (detail \ EventData.credId.toString).as[String] mustEqual credentials.providerId
-      (detail \ EventData.providerType.toString).as[String] mustEqual credentials.providerType
+      (detail \ EventData.credentialId.toString).as[String] mustEqual credentials.providerId
+      (detail \ EventData.authProviderType.toString).as[String] mustEqual credentials.providerType
       (detail \ EventData.internalRegId.toString).as[String] mustEqual testEnrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
