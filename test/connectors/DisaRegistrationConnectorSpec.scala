@@ -18,15 +18,13 @@ package connectors
 
 import base.SpecBase
 import config.FrontendAppConfig
+import models.GetOrCreateJourneyData
 import models.journeydata.JourneyData
 import models.submission.EnrolmentSubmissionResponse
-import models.GetOrCreateJourneyData
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.shouldBe
-import play.api.http.Status.{CREATED, OK}
 import play.api.inject
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 
@@ -112,40 +110,18 @@ class DisaRegistrationConnectorSpec extends SpecBase {
 
     "getOrCreateJourneyData" - {
 
-      "return GetOrCreateJourneyData on CREATED" in new TestSetup {
-        val httpResponse    = HttpResponse(
-          status = CREATED,
-          body = Json.toJson(testJourneyData).toString
-        )
-        val expectedOutcome = GetOrCreateJourneyData(
+      "return GetOrCreateJourneyData on sucessful response" in new TestSetup {
+        val getOrCreateResponse = GetOrCreateJourneyData(
           isNewEnrolmentJourney = true,
           journeyData = testJourneyData
         )
 
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(Future.successful(httpResponse))
+        when(mockRequestBuilder.execute[GetOrCreateJourneyData](any(), any()))
+          .thenReturn(Future.successful(getOrCreateResponse))
 
         val result = connector.getOrCreateJourneyData(testGroupId).futureValue
 
-        result shouldBe expectedOutcome
-      }
-
-      "return GetOrCreateJourneyData on OK" in new TestSetup {
-        val httpResponse    = HttpResponse(
-          status = OK,
-          body = Json.toJson(testJourneyData).toString
-        )
-        val expectedOutcome = GetOrCreateJourneyData(
-          isNewEnrolmentJourney = false,
-          journeyData = testJourneyData
-        )
-
-        when(mockRequestBuilder.execute[HttpResponse](any(), any()))
-          .thenReturn(Future.successful(httpResponse))
-
-        val result = connector.getOrCreateJourneyData(testGroupId).futureValue
-
-        result shouldBe expectedOutcome
+        result shouldBe getOrCreateResponse
       }
 
       "propagate UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {

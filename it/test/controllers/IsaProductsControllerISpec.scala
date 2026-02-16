@@ -36,19 +36,22 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
   "GET /isa-products" should {
 
     "fetch data from the correct endpoint" in {
-      val testJourneyData =
+      val getOrCreateResponse =
         s"""
           |{
-          | "groupId": "$testGroupId",
-          | "enrolmentId": "$testString",
-          | "isaProducts": {
-          |   "isaProducts": ["cashJuniorIsas", "cashIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"]
-          | }
+          |  "isNewEnrolmentJourney": true,
+          |  "journeyData": {
+          |    "groupId": "$testGroupId",
+          |    "enrolmentId": "$testString",
+          |     "isaProducts": {
+          |       "isaProducts": ["cashJuniorIsas", "cashIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"]
+          |     }
+          |  }
           |}
           |""" .stripMargin
 
       stubAuth()
-      stubPut(getOrCreateEnrolmentUrl, OK, testJourneyData)
+      stubPut(getOrCreateEnrolmentUrl, OK, getOrCreateResponse)
       // TODO Replace PUT call with below line when ATs begin from /start page
       //stubGet(getJourneyDataUrl, OK, testJourneyData)
 

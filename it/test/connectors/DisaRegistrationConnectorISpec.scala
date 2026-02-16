@@ -22,7 +22,6 @@ import models.journeydata.isaproducts.IsaProduct.CashJuniorIsas
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import models.submission.EnrolmentSubmissionResponse
 import play.api.http.Status.*
-import play.api.libs.json.JsResultException
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{JsValidationException, UpstreamErrorResponse}
 import utils.BaseIntegrationSpec
@@ -38,9 +37,12 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
   val getOrCreateEnrolmentJsonOnCreated =
     s"""
        |{
-       |  "groupId": "$testGroupId",
-       |  "enrolmentId": "$testEnrolmentId",
-       |  "status": "Active"
+       |    "isNewEnrolmentJourney": true,
+       |    "journeyData": {
+       |      "groupId": "$testGroupId",
+       |      "enrolmentId": "$testEnrolmentId",
+       |      "status": "Active"
+       |    }
        |}
        |""".stripMargin
 
@@ -148,12 +150,15 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
     }
 
     "return GetOrCreateJourneyData when backend returns 200" in {
-      val getOrCreateEnrolmentJson =
+      val getOrCreateEnrolmentJsonOnOk =
         s"""
            |{
-           |  "groupId": "$testGroupId",
-           |  "enrolmentId": "$testEnrolmentId",
-           |  "status": "Active"
+           |    "isNewEnrolmentJourney": false,
+           |    "journeyData": {
+           |      "groupId": "$testGroupId",
+           |      "enrolmentId": "$testEnrolmentId",
+           |      "status": "Active"
+           |    }
            |}
            |""".stripMargin
 
@@ -165,7 +170,7 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
             enrolmentId = testEnrolmentId
           )
         )
-      stubPut(getOrCreateEnrolmentUrl, OK, getOrCreateEnrolmentJson)
+      stubPut(getOrCreateEnrolmentUrl, OK, getOrCreateEnrolmentJsonOnOk)
 
       val response = await(connector.getOrCreateJourneyData(testGroupId))
 
@@ -185,7 +190,7 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
 
       val err = await(connector.getOrCreateJourneyData(testGroupId).failed)
 
-      err shouldBe an[JsResultException]
+      err shouldBe an[JsValidationException]
     }
   }
 

@@ -32,9 +32,11 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
   "GET /start" should {
 
     "redirect to TaskList when business verification has passed" in {
-      val journeyData =
+      val getOrCreateResponse =
         s"""
            |{
+           |  "isNewEnrolmentJourney": true,
+           |  "journeyData": {
            |    "groupId": "$testGroupId",
            |    "enrolmentId": "$testEnrolmentId",
            |    "businessVerification": {
@@ -42,11 +44,12 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
            |      "businessVerificationPassed": true,
            |      "ctutr": "1234567890"
            |    }
+           |  }
            |}
            |""".stripMargin
 
       stubAuth()
-      stubPut(getOrCreateEnrolmentUrl, CREATED, journeyData)
+      stubPut(getOrCreateEnrolmentUrl, CREATED, getOrCreateResponse)
 
       val request =
         FakeRequest(GET, controllerEndpoint)
@@ -62,6 +65,8 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
       val journeyData =
         s"""
            |{
+           |  "isNewEnrolmentJourney": true,
+           |  "journeyData": {
            |    "groupId": "$testGroupId",
            |    "enrolmentId": "$testEnrolmentId",
            |    "businessVerification": {
@@ -69,6 +74,7 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
            |      "businessVerificationPassed": false,
            |      "ctutr": "1234567890"
            |    }
+           |  }
            |}
            |""".stripMargin
 
@@ -89,8 +95,11 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
       val journeyData =
         s"""
            |{
+           |  "isNewEnrolmentJourney": false,
+           |  "journeyData": {
            |    "groupId": "$testGroupId",
            |    "enrolmentId": "$testEnrolmentId"
+           |  }
            |}
            |""".stripMargin
 
@@ -116,8 +125,11 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
       val journeyData =
         s"""
            |{
+           |  "isNewEnrolmentJourney": false,
+           |  "journeyData": {
            |    "groupId": "$testGroupId",
            |    "enrolmentId": "$testEnrolmentId"
+           |  }
            |}
            |""".stripMargin
 
