@@ -23,7 +23,7 @@ import play.api.http.Status.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, POST, contentAsString, redirectLocation, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
 import uk.gov.hmrc.http.SessionKeys
-import utils.WiremockHelper.{stubGet, stubPost}
+import utils.WiremockHelper.{stubGet, stubPost, stubPut}
 import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
 class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
@@ -31,6 +31,7 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
   private val controllerEndpoint = "/obligations/enrolment/isa/isa-products"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   private val updateJourneyUrl = s"/disa-registration/store/$testGroupId/isaProducts"
+  private val getOrCreateEnrolmentUrl = s"/disa-registration/journey/$testGroupId"
 
   "GET /isa-products" should {
 
@@ -47,7 +48,9 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
           |""" .stripMargin
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubPut(getOrCreateEnrolmentUrl, OK, testJourneyData)
+      // TODO Replace PUT call with below line when ATs begin from /start page
+      //stubGet(getJourneyDataUrl, OK, testJourneyData)
 
       val request =
         FakeRequest(GET, controllerEndpoint)

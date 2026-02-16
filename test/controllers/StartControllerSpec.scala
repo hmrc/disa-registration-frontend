@@ -19,14 +19,12 @@ package controllers
 import base.SpecBase
 import models.GetOrCreateJourneyData
 import models.journeydata.{BusinessVerification, JourneyData}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import play.api.inject
-import services.AuditService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
