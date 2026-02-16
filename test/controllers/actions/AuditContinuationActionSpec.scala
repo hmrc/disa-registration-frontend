@@ -35,7 +35,7 @@ class AuditContinuationActionSpec extends SpecBase {
 
   private val sectionName = IsaProducts.sectionName
 
-  private def dataRequest: DataRequest[AnyContent] = {
+  private def dataRequest: DataRequest[AnyContent] =
     DataRequest(
       request = FakeRequest(),
       groupId = testGroupId,
@@ -43,18 +43,20 @@ class AuditContinuationActionSpec extends SpecBase {
       credentialRole = testCredentialRoleUser,
       journeyData = testJourneyData
     )
-  }
 
   private def runThroughTransformer(
-                                     transformer: play.api.mvc.ActionTransformer[DataRequest, DataRequest],
-                                     req: DataRequest[AnyContent]
-                                   ): Future[(Result, DataRequest[AnyContent])] = {
+    transformer: play.api.mvc.ActionTransformer[DataRequest, DataRequest],
+    req: DataRequest[AnyContent]
+  ): Future[(Result, DataRequest[AnyContent])] = {
     var seen: Option[DataRequest[AnyContent]] = None
 
-    val resultF = transformer.invokeBlock(req, { (r: DataRequest[AnyContent]) =>
-      seen = Some(r)
-      Future.successful(Ok)
-    })
+    val resultF = transformer.invokeBlock(
+      req,
+      { (r: DataRequest[AnyContent]) =>
+        seen = Some(r)
+        Future.successful(Ok)
+      }
+    )
 
     resultF.map(r => (r, seen.getOrElse(fail("Block was not invoked"))))
   }

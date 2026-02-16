@@ -16,14 +16,21 @@
 
 package models.session
 
-import play.api.libs.json.{Format, Json, OFormat}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import play.api.libs.json.{Format, JsValue, Json}
+import utils.JsonFormatSpec
 
 import java.time.Instant
 
-case class Session(groupId: String, auditContinuationEventSent: Boolean, lastUpdated: Instant)
+class SessionSpec extends JsonFormatSpec[Session] {
 
-object Session {
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
-  implicit val format: OFormat[Session]       = Json.format[Session]
+  def model: Session = Session(testGroupId, true, Instant.parse("2025-10-21T10:00:00Z"))
+
+  def expectedJsonFromWrites: JsValue =
+    Json.parse("""{
+         | "groupId": "3147318d-1cd9-4534-a4e8-ae268ea923ed",
+         | "auditContinuationEventSent": true,
+         | "lastUpdated":{"$date":{"$numberLong":"1761040800000"}}
+         |}""".stripMargin)
+
+  implicit def format: Format[Session] = Session.format
 }

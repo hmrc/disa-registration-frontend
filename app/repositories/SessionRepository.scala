@@ -18,14 +18,11 @@ package repositories
 
 import config.FrontendAppConfig
 import models.session.Session
-import org.mongodb.scala.bson.conversions.Bson
+import org.bson.conversions.Bson
 import org.mongodb.scala.model.*
 import org.mongodb.scala.model.Filters.equal
-import play.api.libs.json.Format
-import uk.gov.hmrc.mdc.Mdc
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
@@ -59,29 +56,23 @@ class SessionRepository @Inject() (
       replaceIndexes = true
     ) {
 
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
-
   private def byId(id: String): Bson = Filters.equal("groupId", id)
-
-  def find(groupId: String): Future[Session] =
-    collection.find(byId(groupId)).head()
 
   def markAuditEventSent(groupId: String): Future[Boolean] =
     collection
       .updateOne(
-        filter = Filters.and(byId(groupId), equal("continuationAuditEventSent", false)),
-        update = Updates.set("continuationAuditEventSent", true)
+        filter = Filters.and(byId(groupId), equal("auditContinuationEventSent", false)),
+        update = Updates.set("auditContinuationEventSent", true)
       )
       .toFuture()
       .map(_.getModifiedCount == 1)
 
-  def keepAlive(groupId: String): Future[Boolean] = Mdc.preservingMdc {
+  def keepAlive(groupId: String): Future[Unit] =
     collection
       .updateOne(
         filter = byId(groupId),
         update = Updates.set("lastUpdated", Instant.now(clock))
       )
       .toFuture()
-      .map(_ => true)
-  }
+      .map(_ => ())
 }

@@ -27,7 +27,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{BeforeAndAfterEach, OptionValues, TryValues}
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues, TryValues}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Messages, MessagesApi}
@@ -56,6 +56,7 @@ trait SpecBase
     with GuiceOneAppPerSuite
     with AuthTestSupport
     with BeforeAndAfterEach
+    with BeforeAndAfterAll
     with TestData
     with MockitoSugar
     with JourneyDataBuilder {
