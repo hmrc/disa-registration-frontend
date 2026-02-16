@@ -18,12 +18,14 @@ package services
 
 import base.SpecBase
 import config.FrontendAppConfig
+import models.requests.IdentifierRequest
 import models.submission.SubmissionResult
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import play.api.inject
 import play.api.libs.json.JsObject
+import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
@@ -46,6 +48,7 @@ class AuditServiceSpec extends SpecBase {
 
   private val credentials    = Credentials(providerId = testString, providerType = testString)
   private val credentialRole = User
+  private val request        = IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser)
 
   private def stubAuditResult(result: AuditResult): Unit =
     when(mockAuditConnector.sendExtendedEvent(any[ExtendedDataEvent])(any, any))
@@ -183,10 +186,8 @@ class AuditServiceSpec extends SpecBase {
 
       service
         .auditNewEnrolmentStarted(
-          credentials = credentials,
-          credentialRole = credentialRole,
-          enrolmentId = testEnrolmentId,
-          groupId = testGroupId
+          request = request,
+          journeyData = testJourneyData
         )
         .futureValue mustEqual ()
 
@@ -211,10 +212,8 @@ class AuditServiceSpec extends SpecBase {
 
       service
         .auditNewEnrolmentStarted(
-          credentials = credentials,
-          credentialRole = credentialRole,
-          enrolmentId = testEnrolmentId,
-          groupId = testGroupId
+          request = request,
+          journeyData = testJourneyData
         )
         .futureValue mustEqual ()
     }
@@ -225,10 +224,8 @@ class AuditServiceSpec extends SpecBase {
 
       service
         .auditNewEnrolmentStarted(
-          credentials = credentials,
-          credentialRole = credentialRole,
-          enrolmentId = testEnrolmentId,
-          groupId = testGroupId
+          request = request,
+          journeyData = testJourneyData
         )
         .futureValue mustEqual ()
     }

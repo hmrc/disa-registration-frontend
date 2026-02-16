@@ -17,6 +17,7 @@
 package controllers.actions
 
 import handlers.ErrorHandler
+import models.requests.DataRequest.fromRequest
 import models.requests.{DataRequest, IdentifierRequest}
 import play.api.Logging
 import play.api.mvc.{ActionRefiner, Result}
@@ -44,27 +45,12 @@ class GetOrCreateJourneyDataActionImpl @Inject() (
       .flatMap { response =>
         if (response.isNewEnrolmentJourney)
           auditService
-            .auditNewEnrolmentStarted(
-              request.credentials,
-              request.credentialRole,
-              response.journeyData.enrolmentId,
-              request.groupId
-            )
+            .auditNewEnrolmentStarted(request, response.journeyData)
             .recover { case e =>
               logger.warn(s"Failed to audit EnrolmentStarted for groupId [${request.groupId}]", e)
             }
 
-        Future.successful(
-          Right(
-            DataRequest(
-              request.request,
-              request.groupId,
-              request.credentials,
-              request.credentialRole,
-              response.journeyData
-            )
-          )
-        )
+        Future.successful(Right(fromRequest(request, response.journeyData)))
       }
       .recoverWith { case e: Throwable =>
         logger.error(s"Failed to getOrCreateJourneyData for groupId: [${request.groupId}]", e)

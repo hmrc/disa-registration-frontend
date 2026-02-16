@@ -19,6 +19,7 @@ package services
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import models.journeydata.JourneyData
+import models.requests.IdentifierRequest
 import models.submission.SubmissionResult
 import play.api.Logging
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
@@ -36,18 +37,16 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
-  def auditNewEnrolmentStarted(
-    credentials: Credentials,
-    credentialRole: CredentialRole,
-    enrolmentId: String,
-    groupId: String
+  def auditNewEnrolmentStarted[A](
+    request: IdentifierRequest[A],
+    journeyData: JourneyData
   )(implicit hc: HeaderCarrier): Future[Unit] = {
     val data = Json.obj(
-      EventData.credId.toString         -> credentials.providerId,
-      EventData.providerType.toString   -> credentials.providerType,
-      EventData.internalRegId.toString  -> enrolmentId,
-      EventData.credentialRole.toString -> credentialRole.toString,
-      EventData.groupId.toString        -> groupId,
+      EventData.credId.toString         -> request.credentials.providerId,
+      EventData.providerType.toString   -> request.credentials.providerType,
+      EventData.internalRegId.toString  -> journeyData.enrolmentId,
+      EventData.credentialRole.toString -> request.credentialRole.toString,
+      EventData.groupId.toString        -> request.groupId,
       EventData.journeyType.toString    -> EventData.startEnrolment.toString
     )
 

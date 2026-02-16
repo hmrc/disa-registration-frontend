@@ -42,5 +42,5 @@ trait TestData extends Generators {
       innovativeFinancialProducts = Some(InnovativeFinancialProduct.values)
     )
   val testJourneyData: JourneyData        =
-    JourneyData(groupId = testGroupId, enrolmentId = testString, isaProducts = Some(testIsaProductsAnswers))
+    JourneyData(groupId = testGroupId, enrolmentId = testEnrolmentId, isaProducts = Some(testIsaProductsAnswers))
 }

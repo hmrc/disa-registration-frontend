@@ -62,16 +62,15 @@ class GetOrCreateJourneyDataActionSpec extends SpecBase {
         when(
           mockAuditService.auditNewEnrolmentStarted(
             any(),
-            any(),
-            any[String],
-            any[String]
+            any()
           )(any[HeaderCarrier])
         ).thenReturn(Future.successful(()))
 
         val action = new Harness(mockJourneyAnswersService, mockAuditService, mockErrorHandler)
+        val req    = IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser)
 
         val Right(result) = action
-          .callRefine(IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser))
+          .callRefine(req)
           .futureValue: @unchecked
 
         result.groupId mustBe testGroupId
@@ -80,10 +79,8 @@ class GetOrCreateJourneyDataActionSpec extends SpecBase {
         result.journeyData mustBe jd
 
         verify(mockAuditService).auditNewEnrolmentStarted(
-          eqTo(testCredentials),
-          eqTo(testCredentialRoleUser),
-          eqTo(testEnrolmentId),
-          eqTo(testGroupId)
+          eqTo(req),
+          eqTo(jd)
         )(any[HeaderCarrier])
       }
 
@@ -99,22 +96,21 @@ class GetOrCreateJourneyDataActionSpec extends SpecBase {
           .thenReturn(Future.successful(response))
 
         when(
-          mockAuditService.auditNewEnrolmentStarted(any(), any(), any[String], any[String])(any[HeaderCarrier])
+          mockAuditService.auditNewEnrolmentStarted(any(), any())(any[HeaderCarrier])
         ).thenReturn(Future.failed(new RuntimeException("fubar")))
 
         val action = new Harness(mockJourneyAnswersService, mockAuditService, mockErrorHandler)
+        val req    = IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser)
 
         val Right(result) = action
-          .callRefine(IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser))
+          .callRefine(req)
           .futureValue: @unchecked
 
         result.journeyData mustBe jd
 
         verify(mockAuditService).auditNewEnrolmentStarted(
-          eqTo(testCredentials),
-          eqTo(testCredentialRoleUser),
-          eqTo(testEnrolmentId),
-          eqTo(testGroupId)
+          eqTo(req),
+          eqTo(jd)
         )(any[HeaderCarrier])
       }
     }
@@ -133,14 +129,15 @@ class GetOrCreateJourneyDataActionSpec extends SpecBase {
           .thenReturn(Future.successful(response))
 
         val action = new Harness(mockJourneyAnswersService, mockAuditService, mockErrorHandler)
+        val req    = IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser)
 
         val Right(result) = action
-          .callRefine(IdentifierRequest(FakeRequest(), testGroupId, testCredentials, testCredentialRoleUser))
+          .callRefine(req)
           .futureValue: @unchecked
 
         result.journeyData mustBe jd
 
-        verify(mockAuditService, never()).auditNewEnrolmentStarted(any(), any(), any[String], any[String])(
+        verify(mockAuditService, never()).auditNewEnrolmentStarted(any(), any())(
           any[HeaderCarrier]
         )
       }
