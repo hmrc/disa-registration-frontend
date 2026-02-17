@@ -40,7 +40,7 @@ class IsaProductsController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  // TODO Replace getOrCreateAction with DataRetrievalAction when ATs begin from /start page
+  // TODO Replace getOrCreateAction with DataRetrievalAction when ATs begin from /start page DFI-1709
   getOrCreateJourneyDataAction: GetOrCreateJourneyDataAction,
   auditContinuation: AuditContinuationAction,
   formProvider: IsaProductsFormProvider,

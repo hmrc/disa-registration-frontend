@@ -18,13 +18,15 @@ package services
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.requests.IdentifierRequest
+import models.journeydata.isaproducts.IsaProducts
+import models.requests.{DataRequest, IdentifierRequest}
 import models.submission.SubmissionResult
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import play.api.inject
 import play.api.libs.json.JsObject
+import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -173,6 +175,94 @@ class AuditServiceSpec extends SpecBase {
           credentialRole = credentialRole,
           journeyData = testJourneyData,
           failureReason = None
+        )
+        .futureValue mustEqual ()
+    }
+  }
+
+  "AuditService.auditContinuation" - {
+
+    "must send an EnrolmentStarted event with journeyType=continueEnrolment and include continuingSection" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubAuditResult(Success)
+
+      val sectionName = IsaProducts.sectionName
+
+      val dataReq: DataRequest[AnyContent] =
+        DataRequest(
+          request = FakeRequest(),
+          groupId = testGroupId,
+          credentials = credentials,
+          credentialRole = credentialRole,
+          journeyData = testJourneyData
+        )
+
+      service
+        .auditContinuation(
+          request = dataReq,
+          sectionName = sectionName
+        )
+        .futureValue mustEqual ()
+
+      val event = captureEvent()
+
+      event.auditSource mustEqual "disa-registration-frontend"
+      event.auditType mustEqual AuditTypes.EnrolmentStarted.toString
+
+      val detail = event.detail.as[JsObject]
+
+      (detail \ EventData.credentialId.toString).as[String] mustEqual credentials.providerId
+      (detail \ EventData.authProviderType.toString).as[String] mustEqual credentials.providerType
+      (detail \ EventData.internalRegId.toString).as[String] mustEqual testEnrolmentId
+      (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
+      (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
+
+      (detail \ EventData.journeyType.toString).as[String] mustEqual EventData.continueEnrolment.toString
+      (detail \ EventData.continuingSection.toString).as[String] mustEqual sectionName
+    }
+
+    "must complete successfully even when auditing is Disabled" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubAuditResult(Disabled)
+
+      val sectionName = IsaProducts.sectionName
+
+      val dataReq: DataRequest[AnyContent] =
+        DataRequest(
+          request = FakeRequest(),
+          groupId = testGroupId,
+          credentials = credentials,
+          credentialRole = credentialRole,
+          journeyData = testJourneyData
+        )
+
+      service
+        .auditContinuation(
+          request = dataReq,
+          sectionName = sectionName
+        )
+        .futureValue mustEqual ()
+    }
+
+    "must complete successfully even when auditing returns Failure" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubAuditResult(Failure("fubar", None))
+
+      val sectionName = IsaProducts.sectionName
+
+      val dataReq: DataRequest[AnyContent] =
+        DataRequest(
+          request = FakeRequest(),
+          groupId = testGroupId,
+          credentials = credentials,
+          credentialRole = credentialRole,
+          journeyData = testJourneyData
+        )
+
+      service
+        .auditContinuation(
+          request = dataReq,
+          sectionName = sectionName
         )
         .futureValue mustEqual ()
     }
