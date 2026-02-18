@@ -20,15 +20,11 @@ import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
 
-import java.time.Instant
-
 class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
-
-  val instant: Instant = Instant.parse("2024-01-01T12:00:00Z")
 
   override val model: JourneyData =
     JourneyData(
-      enrolmentId = testString,
+      enrolmentId = testEnrolmentId,
       groupId = testGroupId,
       businessVerification = Some(
         BusinessVerification(
@@ -47,11 +43,11 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       feesCommissionsAndIncentives = Some(FeesCommissionsAndIncentives(Some("F1"), Some("F2")))
     )
 
-  override val json: JsValue = Json.parse("""
+  override val expectedJsonFromWrites: JsValue = Json.parse(s"""
     {
-      "groupId": "id",
+      "groupId": "$testGroupId",
       "businessVerification": { "businessRegistrationPassed": true, "businessVerificationPassed": true, "ctUtr": "12345678"},
-      "enrolmentId": "test",
+      "enrolmentId": "$testEnrolmentId",
       "organisationDetails": {
         "registeredToManageIsa": true,
         "zRefNumber": "Z1",
@@ -70,6 +66,32 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" }
     }
   """)
+
+  override val incomingJsonToRead: JsValue = Json.parse(s"""
+      {
+        "groupId": "$testGroupId",
+        "businessVerification": { "businessRegistrationPassed": true, "businessVerificationPassed": true, "ctUtr": "12345678"},
+        "enrolmentId": "$testEnrolmentId",
+        "status": "Active",
+        "organisationDetails": {
+          "registeredToManageIsa": true,
+          "zRefNumber": "Z1",
+          "tradingUsingDifferentName": true,
+          "tradingName": "test",
+          "fcaNumber": "test"
+        },
+        "isaProducts": {
+          "isaProducts" : ["cashIsas","cashJuniorIsas","stocksAndSharesIsas","stocksAndSharesJuniorIsas","innovativeFinanceIsas"],
+          "p2pPlatform": "test",
+          "p2pPlatformNumber": "test"
+        },
+        "certificatesOfAuthority": { "dataItem": "C", "dataItem2": "D" },
+        "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
+        "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
+        "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" },
+        "lastUpdated": "2025-10-21T10:00:00Z"
+      }
+    """)
 
   override implicit val format: Format[JourneyData] = JourneyData.format
 }

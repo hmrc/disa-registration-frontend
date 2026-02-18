@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 
 package controllers.actions
 
-import models.requests.IdentifierRequest
-import play.api.mvc.*
-import utils.TestData
+import models.journeydata.JourneyData
+import models.requests.{DataRequest, IdentifierRequest}
+import play.api.mvc.Result
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject() (bodyParsers: PlayBodyParsers) extends IdentifierAction with TestData {
+class FakeGetOrCreateJourneyDataAction(dataToReturn: JourneyData) extends GetOrCreateJourneyDataAction {
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, testGroupId, testCredentials, testCredentialRoleUser))
+  override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, DataRequest[A]]] =
+    Future(
+      Right(
+        DataRequest(request.request, request.groupId, request.credentials, request.credentialRole, dataToReturn)
+      )
+    )
 
-  override def parser: BodyParser[AnyContent] =
-    bodyParsers.default
-
-  override protected def executionContext: ExecutionContext =
+  override protected implicit val executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
 }

@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class StartController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
-  getData: DataRetrievalAction,
+  getOrCreateJourneyData: GetOrCreateJourneyDataAction,
   formProvider: InnovativeFinancialProductsFormProvider,
   val controllerComponents: MessagesControllerComponents,
   genericRegistrationService: GrsService
@@ -44,9 +44,8 @@ class StartController @Inject() (
   val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData).async { implicit request =>
-      request.journeyData
-        .flatMap(_.businessVerification)
+    (identify andThen getOrCreateJourneyData).async { implicit request =>
+      request.journeyData.businessVerification
         .flatMap(_.businessVerificationPassed) match {
         case Some(true)  =>
           Future.successful(Redirect(routes.TaskListController.onPageLoad()))

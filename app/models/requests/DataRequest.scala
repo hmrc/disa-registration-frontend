@@ -36,3 +36,13 @@ case class DataRequest[A](
   credentialRole: CredentialRole,
   journeyData: JourneyData
 ) extends WrappedRequest[A](request)
+
+object DataRequest {
+  def fromRequest[A](request: IdentifierRequest[A], journeyData: JourneyData): DataRequest[A] = DataRequest(
+    request = request.request,
+    groupId = request.groupId,
+    credentials = request.credentials,
+    credentialRole = request.credentialRole,
+    journeyData = journeyData
+  )
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package utils
+package models
 
-import base.SpecBase
-import org.scalatest.freespec.AnyFreeSpec
-import play.api.libs.json.*
+import models.journeydata.JourneyData
+import play.api.libs.json.{Json, OFormat}
 
-trait JsonFormatSpec[A] extends SpecBase {
+case class GetOrCreateJourneyData(isNewEnrolmentJourney: Boolean, journeyData: JourneyData)
 
-  def model: A
-  def expectedJsonFromWrites: JsValue
-  def incomingJsonToRead: JsValue = expectedJsonFromWrites
-  implicit def format: Format[A]
-
-  "must serialise to JSON" in {
-    Json.toJson(model) mustBe expectedJsonFromWrites
-  }
-
-  "must deserialise from JSON" in {
-    incomingJsonToRead.as[A] mustBe model
-  }
+object GetOrCreateJourneyData {
+  implicit val format: OFormat[GetOrCreateJourneyData] = Json.format[GetOrCreateJourneyData]
 }

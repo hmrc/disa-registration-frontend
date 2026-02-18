@@ -20,33 +20,36 @@ import play.api.http.Status.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, redirectLocation, route, status, writeableOf_AnyContentAsEmpty}
 import uk.gov.hmrc.http.SessionKeys
-import utils.WiremockHelper.{stubGet, stubPost}
+import utils.WiremockHelper.{stubPost, stubPut}
 import utils.{BaseIntegrationSpec, CommonStubs}
 
 class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
 
   private val controllerEndpoint = "/obligations/enrolment/isa/start"
-  private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
+  private val getOrCreateEnrolmentUrl = s"/disa-registration/journey/$testGroupId"
   private val grsStartUrl = "/incorporated-entity-identification/api/limited-company-journey"
 
   "GET /start" should {
 
     "redirect to TaskList when business verification has passed" in {
-      val journeyData =
+      val getOrCreateResponse =
         s"""
            |{
-           |  "groupId": "$testGroupId",
-           |  "enrolmentId": "$testEnrolmentId",
-           |  "businessVerification": {
-           |    "businessRegistrationPassed": true,
-           |    "businessVerificationPassed": true,
-           |    "ctutr": "1234567890"
+           |  "isNewEnrolmentJourney": true,
+           |  "journeyData": {
+           |    "groupId": "$testGroupId",
+           |    "enrolmentId": "$testEnrolmentId",
+           |    "businessVerification": {
+           |      "businessRegistrationPassed": true,
+           |      "businessVerificationPassed": true,
+           |      "ctutr": "1234567890"
+           |    }
            |  }
            |}
            |""".stripMargin
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubPut(getOrCreateEnrolmentUrl, CREATED, getOrCreateResponse)
 
       val request =
         FakeRequest(GET, controllerEndpoint)
@@ -62,18 +65,21 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
       val journeyData =
         s"""
            |{
-           |  "groupId": "$testGroupId",
-           |  "enrolmentId": "$testEnrolmentId",
-           |  "businessVerification": {
-           |    "businessRegistrationPassed": true,
-           |    "businessVerificationPassed": false,
-           |    "ctutr": "1234567890"
+           |  "isNewEnrolmentJourney": true,
+           |  "journeyData": {
+           |    "groupId": "$testGroupId",
+           |    "enrolmentId": "$testEnrolmentId",
+           |    "businessVerification": {
+           |      "businessRegistrationPassed": true,
+           |      "businessVerificationPassed": false,
+           |      "ctutr": "1234567890"
+           |    }
            |  }
            |}
            |""".stripMargin
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubPut(getOrCreateEnrolmentUrl, CREATED, journeyData)
 
       val request =
         FakeRequest(GET, controllerEndpoint)
@@ -86,9 +92,19 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
     }
 
     "redirect to GRS start URL when no business verification data exists" in {
-      stubAuth()
-      stubGet(getJourneyDataUrl, NOT_FOUND, """{"code":"NOT_FOUND","message":"Not found"}""")
+      val journeyData =
+        s"""
+           |{
+           |  "isNewEnrolmentJourney": false,
+           |  "journeyData": {
+           |    "groupId": "$testGroupId",
+           |    "enrolmentId": "$testEnrolmentId"
+           |  }
+           |}
+           |""".stripMargin
 
+      stubAuth()
+      stubPut(getOrCreateEnrolmentUrl, OK, journeyData)
       stubPost(
         grsStartUrl,
         OK,
@@ -106,8 +122,19 @@ class StartControllerISpec extends BaseIntegrationSpec with CommonStubs {
     }
 
     "redirect to Internal Server Error page when GRS service fails" in {
+      val journeyData =
+        s"""
+           |{
+           |  "isNewEnrolmentJourney": false,
+           |  "journeyData": {
+           |    "groupId": "$testGroupId",
+           |    "enrolmentId": "$testEnrolmentId"
+           |  }
+           |}
+           |""".stripMargin
+
       stubAuth()
-      stubGet(getJourneyDataUrl, NOT_FOUND, """{"code":"NOT_FOUND","message":"Not found"}""")
+      stubPut(getOrCreateEnrolmentUrl, OK, journeyData)
       stubPost(
         grsStartUrl,
         INTERNAL_SERVER_ERROR,

@@ -17,6 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
+import models.GetOrCreateJourneyData
 import models.journeydata.{JourneyData, TaskListSection}
 import models.submission.EnrolmentSubmissionResponse
 import play.api.Logging
@@ -75,6 +76,13 @@ class DisaRegistrationConnector @Inject() (http: HttpClientV2, appConfig: Fronte
             )
         }
       )
+  }
+
+  def getOrCreateJourneyData(groupId: String)(implicit hc: HeaderCarrier): Future[GetOrCreateJourneyData] = {
+    val url = s"${appConfig.disaRegistrationBaseUrl}/disa-registration/journey/$groupId"
+    http
+      .put(url"$url")
+      .execute[GetOrCreateJourneyData]
   }
 
   def declareAndSubmit(groupId: String)(implicit hc: HeaderCarrier): Future[EnrolmentSubmissionResponse] = {
