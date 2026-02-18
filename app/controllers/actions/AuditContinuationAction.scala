@@ -43,7 +43,7 @@ class AuditContinuationActionImpl @Inject() (
           HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
         sessionRepository
-          .markAuditEventSent(request.groupId)
+          .getOrCreateSessionAndMarkAuditEventSent(request.credentials.providerId)
           .flatMap {
             case true =>
               auditService

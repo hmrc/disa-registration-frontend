@@ -44,7 +44,7 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     val data = Json.obj(
       EventData.credentialId.toString     -> request.credentials.providerId,
       EventData.authProviderType.toString -> request.credentials.providerType,
-      EventData.internalRegId.toString    -> journeyData.enrolmentId,
+      EventData.enrolmentId.toString      -> journeyData.enrolmentId,
       EventData.credentialRole.toString   -> request.credentialRole.toString,
       EventData.groupId.toString          -> request.groupId,
       EventData.journeyType.toString      -> EventData.startEnrolment.toString
@@ -58,7 +58,7 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     val data = Json.obj(
       EventData.credentialId.toString      -> request.credentials.providerId,
       EventData.authProviderType.toString  -> request.credentials.providerType,
-      EventData.internalRegId.toString     -> request.journeyData.enrolmentId,
+      EventData.enrolmentId.toString       -> request.journeyData.enrolmentId,
       EventData.credentialRole.toString    -> request.credentialRole.toString,
       EventData.groupId.toString           -> request.groupId,
       EventData.journeyType.toString       -> EventData.continueEnrolment.toString,
@@ -78,9 +78,7 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     val baseData = Json.obj(
       EventData.credentialId.toString     -> credentials.providerId,
       EventData.authProviderType.toString -> credentials.providerType,
-      EventData.internalRegId.toString    -> journeyData.enrolmentId,
       EventData.credentialRole.toString   -> credentialRole.toString,
-      EventData.groupId.toString          -> journeyData.groupId,
       EventData.submissionStatus.toString -> status.toString,
       EventData.payload.toString          -> journeyData
     )
@@ -123,6 +121,6 @@ object AuditTypes extends Enumeration {
 
 object EventData extends Enumeration {
   type Data = Value
-  val authProviderType, internalRegId, credentialId, credentialRole, groupId, submissionStatus, failureReason, payload,
-    journeyType, continuingSection, startEnrolment, continueEnrolment = Value
+  val authProviderType, credentialId, credentialRole, groupId, submissionStatus, failureReason, payload, journeyType,
+    enrolmentId, continuingSection, startEnrolment, continueEnrolment = Value
 }

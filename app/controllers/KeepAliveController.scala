@@ -32,6 +32,6 @@ class KeepAliveController @Inject() (
     extends FrontendBaseController {
 
   def keepAlive(): Action[AnyContent] = identify.async { implicit request =>
-    sessionRepository.keepAlive(request.groupId).map(_ => Ok)
+    sessionRepository.keepAlive(request.credentials.providerId).map(_ => Ok)
   }
 }

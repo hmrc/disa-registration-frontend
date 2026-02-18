@@ -27,7 +27,7 @@ class SessionSpec extends JsonFormatSpec[Session] {
 
   def expectedJsonFromWrites: JsValue =
     Json.parse("""{
-         | "groupId": "3147318d-1cd9-4534-a4e8-ae268ea923ed",
+         | "userId": "3147318d-1cd9-4534-a4e8-ae268ea923ed",
          | "auditContinuationEventSent": true,
          | "lastUpdated":{"$date":{"$numberLong":"1761040800000"}}
          |}""".stripMargin)

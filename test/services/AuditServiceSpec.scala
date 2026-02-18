@@ -90,9 +90,7 @@ class AuditServiceSpec extends SpecBase {
 
       (detail \ EventData.credentialId.toString).as[String] mustEqual testString
       (detail \ EventData.authProviderType.toString).as[String] mustEqual testString
-      (detail \ EventData.internalRegId.toString).as[String] mustEqual jd.enrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
-      (detail \ EventData.groupId.toString).as[String] mustEqual jd.groupId
       (detail \ EventData.submissionStatus.toString).as[String] mustEqual SubmissionResult.Success.toString
 
       (detail \ EventData.payload.toString).toOption.isDefined mustEqual true
@@ -213,7 +211,7 @@ class AuditServiceSpec extends SpecBase {
 
       (detail \ EventData.credentialId.toString).as[String] mustEqual credentials.providerId
       (detail \ EventData.authProviderType.toString).as[String] mustEqual credentials.providerType
-      (detail \ EventData.internalRegId.toString).as[String] mustEqual testEnrolmentId
+      (detail \ EventData.enrolmentId.toString).as[String] mustEqual testEnrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
 
@@ -290,7 +288,7 @@ class AuditServiceSpec extends SpecBase {
 
       (detail \ EventData.credentialId.toString).as[String] mustEqual credentials.providerId
       (detail \ EventData.authProviderType.toString).as[String] mustEqual credentials.providerType
-      (detail \ EventData.internalRegId.toString).as[String] mustEqual testEnrolmentId
+      (detail \ EventData.enrolmentId.toString).as[String] mustEqual testEnrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
       (detail \ EventData.journeyType.toString).as[String] mustEqual EventData.startEnrolment.toString

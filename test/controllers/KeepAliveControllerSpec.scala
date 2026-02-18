@@ -31,9 +31,9 @@ class KeepAliveControllerSpec extends SpecBase {
 
   "KeepAliveController" - {
 
-    "must return OK for a GET and call keepAlive with the user's groupId" in {
+    "must return OK for a GET and call keepAlive with the user's userId" in {
 
-      when(mockSessionRepository.keepAlive(eqTo(testGroupId)))
+      when(mockSessionRepository.keepAlive(eqTo(testCredentials.providerId)))
         .thenReturn(Future.successful(()))
 
       val application = applicationBuilder(journeyData = None)
@@ -55,7 +55,7 @@ class KeepAliveControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
 
-        verify(mockSessionRepository).keepAlive(eqTo(testGroupId))
+        verify(mockSessionRepository).keepAlive(eqTo(testCredentials.providerId))
       }
     }
   }

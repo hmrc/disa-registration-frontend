@@ -20,7 +20,6 @@ import config.FrontendAppConfig
 import models.session.Session
 import org.bson.conversions.Bson
 import org.mongodb.scala.model.*
-import org.mongodb.scala.model.Filters.equal
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
@@ -47,30 +46,39 @@ class SessionRepository @Inject() (
             .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
         ),
         IndexModel(
-          Indexes.ascending("groupId"),
+          Indexes.ascending("userId"),
           IndexOptions()
-            .name("groupIdIdx")
+            .name("userIdIdx")
             .unique(true)
         )
       ),
       replaceIndexes = true
     ) {
 
-  private def byId(id: String): Bson = Filters.equal("groupId", id)
+  private def byId(id: String): Bson = Filters.equal("userId", id)
 
-  def markAuditEventSent(groupId: String): Future[Boolean] =
+  def getOrCreateSessionAndMarkAuditEventSent(userId: String): Future[Boolean] =
+    val now = Instant.now(clock)
     collection
-      .updateOne(
-        filter = Filters.and(byId(groupId), equal("auditContinuationEventSent", false)),
-        update = Updates.set("auditContinuationEventSent", true)
+      .findOneAndUpdate(
+        filter = byId(userId),
+        update = Updates.combine(
+          Updates.set("auditContinuationEventSent", true),
+          Updates.set("lastUpdated", now),
+          Updates.setOnInsert("userId", userId)
+        ),
+        options = new FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.BEFORE)
       )
-      .toFuture()
-      .map(_.getModifiedCount == 1)
+      .toFutureOption()
+      .map {
+        case None           => true
+        case Some(existing) => !existing.auditContinuationEventSent
+      }
 
-  def keepAlive(groupId: String): Future[Unit] =
+  def keepAlive(userId: String): Future[Unit] =
     collection
       .updateOne(
-        filter = byId(groupId),
+        filter = byId(userId),
         update = Updates.set("lastUpdated", Instant.now(clock))
       )
       .toFuture()

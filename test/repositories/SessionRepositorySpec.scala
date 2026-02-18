@@ -46,43 +46,50 @@ class SessionRepositorySpec extends SpecBase {
   }
 
   private def buildSession(
-    groupId: String,
+    userId: String,
     sent: Boolean = false,
     lastUpdated: Instant = Instant.parse("2026-02-16T09:00:00Z")
   ) =
     Session(
-      groupId = groupId,
+      userId = userId,
       auditContinuationEventSent = sent,
       lastUpdated = lastUpdated
     )
 
-  "markAuditEventSent" - {
+  "getOrCreateSessionAndMarkAuditEventSent" - {
 
     "return true and set auditContinuationEventSent to true when it was previously false" in {
-      val session = buildSession(testGroupId, sent = false)
+      val session = buildSession(testCredentials.providerId, sent = false)
       await(repository.collection.insertOne(session).toFuture())
 
-      val res = await(repository.markAuditEventSent(testGroupId))
+      val res = await(repository.getOrCreateSessionAndMarkAuditEventSent(testCredentials.providerId))
       res mustBe true
 
-      val stored = await(repository.collection.find(Filters.eq("groupId", testGroupId)).head())
+      val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
       stored.auditContinuationEventSent mustBe true
+      stored.lastUpdated mustBe fixedNow
     }
 
     "return false when auditContinuationEventSent is already true" in {
-      val session = buildSession(testGroupId, sent = true)
+      val session = buildSession(testCredentials.providerId, sent = true)
       await(repository.collection.insertOne(session).toFuture())
 
-      val res = await(repository.markAuditEventSent(testGroupId))
+      val res = await(repository.getOrCreateSessionAndMarkAuditEventSent(testCredentials.providerId))
       res mustBe false
 
-      val stored = await(repository.collection.find(Filters.eq("groupId", testGroupId)).head())
+      val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
       stored.auditContinuationEventSent mustBe true
+      stored.lastUpdated mustBe fixedNow
     }
 
-    "return false when no document exists for the groupId" in {
-      val res = await(repository.markAuditEventSent(testGroupId))
-      res mustBe false
+    "create a new session, set auditContinuationEventSent to true, and return true when no document exists for the userId" in {
+      val res = await(repository.getOrCreateSessionAndMarkAuditEventSent(testCredentials.providerId))
+      res mustBe true
+
+      val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
+      stored.userId mustBe testCredentials.providerId
+      stored.auditContinuationEventSent mustBe true
+      stored.lastUpdated mustBe fixedNow
     }
   }
 
@@ -90,18 +97,19 @@ class SessionRepositorySpec extends SpecBase {
 
     "update lastUpdated to the current clock time and return unit when a document exists" in {
 
-      val session = buildSession(testGroupId, sent = false, lastUpdated = Instant.parse("2026-02-16T08:00:00Z"))
+      val session =
+        buildSession(testCredentials.providerId, sent = false, lastUpdated = Instant.parse("2026-02-16T08:00:00Z"))
       await(repository.collection.insertOne(session).toFuture())
 
-      val res = await(repository.keepAlive(testGroupId))
+      val res = await(repository.keepAlive(testCredentials.providerId))
       res mustBe ()
 
-      val stored = await(repository.collection.find(Filters.eq("groupId", testGroupId)).head())
+      val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
       stored.lastUpdated mustBe fixedNow
     }
 
-    "return unit even when no document exists for the groupId" in {
-      val res = await(repository.keepAlive(testGroupId))
+    "return unit even when no document exists for the userId" in {
+      val res = await(repository.keepAlive(testCredentials.providerId))
       res mustBe ()
     }
   }
