@@ -23,6 +23,7 @@ import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.mvc.*
 import play.api.mvc.Results.*
+import repositories.SessionRepository
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -40,6 +41,7 @@ trait IdentifierAction
 class AuthenticatedIdentifierAction @Inject() (
   override val authConnector: AuthConnector,
   config: FrontendAppConfig,
+  sessionRepository: SessionRepository,
   val parser: BodyParsers.Default
 )(implicit val executionContext: ExecutionContext)
     extends IdentifierAction
@@ -52,7 +54,10 @@ class AuthenticatedIdentifierAction @Inject() (
 
     authorised().retrieve(groupIdentifier and affinityGroup and credentials and credentialRole) {
       case Some(groupId) ~ Some(Organisation) ~ Some(credentials) ~ Some(role) =>
-        block(IdentifierRequest(request, groupId, credentials, role))
+        sessionRepository
+          .keepAlive(credentials.providerId)
+          .recover { case e => logger.warn(s"Failed to keep session alive for userId: [${credentials.providerId}]", e) }
+          .flatMap(_ => block(IdentifierRequest(request, groupId, credentials, role)))
       case _ ~ _ ~ None ~ _ | _ ~ _ ~ _ ~ None                                 =>
         logger.warn(s"Authorisation failed due to missing credentials or credentialRole")
         Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))

@@ -29,7 +29,7 @@ class SessionSpec extends JsonFormatSpec[Session] {
     Json.parse("""{
          | "userId": "3147318d-1cd9-4534-a4e8-ae268ea923ed",
          | "auditContinuationEventSent": true,
-         | "lastUpdated":{"$date":{"$numberLong":"1761040800000"}}
+         | "lastSeen":{"$date":{"$numberLong":"1761040800000"}}
          |}""".stripMargin)
 
   implicit def format: Format[Session] = Session.format

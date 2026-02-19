@@ -53,7 +53,7 @@ class SessionRepositorySpec extends SpecBase {
     Session(
       userId = userId,
       auditContinuationEventSent = sent,
-      lastUpdated = lastUpdated
+      lastSeen = lastUpdated
     )
 
   "getOrCreateSessionAndMarkAuditEventSent" - {
@@ -67,7 +67,7 @@ class SessionRepositorySpec extends SpecBase {
 
       val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
       stored.auditContinuationEventSent mustBe true
-      stored.lastUpdated mustBe fixedNow
+      stored.lastSeen mustBe fixedNow
     }
 
     "return false when auditContinuationEventSent is already true" in {
@@ -79,7 +79,7 @@ class SessionRepositorySpec extends SpecBase {
 
       val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
       stored.auditContinuationEventSent mustBe true
-      stored.lastUpdated mustBe fixedNow
+      stored.lastSeen mustBe fixedNow
     }
 
     "create a new session, set auditContinuationEventSent to true, and return true when no document exists for the userId" in {
@@ -89,13 +89,13 @@ class SessionRepositorySpec extends SpecBase {
       val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
       stored.userId mustBe testCredentials.providerId
       stored.auditContinuationEventSent mustBe true
-      stored.lastUpdated mustBe fixedNow
+      stored.lastSeen mustBe fixedNow
     }
   }
 
   "keepAlive" - {
 
-    "update lastUpdated to the current clock time and return unit when a document exists" in {
+    "update lastSeen to the current clock time and return unit when a document exists" in {
 
       val session =
         buildSession(testCredentials.providerId, sent = false, lastUpdated = Instant.parse("2026-02-16T08:00:00Z"))
@@ -105,7 +105,7 @@ class SessionRepositorySpec extends SpecBase {
       res mustBe ()
 
       val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
-      stored.lastUpdated mustBe fixedNow
+      stored.lastSeen mustBe fixedNow
     }
 
     "return unit even when no document exists for the userId" in {

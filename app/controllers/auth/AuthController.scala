@@ -18,26 +18,31 @@ package controllers.auth
 
 import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
+import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class AuthController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   config: FrontendAppConfig,
-  identify: IdentifierAction
-) extends FrontendBaseController
-    with I18nSupport {
+  identify: IdentifierAction,
+  sessionRepository: SessionRepository
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   def signOut(): Action[AnyContent] = identify.async { implicit request =>
-    Future.successful(Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl))))
-  }
-
-  def signOutNoSurvey(): Action[AnyContent] = identify.async { implicit request =>
-    val signOutServiceUrl = config.host + routes.SignedOutController.onPageLoad().url
-    Future.successful(Redirect(config.signOutUrl, Map("continue" -> Seq(signOutServiceUrl))))
+    sessionRepository
+      .clear(request.credentials.providerId)
+      .recover { case e => logger.warn(s"Failed to clear session for userId: [${request.credentials.providerId}]", e) }
+      .flatMap { _ =>
+        Future.successful(Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl))))
+      }
   }
 }

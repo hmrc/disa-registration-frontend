@@ -18,13 +18,15 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.AuthenticatedIdentifierAction
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
 import views.html.AddLiaisonOfficerView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class AddLiaisonOfficerControllerSpec extends SpecBase {
   implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
@@ -38,12 +40,15 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
       running(application) {
         val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
 
+        when(mockSessionRepository.keepAlive(any)).thenReturn(Future.unit)
+
         val authAction = new AuthenticatedIdentifierAction(
           successfulAuthConnector(
             groupId = Some(testGroupId),
             affinityGroup = Some(AffinityGroup.Organisation)
           ),
           application.injector.instanceOf[config.FrontendAppConfig],
+          mockSessionRepository,
           bodyParsers
         )
 
@@ -77,6 +82,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
             affinityGroup = Some(AffinityGroup.Agent)
           ),
           application.injector.instanceOf[config.FrontendAppConfig],
+          mockSessionRepository,
           bodyParsers
         )
 

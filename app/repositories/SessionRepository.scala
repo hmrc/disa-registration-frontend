@@ -40,7 +40,7 @@ class SessionRepository @Inject() (
       domainFormat = Session.format,
       indexes = Seq(
         IndexModel(
-          Indexes.ascending("lastUpdated"),
+          Indexes.ascending("lastSeen"),
           IndexOptions()
             .name("lastUpdatedIdx")
             .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
@@ -64,7 +64,7 @@ class SessionRepository @Inject() (
         filter = byId(userId),
         update = Updates.combine(
           Updates.set("auditContinuationEventSent", true),
-          Updates.set("lastUpdated", now),
+          Updates.set("lastSeen", now),
           Updates.setOnInsert("userId", userId)
         ),
         options = new FindOneAndUpdateOptions().upsert(true).returnDocument(ReturnDocument.BEFORE)
@@ -79,7 +79,15 @@ class SessionRepository @Inject() (
     collection
       .updateOne(
         filter = byId(userId),
-        update = Updates.set("lastUpdated", Instant.now(clock))
+        update = Updates.set("lastSeen", Instant.now(clock))
+      )
+      .toFuture()
+      .map(_ => ())
+
+  def clear(userId: String): Future[Unit] =
+    collection
+      .deleteOne(
+        filter = byId(userId)
       )
       .toFuture()
       .map(_ => ())
