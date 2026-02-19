@@ -19,7 +19,6 @@ package controllers.actions
 import base.SpecBase
 import config.FrontendAppConfig
 import controllers.routes
-import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.{times, verify, when}
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest

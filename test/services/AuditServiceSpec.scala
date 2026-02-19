@@ -88,8 +88,8 @@ class AuditServiceSpec extends SpecBase {
 
       val detail = event.detail.as[JsObject]
 
-      (detail \ EventData.credentialId.toString).as[String] mustEqual testString
-      (detail \ EventData.authProviderType.toString).as[String] mustEqual testString
+      (detail \ EventData.credId.toString).as[String] mustEqual testString
+      (detail \ EventData.providerType.toString).as[String] mustEqual testString
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.submissionStatus.toString).as[String] mustEqual SubmissionResult.Success.toString
 
@@ -209,8 +209,8 @@ class AuditServiceSpec extends SpecBase {
 
       val detail = event.detail.as[JsObject]
 
-      (detail \ EventData.credentialId.toString).as[String] mustEqual credentials.providerId
-      (detail \ EventData.authProviderType.toString).as[String] mustEqual credentials.providerType
+      (detail \ EventData.credId.toString).as[String] mustEqual credentials.providerId
+      (detail \ EventData.providerType.toString).as[String] mustEqual credentials.providerType
       (detail \ EventData.enrolmentId.toString).as[String] mustEqual testEnrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
@@ -286,8 +286,8 @@ class AuditServiceSpec extends SpecBase {
 
       val detail = event.detail.as[JsObject]
 
-      (detail \ EventData.credentialId.toString).as[String] mustEqual credentials.providerId
-      (detail \ EventData.authProviderType.toString).as[String] mustEqual credentials.providerType
+      (detail \ EventData.credId.toString).as[String] mustEqual credentials.providerId
+      (detail \ EventData.providerType.toString).as[String] mustEqual credentials.providerType
       (detail \ EventData.enrolmentId.toString).as[String] mustEqual testEnrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId

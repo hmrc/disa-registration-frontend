@@ -42,12 +42,12 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     journeyData: JourneyData
   )(implicit hc: HeaderCarrier): Future[Unit] = {
     val data = Json.obj(
-      EventData.credentialId.toString     -> request.credentials.providerId,
-      EventData.authProviderType.toString -> request.credentials.providerType,
-      EventData.enrolmentId.toString      -> journeyData.enrolmentId,
-      EventData.credentialRole.toString   -> request.credentialRole.toString,
-      EventData.groupId.toString          -> request.groupId,
-      EventData.journeyType.toString      -> EventData.startEnrolment.toString
+      EventData.credId.toString         -> request.credentials.providerId,
+      EventData.providerType.toString   -> request.credentials.providerType,
+      EventData.enrolmentId.toString    -> journeyData.enrolmentId,
+      EventData.credentialRole.toString -> request.credentialRole.toString,
+      EventData.groupId.toString        -> request.groupId,
+      EventData.journeyType.toString    -> EventData.startEnrolment.toString
     )
 
     val event = createAuditEvent(EnrolmentStarted, data)
@@ -56,8 +56,8 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
 
   def auditContinuation[A](request: DataRequest[A], sectionName: String)(implicit hc: HeaderCarrier): Future[Unit] =
     val data = Json.obj(
-      EventData.credentialId.toString      -> request.credentials.providerId,
-      EventData.authProviderType.toString  -> request.credentials.providerType,
+      EventData.credId.toString            -> request.credentials.providerId,
+      EventData.providerType.toString      -> request.credentials.providerType,
       EventData.enrolmentId.toString       -> request.journeyData.enrolmentId,
       EventData.credentialRole.toString    -> request.credentialRole.toString,
       EventData.groupId.toString           -> request.groupId,
@@ -76,8 +76,8 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     failureReason: Option[String]
   )(implicit hc: HeaderCarrier): Future[Unit] = {
     val baseData = Json.obj(
-      EventData.credentialId.toString     -> credentials.providerId,
-      EventData.authProviderType.toString -> credentials.providerType,
+      EventData.credId.toString           -> credentials.providerId,
+      EventData.providerType.toString     -> credentials.providerType,
       EventData.credentialRole.toString   -> credentialRole.toString,
       EventData.submissionStatus.toString -> status.toString,
       EventData.payload.toString          -> journeyData
@@ -121,6 +121,6 @@ object AuditTypes extends Enumeration {
 
 object EventData extends Enumeration {
   type Data = Value
-  val authProviderType, credentialId, credentialRole, groupId, submissionStatus, failureReason, payload, journeyType,
-    enrolmentId, continuingSection, startEnrolment, continueEnrolment = Value
+  val providerType, credId, credentialRole, groupId, submissionStatus, failureReason, payload, journeyType, enrolmentId,
+    continuingSection, startEnrolment, continueEnrolment = Value
 }
