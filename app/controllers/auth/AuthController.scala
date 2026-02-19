@@ -43,6 +43,7 @@ class AuthController @Inject() (
       .findAndDelete(request.credentials.providerId)
       .recover { case e =>
         logger.warn(s"Failed to find and clear session for userId: [${request.credentials.providerId}]", e)
+        None
       }
       .flatMap {
         case Some(Session(_, _, true, _)) =>

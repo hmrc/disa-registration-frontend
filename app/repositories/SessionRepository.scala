@@ -57,7 +57,7 @@ class SessionRepository @Inject() (
 
   private def byId(id: String): Bson = Filters.equal("userId", id)
 
-  private lazy val now = Instant.now(clock)
+  private def now = Instant.now(clock)
 
   def findAndDelete(userId: String): Future[Option[Session]] =
     collection

@@ -48,14 +48,61 @@ class SessionRepositorySpec extends SpecBase {
   private def buildSession(
     userId: String,
     sent: Boolean = false,
+    updatesInSession: Boolean = true,
     lastUpdated: Instant = Instant.parse("2026-02-16T09:00:00Z")
   ) =
     Session(
       userId = userId,
       auditContinuationEventSent = sent,
-      updatesInThisSession = true,
+      updatesInThisSession = updatesInSession,
       lastSeen = lastUpdated
     )
+
+  "findAndDelete" - {
+
+    "return Some(session) and remove it when a document exists" in {
+      val session = buildSession(testCredentials.providerId, sent = false, updatesInSession = true)
+      await(repository.collection.insertOne(session).toFuture())
+
+      val res = await(repository.findAndDelete(testCredentials.providerId))
+      res.value.userId mustBe testCredentials.providerId
+
+      val count = await(repository.collection.countDocuments(Filters.eq("userId", testCredentials.providerId)).head())
+      count mustBe 0L
+    }
+
+    "return None when no document exists" in {
+      val res = await(repository.findAndDelete(testCredentials.providerId))
+      res mustBe None
+    }
+  }
+
+  "upsertAndMarkUpdatesInSession" - {
+
+    "create a new session with updatesInThisSession=true, auditContinuationEventSent=false, and lastSeen updated when none exists" in {
+      val res = await(repository.upsertAndMarkUpdatesInSession(testCredentials.providerId))
+      res mustBe ()
+
+      val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
+      stored.userId mustBe testCredentials.providerId
+      stored.updatesInThisSession mustBe true
+      stored.auditContinuationEventSent mustBe false
+      stored.lastSeen mustBe fixedNow
+    }
+
+    "set updatesInThisSession=true and lastSeen updated when a document exists, without overwriting auditContinuationEventSent" in {
+      val session = buildSession(testCredentials.providerId, sent = true, updatesInSession = false)
+      await(repository.collection.insertOne(session).toFuture())
+
+      val res = await(repository.upsertAndMarkUpdatesInSession(testCredentials.providerId))
+      res mustBe ()
+
+      val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
+      stored.auditContinuationEventSent mustBe true
+      stored.updatesInThisSession mustBe true
+      stored.lastSeen mustBe fixedNow
+    }
+  }
 
   "upsertAndMarkAuditEventSent" - {
 
@@ -90,6 +137,7 @@ class SessionRepositorySpec extends SpecBase {
       val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
       stored.userId mustBe testCredentials.providerId
       stored.auditContinuationEventSent mustBe true
+      stored.updatesInThisSession mustBe false
       stored.lastSeen mustBe fixedNow
     }
   }
@@ -112,6 +160,9 @@ class SessionRepositorySpec extends SpecBase {
     "return unit even when no document exists for the userId" in {
       val res = await(repository.keepAlive(testCredentials.providerId))
       res mustBe ()
+
+      val count = await(repository.collection.countDocuments(Filters.eq("userId", testCredentials.providerId)).head())
+      count mustBe 0L
     }
   }
 }

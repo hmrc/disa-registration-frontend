@@ -22,7 +22,7 @@ import models.session.Session
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import repositories.SessionRepository
@@ -35,16 +35,25 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
   private val appConfig = injector.instanceOf[FrontendAppConfig]
 
+  private def expectedRedirect(continueUrl: String): String =
+    s"${appConfig.signOutUrl}?continue=${URLEncoder.encode(continueUrl, "UTF-8")}"
+
   "signOut" - {
 
-    "must clear the session for the current user and redirect to sign out when updates were made" in {
-      val session               = Session(testCredentials.providerId, false, true, Instant.now)
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.findAndDelete(any[String])).thenReturn(Future.successful(Some(session)))
+    "must find and delete the session and redirect to sign out when answers were saved" in {
+      val session = Session(
+        testCredentials.providerId,
+        auditContinuationEventSent = false,
+        updatesInThisSession = true,
+        lastSeen = Instant.now
+      )
+
+      when(mockSessionRepository.findAndDelete(any[String]))
+        .thenReturn(Future.successful(Some(session)))
 
       val application =
         applicationBuilder(None)
-          .overrides(inject.bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -53,19 +62,27 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe s"${appConfig.signOutUrl}?continue=${URLEncoder.encode(controllers.auth.routes.SignedOutController.signOut().url, "UTF-8")}"
+        redirectLocation(result).value mustBe expectedRedirect(
+          controllers.auth.routes.SignedOutController.signOut().url
+        )
         verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
       }
     }
 
-    "must clear the session for the current user and redirect to sign out when updates were NOT made" in {
-      val session               = Session(testCredentials.providerId, false, false, Instant.now)
-      val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.findAndDelete(any[String])).thenReturn(Future.successful(Some(session)))
+    "must find and delete the session and redirect to sign out answers-not-saved when answers were NOT saved" in {
+      val session = Session(
+        testCredentials.providerId,
+        auditContinuationEventSent = false,
+        updatesInThisSession = false,
+        lastSeen = Instant.now
+      )
+
+      when(mockSessionRepository.findAndDelete(any[String]))
+        .thenReturn(Future.successful(Some(session)))
 
       val application =
         applicationBuilder(None)
-          .overrides(inject.bind[SessionRepository].toInstance(mockSessionRepository))
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
           .build()
 
       running(application) {
@@ -74,7 +91,53 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe s"${appConfig.signOutUrl}?continue=${URLEncoder.encode(controllers.auth.routes.SignedOutController.signOutAnswersNotSaved().url, "UTF-8")}"
+        redirectLocation(result).value mustBe expectedRedirect(
+          controllers.auth.routes.SignedOutController.signOutAnswersNotSaved().url
+        )
+        verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
+      }
+    }
+
+    "must redirect to sign out answers-not-saved when no session exists for the user" in {
+      when(mockSessionRepository.findAndDelete(any[String]))
+        .thenReturn(Future.successful(None))
+
+      val application =
+        applicationBuilder(None)
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.signOut().url)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe expectedRedirect(
+          controllers.auth.routes.SignedOutController.signOutAnswersNotSaved().url
+        )
+        verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
+      }
+    }
+
+    "must still redirect to sign out answers-not-saved when findAndDelete fails" in {
+      when(mockSessionRepository.findAndDelete(any[String]))
+        .thenReturn(Future.failed(new RuntimeException("fubar")))
+
+      val application =
+        applicationBuilder(None)
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.signOut().url)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe expectedRedirect(
+          controllers.auth.routes.SignedOutController.signOutAnswersNotSaved().url
+        )
         verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
       }
     }

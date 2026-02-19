@@ -40,11 +40,11 @@ class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector, ses
     val sectionName = taskListSection.sectionName
     connector
       .updateTaskListJourney(taskListSection, groupId, sectionName)
-      .map { result =>
+      .flatMap { result =>
         sessionRepository
           .upsertAndMarkUpdatesInSession(userId)
           .recover { case e => logger.warn(s"Failed to mark updates in session for userId: [$userId]", e) }
-        result
+          .map(_ => result)
       }
   }
 
