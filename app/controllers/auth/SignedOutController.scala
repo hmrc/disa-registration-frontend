@@ -25,16 +25,16 @@ import javax.inject.Inject
 
 class SignedOutController @Inject() (
   val controllerComponents: MessagesControllerComponents,
-  signOutView: SignOutView,
-  signOutAnswersNotSavedView: SignOutAnswersNotSavedView
+  signOutAnswersSavedView: SignOutAnswersSavedView,
+  signOutView: SignOutView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def signOut(): Action[AnyContent] = Action { implicit request =>
-    Ok(signOutView())
+  def signOutAnswersSaved(): Action[AnyContent] = Action { implicit request =>
+    Ok(signOutAnswersSavedView())
   }
 
-  def signOutAnswersNotSaved(): Action[AnyContent] = Action { implicit request =>
-    Ok(signOutAnswersNotSavedView())
+  def signOut(): Action[AnyContent] = Action { implicit request =>
+    Ok(signOutView())
   }
 }

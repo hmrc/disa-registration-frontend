@@ -50,14 +50,14 @@ class AuthController @Inject() (
           Future.successful(
             Redirect(
               config.signOutUrl,
-              Map("continue" -> Seq(s"${routes.SignedOutController.signOut().url}"))
+              Map("continue" -> Seq(s"${routes.SignedOutController.signOutAnswersSaved().url}"))
             )
           )
         case _                            =>
           Future.successful(
             Redirect(
               config.signOutUrl,
-              Map("continue" -> Seq(s"${routes.SignedOutController.signOutAnswersNotSaved().url}"))
+              Map("continue" -> Seq(s"${routes.SignedOutController.signOut().url}"))
             )
           )
       }

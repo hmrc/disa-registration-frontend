@@ -40,7 +40,7 @@ class GrsService @Inject() (grsConnector: GrsConnector, appConfig: FrontendAppCo
       continueUrl = appConfig.grsCallback,
       businessVerificationCheck = true,
       deskProServiceId = "deskProServiceId",
-      signOutUrl = appConfig.host + controllers.auth.routes.SignedOutController.signOutAnswersNotSaved().url,
+      signOutUrl = appConfig.host + controllers.auth.routes.SignedOutController.signOut().url,
       regime =
         "ISA", // TODO: waiting on confirmation for this only options according to docs are VATC/PPT but seems to work fine with ISA locally
       accessibilityUrl = appConfig.accessibilityStatementUrl,

@@ -40,11 +40,40 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
   "signOut" - {
 
-    "must find and delete the session and redirect to sign out when answers were saved" in {
+    "must find and delete the session and redirect to answer-saved sign out when answers were saved" in {
       val session = Session(
         testCredentials.providerId,
         auditContinuationEventSent = false,
         updatesInThisSession = true,
+        lastSeen = Instant.now
+      )
+
+      when(mockSessionRepository.findAndDelete(any[String]))
+        .thenReturn(Future.successful(Some(session)))
+
+      val application =
+        applicationBuilder(None)
+          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.AuthController.signOut().url)
+
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe expectedRedirect(
+          controllers.auth.routes.SignedOutController.signOutAnswersSaved().url
+        )
+        verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
+      }
+    }
+
+    "must find and delete the session and redirect to regular sign out when answers were NOT saved" in {
+      val session = Session(
+        testCredentials.providerId,
+        auditContinuationEventSent = false,
+        updatesInThisSession = false,
         lastSeen = Instant.now
       )
 
@@ -69,36 +98,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must find and delete the session and redirect to sign out answers-not-saved when answers were NOT saved" in {
-      val session = Session(
-        testCredentials.providerId,
-        auditContinuationEventSent = false,
-        updatesInThisSession = false,
-        lastSeen = Instant.now
-      )
-
-      when(mockSessionRepository.findAndDelete(any[String]))
-        .thenReturn(Future.successful(Some(session)))
-
-      val application =
-        applicationBuilder(None)
-          .overrides(bind[SessionRepository].toInstance(mockSessionRepository))
-          .build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.AuthController.signOut().url)
-
-        val result = route(application, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe expectedRedirect(
-          controllers.auth.routes.SignedOutController.signOutAnswersNotSaved().url
-        )
-        verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
-      }
-    }
-
-    "must redirect to sign out answers-not-saved when no session exists for the user" in {
+    "must redirect to sign out when no session exists for the user" in {
       when(mockSessionRepository.findAndDelete(any[String]))
         .thenReturn(Future.successful(None))
 
@@ -114,13 +114,13 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe expectedRedirect(
-          controllers.auth.routes.SignedOutController.signOutAnswersNotSaved().url
+          controllers.auth.routes.SignedOutController.signOut().url
         )
         verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
       }
     }
 
-    "must still redirect to sign out answers-not-saved when findAndDelete fails" in {
+    "must still redirect to sign out when findAndDelete fails" in {
       when(mockSessionRepository.findAndDelete(any[String]))
         .thenReturn(Future.failed(new RuntimeException("fubar")))
 
@@ -136,7 +136,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe expectedRedirect(
-          controllers.auth.routes.SignedOutController.signOutAnswersNotSaved().url
+          controllers.auth.routes.SignedOutController.signOut().url
         )
         verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
       }
