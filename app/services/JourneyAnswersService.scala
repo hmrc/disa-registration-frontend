@@ -21,21 +21,31 @@ import models.GetOrCreateJourneyData
 import models.journeydata.{JourneyData, TaskListSection}
 import play.api.Logging
 import play.api.libs.json.Writes
+import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector) extends Logging {
+class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector, sessionRepository: SessionRepository)(
+  implicit executionContext: ExecutionContext
+) extends Logging {
 
   def get(groupId: String)(implicit hc: HeaderCarrier): Future[Option[JourneyData]] =
     connector.getJourneyData(groupId)
 
-  def update[A <: TaskListSection: Writes](taskListSection: A, groupId: String)(implicit
+  def update[A <: TaskListSection: Writes](taskListSection: A, groupId: String, userId: String)(implicit
     hc: HeaderCarrier
   ): Future[A] = {
     val sectionName = taskListSection.sectionName
-    connector.updateTaskListJourney(taskListSection, groupId, sectionName)
+    connector
+      .updateTaskListJourney(taskListSection, groupId, sectionName)
+      .map { result =>
+        sessionRepository
+          .upsertAndMarkUpdatesInSession(userId)
+          .recover { case e => logger.warn(s"Failed to mark updates in session for userId: [$userId]", e) }
+        result
+      }
   }
 
   def getOrCreateJourneyData(groupId: String)(implicit hc: HeaderCarrier): Future[GetOrCreateJourneyData] =

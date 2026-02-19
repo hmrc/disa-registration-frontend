@@ -53,16 +53,17 @@ class SessionRepositorySpec extends SpecBase {
     Session(
       userId = userId,
       auditContinuationEventSent = sent,
+      updatesInThisSession = true,
       lastSeen = lastUpdated
     )
 
-  "getOrCreateSessionAndMarkAuditEventSent" - {
+  "upsertAndMarkAuditEventSent" - {
 
     "return true and set auditContinuationEventSent to true when it was previously false" in {
       val session = buildSession(testCredentials.providerId, sent = false)
       await(repository.collection.insertOne(session).toFuture())
 
-      val res = await(repository.getOrCreateSessionAndMarkAuditEventSent(testCredentials.providerId))
+      val res = await(repository.upsertAndMarkAuditEventSent(testCredentials.providerId))
       res mustBe true
 
       val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
@@ -74,7 +75,7 @@ class SessionRepositorySpec extends SpecBase {
       val session = buildSession(testCredentials.providerId, sent = true)
       await(repository.collection.insertOne(session).toFuture())
 
-      val res = await(repository.getOrCreateSessionAndMarkAuditEventSent(testCredentials.providerId))
+      val res = await(repository.upsertAndMarkAuditEventSent(testCredentials.providerId))
       res mustBe false
 
       val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
@@ -83,7 +84,7 @@ class SessionRepositorySpec extends SpecBase {
     }
 
     "create a new session, set auditContinuationEventSent to true, and return true when no document exists for the userId" in {
-      val res = await(repository.getOrCreateSessionAndMarkAuditEventSent(testCredentials.providerId))
+      val res = await(repository.upsertAndMarkAuditEventSent(testCredentials.providerId))
       res mustBe true
 
       val stored = await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())

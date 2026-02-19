@@ -71,7 +71,7 @@ class PeerToPeerPlatformNumberController @Inject() (
               val updatedSection = isaProducts.copy(p2pPlatformNumber = Some(answer))
 
               journeyAnswersService
-                .update(updatedSection, request.groupId)
+                .update(updatedSection, request.groupId, request.credentials.providerId)
                 .map { updatedSection =>
                   Redirect(navigator.nextPage(PeerToPeerPlatformNumberPage, updatedSection, mode))
                 }

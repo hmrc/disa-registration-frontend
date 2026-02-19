@@ -97,7 +97,8 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
         IsaProducts(innovativeFinancialProducts = Some(Seq(PeertopeerLoansAndHave36hPermissions)))
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService
+          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[IsaProducts]], any)
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
@@ -125,7 +126,8 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
         IsaProducts(innovativeFinancialProducts = Some(Seq(PeertopeerLoansAndHave36hPermissions)))
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService
+          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[IsaProducts]], any)
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
@@ -168,7 +170,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
     "must return Internal Server Error when theres an issue updating the journey answers" in {
 
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService.update(any[IsaProducts], any[String], any[String])(any[Writes[IsaProducts]], any)
       ) thenReturn Future.failed(new Exception)
 
       val application =

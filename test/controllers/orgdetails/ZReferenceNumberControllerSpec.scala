@@ -90,7 +90,8 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       val expectedJourneyData = OrganisationDetails(zRefNumber = Some(testZRef))
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[OrganisationDetails]], any)
+        mockJourneyAnswersService
+          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[OrganisationDetails]], any)
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
@@ -115,7 +116,8 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       val expectedJourneyData = OrganisationDetails(zRefNumber = Some(testZRef))
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[OrganisationDetails]], any)
+        mockJourneyAnswersService
+          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[OrganisationDetails]], any)
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
@@ -158,7 +160,8 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
     "must return Internal Server Error when updateJourneyAnswers returns a fail exception" in {
 
       when(
-        mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
+        mockJourneyAnswersService
+          .update(any[OrganisationDetails], any[String], any[String])(any[Writes[OrganisationDetails]], any)
       ) thenReturn Future.failed(new Exception)
 
       val application =

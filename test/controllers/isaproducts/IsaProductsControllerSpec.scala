@@ -112,7 +112,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       val expectedJourneyData = IsaProducts(Some(Seq(CashIsas)))
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService
+          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[IsaProducts]], any)
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
@@ -137,7 +138,8 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       val expectedJourneyData = IsaProducts(Some(Seq(CashIsas)))
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService
+          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[IsaProducts]], any)
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
@@ -180,7 +182,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
     "must return Internal Server Error when invalid data is submitted" in {
 
       when(
-        mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService.update(any[IsaProducts], any[String], any[String])(any[Writes[IsaProducts]], any)
       ) thenReturn Future.failed(new Exception)
 
       val application =

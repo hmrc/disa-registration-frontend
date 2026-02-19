@@ -42,7 +42,7 @@ class SessionRepository @Inject() (
         IndexModel(
           Indexes.ascending("lastSeen"),
           IndexOptions()
-            .name("lastUpdatedIdx")
+            .name("lastSeenIdx")
             .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
         ),
         IndexModel(
@@ -57,13 +57,20 @@ class SessionRepository @Inject() (
 
   private def byId(id: String): Bson = Filters.equal("userId", id)
 
-  def getOrCreateSessionAndMarkAuditEventSent(userId: String): Future[Boolean] =
-    val now = Instant.now(clock)
+  private lazy val now = Instant.now(clock)
+
+  def findAndDelete(userId: String): Future[Option[Session]] =
+    collection
+      .findOneAndDelete(filter = byId(userId))
+      .toFutureOption()
+
+  def upsertAndMarkAuditEventSent(userId: String): Future[Boolean] =
     collection
       .findOneAndUpdate(
         filter = byId(userId),
         update = Updates.combine(
           Updates.set("auditContinuationEventSent", true),
+          Updates.setOnInsert("updatesInThisSession", false),
           Updates.set("lastSeen", now),
           Updates.setOnInsert("userId", userId)
         ),
@@ -75,19 +82,26 @@ class SessionRepository @Inject() (
         case Some(existing) => !existing.auditContinuationEventSent
       }
 
+  def upsertAndMarkUpdatesInSession(userId: String): Future[Unit] =
+    collection
+      .updateOne(
+        filter = byId(userId),
+        update = Updates.combine(
+          Updates.setOnInsert("auditContinuationEventSent", false),
+          Updates.set("updatesInThisSession", true),
+          Updates.set("lastSeen", now),
+          Updates.setOnInsert("userId", userId)
+        ),
+        options = new UpdateOptions().upsert(true)
+      )
+      .toFuture()
+      .map(_ => ())
+
   def keepAlive(userId: String): Future[Unit] =
     collection
       .updateOne(
         filter = byId(userId),
         update = Updates.set("lastSeen", Instant.now(clock))
-      )
-      .toFuture()
-      .map(_ => ())
-
-  def clear(userId: String): Future[Unit] =
-    collection
-      .deleteOne(
-        filter = byId(userId)
       )
       .toFuture()
       .map(_ => ())

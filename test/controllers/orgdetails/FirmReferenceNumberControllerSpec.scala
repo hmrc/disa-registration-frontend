@@ -93,7 +93,8 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       val expectedJourneyData = OrganisationDetails(fcaNumber = Some(fcaNumber))
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[OrganisationDetails]], any)
+        mockJourneyAnswersService
+          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[OrganisationDetails]], any)
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
@@ -136,7 +137,8 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
     "must return Internal Server Error when theres an issue updating the journey answers" in {
 
       when(
-        mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
+        mockJourneyAnswersService
+          .update(any[OrganisationDetails], any[String], any[String])(any[Writes[OrganisationDetails]], any)
       ) thenReturn Future.failed(new Exception)
 
       val application =

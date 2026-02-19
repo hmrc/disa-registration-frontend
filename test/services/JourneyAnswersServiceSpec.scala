@@ -31,7 +31,7 @@ class JourneyAnswersServiceSpec extends SpecBase {
   val mockConnector: DisaRegistrationConnector =
     mock[DisaRegistrationConnector]
 
-  val service = new JourneyAnswersService(mockConnector)
+  val service = new JourneyAnswersService(mockConnector, mockSessionRepository)
 
   "JourneyAnswersService" - {
 
@@ -70,19 +70,22 @@ class JourneyAnswersServiceSpec extends SpecBase {
     "update" - {
 
       "must complete successfully when connector returns Unit" in {
+        when(mockSessionRepository.upsertAndMarkUpdatesInSession(any[String])).thenReturn(Future.unit)
+
         when(
           mockConnector.updateTaskListJourney(
             ArgumentMatchers.eq(testIsaProductsAnswers),
             ArgumentMatchers.eq(testGroupId),
             ArgumentMatchers.eq(testIsaProductsAnswers.sectionName)
           )(any(), any())
-        ).thenReturn(Future.successful(()))
+        ).thenReturn(Future.successful(testIsaProductsAnswers))
 
-        val result: Unit = service.update(testIsaProductsAnswers, testGroupId).futureValue
+        val result: Unit = service.update(testIsaProductsAnswers, testGroupId, testCredentials.providerId).futureValue
 
         result mustBe ()
         verify(mockConnector)
           .updateTaskListJourney(testIsaProductsAnswers, testGroupId, testIsaProductsAnswers.sectionName)
+        verify(mockSessionRepository).upsertAndMarkUpdatesInSession(testCredentials.providerId)
       }
 
       "must propagate exception from connector" in {
@@ -96,7 +99,7 @@ class JourneyAnswersServiceSpec extends SpecBase {
           )(any(), any())
         ).thenReturn(Future.failed(ex))
 
-        val thrown = service.update(testIsaProductsAnswers, testGroupId).failed.futureValue
+        val thrown = service.update(testIsaProductsAnswers, testGroupId, testCredentials.providerId).failed.futureValue
         thrown mustBe ex
       }
     }

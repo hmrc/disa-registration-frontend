@@ -63,10 +63,10 @@ class AuditContinuationActionSpec extends SpecBase {
 
   "AuditContinuationAction" - {
 
-    "when getOrCreateSessionAndMarkAuditEventSent returns true" - {
+    "when upsertAndMarkAuditEventSent returns true" - {
 
       "must call auditContinuation and pass request" in {
-        when(mockSessionRepository.getOrCreateSessionAndMarkAuditEventSent(eqTo(testCredentials.providerId)))
+        when(mockSessionRepository.upsertAndMarkAuditEventSent(eqTo(testCredentials.providerId)))
           .thenReturn(Future.successful(true))
 
         when(mockAuditService.auditContinuation(any(), eqTo(sectionName))(any[HeaderCarrier]))
@@ -81,12 +81,12 @@ class AuditContinuationActionSpec extends SpecBase {
         status(Future.successful(result)) mustBe OK
         seenReq.credentials.providerId mustBe testCredentials.providerId
 
-        verify(mockSessionRepository).getOrCreateSessionAndMarkAuditEventSent(eqTo(testCredentials.providerId))
+        verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(testCredentials.providerId))
         verify(mockAuditService).auditContinuation(any(), eqTo(sectionName))(any[HeaderCarrier])
       }
 
       "must pass request through even if auditContinuation fails" in {
-        when(mockSessionRepository.getOrCreateSessionAndMarkAuditEventSent(eqTo(testCredentials.providerId)))
+        when(mockSessionRepository.upsertAndMarkAuditEventSent(eqTo(testCredentials.providerId)))
           .thenReturn(Future.successful(true))
 
         when(mockAuditService.auditContinuation(any(), eqTo(sectionName))(any[HeaderCarrier]))
@@ -101,15 +101,15 @@ class AuditContinuationActionSpec extends SpecBase {
         status(Future.successful(result)) mustBe OK
         seenReq.credentials.providerId mustBe testCredentials.providerId
 
-        verify(mockSessionRepository).getOrCreateSessionAndMarkAuditEventSent(eqTo(testCredentials.providerId))
+        verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(testCredentials.providerId))
         verify(mockAuditService).auditContinuation(any(), eqTo(sectionName))(any[HeaderCarrier])
       }
     }
 
-    "when getOrCreateSessionAndMarkAuditEventSent returns false" - {
+    "when upsertAndMarkAuditEventSent returns false" - {
 
       "must NOT call auditContinuation and pass request unchanged" in {
-        when(mockSessionRepository.getOrCreateSessionAndMarkAuditEventSent(eqTo(testCredentials.providerId)))
+        when(mockSessionRepository.upsertAndMarkAuditEventSent(eqTo(testCredentials.providerId)))
           .thenReturn(Future.successful(false))
 
         val action      = new AuditContinuationActionImpl(mockSessionRepository, mockAuditService)
@@ -121,15 +121,15 @@ class AuditContinuationActionSpec extends SpecBase {
         status(Future.successful(result)) mustBe OK
         seenReq.credentials.providerId mustBe testCredentials.providerId
 
-        verify(mockSessionRepository).getOrCreateSessionAndMarkAuditEventSent(eqTo(testCredentials.providerId))
+        verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(testCredentials.providerId))
         verify(mockAuditService, never()).auditContinuation(any(), any())(any[HeaderCarrier])
       }
     }
 
-    "when getOrCreateSessionAndMarkAuditEventSent fails" - {
+    "when upsertAndMarkAuditEventSent fails" - {
 
       "must recover, NOT call auditContinuation, and pass request unchanged" in {
-        when(mockSessionRepository.getOrCreateSessionAndMarkAuditEventSent(eqTo(testCredentials.providerId)))
+        when(mockSessionRepository.upsertAndMarkAuditEventSent(eqTo(testCredentials.providerId)))
           .thenReturn(Future.failed(new RuntimeException("fubar")))
 
         val action      = new AuditContinuationActionImpl(mockSessionRepository, mockAuditService)
@@ -141,7 +141,7 @@ class AuditContinuationActionSpec extends SpecBase {
         status(Future.successful(result)) mustBe OK
         seenReq.credentials.providerId mustBe testCredentials.providerId
 
-        verify(mockSessionRepository).getOrCreateSessionAndMarkAuditEventSent(eqTo(testCredentials.providerId))
+        verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(testCredentials.providerId))
         verify(mockAuditService, never()).auditContinuation(any(), any())(any[HeaderCarrier])
       }
     }

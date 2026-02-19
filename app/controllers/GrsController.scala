@@ -46,7 +46,7 @@ class GrsController @Inject() (
         val businessVerification =
           buildBusinessVerification(grsResponse, request.journeyData.flatMap(_.businessVerification))
 
-        journeyAnswersService.update(businessVerification, request.groupId).map { _ =>
+        journeyAnswersService.update(businessVerification, request.groupId, request.credentials.providerId).map { _ =>
           Redirect(
             (businessVerification.businessRegistrationPassed, businessVerification.businessVerificationPassed) match {
               case (Some(true), Some(true)) => routes.TaskListController.onPageLoad()

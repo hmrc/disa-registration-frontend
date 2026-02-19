@@ -99,7 +99,10 @@ class TradingNameControllerSpec extends SpecBase {
 
         when(
           mockJourneyAnswersService
-            .update(eqTo(expectedJourneyData), eqTo(testGroupId))(any[Writes[OrganisationDetails]], any)
+            .update(eqTo(expectedJourneyData), eqTo(testGroupId), eqTo(testCredentials.providerId))(
+              any[Writes[OrganisationDetails]],
+              any
+            )
         ) thenReturn Future.successful(expectedJourneyData)
 
         val application =
@@ -142,7 +145,8 @@ class TradingNameControllerSpec extends SpecBase {
       "must return Internal Server Error when there is an issue storing the answer" in {
 
         when(
-          mockJourneyAnswersService.update(any[OrganisationDetails], any[String])(any[Writes[OrganisationDetails]], any)
+          mockJourneyAnswersService
+            .update(any[OrganisationDetails], any[String], any[String])(any[Writes[OrganisationDetails]], any)
         ) thenReturn Future.failed(new Exception)
 
         val application =
