@@ -19,12 +19,15 @@ package controllers.actions
 import base.SpecBase
 import config.FrontendAppConfig
 import controllers.routes
+import org.mockito.Mockito.{times, verify, when}
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+
+import scala.concurrent.Future
 
 class AuthActionSpec extends SpecBase {
 
@@ -49,6 +52,7 @@ class AuthActionSpec extends SpecBase {
           val authAction = new AuthenticatedIdentifierAction(
             failingAuthConnector(new MissingBearerToken),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -74,6 +78,7 @@ class AuthActionSpec extends SpecBase {
           val authAction = new AuthenticatedIdentifierAction(
             failingAuthConnector(new BearerTokenExpired),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -99,6 +104,7 @@ class AuthActionSpec extends SpecBase {
           val authAction = new AuthenticatedIdentifierAction(
             failingAuthConnector(new InsufficientEnrolments),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -124,6 +130,7 @@ class AuthActionSpec extends SpecBase {
           val authAction = new AuthenticatedIdentifierAction(
             failingAuthConnector(new InsufficientConfidenceLevel),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -149,6 +156,7 @@ class AuthActionSpec extends SpecBase {
           val authAction = new AuthenticatedIdentifierAction(
             failingAuthConnector(new UnsupportedAuthProvider),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -179,6 +187,7 @@ class AuthActionSpec extends SpecBase {
               credentialRole = Some(testCredentialRoleUser)
             ),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -211,6 +220,7 @@ class AuthActionSpec extends SpecBase {
               groupId = Some("group-id-123")
             ),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -240,6 +250,7 @@ class AuthActionSpec extends SpecBase {
           val authAction = new AuthenticatedIdentifierAction(
             failingAuthConnector(new UnsupportedCredentialRole),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -265,6 +276,7 @@ class AuthActionSpec extends SpecBase {
           val authAction = new AuthenticatedIdentifierAction(
             successfulAuthConnector(Some(testGroupId), Some(Organisation), Some(Credentials("", "")), None),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -290,6 +302,7 @@ class AuthActionSpec extends SpecBase {
           val authAction = new AuthenticatedIdentifierAction(
             successfulAuthConnector(Some(testGroupId), Some(Organisation), None, Some(User)),
             appConfig,
+            mockSessionRepository,
             bodyParsers
           )
 
@@ -299,6 +312,36 @@ class AuthActionSpec extends SpecBase {
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
         }
+      }
+    }
+
+    "must still allow the request to proceed when keepAlive fails" in {
+      val application = applicationBuilder(journeyData = None).build()
+
+      running(application) {
+        val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+        val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+        when(mockSessionRepository.keepAlive(testCredentials.providerId))
+          .thenReturn(Future.failed(new RuntimeException("fubar")))
+
+        val authAction = new AuthenticatedIdentifierAction(
+          authConnector = successfulAuthConnector(
+            affinityGroup = Some(Organisation),
+            groupId = Some(testGroupId),
+            credentials = Some(testCredentials),
+            credentialRole = Some(testCredentialRoleUser)
+          ),
+          config = appConfig,
+          parser = bodyParsers,
+          sessionRepository = mockSessionRepository
+        )
+
+        val controller = new Harness(authAction)
+        val result     = controller.onPageLoad()(FakeRequest())
+
+        status(result) mustBe OK
+        verify(mockSessionRepository, times(1)).keepAlive(testCredentials.providerId)
       }
     }
   }

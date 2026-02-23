@@ -19,7 +19,7 @@ package services
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import models.journeydata.JourneyData
-import models.requests.IdentifierRequest
+import models.requests.{DataRequest, IdentifierRequest}
 import models.submission.SubmissionResult
 import play.api.Logging
 import play.api.libs.json.{JsObject, JsString, JsValue, Json}
@@ -44,7 +44,7 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     val data = Json.obj(
       EventData.credId.toString         -> request.credentials.providerId,
       EventData.providerType.toString   -> request.credentials.providerType,
-      EventData.internalRegId.toString  -> journeyData.enrolmentId,
+      EventData.enrolmentId.toString    -> journeyData.enrolmentId,
       EventData.credentialRole.toString -> request.credentialRole.toString,
       EventData.groupId.toString        -> request.groupId,
       EventData.journeyType.toString    -> EventData.startEnrolment.toString
@@ -53,6 +53,21 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     val event = createAuditEvent(EnrolmentStarted, data)
     connector.sendExtendedEvent(event).map(logResponse(_, EnrolmentStarted.toString))
   }
+
+  def auditContinuation[A](request: DataRequest[A], sectionName: String)(implicit hc: HeaderCarrier): Future[Unit] =
+    val data = Json.obj(
+      EventData.credId.toString            -> request.credentials.providerId,
+      EventData.providerType.toString      -> request.credentials.providerType,
+      EventData.enrolmentId.toString       -> request.journeyData.enrolmentId,
+      EventData.credentialRole.toString    -> request.credentialRole.toString,
+      EventData.groupId.toString           -> request.groupId,
+      EventData.journeyType.toString       -> EventData.continueEnrolment.toString,
+      EventData.continuingSection.toString -> sectionName
+    )
+
+    val event = createAuditEvent(EnrolmentStarted, data)
+    connector.sendExtendedEvent(event).map(logResponse(_, EnrolmentStarted.toString))
+
   def auditEnrolmentSubmission(
     status: SubmissionResult,
     credentials: Credentials,
@@ -63,9 +78,7 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     val baseData = Json.obj(
       EventData.credId.toString           -> credentials.providerId,
       EventData.providerType.toString     -> credentials.providerType,
-      EventData.internalRegId.toString    -> journeyData.enrolmentId,
       EventData.credentialRole.toString   -> credentialRole.toString,
-      EventData.groupId.toString          -> journeyData.groupId,
       EventData.submissionStatus.toString -> status.toString,
       EventData.payload.toString          -> journeyData
     )
@@ -108,6 +121,6 @@ object AuditTypes extends Enumeration {
 
 object EventData extends Enumeration {
   type Data = Value
-  val providerType, internalRegId, credId, credentialRole, groupId, submissionStatus, failureReason, payload,
-    journeyType, startEnrolment = Value
+  val providerType, credId, credentialRole, groupId, submissionStatus, failureReason, payload, journeyType, enrolmentId,
+    continuingSection, startEnrolment, continueEnrolment = Value
 }

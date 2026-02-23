@@ -36,7 +36,7 @@
     @if(timeout) {
       @hmrcTimeoutDialogHelper(
         signOutUrl = controllers.auth.routes.AuthController.signOut().url,
-        keepAliveUrl = Some(request.uri),
+        keepAliveUrl = Some(controllers.routes.KeepAliveController.keepAlive().url),
         timeout = Some(appConfig.timeout),
         countdown = Some(appConfig.countdown)
       )

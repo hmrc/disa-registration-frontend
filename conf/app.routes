@@ -10,6 +10,8 @@ GET         /language/:lang                              controllers.LanguageSwi
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
+GET         /keep-alive                                  controllers.KeepAliveController.keepAlive()
+
 GET         /start                                       controllers.StartController.onPageLoad()
 
 GET         /task-list                                   controllers.TaskListController.onPageLoad()
@@ -22,7 +24,6 @@ GET         /business-verification-lockout               controllers.BusinessVer
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
-GET         /account/sign-out-no-survey                  controllers.auth.AuthController.signOutNoSurvey()
 GET         /account/auto-sign-out                       controllers.auth.SignedOutController.onPageLoad()
 GET         /account/sign-out                            controllers.auth.SignedOutController.signOut()
 GET         /account/sign-out-answers-not-saved          controllers.auth.SignedOutController.signOutAnswersNotSaved()

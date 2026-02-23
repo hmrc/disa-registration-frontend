@@ -40,8 +40,9 @@ class IsaProductsController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  // TODO Replace getOrCreateAction with DataRetrievalAction when ATs begin from /start page
+  // TODO Replace getOrCreateAction with DataRetrievalAction when ATs begin from /start page DFI-1709
   getOrCreateJourneyDataAction: GetOrCreateJourneyDataAction,
+  auditContinuation: AuditContinuationAction,
   formProvider: IsaProductsFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
@@ -54,14 +55,16 @@ class IsaProductsController @Inject() (
 
   val form: Form[Set[IsaProduct]] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getOrCreateJourneyDataAction) { implicit request =>
-    val preparedForm = (for {
-      products <- request.journeyData.isaProducts
-      values   <- products.isaProducts
-    } yield form.fill(values.toSet)).getOrElse(form)
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getOrCreateJourneyDataAction andThen auditContinuation(IsaProducts.sectionName)) {
+      implicit request =>
+        val preparedForm = (for {
+          products <- request.journeyData.isaProducts
+          values   <- products.isaProducts
+        } yield form.fill(values.toSet)).getOrElse(form)
 
-    Ok(view(preparedForm, mode))
-  }
+        Ok(view(preparedForm, mode))
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form

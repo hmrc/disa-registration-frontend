@@ -52,7 +52,7 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
 
       stubAuth()
       stubPut(getOrCreateEnrolmentUrl, OK, getOrCreateResponse)
-      // TODO Replace PUT call with below line when ATs begin from /start page
+      // TODO Replace PUT call with below line when ATs begin from /start page DFI-1709
       //stubGet(getJourneyDataUrl, OK, testJourneyData)
 
       val request =

@@ -18,11 +18,16 @@ package controllers.auth
 
 import base.SpecBase
 import config.FrontendAppConfig
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import repositories.SessionRepository
 
 import java.net.URLEncoder
+import scala.concurrent.Future
 
 class AuthControllerSpec extends SpecBase with MockitoSugar {
 
@@ -45,25 +50,23 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual expectedRedirectUrl
       }
     }
-  }
 
-  "signOutNoSurvey" - {
+    "must clear the session for the current user and redirect to sign out" in {
+      val mockSessionRepository = mock[SessionRepository]
+      when(mockSessionRepository.clear(any[String])).thenReturn(Future.successful(()))
 
-    "must redirect to sign out, specifying SignedOut as the continue URL" in {
-
-      val application = applicationBuilder(None).build()
+      val application =
+        applicationBuilder(None)
+          .overrides(inject.bind[SessionRepository].toInstance(mockSessionRepository))
+          .build()
 
       running(application) {
+        val request = FakeRequest(GET, routes.AuthController.signOut().url)
 
-        val appConfig = application.injector.instanceOf[FrontendAppConfig]
-        val request   = FakeRequest(GET, routes.AuthController.signOutNoSurvey().url)
+        val result = route(application, request).value
 
-        val result                   = route(application, request).value
-        val expectedContinue: String = appConfig.host + routes.SignedOutController.onPageLoad().url
-        val expectedRedirectUrl      = appConfig.signOutUrl + "?continue=" + URLEncoder.encode(expectedContinue, "UTF-8")
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual expectedRedirectUrl
+        status(result) mustBe SEE_OTHER
+        verify(mockSessionRepository).clear(testCredentials.providerId)
       }
     }
   }

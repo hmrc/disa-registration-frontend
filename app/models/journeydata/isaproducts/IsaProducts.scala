@@ -25,9 +25,11 @@ case class IsaProducts(
   p2pPlatformNumber: Option[String] = None,
   innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
 ) extends TaskListSection {
-  override def sectionName: String = "isaProducts"
+  override def sectionName: String = IsaProducts.sectionName
 }
 
 object IsaProducts {
   implicit val format: OFormat[IsaProducts] = Json.format[IsaProducts]
+
+  val sectionName = "isaProducts"
 }

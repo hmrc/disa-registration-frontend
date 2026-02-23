@@ -1,5 +1,5 @@
-@*
- * Copyright 2025 HM Revenue & Customs
+/*
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,21 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import models.NormalMode
+package models.session
 
-@this(
-  layout: templates.Layout
-)
+import play.api.libs.json.{Format, Json, OFormat}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
-@()(implicit request: Request[_], messages: Messages)
+import java.time.Instant
 
-@layout(pageTitle = titleNoForm(messages("taskList.title"))) {
+case class Session(userId: String, auditContinuationEventSent: Boolean, lastSeen: Instant)
 
-  <div>
-    <h1 class="govuk-heading-xl">@messages("taskList.title")</h1>
-  </div>
-
-  <a class="govuk-link" href="@controllers.isaproducts.routes.IsaProductsController.onPageLoad(NormalMode).url">ISA Products</a>
+object Session {
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+  implicit val format: OFormat[Session]       = Json.format[Session]
 }
