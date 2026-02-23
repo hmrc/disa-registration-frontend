@@ -24,8 +24,7 @@ GET         /business-verification-lockout               controllers.BusinessVer
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
-GET         /account/sign-out-answers-saved              controllers.auth.SignedOutController.signOutAnswersSaved()
-GET         /account/sign-out                            controllers.auth.SignedOutController.signOut()
+GET         /account/sign-out                            controllers.auth.SignedOutController.signOut(updatesInSession: Boolean)
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 GET         /unsupported-affinity-group                  controllers.UnsupportedAffinityGroupController.onPageLoad(affinityGroup: String)

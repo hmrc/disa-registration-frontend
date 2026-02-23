@@ -46,18 +46,18 @@ class AuthController @Inject() (
         None
       }
       .flatMap {
-        case Some(Session(_, _, true, _)) =>
+        case Some(Session(_, _, updatesInThisSession, _)) =>
           Future.successful(
             Redirect(
               config.signOutUrl,
-              Map("continue" -> Seq(s"${routes.SignedOutController.signOutAnswersSaved().url}"))
+              Map("continue" -> Seq(s"${routes.SignedOutController.signOut(updatesInThisSession).url}"))
             )
           )
-        case _                            =>
+        case _                                            =>
           Future.successful(
             Redirect(
               config.signOutUrl,
-              Map("continue" -> Seq(s"${routes.SignedOutController.signOut().url}"))
+              Map("continue" -> Seq(s"${routes.SignedOutController.signOut(false).url}"))
             )
           )
       }

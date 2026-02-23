@@ -63,7 +63,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe expectedRedirect(
-          controllers.auth.routes.SignedOutController.signOutAnswersSaved().url
+          controllers.auth.routes.SignedOutController.signOut(true).url
         )
         verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
       }
@@ -92,7 +92,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe expectedRedirect(
-          controllers.auth.routes.SignedOutController.signOut().url
+          controllers.auth.routes.SignedOutController.signOut(false).url
         )
         verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
       }
@@ -114,7 +114,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe expectedRedirect(
-          controllers.auth.routes.SignedOutController.signOut().url
+          controllers.auth.routes.SignedOutController.signOut(false).url
         )
         verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
       }
@@ -136,7 +136,7 @@ class AuthControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe expectedRedirect(
-          controllers.auth.routes.SignedOutController.signOut().url
+          controllers.auth.routes.SignedOutController.signOut(false).url
         )
         verify(mockSessionRepository).findAndDelete(testCredentials.providerId)
       }

@@ -25,35 +25,35 @@ class SignedOutControllerSpec extends SpecBase {
 
   "SignedOut Controller" - {
 
-    "must return OK and the correct view for a GET for signOutAnswerSaved" in {
+    "must return OK and the correct view for a GET for signOut with updates in session" in {
 
       val application = applicationBuilder(journeyData = None).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.SignedOutController.signOutAnswersSaved().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[SignOutAnswersSavedView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
-      }
-    }
-
-    "must return OK and the correct view for a GET for signOut" in {
-
-      val application = applicationBuilder(journeyData = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.SignedOutController.signOut().url)
+        val request = FakeRequest(GET, routes.SignedOutController.signOut(true).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[SignOutView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(true)(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the correct view for a GET for signOut with NO updates in session" in {
+
+      val application = applicationBuilder(journeyData = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SignedOutController.signOut(false).url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[SignOutView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(false)(request, messages(application)).toString
       }
     }
   }
