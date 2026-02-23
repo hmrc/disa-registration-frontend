@@ -21,7 +21,12 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
-case class Session(userId: String, auditContinuationEventSent: Boolean, lastSeen: Instant)
+case class Session(
+  userId: String,
+  auditContinuationEventSent: Boolean,
+  updatesInThisSession: Boolean,
+  lastSeen: Instant
+)
 
 object Session {
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat

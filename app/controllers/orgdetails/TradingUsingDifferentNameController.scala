@@ -69,7 +69,7 @@ class TradingUsingDifferentNameController @Inject() (
               case None           => OrganisationDetails(tradingUsingDifferentName = Some(answer))
             }
           journeyAnswersService
-            .update(updatedSection, request.groupId)
+            .update(updatedSection, request.groupId, request.credentials.providerId)
             .map { updatedSection =>
               Redirect(navigator.nextPage(TradingUsingDifferentNamePage, updatedSection, mode))
             }

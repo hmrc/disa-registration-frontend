@@ -59,7 +59,7 @@ class GrsControllerSpec extends SpecBase {
         val grsResponse = baseGRSResponse()
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
-        when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
           .thenReturn(Future.successful(BusinessVerification(Some(true), Some(true), Some("1234567890"))))
 
         running(application) {
@@ -76,7 +76,7 @@ class GrsControllerSpec extends SpecBase {
         val grsResponse = baseGRSResponse(businessVerificationStatus = Some(BvFail))
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
-        when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
           .thenReturn(Future.successful(BusinessVerification(Some(true), Some(false), Some("1234567890"))))
 
         running(application) {
@@ -93,7 +93,7 @@ class GrsControllerSpec extends SpecBase {
         val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
-        when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
           .thenReturn(Future.successful(BusinessVerification(None, None, Some("1234567890"))))
 
         running(application) {
@@ -110,7 +110,7 @@ class GrsControllerSpec extends SpecBase {
         val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
-        when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
           .thenReturn(Future.successful(BusinessVerification(Some(false), Some(true), Some("1234567890"))))
 
         running(application) {
@@ -127,7 +127,7 @@ class GrsControllerSpec extends SpecBase {
         val grsResponse = baseGRSResponse()
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
-        when(mockJourneyAnswersService.update(any[BusinessVerification], any())(any(), any()))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
           .thenReturn(Future.failed(new Exception("Update journeyAnswersService failed - Service Down")))
 
         running(application) {

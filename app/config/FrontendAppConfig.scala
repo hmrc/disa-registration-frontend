@@ -29,6 +29,7 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
 
   lazy val host: String    = getString("host")
   lazy val appName: String = getString("appName")
+  val selfBaseUrl: String  = baseUrl(appName)
 
   private lazy val contactHost                  = getString("contact-frontend.host")
   private lazy val contactFormServiceIdentifier = "disa-registration-frontend"

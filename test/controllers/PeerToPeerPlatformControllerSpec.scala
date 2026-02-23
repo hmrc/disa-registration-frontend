@@ -112,7 +112,8 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
       val expectedJourneyData = IsaProducts(p2pPlatform = Some(testString))
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService
+          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[IsaProducts]], any)
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
@@ -139,7 +140,8 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
       val expectedJourneyData = IsaProducts(p2pPlatform = Some(testString))
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedJourneyData), any[String])(any[Writes[IsaProducts]], any)
+        mockJourneyAnswersService
+          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[IsaProducts]], any)
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
@@ -185,7 +187,7 @@ class PeerToPeerPlatformControllerSpec extends SpecBase with MockitoSugar {
 
       when(
         mockJourneyAnswersService
-          .update(any[IsaProducts], eqTo(testGroupId))(any[Writes[IsaProducts]], any)
+          .update(any[IsaProducts], eqTo(testGroupId), eqTo(testCredentials.providerId))(any[Writes[IsaProducts]], any)
       ) thenReturn Future.failed(new Exception)
 
       val application =

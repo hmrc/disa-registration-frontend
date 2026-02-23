@@ -115,7 +115,10 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
 
         when(
           mockJourneyAnswersService
-            .update(eqTo(expectedJourneyData), eqTo(testGroupId))(any[Writes[IsaProducts]], any)
+            .update(eqTo(expectedJourneyData), eqTo(testGroupId), eqTo(testCredentials.providerId))(
+              any[Writes[IsaProducts]],
+              any
+            )
         ) thenReturn Future.successful(expectedJourneyData)
 
         val application =
@@ -177,7 +180,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
       "must return Internal Server Error when there is an issue storing the answer" in {
 
         when(
-          mockJourneyAnswersService.update(any[IsaProducts], any[String])(any[Writes[IsaProducts]], any)
+          mockJourneyAnswersService.update(any[IsaProducts], any[String], any[String])(any[Writes[IsaProducts]], any)
         ) thenReturn Future.failed(new Exception)
 
         val application =

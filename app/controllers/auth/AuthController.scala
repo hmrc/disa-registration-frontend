@@ -18,6 +18,7 @@ package controllers.auth
 
 import config.FrontendAppConfig
 import controllers.actions.IdentifierAction
+import models.session.Session
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -39,10 +40,26 @@ class AuthController @Inject() (
 
   def signOut(): Action[AnyContent] = identify.async { implicit request =>
     sessionRepository
-      .clear(request.credentials.providerId)
-      .recover { case e => logger.warn(s"Failed to clear session for userId: [${request.credentials.providerId}]", e) }
-      .flatMap { _ =>
-        Future.successful(Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl))))
+      .findAndDelete(request.credentials.providerId)
+      .recover { case e =>
+        logger.warn(s"Failed to find and clear session for userId: [${request.credentials.providerId}]", e)
+        None
+      }
+      .flatMap {
+        case Some(Session(_, _, updatesInThisSession, _)) =>
+          Future.successful(
+            Redirect(
+              config.signOutUrl,
+              Map("continue" -> Seq(s"${routes.SignedOutController.signOut(updatesInThisSession).url}"))
+            )
+          )
+        case _                                            =>
+          Future.successful(
+            Redirect(
+              config.signOutUrl,
+              Map("continue" -> Seq(s"${routes.SignedOutController.signOut(false).url}"))
+            )
+          )
       }
   }
 }

@@ -23,12 +23,13 @@ import java.time.Instant
 
 class SessionSpec extends JsonFormatSpec[Session] {
 
-  def model: Session = Session(testGroupId, true, Instant.parse("2025-10-21T10:00:00Z"))
+  def model: Session = Session(testGroupId, true, true, Instant.parse("2025-10-21T10:00:00Z"))
 
   def expectedJsonFromWrites: JsValue =
     Json.parse("""{
          | "userId": "3147318d-1cd9-4534-a4e8-ae268ea923ed",
          | "auditContinuationEventSent": true,
+         | "updatesInThisSession": true,
          | "lastSeen":{"$date":{"$numberLong":"1761040800000"}}
          |}""".stripMargin)
 

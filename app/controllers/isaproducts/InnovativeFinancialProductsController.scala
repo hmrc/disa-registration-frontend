@@ -75,7 +75,7 @@ class InnovativeFinancialProductsController @Inject() (
             }
 
           journeyAnswersService
-            .update(updatedSection, request.groupId)
+            .update(updatedSection, request.groupId, request.credentials.providerId)
             .map { updatedSection =>
               Redirect(
                 navigator.nextPage(
