@@ -85,6 +85,11 @@ GET        /isa-products-check-your-answers              controllers.isaproducts
 ## Certificates Of Authority
 GET        /eligibility-to-manage-isas                   controllers.certificatesOfAuthority.EligibilityToManageIsaController.onPageLoad()
 
+GET        /certificates-of-authority                    controllers.certificatesofauthority.CertificatesOfAuthorityYesNoController.onPageLoad(mode: Mode = NormalMode)
+POST       /certificates-of-authority                    controllers.certificatesofauthority.CertificatesOfAuthorityYesNoController.onSubmit(mode: Mode = NormalMode)
+GET        /change-certificates-of-authority             controllers.certificatesofauthority.CertificatesOfAuthorityYesNoController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-certificates-of-authority             controllers.certificatesofauthority.CertificatesOfAuthorityYesNoController.onSubmit(mode: Mode = CheckMode)
+
 ## LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
 GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()

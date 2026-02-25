@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package navigation
+package pages
 
-import play.api.mvc.Call
-import pages.*
-import models.Mode
-import models.journeydata.TaskListSection
+import base.SpecBase
 
-class FakeNavigator(desiredRoute: Call) extends Navigator {
+class CertificatesOfAuthorityYesNoPageSpec extends SpecBase {
 
-  override def nextPage[A <: TaskListSection](
-    page: PageWithDependents[A],
-    existing: Option[A],
-    updated: A,
-    mode: Mode
-  ): Call = desiredRoute
+  "CertificatesOfAuthorityYesNoPage" - {
 
-  override def nextPage[A <: TaskListSection](page: PageWithoutDependents[A], updated: A, mode: Mode): Call =
-    desiredRoute
+    "must have the correct string representation" in {
+      CertificatesOfAuthorityYesNoPage.toString mustBe "certificatesOfAuthorityYesNo"
+    }
+  }
 }
