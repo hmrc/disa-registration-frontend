@@ -85,6 +85,7 @@ sectionTitle.orgDetails = Organisation details
 sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
 sectionTitle.isaProducts = ISA products
+sectionTitle.certificatesOfAuthority = Certificates of authority
 sectionTitle.submit = Submit answers
 section.caption.hidden = This section is
 
@@ -189,6 +190,16 @@ addLiaisonOfficer.details.summary = What is a liaison officer?
 addLiaisonOfficer.details.content.p1 = Liaison officers act as a point of contact between the ISA manager and HMRC.
 addLiaisonOfficer.details.content.p2 = They provide their name, telephone number and email address and are individuals an organisation appoints to provide day-to-day contact with HMRC.
 
+### Certificates of Authority
+
+certificatesOfAuthority.title = Eligibility to manage ISAs
+certificatesOfAuthority.heading = Eligibility to manage ISAs
+certificatesOfAuthority.p1 = Before you continue, you will need to make sure you have the correct information available to show which permissions your organisation holds.
+certificatesOfAuthority.p2 = You will need to know:
+certificatesOfAuthority.bullet1 = the Articles which apply to your organisation - as set out by the FCA
+certificatesOfAuthority.bullet2 = which type of financial organisation you are
+certificatesOfAuthority.linkText = Find out more about who can manage ISAs in the Applications for ISA manager status guidance (opens in new tab)
+
 ### Task List
 taskList.title = Task List
 taskList.heading = Task List
@@ -206,8 +217,8 @@ bvLockout.telephoneNonUk.value = +44 161 931 9070
 bvLockout.OpeningTimes = Opening times:
 bvLockout.OpeningTimes.value = Monday to Friday: 8am to 6pm
 bvLockout.p3 = Closed on weekends and bank holidays.
-## Declaration
 
+## Declaration
 declarationForIsaManagers.title = Declaration for registering and enrolling ISA managers
 declarationForIsaManagers.heading = Declaration for registering and enrolling ISA managers
 declarationForIsaManagers.junior.li1 = I’m applying to manage Junior ISA accounts, I undertake to publicise (and update where appropriate) statements of the minimum amount that may be subscribed to a Junior ISA account on a single occasion, and the permitted means of payment on subscriptions
