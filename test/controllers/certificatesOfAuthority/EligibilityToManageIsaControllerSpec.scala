@@ -39,7 +39,10 @@ class EligibilityToManageIsaControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[EligibilityToManageIsaView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(mockAppConfig.isaManagerGuidanceUrl)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(mockAppConfig.isaManagerGuidanceUrl)(
+          request,
+          messages(application)
+        ).toString
       }
     }
   }
