@@ -192,13 +192,13 @@ addLiaisonOfficer.details.content.p2 = They provide their name, telephone number
 
 ### Certificates of Authority
 
-certificatesOfAuthority.title = Eligibility to manage ISAs
-certificatesOfAuthority.heading = Eligibility to manage ISAs
-certificatesOfAuthority.p1 = Before you continue, you will need to make sure you have the correct information available to show which permissions your organisation holds.
-certificatesOfAuthority.p2 = You will need to know:
-certificatesOfAuthority.bullet1 = the Articles which apply to your organisation - as set out by the FCA
-certificatesOfAuthority.bullet2 = which type of financial organisation you are
-certificatesOfAuthority.linkText = Find out more about who can manage ISAs in the Applications for ISA manager status guidance (opens in new tab)
+eligibilityToManageIsa.title = Eligibility to manage ISAs
+eligibilityToManageIsa.heading = Eligibility to manage ISAs
+eligibilityToManageIsa.p1 = Before you continue, you will need to make sure you have the correct information available to show which permissions your organisation holds.
+eligibilityToManageIsa.p2 = You will need to know:
+eligibilityToManageIsa.bullet1 = the Articles which apply to your organisation - as set out by the FCA
+eligibilityToManageIsa.bullet2 = which kind of financial organisation you operate as
+eligibilityToManageIsa.linkText = Find out more about who can manage ISAs in the Applications for ISA manager status guidance
 
 ### Task List
 taskList.title = Task List

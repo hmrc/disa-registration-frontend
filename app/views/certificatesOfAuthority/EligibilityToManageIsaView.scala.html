@@ -15,34 +15,40 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
-
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 @this(layout: templates.Layout,
-        govukButton: GovukButton)
+        govukButton: GovukButton,
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper)
 
 @(guidanceHref: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("certificatesOfAuthority.title"), Some(messages("sectionTitle.certificatesOfAuthority")))) {
+@layout(pageTitle = titleNoForm(messages("eligibilityToManageIsa.title"), Some(messages("sectionTitle.certificatesOfAuthority")))) {
 
     <h1 class="govuk-heading-xl">
         <span class="govuk-visually-hidden">@messages("section.caption.hidden")</span>
         <span class="govuk-caption-l">@messages("sectionTitle.certificatesOfAuthority")</span>
-        @messages("certificatesOfAuthority.heading")
+        @messages("eligibilityToManageIsa.heading")
     </h1>
 
     <div class="govuk-body">
-    <p>@messages("certificatesOfAuthority.p1")</p>
-    <p>@messages("certificatesOfAuthority.p2")</p>
+    <p>@messages("eligibilityToManageIsa.p1")</p>
+    <p>@messages("eligibilityToManageIsa.p2")</p>
 
     <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("certificatesOfAuthority.bullet1")</li>
-        <li>@messages("certificatesOfAuthority.bullet2")</li>
+        <li>@messages("eligibilityToManageIsa.bullet1")</li>
+        <li>@messages("eligibilityToManageIsa.bullet2")</li>
     </ul>
 
-    <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="@guidanceHref">@messages("certificatesOfAuthority.linkText")</a>
+    @hmrcNewTabLinkHelper(NewTabLinkHelper(
+       text = messages("eligibilityToManageIsa.linkText"),
+       href = Some(guidanceHref)
+    ))
     </div>
 
     @govukButton(Button(
         content = Text(messages("site.continue")),
         href = None))
+
 }
