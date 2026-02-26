@@ -200,6 +200,24 @@ eligibilityToManageIsa.bullet1 = the Articles which apply to your organisation -
 eligibilityToManageIsa.bullet2 = which kind of financial organisation you operate as
 eligibilityToManageIsa.linkText = Find out more about who can manage ISAs in the Applications for ISA manager status guidance
 
+financialOrganisation.title = Financial organisation
+financialOrganisation.heading = Financial organisation
+financialOrganisation.p1 = We need to know which type of organisation you are.
+financialOrganisation.legend = Which best describes your organisation?
+financialOrganisation.hint = Select all that apply
+financialOrganisation.europeanInstitution = A European institution that has a base in the UK
+financialOrganisation.creditUnion = A credit union
+financialOrganisation.directorSavings = The Director of Savings
+financialOrganisation.buildingSociety = A building society
+financialOrganisation.bank = A bank
+financialOrganisation.insuranceCompany = An insurance company
+financialOrganisation.incorporatedFriendlySociety = An incorporated friendly society
+financialOrganisation.registeredFriendlySociety = A registered friendly society
+financialOrganisation.assuranceUndertaking = An organisation that offers assurance undertaking services
+financialOrganisation.checkYourAnswersLabel = Financial organisation
+financialOrganisation.error.required = You need to tell us which organisation type you are. Select from the options
+financialOrganisation.change.hidden = FinancialOrganisation
+
 ### Task List
 taskList.title = Task List
 taskList.heading = Task List

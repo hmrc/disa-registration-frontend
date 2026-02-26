@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package models.journeydata.certificatesofauthority
 
+import models.journeydata.TaskListSection
 import play.api.libs.json.{Json, OFormat}
 
-case class CertificatesOfAuthority(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
+case class CertificatesOfAuthority(
+  financialOrganisation: Option[Seq[FinancialOrganisation]] = None
+) extends TaskListSection {
   override def sectionName: String = CertificatesOfAuthority.sectionName
 }
 
