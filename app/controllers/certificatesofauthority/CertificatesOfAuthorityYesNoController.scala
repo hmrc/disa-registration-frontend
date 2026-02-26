@@ -69,7 +69,10 @@ class CertificatesOfAuthorityYesNoController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           answer => {
             val existingSection = request.journeyData.certificatesOfAuthority
-            val updatedSection  = CertificatesOfAuthority(certificatesYesNo = Some(answer))
+            val updatedSection  = existingSection match {
+              case Some(existing) => existing.copy(certificatesYesNo = Some(answer))
+              case None           => CertificatesOfAuthority(certificatesYesNo = Some(answer))
+            }
 
             journeyAnswersService
               .update(updatedSection, request.groupId, request.credentials.providerId)
