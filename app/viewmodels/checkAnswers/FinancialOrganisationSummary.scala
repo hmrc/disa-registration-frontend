@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers
 
-import controllers.certificatesofauthority.routes
+import controllers.certificatesofauthority.routes.FinancialOrganisationController
 import models.CheckMode
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
@@ -26,27 +26,27 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object FcaArticlesSummary {
+object FinancialOrganisationSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.certificatesOfAuthority.flatMap(_.fcaArticles).map { answers =>
+    answers.certificatesOfAuthority.flatMap(_.financialOrganisation).map { answers =>
 
       val value = ValueViewModel(
         HtmlContent(
           answers
             .map { answer =>
-              HtmlFormat.escape(messages(s"fcaArticles.$answer")).toString
+              HtmlFormat.escape(messages(s"financialOrganisation.$answer")).toString
             }
             .mkString(",<br>")
         )
       )
 
       SummaryListRowViewModel(
-        key = "fcaArticles.checkYourAnswersLabel",
+        key = "financialOrganisation.checkYourAnswersLabel",
         value = value,
         actions = Seq(
-          ActionItemViewModel("site.change", routes.FcaArticlesController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("fcaArticles.change.hidden"))
+          ActionItemViewModel("site.change", FinancialOrganisationController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("financialOrganisation.change.hidden"))
         )
       )
     }

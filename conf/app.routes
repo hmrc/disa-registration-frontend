@@ -90,11 +90,19 @@ POST       /certificates-of-authority                    controllers.certificate
 GET        /change-certificates-of-authority             controllers.certificatesofauthority.CertificatesOfAuthorityYesNoController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-certificates-of-authority             controllers.certificatesofauthority.CertificatesOfAuthorityYesNoController.onSubmit(mode: Mode = CheckMode)
 
+GET        /fca-articles                                 controllers.certificatesofauthority.FcaArticlesController.onPageLoad(mode: Mode = NormalMode)
+POST       /fca-articles                                 controllers.certificatesofauthority.FcaArticlesController.onSubmit(mode: Mode = NormalMode)
+GET        /change-fca-articles                          controllers.certificatesofauthority.FcaArticlesController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-fca-articles                          controllers.certificatesofauthority.FcaArticlesController.onSubmit(mode: Mode = CheckMode)
+
+GET        /financial-organisation                       controllers.certificatesofauthority.FinancialOrganisationController.onPageLoad(mode: Mode = NormalMode)
+POST       /financial-organisation                       controllers.certificatesofauthority.FinancialOrganisationController.onSubmit(mode: Mode = NormalMode)
+GET        /change-financial-organisation                controllers.certificatesofauthority.FinancialOrganisationController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-financial-organisation                controllers.certificatesofauthority.FinancialOrganisationController.onSubmit(mode: Mode = CheckMode)
+
 ## LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
 GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()
-
-
 
 ## Declare & Submit
 
@@ -104,8 +112,3 @@ POST       /declaration-for-isa-managers                 controllers.Declaration
 
 ### Confirmation
 GET        /confirmation                                 controllers.ConfirmationController.onPageLoad(receiptId: String)
-
-GET        /fca-articles                                 controllers.FcaArticlesController.onPageLoad(mode: Mode = NormalMode)
-POST       /fca-articles                                 controllers.FcaArticlesController.onSubmit(mode: Mode = NormalMode)
-GET        /change-fca-articles                          controllers.FcaArticlesController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-fca-articles                          controllers.FcaArticlesController.onSubmit(mode: Mode = CheckMode)

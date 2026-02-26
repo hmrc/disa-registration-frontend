@@ -18,15 +18,15 @@ package forms
 
 import javax.inject.Inject
 import forms.mappings.Mappings
-import models.journeydata.certificatesofauthority.FcaArticles
+import models.journeydata.certificatesofauthority.FinancialOrganisation
 import play.api.data.Form
 import play.api.data.Forms.set
 
-class FcaArticlesFormProvider @Inject() extends Mappings {
+class FinancialOrganisationFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Set[FcaArticles]] =
+  def apply(): Form[Set[FinancialOrganisation]] =
     Form(
-      "value" -> set(enumerable[FcaArticles]("fcaArticles.error.required"))
-        .verifying(nonEmptySet("fcaArticles.error.required"))
+      "value" -> set(enumerable[FinancialOrganisation]("financialOrganisation.error.required"))
+        .verifying(nonEmptySet("financialOrganisation.error.required"))
     )
 }

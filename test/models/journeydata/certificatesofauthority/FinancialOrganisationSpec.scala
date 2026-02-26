@@ -14,52 +14,49 @@
  * limitations under the License.
  */
 
-package models
+package models.journeydata.certificatesofauthority
 
-import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo
+import generators.{ModelGenerators, arbitraryFinancialOrganisation}
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.Gen
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.OptionValues
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
-class CertificatesOfAuthorityYesNoSpec
+class FinancialOrganisationSpec
     extends AnyFreeSpec
     with Matchers
     with ScalaCheckPropertyChecks
-    with OptionValues {
+    with OptionValues
+    with ModelGenerators {
 
-  "CertificatesOfAuthorityYesNo" - {
+  "FinancialOrganisation" - {
 
     "must deserialise valid values" in {
 
-      val gen = Gen.oneOf(CertificatesOfAuthorityYesNo.values.toSeq)
+      val gen = arbitrary[FinancialOrganisation]
 
-      forAll(gen) { certificatesOfAuthority =>
-        JsString(certificatesOfAuthority.toString)
-          .validate[CertificatesOfAuthorityYesNo]
-          .asOpt
-          .value mustEqual certificatesOfAuthority
+      forAll(gen) { isaProducts =>
+        JsString(isaProducts.toString).validate[FinancialOrganisation].asOpt.value mustEqual isaProducts
       }
     }
 
     "must fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!CertificatesOfAuthorityYesNo.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!FinancialOrganisation.values.map(_.toString).contains(_))
 
       forAll(gen) { invalidValue =>
-        JsString(invalidValue).validate[CertificatesOfAuthorityYesNo] mustEqual JsError("error.invalid")
+        JsString(invalidValue).validate[FinancialOrganisation] mustEqual JsError("error.invalid")
       }
     }
 
     "must serialise" in {
 
-      val gen = Gen.oneOf(CertificatesOfAuthorityYesNo.values.toSeq)
+      val gen = arbitrary[FinancialOrganisation]
 
-      forAll(gen) { certificatesOfAuthority =>
-        Json.toJson(certificatesOfAuthority) mustEqual JsString(certificatesOfAuthority.toString)
+      forAll(gen) { isaProducts =>
+        Json.toJson(isaProducts) mustEqual JsString(isaProducts.toString)
       }
     }
   }

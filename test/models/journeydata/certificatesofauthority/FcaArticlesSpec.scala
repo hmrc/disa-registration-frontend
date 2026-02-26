@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package models
+package models.journeydata.certificatesofauthority
 
-import generators.ModelGenerators
+import generators.{ModelGenerators, arbitraryFcaArticles}
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.OptionValues
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
-import generators.arbitraryFcaArticles
 
 class FcaArticlesSpec
     extends AnyFreeSpec
