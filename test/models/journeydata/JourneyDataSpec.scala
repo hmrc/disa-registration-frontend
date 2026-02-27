@@ -16,6 +16,7 @@
 
 package models.journeydata
 
+import models.FcaArticles.Article14
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
@@ -36,7 +37,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       isaProducts = Some(IsaProducts(Some(IsaProduct.values), Some(testString), Some(testString))),
       organisationDetails =
         Some(OrganisationDetails(Some(true), Some("Z1"), Some(true), Some(testString), Some(testString), None)),
-      certificatesOfAuthority = Some(CertificatesOfAuthority(Some("C"), Some("D"))),
+      certificatesOfAuthority = Some(CertificatesOfAuthority(fcaArticles = Some(Seq(Article14)), Some("D"))),
       liaisonOfficers = Some(LiaisonOfficers(Some("L"), Some("LO"))),
       signatories = None,
       outsourcedAdministration = Some(OutsourcedAdministration(Some("O1"), Some("O2"))),
@@ -60,7 +61,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "p2pPlatform": "test",
         "p2pPlatformNumber": "test"
       },
-      "certificatesOfAuthority": { "dataItem": "C", "dataItem2": "D" },
+      "certificatesOfAuthority": { "fcaArticles": ["article14"], "dataItem2": "D" },
       "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
       "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
       "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" }
@@ -85,7 +86,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
           "p2pPlatform": "test",
           "p2pPlatformNumber": "test"
         },
-        "certificatesOfAuthority": { "dataItem": "C", "dataItem2": "D" },
+      "certificatesOfAuthority": { "fcaArticles": ["article14"], "dataItem2": "D" },
         "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
         "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
         "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" },

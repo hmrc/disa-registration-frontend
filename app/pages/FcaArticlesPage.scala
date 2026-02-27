@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package pages
 
-import models.FcaArticles
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.CertificatesOfAuthority
 
-case class CertificatesOfAuthority(fcaArticles: Option[Seq[FcaArticles]] = None, dataItem2: Option[String] = None)
-    extends TaskListSection {
-  override def sectionName: String = CertificatesOfAuthority.sectionName
-
-}
-
-object CertificatesOfAuthority {
-  implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
-  val sectionName                                       = "isaProducts"
+case object FcaArticlesPage extends PageWithoutDependents[CertificatesOfAuthority] {
+  
+  override def toString: String = "fcaArticles"
+  
+  override def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority = sectionAnswers.copy(fcaArticles = None)
 }
