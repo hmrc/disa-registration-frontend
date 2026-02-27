@@ -18,6 +18,8 @@ package controllers.certificatesOfAuthority
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import models.journeydata.CertificatesOfAuthority
+import models.journeydata.isaproducts.IsaProducts
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -28,13 +30,16 @@ import javax.inject.Inject
 class EligibilityToManageIsaController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  getOrCreateJourneyDataAction: GetOrCreateJourneyDataAction,
+  auditContinuationAction: AuditContinuationAction,
   val controllerComponents: MessagesControllerComponents,
   view: EligibilityToManageIsaView,
   appConfig: FrontendAppConfig
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify andThen getOrCreateJourneyDataAction
+    andThen auditContinuationAction(CertificatesOfAuthority.sectionName)) { implicit request =>
     Ok(view(guidanceHref = appConfig.isaManagerGuidanceUrl))
   }
 }
