@@ -26,27 +26,28 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object FcaArticlesSummary  {
+object FcaArticlesSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
     answers.certificatesOfAuthority.flatMap(_.fcaArticles).map { answers =>
 
-        val value = ValueViewModel(
-          HtmlContent(
-            answers.map {
-              answer => HtmlFormat.escape(messages(s"fcaArticles.$answer")).toString
+      val value = ValueViewModel(
+        HtmlContent(
+          answers
+            .map { answer =>
+              HtmlFormat.escape(messages(s"fcaArticles.$answer")).toString
             }
             .mkString(",<br>")
-          )
         )
+      )
 
-        SummaryListRowViewModel(
-          key     = "fcaArticles.checkYourAnswersLabel",
-          value   = value,
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.FcaArticlesController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("fcaArticles.change.hidden"))
-          )
+      SummaryListRowViewModel(
+        key = "fcaArticles.checkYourAnswersLabel",
+        value = value,
+        actions = Seq(
+          ActionItemViewModel("site.change", routes.FcaArticlesController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("fcaArticles.change.hidden"))
         )
+      )
     }
 }

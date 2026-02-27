@@ -27,5 +27,5 @@ case class CertificatesOfAuthority(fcaArticles: Option[Seq[FcaArticles]] = None,
 
 object CertificatesOfAuthority {
   implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
-  val sectionName                                       = "isaProducts"
+  val sectionName                                       = "certificatesOfAuthority"
 }

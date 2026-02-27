@@ -25,7 +25,12 @@ import org.scalatest.OptionValues
 import play.api.libs.json.{JsError, JsString, Json}
 import generators.arbitraryFcaArticles
 
-class FcaArticlesSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues with ModelGenerators {
+class FcaArticlesSpec
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with OptionValues
+    with ModelGenerators {
 
   "FcaArticles" - {
 
@@ -33,10 +38,8 @@ class FcaArticlesSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
       val gen = arbitrary[FcaArticles]
 
-      forAll(gen) {
-        fcaArticles =>
-
-          JsString(fcaArticles.toString).validate[FcaArticles].asOpt.value mustEqual fcaArticles
+      forAll(gen) { fcaArticles =>
+        JsString(fcaArticles.toString).validate[FcaArticles].asOpt.value mustEqual fcaArticles
       }
     }
 
@@ -44,10 +47,8 @@ class FcaArticlesSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
       val gen = arbitrary[String] suchThat (!FcaArticles.values.map(_.toString).contains(_))
 
-      forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[FcaArticles] mustEqual JsError("error.invalid")
+      forAll(gen) { invalidValue =>
+        JsString(invalidValue).validate[FcaArticles] mustEqual JsError("error.invalid")
       }
     }
 
@@ -55,10 +56,8 @@ class FcaArticlesSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyC
 
       val gen = arbitrary[FcaArticles]
 
-      forAll(gen) {
-        fcaArticles =>
-
-          Json.toJson(fcaArticles) mustEqual JsString(fcaArticles.toString)
+      forAll(gen) { fcaArticles =>
+        Json.toJson(fcaArticles) mustEqual JsString(fcaArticles.toString)
       }
     }
   }

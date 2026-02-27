@@ -19,8 +19,9 @@ package pages
 import models.journeydata.CertificatesOfAuthority
 
 case object FcaArticlesPage extends PageWithoutDependents[CertificatesOfAuthority] {
-  
+
   override def toString: String = "fcaArticles"
-  
-  override def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority = sectionAnswers.copy(fcaArticles = None)
+
+  override def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority =
+    sectionAnswers.copy(fcaArticles = None)
 }

@@ -27,6 +27,7 @@ class FcaArticlesFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Set[FcaArticles]] =
     Form(
-      "value" -> set(enumerable[FcaArticles]("fcaArticles.error.required")).verifying(nonEmptySet("fcaArticles.error.required"))
+      "value" -> set(enumerable[FcaArticles]("fcaArticles.error.required"))
+        .verifying(nonEmptySet("fcaArticles.error.required"))
     )
 }

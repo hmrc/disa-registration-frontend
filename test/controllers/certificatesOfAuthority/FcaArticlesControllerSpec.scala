@@ -43,7 +43,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val fcaArticlesRoute = routes.FcaArticlesController.onPageLoad(NormalMode).url
 
-  val formProvider = new FcaArticlesFormProvider()
+  val formProvider                 = new FcaArticlesFormProvider()
   val form: Form[Set[FcaArticles]] = formProvider()
 
   "FcaArticles Controller" - {
@@ -84,7 +84,10 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(FcaArticles.values.toSet), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(FcaArticles.values.toSet), NormalMode)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -113,7 +116,6 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
-    
 
     "must redirect to the next page when valid data is submitted and no existing data was found" in {
 
@@ -123,7 +125,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         mockJourneyAnswersService
           .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
       ) thenReturn Future.successful(expectedJourneyData)
-      
+
       val application =
         applicationBuilder(journeyData = None)
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
@@ -207,7 +209,8 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
     "must return Internal Server Error when failed to store data" in {
 
       when(
-        mockJourneyAnswersService.update(any[CertificatesOfAuthority], any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
+        mockJourneyAnswersService
+          .update(any[CertificatesOfAuthority], any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
       ) thenReturn Future.failed(new Exception)
 
       val application =

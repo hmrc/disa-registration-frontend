@@ -26,13 +26,13 @@ class FcaArticlesFormProviderSpec extends CheckboxFieldBehaviours {
 
   ".value" - {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "fcaArticles.error.required"
 
     behave like checkboxField[FcaArticles](
       form,
       fieldName,
-      validValues  = FcaArticles.values,
+      validValues = FcaArticles.values,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

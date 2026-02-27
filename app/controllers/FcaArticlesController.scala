@@ -34,30 +34,31 @@ import views.html.FcaArticlesView
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FcaArticlesController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       navigator: Navigator,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       formProvider: FcaArticlesFormProvider,
-                                       journeyAnswersService: JourneyAnswersService,
-                                       errorHandler: ErrorHandler,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: FcaArticlesView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class FcaArticlesController @Inject() (
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  formProvider: FcaArticlesFormProvider,
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler,
+  val controllerComponents: MessagesControllerComponents,
+  view: FcaArticlesView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   val form: Form[Set[FcaArticles]] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData) {
-      implicit request =>
-        val preparedForm = (for {
-          journeyData <- request.journeyData
-          certificatesOfAuthority <- journeyData.certificatesOfAuthority
-          values <- certificatesOfAuthority.fcaArticles
-        } yield form.fill(values.toSet)).getOrElse(form)
+    (identify andThen getData) { implicit request =>
+      val preparedForm = (for {
+        journeyData             <- request.journeyData
+        certificatesOfAuthority <- journeyData.certificatesOfAuthority
+        values                  <- certificatesOfAuthority.fcaArticles
+      } yield form.fill(values.toSet)).getOrElse(form)
 
-        Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode))
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
@@ -67,11 +68,11 @@ class FcaArticlesController @Inject()(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         answer => {
           val existingSection = request.journeyData.flatMap(_.certificatesOfAuthority)
-          val updatedSection =
+          val updatedSection  =
             existingSection match {
               case Some(existing) =>
                 existing.copy(fcaArticles = Some(answer.toSeq))
-              case None => CertificatesOfAuthority(fcaArticles = Some(answer.toSeq))
+              case None           => CertificatesOfAuthority(fcaArticles = Some(answer.toSeq))
             }
 
           journeyAnswersService

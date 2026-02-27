@@ -35,6 +35,7 @@ object FcaArticles extends Enumerable.Implicits {
   case object Article45 extends WithName("article45") with FcaArticles
   case object Article51ZA extends WithName("article51ZA") with FcaArticles
   case object Article51ZC extends WithName("article51ZC") with FcaArticles
+  case object Article51ZE extends WithName("article51ZE") with FcaArticles
   case object Article53 extends WithName("article53") with FcaArticles
   case object Article64 extends WithName("article64") with FcaArticles
 
@@ -49,19 +50,19 @@ object FcaArticles extends Enumerable.Implicits {
     Article45,
     Article51ZA,
     Article51ZC,
+    Article51ZE,
     Article53,
     Article64
   )
 
   def checkboxItems(implicit messages: Messages): Seq[CheckboxItem] =
-    values.zipWithIndex.map {
-      case (value, index) =>
-        CheckboxItemViewModel(
-          content = Text(messages(s"fcaArticles.${value.toString}")),
-          fieldId = "value",
-          index   = index,
-          value   = value.toString
-        )
+    values.zipWithIndex.map { case (value, index) =>
+      CheckboxItemViewModel(
+        content = Text(messages(s"fcaArticles.${value.toString}")),
+        fieldId = "value",
+        index = index,
+        value = value.toString
+      )
     }
 
   implicit val enumerable: Enumerable[FcaArticles] =
