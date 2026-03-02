@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.certificatesOfAuthority
+package controllers.certificatesofauthority
 
 import config.FrontendAppConfig
 import controllers.actions.*
