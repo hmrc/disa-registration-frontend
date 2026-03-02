@@ -19,17 +19,15 @@ package controllers.certificatesofauthority
 import base.SpecBase
 import controllers.certificatesofauthority.routes.CertificatesOfAuthorityYesNoController
 import forms.CertificatesOfAuthorityYesNoFormProvider
-import models.{CheckMode, NormalMode}
 import models.journeydata.JourneyData
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Yes
 import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, CertificatesOfAuthorityYesNo}
-import navigation.{FakeNavigator, Navigator}
+import models.{CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
-import play.api.inject.bind
 import play.api.libs.json.Writes
-import play.api.mvc.{Call, RequestHeader}
+import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.certificatesofauthority.CertificatesOfAuthorityYesNoView
@@ -38,10 +36,10 @@ import scala.concurrent.Future
 
 class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
 
-  def onwardRoute: Call = Call("GET", "/foo")
-
   lazy val routeUrl: String  = CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode).url
   lazy val submitUrl: String = CertificatesOfAuthorityYesNoController.onSubmit(NormalMode).url
+
+  val onwardRoute = "/obligations/enrolment/isa"
 
   val formProvider                             = new CertificatesOfAuthorityYesNoFormProvider()
   val form: Form[CertificatesOfAuthorityYesNo] = formProvider()
@@ -118,7 +116,6 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
 
         val application =
           applicationBuilder(journeyData = Some(emptyJourneyData))
-            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
             .build()
 
         running(application) {
@@ -128,8 +125,10 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
+          verify(mockJourneyAnswersService, atMostOnce)
+            .update(eqTo(expectedSection), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute.url
+          redirectLocation(result).value mustEqual onwardRoute
         }
       }
 
@@ -144,7 +143,6 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
 
         val application =
           applicationBuilder(journeyData = Some(emptyJourneyData))
-            .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
             .build()
 
         running(application) {
@@ -155,7 +153,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute.url
+          redirectLocation(result).value mustEqual onwardRoute
         }
       }
     }
@@ -168,7 +166,6 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -206,7 +203,6 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -217,7 +213,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute
       }
     }
   }

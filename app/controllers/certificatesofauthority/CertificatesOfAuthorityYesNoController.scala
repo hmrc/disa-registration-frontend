@@ -21,8 +21,6 @@ import forms.CertificatesOfAuthorityYesNoFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import navigation.Navigator
-import pages.CertificatesOfAuthorityYesNoPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -35,7 +33,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CertificatesOfAuthorityYesNoController @Inject() (
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -77,14 +74,7 @@ class CertificatesOfAuthorityYesNoController @Inject() (
             journeyAnswersService
               .update(updatedSection, request.groupId, request.credentials.providerId)
               .map { updatedSection =>
-                Redirect(
-                  navigator.nextPage(
-                    CertificatesOfAuthorityYesNoPage,
-                    existingSection,
-                    updatedSection,
-                    mode
-                  )
-                )
+                Redirect(controllers.routes.IndexController.onPageLoad()) // TODO Update as part of DFI-1710
               }
               .recoverWith { case e =>
                 logger.warn(
