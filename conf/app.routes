@@ -99,3 +99,8 @@ POST       /declaration-for-isa-managers                       controllers.Decla
 
 ### Confirmation
 GET        /confirmation                       controllers.ConfirmationController.onPageLoad(receiptId: String)
+
+GET        /financial-organisation                        controllers.certificatesofauthority.FinancialOrganisationController.onPageLoad(mode: Mode = NormalMode)
+POST       /financial-organisation                        controllers.certificatesofauthority.FinancialOrganisationController.onSubmit(mode: Mode = NormalMode)
+GET        /change-financial-organisation                  controllers.certificatesofauthority.FinancialOrganisationController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-financial-organisation                  controllers.certificatesofauthority.FinancialOrganisationController.onSubmit(mode: Mode = CheckMode)

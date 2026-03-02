@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
+import javax.inject.Inject
+import forms.mappings.Mappings
 import models.journeydata.certificatesofauthority.FinancialOrganisation
-import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct}
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.data.Form
+import play.api.data.Forms.set
 
-trait ModelGenerators {}
+class FinancialOrganisationFormProvider @Inject() extends Mappings {
 
-implicit lazy val arbitraryFinancialOrganisation: Arbitrary[FinancialOrganisation] =
-  Arbitrary {
-    Gen.oneOf(FinancialOrganisation.values)
-  }
-
-implicit lazy val arbitraryInnovativeFinancialProducts: Arbitrary[InnovativeFinancialProduct] =
-  Arbitrary {
-    Gen.oneOf(InnovativeFinancialProduct.values)
-  }
-
-implicit lazy val arbitraryIsaProducts: Arbitrary[IsaProduct] =
-  Arbitrary {
-    Gen.oneOf(IsaProduct.values)
-  }
+  def apply(): Form[Set[FinancialOrganisation]] =
+    Form(
+      "value" -> set(enumerable[FinancialOrganisation]("financialOrganisation.error.required"))
+        .verifying(nonEmptySet("financialOrganisation.error.required"))
+    )
+}
