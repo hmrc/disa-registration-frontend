@@ -20,9 +20,10 @@ import base.SpecBase
 import controllers.routes
 import models.CheckMode
 import models.FcaArticles.{Article14, Article21, Article25}
-import models.journeydata.{CertificatesOfAuthority, JourneyData}
-import viewmodels.checkAnswers.FcaArticlesSummary
+import models.journeydata.JourneyData
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import org.scalatest.matchers.must.Matchers.*
+import viewmodels.checkAnswers.FcaArticlesSummary
 
 class FcaArticlesSummarySpec extends SpecBase {
 

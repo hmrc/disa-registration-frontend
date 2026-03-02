@@ -18,10 +18,14 @@ package pages
 
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 
-case object FcaArticlesPage extends PageWithoutDependents[CertificatesOfAuthority] {
+case object CertificatesOfAuthorityYesNoPage extends PageWithDependents[CertificatesOfAuthority] {
 
-  override def toString: String = "fcaArticles"
+  override def toString: String = "certificatesOfAuthorityYesNo"
 
-  override def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority =
-    sectionAnswers.copy(fcaArticles = None)
+  def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority =
+    sectionAnswers.copy(certificatesYesNo = None)
+
+  def pagesToClear(currentAnswers: CertificatesOfAuthority): List[Page[CertificatesOfAuthority]] = ???
+
+  def resumeNormalMode(currentAnswers: CertificatesOfAuthority): Boolean = ???
 }

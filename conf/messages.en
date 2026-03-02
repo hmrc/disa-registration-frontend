@@ -200,6 +200,21 @@ eligibilityToManageIsa.bullet1 = the Articles which apply to your organisation -
 eligibilityToManageIsa.bullet2 = which kind of financial organisation you operate as
 eligibilityToManageIsa.linkText = Find out more about who can manage ISAs in the Applications for ISA manager status guidance
 
+certificatesOfAuthorityYesNo.title = Certificates of authority which apply to your organisation
+certificatesOfAuthorityYesNo.heading = Certificates of authority which apply to your organisation
+certificatesOfAuthorityYesNo.p1 = An organisation must have the FCA’s approval to offer financial services.
+certificatesOfAuthorityYesNo.p2 = This refers to individuals or organisations who have been authorised under the Financial Services and Markets Act 2000 to carry out specific regulated financial activities.
+certificatesOfAuthorityYesNo.p3 = Your organisation:
+certificatesOfAuthorityYesNo.li1 = must be authorised under section 31(1)(a) or (c), or Schedule 5 of the Financial Services and Markets Act 2000
+certificatesOfAuthorityYesNo.li2 = must be allowed to carry out one or more regulated activities specified in Articles 14, 21, 25, 36H, 37, 39G, 40, 45, 51ZA, 51ZC, 51ZE and 53
+certificatesOfAuthorityYesNo.li3 = can also carry out activities under Article 64 when related to the above permissions
+certificatesOfAuthorityYesNo.li4 = understand that temporary or interim permissions (under Chapter 4 of Part 8 of the 2013 Amendment Order) are not sufficient
+certificatesOfAuthorityYesNo.li5 = must be able to provide relevant evidence to confirm their authorisation
+certificatesOfAuthorityYesNo.label = Do the certificates and permissions described above apply to your organisation?
+certificatesOfAuthorityYesNo.yes = Yes - you will now tell us which articles apply to your financial organisation
+certificatesOfAuthorityYesNo.no = No - you need to provide further details about your financial organisation
+certificatesOfAuthorityYesNo.error.required = You need to tell us if the certificates and permissions apply to your organisation. Select yes, if they do
+
 ### Task List
 taskList.title = Task List
 taskList.heading = Task List

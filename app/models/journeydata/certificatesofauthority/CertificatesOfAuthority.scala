@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package navigation
+package models.journeydata.certificatesofauthority
 
-import play.api.mvc.Call
-import pages.*
-import models.Mode
+import models.FcaArticles
 import models.journeydata.TaskListSection
+import play.api.libs.json.{Json, OFormat}
 
-class FakeNavigator(desiredRoute: Call) extends Navigator {
+case class CertificatesOfAuthority(
+  certificatesYesNo: Option[CertificatesOfAuthorityYesNo] = None,
+  fcaArticles: Option[Seq[FcaArticles]] = None
+) extends TaskListSection {
+  override def sectionName: String = CertificatesOfAuthority.sectionName
+}
 
-  override def nextPage[A <: TaskListSection](
-    page: PageWithDependents[A],
-    existing: Option[A],
-    updated: A,
-    mode: Mode
-  ): Call = desiredRoute
-
-  override def nextPage[A <: TaskListSection](page: PageWithoutDependents[A], updated: A, mode: Mode): Call =
-    desiredRoute
+object CertificatesOfAuthority {
+  implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
+  val sectionName                                       = "certificatesOfAuthority"
 }

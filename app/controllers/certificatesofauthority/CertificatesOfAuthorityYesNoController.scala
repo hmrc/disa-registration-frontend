@@ -14,52 +14,49 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.certificatesofauthority
 
 import controllers.actions.*
-import forms.FcaArticlesFormProvider
+import forms.CertificatesOfAuthorityYesNoFormProvider
 import handlers.ErrorHandler
+import models.Mode
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import models.{FcaArticles, Mode}
-import navigation.Navigator
-import pages.FcaArticlesPage
-import play.api.data.Form
-import play.api.i18n.Lang.logger
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.FcaArticlesView
+import views.html.certificatesofauthority.CertificatesOfAuthorityYesNoView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FcaArticlesController @Inject() (
+class CertificatesOfAuthorityYesNoController @Inject() (
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: FcaArticlesFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
+  formProvider: CertificatesOfAuthorityYesNoFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: FcaArticlesView
+  view: CertificatesOfAuthorityYesNoView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  val form: Form[Set[FcaArticles]] = formProvider()
+  val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      val preparedForm = (for {
-        certificatesOfAuthority <- request.journeyData.certificatesOfAuthority
-        values                  <- certificatesOfAuthority.fcaArticles
-      } yield form.fill(values.toSet)).getOrElse(form)
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-      Ok(view(preparedForm, mode))
+    val preparedForm = request.journeyData.certificatesOfAuthority.flatMap(_.certificatesYesNo) match {
+      case None        => form
+      case Some(value) => form.fill(value)
     }
+
+    Ok(view(preparedForm, mode))
+  }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -68,23 +65,16 @@ class FcaArticlesController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           answer => {
-            val updatedSection =
-              request.journeyData.certificatesOfAuthority.fold {
-                CertificatesOfAuthority(fcaArticles = Some(answer.toSeq))
-              } { existing =>
-                existing.copy(fcaArticles = Some(answer.toSeq))
-              }
+            val existingSection = request.journeyData.certificatesOfAuthority
+            val updatedSection  = existingSection match {
+              case Some(existing) => existing.copy(certificatesYesNo = Some(answer))
+              case None           => CertificatesOfAuthority(certificatesYesNo = Some(answer))
+            }
 
             journeyAnswersService
               .update(updatedSection, request.groupId, request.credentials.providerId)
               .map { updatedSection =>
-                Redirect(
-                  navigator.nextPage(
-                    FcaArticlesPage,
-                    updatedSection,
-                    mode
-                  )
-                )
+                Redirect(controllers.routes.IndexController.onPageLoad()) // TODO Update as part of DFI-1710
               }
               .recoverWith { case e =>
                 logger.warn(

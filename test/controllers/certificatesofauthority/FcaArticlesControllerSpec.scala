@@ -20,17 +20,16 @@ import base.SpecBase
 import controllers.routes
 import forms.FcaArticlesFormProvider
 import models.FcaArticles.Article14
+import models.journeydata.JourneyData
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.isaproducts.IsaProducts
-import models.journeydata.{CertificatesOfAuthority, JourneyData}
 import models.{FcaArticles, NormalMode}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
-import play.api.inject.bind
 import play.api.libs.json.Writes
-import play.api.mvc.{Call, RequestHeader}
+import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.FcaArticlesView
@@ -71,7 +70,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
-          certificatesOfAuthority = Some(CertificatesOfAuthority(Some(FcaArticles.values), None))
+          certificatesOfAuthority = Some(CertificatesOfAuthority(fcaArticles = Some(FcaArticles.values)))
         )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
@@ -149,7 +148,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
       val existingCertificates =
         CertificatesOfAuthority(
           fcaArticles = None,
-          dataItem2 = None
+          certificatesYesNo = None
         )
 
       val journeyData =

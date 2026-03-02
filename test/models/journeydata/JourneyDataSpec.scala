@@ -17,6 +17,8 @@
 package models.journeydata
 
 import models.FcaArticles.Article14
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Yes
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
@@ -37,7 +39,8 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       isaProducts = Some(IsaProducts(Some(IsaProduct.values), Some(testString), Some(testString))),
       organisationDetails =
         Some(OrganisationDetails(Some(true), Some("Z1"), Some(true), Some(testString), Some(testString), None)),
-      certificatesOfAuthority = Some(CertificatesOfAuthority(fcaArticles = Some(Seq(Article14)), Some("D"))),
+      certificatesOfAuthority =
+        Some(CertificatesOfAuthority(certificatesYesNo = Some(Yes), fcaArticles = Some(Seq(Article14)))),
       liaisonOfficers = Some(LiaisonOfficers(Some("L"), Some("LO"))),
       signatories = None,
       outsourcedAdministration = Some(OutsourcedAdministration(Some("O1"), Some("O2"))),
@@ -47,6 +50,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
   override val expectedJsonFromWrites: JsValue = Json.parse(s"""
     {
       "groupId": "$testGroupId",
+      "enrolmentId":"2b2825af-d5a6-4518-a6cb-67ddb4e66952",
       "businessVerification": { "businessRegistrationPassed": true, "businessVerificationPassed": true, "ctUtr": "12345678"},
       "enrolmentId": "$testEnrolmentId",
       "organisationDetails": {
@@ -61,7 +65,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "p2pPlatform": "test",
         "p2pPlatformNumber": "test"
       },
-      "certificatesOfAuthority": { "fcaArticles": ["article14"], "dataItem2": "D" },
+      "certificatesOfAuthority": {  "certificatesYesNo":"yes", "fcaArticles": ["article14"]},
       "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
       "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
       "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" }
@@ -86,7 +90,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
           "p2pPlatform": "test",
           "p2pPlatformNumber": "test"
         },
-      "certificatesOfAuthority": { "fcaArticles": ["article14"], "dataItem2": "D" },
+        "certificatesOfAuthority": {"certificatesYesNo":"yes", "fcaArticles": ["article14"]},
         "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
         "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
         "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" },
