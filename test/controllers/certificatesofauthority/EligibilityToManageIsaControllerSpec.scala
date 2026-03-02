@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.certificatesOfAuthority
+package controllers.certificatesofauthority
 
 import base.SpecBase
 import org.mockito.Mockito.when
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.certificatesOfAuthority.EligibilityToManageIsaView
+import views.html.certificatesofauthority.EligibilityToManageIsaView
 
 class EligibilityToManageIsaControllerSpec extends SpecBase {
 

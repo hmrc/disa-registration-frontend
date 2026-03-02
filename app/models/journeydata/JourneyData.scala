@@ -16,6 +16,7 @@
 
 package models.journeydata
 
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.isaproducts.IsaProducts
 import play.api.libs.json.{Format, Json}
 
