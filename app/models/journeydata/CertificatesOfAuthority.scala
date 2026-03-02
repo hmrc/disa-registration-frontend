@@ -22,7 +22,8 @@ import play.api.libs.json.{Json, OFormat}
 case class CertificatesOfAuthority(fcaArticles: Option[Seq[FcaArticles]] = None, dataItem2: Option[String] = None)
     extends TaskListSection {
   override def sectionName: String = CertificatesOfAuthority.sectionName
-  
+}
+
 object CertificatesOfAuthority {
   implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
   val sectionName                                       = "certificatesOfAuthority"

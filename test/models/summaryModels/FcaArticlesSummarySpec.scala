@@ -30,18 +30,19 @@ class FcaArticlesSummarySpec extends SpecBase {
 
     "return None when no FCA articles exist" in {
 
-      val answers = JourneyData(groupId = testGroupId,
-        enrolmentId = testEnrolmentId,
-        certificatesOfAuthority = None)
+      val answers = JourneyData(groupId = testGroupId, enrolmentId = testEnrolmentId, certificatesOfAuthority = None)
 
       FcaArticlesSummary.row(answers) mustBe None
     }
 
     "render a row when FCA articles exist" in {
 
-      val answers = JourneyData(groupId = testGroupId,
+      val answers = JourneyData(
+        groupId = testGroupId,
         enrolmentId = testEnrolmentId,
-        certificatesOfAuthority = Some(CertificatesOfAuthority(fcaArticles = Some(Seq(Article14, Article21, Article25)))))
+        certificatesOfAuthority =
+          Some(CertificatesOfAuthority(fcaArticles = Some(Seq(Article14, Article21, Article25))))
+      )
 
       val result = FcaArticlesSummary.row(answers)
 
