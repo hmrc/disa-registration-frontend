@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.certificatesOfAuthority
+package controllers.certificatesofauthority
 
 import config.FrontendAppConfig
 import controllers.actions.*
@@ -22,7 +22,7 @@ import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.certificatesOfAuthority.EligibilityToManageIsaView
+import views.html.certificatesofauthority.EligibilityToManageIsaView
 
 import javax.inject.Inject
 
