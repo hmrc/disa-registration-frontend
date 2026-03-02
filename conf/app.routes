@@ -82,6 +82,9 @@ POST       /change-fca-platform-number                   controllers.isaproducts
 
 GET        /isa-products-check-your-answers              controllers.isaproducts.IsaProductsCheckYourAnswersController.onPageLoad()
 
+## Certificates Of Authority
+GET        /eligibility-to-manage-isas                   controllers.certificatesOfAuthority.EligibilityToManageIsaController.onPageLoad()
+
 ## LOs and Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
 GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()

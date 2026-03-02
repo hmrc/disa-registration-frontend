@@ -1,0 +1,54 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+
+@this(layout: templates.Layout,
+        govukButton: GovukButton,
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper)
+
+@(guidanceHref: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("eligibilityToManageIsa.title"), Some(messages("sectionTitle.certificatesOfAuthority")))) {
+
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-visually-hidden">@messages("section.caption.hidden")</span>
+        <span class="govuk-caption-l">@messages("sectionTitle.certificatesOfAuthority")</span>
+        @messages("eligibilityToManageIsa.heading")
+    </h1>
+
+    <div class="govuk-body">
+    <p>@messages("eligibilityToManageIsa.p1")</p>
+    <p>@messages("eligibilityToManageIsa.p2")</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("eligibilityToManageIsa.bullet1")</li>
+        <li>@messages("eligibilityToManageIsa.bullet2")</li>
+    </ul>
+
+    @hmrcNewTabLinkHelper(NewTabLinkHelper(
+       text = messages("eligibilityToManageIsa.linkText"),
+       href = Some(guidanceHref)
+    ))
+    </div>
+
+    @govukButton(Button(
+        content = Text(messages("site.continue")),
+        href = None))
+
+}
