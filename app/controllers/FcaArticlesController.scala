@@ -39,6 +39,7 @@ class FcaArticlesController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   formProvider: FcaArticlesFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
@@ -51,48 +52,47 @@ class FcaArticlesController @Inject() (
   val form: Form[Set[FcaArticles]] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
-    (identify andThen getData) { implicit request =>
+    (identify andThen getData andThen requireData) { implicit request =>
       val preparedForm = (for {
-        journeyData             <- request.journeyData
-        certificatesOfAuthority <- journeyData.certificatesOfAuthority
+        certificatesOfAuthority <- request.journeyData.certificatesOfAuthority
         values                  <- certificatesOfAuthority.fcaArticles
       } yield form.fill(values.toSet)).getOrElse(form)
 
       Ok(view(preparedForm, mode))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val existingSection = request.journeyData.flatMap(_.certificatesOfAuthority)
-          val updatedSection  =
-            existingSection match {
-              case Some(existing) =>
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          answer => {
+            val updatedSection =
+              request.journeyData.certificatesOfAuthority.fold {
+                CertificatesOfAuthority(fcaArticles = Some(answer.toSeq))
+              } { existing =>
                 existing.copy(fcaArticles = Some(answer.toSeq))
-              case None           => CertificatesOfAuthority(fcaArticles = Some(answer.toSeq))
-            }
+              }
 
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(
-                navigator.nextPage(
-                  FcaArticlesPage,
-                  updatedSection,
-                  mode
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { updatedSection =>
+                Redirect(
+                  navigator.nextPage(
+                    FcaArticlesPage,
+                    updatedSection,
+                    mode
+                  )
                 )
-              )
-            }
-            .recoverWith { case e =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
+              }
+              .recoverWith { case e =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
   }
 }

@@ -25,7 +25,7 @@ import models.journeydata.{CertificatesOfAuthority, JourneyData}
 import models.{FcaArticles, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{atMostOnce, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  val onwardRoute = "/obligations/enrolment/isa"
 
   lazy val fcaArticlesRoute = routes.FcaArticlesController.onPageLoad(NormalMode).url
 
@@ -102,7 +102,6 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -113,11 +112,14 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute
       }
     }
 
     "must redirect to the next page when valid data is submitted and no existing data was found" in {
+
+      val journeyData =
+        JourneyData(groupId = testGroupId, enrolmentId = testString, certificatesOfAuthority = None)
 
       val expectedJourneyData = CertificatesOfAuthority(fcaArticles = Some(Seq(Article14)))
 
@@ -127,8 +129,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = None)
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+        applicationBuilder(journeyData = Some(journeyData))
           .build()
 
       running(application) {
@@ -139,7 +140,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute
       }
     }
 
@@ -170,7 +171,6 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -181,8 +181,11 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedUpdated), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
+
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute
       }
     }
 
@@ -208,16 +211,16 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
     "must return Internal Server Error when failed to store data" in {
 
+      val journeyData =
+        JourneyData(groupId = testGroupId, enrolmentId = testString, certificatesOfAuthority = None)
+
       when(
         mockJourneyAnswersService
           .update(any[CertificatesOfAuthority], any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
       ) thenReturn Future.failed(new Exception)
 
       val application =
-        applicationBuilder(journeyData = None)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
+        applicationBuilder(journeyData = Some(journeyData))
           .build()
 
       running(application) {
