@@ -236,3 +236,25 @@ declarationForIsaManagers.action = I agree, submit
 ## Confirmation
 confirmation.title = confirmation dummy
 confirmation.heading = confirmation dummy
+
+fcaArticles.title = FCA Articles that apply to your organisation
+fcaArticles.heading = FCA Articles that apply to your organisation
+fcaArticles.p1 = We need to know which of the FCA Articles apply to your organisation, as set out by the Financial Service and Markets Act 2000.
+fcaArticles.h2 = Which Articles apply to your organisation?
+fcaArticles.hint = Select all that apply
+fcaArticles.article14 = Article 14
+fcaArticles.article21 = Article 21
+fcaArticles.article25 = Article 25
+fcaArticles.article36H = Article 36H
+fcaArticles.article37 = Article 37
+fcaArticles.article39G = Article 39G
+fcaArticles.article40 = Article 40
+fcaArticles.article45 = Article 45
+fcaArticles.article51ZA = Article 51ZA
+fcaArticles.article51ZC = Article 51ZC
+fcaArticles.article51ZE = Article 51ZE
+fcaArticles.article53 = Article 53
+fcaArticles.article64 = Article 64
+fcaArticles.checkYourAnswersLabel = FCA Articles that apply to your organisation
+fcaArticles.error.required = You need to select which of the Articles apply to your organisation. Select from the options
+fcaArticles.change.hidden = Change FCA Articles

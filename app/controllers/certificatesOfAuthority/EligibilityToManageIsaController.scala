@@ -19,7 +19,6 @@ package controllers.certificatesOfAuthority
 import config.FrontendAppConfig
 import controllers.actions.*
 import models.journeydata.CertificatesOfAuthority
-import models.journeydata.isaproducts.IsaProducts
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController

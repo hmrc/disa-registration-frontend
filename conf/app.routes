@@ -94,8 +94,13 @@ GET        /add-liaison-officer                          controllers.AddLiaisonO
 ## Declare & Submit
 
 ### Declaration
-GET        /declaration-for-isa-managers                       controllers.DeclarationForIsaManagersController.onPageLoad()
-POST       /declaration-for-isa-managers                       controllers.DeclarationForIsaManagersController.onSubmit()
+GET        /declaration-for-isa-managers                 controllers.DeclarationForIsaManagersController.onPageLoad()
+POST       /declaration-for-isa-managers                 controllers.DeclarationForIsaManagersController.onSubmit()
 
 ### Confirmation
-GET        /confirmation                       controllers.ConfirmationController.onPageLoad(receiptId: String)
+GET        /confirmation                                 controllers.ConfirmationController.onPageLoad(receiptId: String)
+
+GET        /fca-articles                                 controllers.FcaArticlesController.onPageLoad(mode: Mode = NormalMode)
+POST       /fca-articles                                 controllers.FcaArticlesController.onSubmit(mode: Mode = NormalMode)
+GET        /change-fca-articles                          controllers.FcaArticlesController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-fca-articles                          controllers.FcaArticlesController.onSubmit(mode: Mode = CheckMode)
