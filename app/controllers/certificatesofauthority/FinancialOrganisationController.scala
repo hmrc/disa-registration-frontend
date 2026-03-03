@@ -68,12 +68,11 @@ class FinancialOrganisationController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           answer => {
-            val existingSection = request.journeyData.certificatesOfAuthority
-            val updatedSection  =
-              existingSection match {
-                case Some(existing) =>
-                  existing.copy(financialOrganisation = Some(answer.toSeq))
-                case None           => CertificatesOfAuthority(financialOrganisation = Some(answer.toSeq))
+            val updatedSection =
+              request.journeyData.certificatesOfAuthority.fold {
+                CertificatesOfAuthority(financialOrganisation = Some(answer.toSeq))
+              } { existing =>
+                existing.copy(financialOrganisation = Some(answer.toSeq))
               }
 
             journeyAnswersService
