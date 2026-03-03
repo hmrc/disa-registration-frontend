@@ -16,10 +16,16 @@
 
 package generators
 
+import models.FcaArticles
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {}
+
+implicit lazy val arbitraryFcaArticles: Arbitrary[FcaArticles] =
+  Arbitrary {
+    Gen.oneOf(FcaArticles.values)
+  }
 
 implicit lazy val arbitraryInnovativeFinancialProducts: Arbitrary[InnovativeFinancialProduct] =
   Arbitrary {

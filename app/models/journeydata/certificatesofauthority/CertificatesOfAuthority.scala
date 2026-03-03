@@ -16,10 +16,14 @@
 
 package models.journeydata.certificatesofauthority
 
+import models.FcaArticles
 import models.journeydata.TaskListSection
 import play.api.libs.json.{Json, OFormat}
 
-case class CertificatesOfAuthority(certificatesYesNo: Option[CertificatesOfAuthorityYesNo]) extends TaskListSection {
+case class CertificatesOfAuthority(
+  certificatesYesNo: Option[CertificatesOfAuthorityYesNo] = None,
+  fcaArticles: Option[Seq[FcaArticles]] = None
+) extends TaskListSection {
   override def sectionName: String = CertificatesOfAuthority.sectionName
 }
 
