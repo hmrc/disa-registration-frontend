@@ -16,9 +16,10 @@
 
 package models.journeydata
 
-import models.FcaArticles.Article14
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.certificatesofauthority.FinancialOrganisation.Bank
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Yes
+import models.journeydata.certificatesofauthority.FcaArticles.Article14
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
@@ -39,8 +40,13 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       isaProducts = Some(IsaProducts(Some(IsaProduct.values), Some(testString), Some(testString))),
       organisationDetails =
         Some(OrganisationDetails(Some(true), Some("Z1"), Some(true), Some(testString), Some(testString), None)),
-      certificatesOfAuthority =
-        Some(CertificatesOfAuthority(certificatesYesNo = Some(Yes), fcaArticles = Some(Seq(Article14)))),
+      certificatesOfAuthority = Some(
+        CertificatesOfAuthority(
+          certificatesYesNo = Some(Yes),
+          fcaArticles = Some(Seq(Article14)),
+          financialOrganisation = Some(Seq(Bank))
+        )
+      ),
       liaisonOfficers = Some(LiaisonOfficers(Some("L"), Some("LO"))),
       signatories = None,
       outsourcedAdministration = Some(OutsourcedAdministration(Some("O1"), Some("O2"))),
@@ -65,7 +71,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "p2pPlatform": "test",
         "p2pPlatformNumber": "test"
       },
-      "certificatesOfAuthority": {  "certificatesYesNo":"yes", "fcaArticles": ["article14"]},
+      "certificatesOfAuthority": {  "certificatesYesNo":"yes", "fcaArticles": ["article14"], "financialOrganisation": ["bank"]},
       "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
       "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
       "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" }
@@ -90,7 +96,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
           "p2pPlatform": "test",
           "p2pPlatformNumber": "test"
         },
-        "certificatesOfAuthority": {"certificatesYesNo":"yes", "fcaArticles": ["article14"]},
+        "certificatesOfAuthority": {"certificatesYesNo":"yes", "fcaArticles": ["article14"], "financialOrganisation": ["bank"]},
         "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
         "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
         "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" },

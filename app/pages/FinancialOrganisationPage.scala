@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import javax.inject.Inject
-import forms.mappings.Mappings
-import models.journeydata.certificatesofauthority.FcaArticles
-import play.api.data.Form
-import play.api.data.Forms.set
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 
-class FcaArticlesFormProvider @Inject() extends Mappings {
+case object FinancialOrganisationPage extends PageWithoutDependents[CertificatesOfAuthority] {
 
-  def apply(): Form[Set[FcaArticles]] =
-    Form(
-      "value" -> set(enumerable[FcaArticles]("fcaArticles.error.required"))
-        .verifying(nonEmptySet("fcaArticles.error.required"))
-    )
+  override def toString: String = "financialOrganisation"
+
+  def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority =
+    sectionAnswers.copy(financialOrganisation = None)
 }

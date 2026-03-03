@@ -17,22 +17,22 @@
 package forms
 
 import forms.behaviours.CheckboxFieldBehaviours
-import models.journeydata.certificatesofauthority.FcaArticles
+import models.journeydata.certificatesofauthority.FinancialOrganisation
 import play.api.data.FormError
 
-class FcaArticlesFormProviderSpec extends CheckboxFieldBehaviours {
+class FinancialOrganisationFormProviderSpec extends CheckboxFieldBehaviours {
 
-  val form = new FcaArticlesFormProvider()()
+  val form = new FinancialOrganisationFormProvider()()
 
   ".value" - {
 
     val fieldName   = "value"
-    val requiredKey = "fcaArticles.error.required"
+    val requiredKey = "financialOrganisation.error.required"
 
-    behave like checkboxField[FcaArticles](
+    behave like checkboxField[FinancialOrganisation](
       form,
       fieldName,
-      validValues = FcaArticles.values,
+      validValues = FinancialOrganisation.values,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 
