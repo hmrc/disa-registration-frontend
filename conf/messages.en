@@ -215,6 +215,7 @@ certificatesOfAuthorityYesNo.yes = Yes - you will now tell us which articles app
 certificatesOfAuthorityYesNo.no = No - you need to provide further details about your financial organisation
 certificatesOfAuthorityYesNo.error.required = You need to tell us if the certificates and permissions apply to your organisation. Select yes, if they do
 certificatesOfAuthorityYesNo.checkYourAnswersLabel = Certificates of authority that apply to your organisation
+certificatesOfAuthorityYesNo.change.hidden = certificates of authority
 
 financialOrganisation.title = Financial organisation
 financialOrganisation.heading = Financial organisation
@@ -230,9 +231,9 @@ financialOrganisation.insuranceCompany = An insurance company
 financialOrganisation.incorporatedFriendlySociety = An incorporated friendly society
 financialOrganisation.registeredFriendlySociety = A registered friendly society
 financialOrganisation.assuranceUndertaking = An organisation that offers assurance undertaking services
-financialOrganisation.checkYourAnswersLabel = Financial organisation
+financialOrganisation.checkYourAnswersLabel = What is your financial organisation?
 financialOrganisation.error.required = You need to tell us which organisation type you are. Select from the options
-financialOrganisation.change.hidden = FinancialOrganisation
+financialOrganisation.change.hidden = financial organisation
 
 fcaArticles.title = FCA Articles that apply to your organisation
 fcaArticles.heading = FCA Articles that apply to your organisation
@@ -252,9 +253,9 @@ fcaArticles.article51ZC = Article 51ZC
 fcaArticles.article51ZE = Article 51ZE
 fcaArticles.article53 = Article 53
 fcaArticles.article64 = Article 64
-fcaArticles.checkYourAnswersLabel = FCA Articles that apply to your organisation
+fcaArticles.checkYourAnswersLabel = Articles selected
 fcaArticles.error.required = You need to select which of the Articles apply to your organisation. Select from the options
-fcaArticles.change.hidden = Change FCA Articles
+fcaArticles.change.hidden = articles selected
 
 CoaCheckYourAnswers.title = Check your certificates of authority
 CoaCheckYourAnswers.heading = Check your certificates of authority
