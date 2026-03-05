@@ -18,6 +18,10 @@ package utils
 
 import generators.Generators
 import models.journeydata.JourneyData
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
+import models.journeydata.certificatesofauthority.FcaArticles.Article14
+import models.journeydata.certificatesofauthority.FinancialOrganisation.EuropeanInstitution
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -41,6 +45,19 @@ trait TestData extends Generators {
       p2pPlatformNumber = Some("1234567"),
       innovativeFinancialProducts = Some(InnovativeFinancialProduct.values)
     )
-  val testJourneyData: JourneyData        =
+
+  val testCoaAnswersWithFinancialOrg: CertificatesOfAuthority =
+    CertificatesOfAuthority(
+      certificatesYesNo = Some(No),
+      financialOrganisation = Some(Seq(EuropeanInstitution))
+    )
+
+  val testCoaAnswersWithArticles: CertificatesOfAuthority =
+    CertificatesOfAuthority(
+      certificatesYesNo = Some(Yes),
+      fcaArticles = Some(Seq(Article14))
+    )
+
+  val testJourneyData: JourneyData =
     JourneyData(groupId = testGroupId, enrolmentId = testEnrolmentId, isaProducts = Some(testIsaProductsAnswers))
 }

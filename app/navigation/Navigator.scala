@@ -16,10 +16,13 @@
 
 package navigation
 
+import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
 import controllers.routes
 import models.*
 import models.journeydata.TaskListSection
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo._
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
@@ -51,24 +54,31 @@ class Navigator @Inject() () {
         checkRouteMap(page)
     }
 
+  // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
-    case RegisteredIsaManagerPage        => ???
-    case ZReferenceNumberPage            => ???
-    case IsaProductsPage                 => isaProductsNextPage(answers)
-    case InnovativeFinancialProductsPage => innovativeFinancialProductsNextPage(answers)
-    case PeerToPeerPlatformPage          => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
-    case PeerToPeerPlatformNumberPage    => IsaProductsCheckYourAnswersController.onPageLoad()
-    case _                               => routes.IndexController.onPageLoad()
+    case RegisteredIsaManagerPage         => ???
+    case ZReferenceNumberPage             => ???
+    case IsaProductsPage                  => isaProductsNextPage(answers)
+    case InnovativeFinancialProductsPage  => innovativeFinancialProductsNextPage(answers)
+    case PeerToPeerPlatformPage           => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
+    case PeerToPeerPlatformNumberPage     => IsaProductsCheckYourAnswersController.onPageLoad()
+    case CertificatesOfAuthorityYesNoPage => certificatesOfAuthorityYesNoNextPage(answers)
+    case FcaArticlesPage                  => CoaCheckYourAnswersController.onPageLoad()
+    case FinancialOrganisationPage        => CoaCheckYourAnswersController.onPageLoad()
+    case _                                => routes.IndexController.onPageLoad()
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
-    case RegisteredIsaManagerPage        => ???
-    case ZReferenceNumberPage            => ???
-    case IsaProductsPage                 => IsaProductsCheckYourAnswersController.onPageLoad()
-    case InnovativeFinancialProductsPage => IsaProductsCheckYourAnswersController.onPageLoad()
-    case PeerToPeerPlatformPage          => IsaProductsCheckYourAnswersController.onPageLoad()
-    case PeerToPeerPlatformNumberPage    => IsaProductsCheckYourAnswersController.onPageLoad()
-    case _                               => routes.IndexController.onPageLoad()
+    case RegisteredIsaManagerPage         => ???
+    case ZReferenceNumberPage             => ???
+    case IsaProductsPage                  => IsaProductsCheckYourAnswersController.onPageLoad()
+    case InnovativeFinancialProductsPage  => IsaProductsCheckYourAnswersController.onPageLoad()
+    case PeerToPeerPlatformPage           => IsaProductsCheckYourAnswersController.onPageLoad()
+    case PeerToPeerPlatformNumberPage     => IsaProductsCheckYourAnswersController.onPageLoad()
+    case CertificatesOfAuthorityYesNoPage => CoaCheckYourAnswersController.onPageLoad()
+    case FcaArticlesPage                  => CoaCheckYourAnswersController.onPageLoad()
+    case FinancialOrganisationPage        => CoaCheckYourAnswersController.onPageLoad()
+    case _                                => routes.IndexController.onPageLoad()
   }
 
   private def isaProductsNextPage(answers: IsaProducts): Call =
@@ -82,5 +92,15 @@ class Navigator @Inject() () {
       if (ifps.contains(PeertopeerLoansUsingAPlatformWith36hPermissions))
         PeerToPeerPlatformController.onPageLoad(NormalMode)
       else IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+  private def certificatesOfAuthorityYesNoNextPage(
+    answers: CertificatesOfAuthority
+  ): Call =
+    answers.certificatesYesNo.fold(CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode)) {
+      case Yes =>
+        FcaArticlesController.onPageLoad(NormalMode)
+      case No  =>
+        FinancialOrganisationController.onPageLoad(NormalMode)
     }
 }

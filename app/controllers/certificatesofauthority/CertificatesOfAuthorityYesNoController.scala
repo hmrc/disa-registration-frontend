@@ -19,9 +19,13 @@ package controllers.certificatesofauthority
 import controllers.actions.*
 import forms.CertificatesOfAuthorityYesNoFormProvider
 import handlers.ErrorHandler
+import handlers.JourneyHandler.clearStalePages
 import models.Mode
-import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, CertificatesOfAuthorityYesNo}
+import navigation.Navigator
+import pages.CertificatesOfAuthorityYesNoPage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
@@ -39,6 +43,7 @@ class CertificatesOfAuthorityYesNoController @Inject() (
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
   formProvider: CertificatesOfAuthorityYesNoFormProvider,
+  navigator: Navigator,
   val controllerComponents: MessagesControllerComponents,
   view: CertificatesOfAuthorityYesNoView
 )(implicit ec: ExecutionContext)
@@ -46,7 +51,7 @@ class CertificatesOfAuthorityYesNoController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form: Form[CertificatesOfAuthorityYesNo] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
@@ -67,14 +72,21 @@ class CertificatesOfAuthorityYesNoController @Inject() (
           answer => {
             val existingSection = request.journeyData.certificatesOfAuthority
             val updatedSection  = existingSection match {
-              case Some(existing) => existing.copy(certificatesYesNo = Some(answer))
+              case Some(existing) =>
+                clearStalePages(CertificatesOfAuthorityYesNoPage, existing.copy(certificatesYesNo = Some(answer)))
               case None           => CertificatesOfAuthority(certificatesYesNo = Some(answer))
             }
-
             journeyAnswersService
               .update(updatedSection, request.groupId, request.credentials.providerId)
               .map { updatedSection =>
-                Redirect(controllers.routes.IndexController.onPageLoad()) // TODO Update as part of DFI-1710
+                Redirect(
+                  navigator.nextPage(
+                    CertificatesOfAuthorityYesNoPage,
+                    existingSection,
+                    updatedSection,
+                    mode
+                  )
+                )
               }
               .recoverWith { case e =>
                 logger.warn(

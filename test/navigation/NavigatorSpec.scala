@@ -17,16 +17,19 @@
 package navigation
 
 import base.SpecBase
+import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
-import controllers.routes.IndexController
-import pages.*
+import controllers.routes.{CheckYourAnswersController, IndexController}
 import models.*
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
+import pages.*
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -45,11 +48,14 @@ class NavigatorSpec extends SpecBase {
       innovativeFinancialProducts = Some(ifps)
     )
 
-  private val emptyAnswers: IsaProducts =
+  private val emptyIsaProductsAnswers: IsaProducts =
     IsaProducts(
       isaProducts = None,
       innovativeFinancialProducts = None
     )
+
+  private val coaAnswers: CertificatesOfAuthority =
+    CertificatesOfAuthority(certificatesYesNo = Some(Yes), fcaArticles = None, financialOrganisation = None)
 
   "Navigator.nextPage(PageWithDependents)" - {
 
@@ -62,7 +68,7 @@ class NavigatorSpec extends SpecBase {
       val result: Call =
         navigator.nextPage(
           page = IsaProductsPage,
-          existing = Some(emptyAnswers),
+          existing = Some(emptyIsaProductsAnswers),
           updated = answerWithIfpSelected,
           mode = CheckMode
         )
@@ -78,8 +84,8 @@ class NavigatorSpec extends SpecBase {
       val result =
         navigator.nextPage(
           page = InnovativeFinancialProductsPage,
-          existing = Some(emptyAnswers),
-          updated = emptyAnswers,
+          existing = Some(emptyIsaProductsAnswers),
+          updated = emptyIsaProductsAnswers,
           mode = CheckMode
         )
 
@@ -106,7 +112,7 @@ class NavigatorSpec extends SpecBase {
 
       spiedNav.nextPage(
         page = PeerToPeerPlatformPage,
-        updated = emptyAnswers,
+        updated = emptyIsaProductsAnswers,
         mode = NormalMode
       )
 
@@ -118,7 +124,7 @@ class NavigatorSpec extends SpecBase {
 
       spiedNav.nextPage(
         page = PeerToPeerPlatformPage,
-        updated = emptyAnswers,
+        updated = emptyIsaProductsAnswers,
         mode = CheckMode
       )
 
@@ -145,7 +151,7 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route IsaProductsPage to Index when isaProducts is missing" in {
-      val answers = emptyAnswers.copy(isaProducts = None)
+      val answers = emptyIsaProductsAnswers.copy(isaProducts = None)
 
       val result: Call = navigator.normalRoutes(IsaProductsPage, answers)
 
@@ -169,7 +175,7 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route InnovativeFinancialProductsPage to Index when innovativeFinancialProducts is missing" in {
-      val answers = emptyAnswers.copy(innovativeFinancialProducts = None)
+      val answers = emptyIsaProductsAnswers.copy(innovativeFinancialProducts = None)
 
       val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers)
 
@@ -177,15 +183,42 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route PeerToPeerPlatformPage to PeerToPeerPlatformNumberPage" in {
-      val result: Call = navigator.normalRoutes(PeerToPeerPlatformPage, emptyAnswers)
+      val result: Call = navigator.normalRoutes(PeerToPeerPlatformPage, emptyIsaProductsAnswers)
 
       result shouldBe PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
     }
 
     "route PeerToPeerPlatformNumberPage to ISA products CYA" in {
-      val result: Call = navigator.normalRoutes(PeerToPeerPlatformNumberPage, emptyAnswers)
+      val result: Call = navigator.normalRoutes(PeerToPeerPlatformNumberPage, emptyIsaProductsAnswers)
 
       result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route CertificatesOfAuthorityYesNoPage to FcaArticlesPage if yes submitted" in {
+      val result: Call = navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers)
+      result shouldBe FcaArticlesController.onPageLoad(NormalMode)
+    }
+
+    "route CertificatesOfAuthorityYesNoPage to FinancialOrganisationPage if no submitted" in {
+      val result: Call =
+        navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers.copy(certificatesYesNo = Some(No)))
+      result shouldBe FinancialOrganisationController.onPageLoad(NormalMode)
+    }
+
+    "route to CertificatesOfAuthorityYesNoPage if no answer is present for certificatesYesNo" in {
+      val result: Call =
+        navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers.copy(certificatesYesNo = None))
+      result shouldBe CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode)
+    }
+
+    "route FcaArticlesPage to ISA products CYA" in {
+      val result: Call = navigator.normalRoutes(FcaArticlesPage, coaAnswers)
+      result shouldBe CoaCheckYourAnswersController.onPageLoad()
+    }
+
+    "route FinancialOrganisationPage to ISA products CYA" in {
+      val result: Call = navigator.normalRoutes(FinancialOrganisationPage, coaAnswers)
+      result shouldBe CoaCheckYourAnswersController.onPageLoad()
     }
 
     "route unknown page to Index" in {
@@ -193,7 +226,7 @@ class NavigatorSpec extends SpecBase {
         override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers
       }
 
-      val result: Call = navigator.normalRoutes(UnknownPage, emptyAnswers)
+      val result: Call = navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers)
 
       result shouldBe IndexController.onPageLoad()
     }
@@ -216,6 +249,21 @@ class NavigatorSpec extends SpecBase {
 
     "route PeerToPeerPlatformNumberPage to ISA products CYA" in {
       navigator.checkRouteMap(PeerToPeerPlatformNumberPage) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route CertificatesOfAuthorityYesNoPage to COA CYA" in {
+      navigator.checkRouteMap(CertificatesOfAuthorityYesNoPage) shouldBe
+        CoaCheckYourAnswersController.onPageLoad()
+    }
+
+    "route FcaArticlesPage to COA CYA" in {
+      navigator.checkRouteMap(FcaArticlesPage) shouldBe
+        CoaCheckYourAnswersController.onPageLoad()
+    }
+
+    "route FinancialOrganisationPage to COA CYA" in {
+      navigator.checkRouteMap(FinancialOrganisationPage) shouldBe
+        CoaCheckYourAnswersController.onPageLoad()
     }
 
     "route unknown page to Index" in {

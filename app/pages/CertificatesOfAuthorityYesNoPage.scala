@@ -17,6 +17,7 @@
 package pages
 
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 
 case object CertificatesOfAuthorityYesNoPage extends PageWithDependents[CertificatesOfAuthority] {
 
@@ -25,7 +26,24 @@ case object CertificatesOfAuthorityYesNoPage extends PageWithDependents[Certific
   def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority =
     sectionAnswers.copy(certificatesYesNo = None)
 
-  def pagesToClear(currentAnswers: CertificatesOfAuthority): List[Page[CertificatesOfAuthority]] = ???
+  def pagesToClear(
+    currentAnswers: CertificatesOfAuthority
+  ): List[Page[CertificatesOfAuthority]] =
+    currentAnswers.certificatesYesNo match {
+      case Some(Yes) =>
+        List(FinancialOrganisationPage)
+      case Some(No)  =>
+        List(FcaArticlesPage)
+      case _         =>
+        Nil
+    }
 
-  def resumeNormalMode(currentAnswers: CertificatesOfAuthority): Boolean = ???
+  def resumeNormalMode(answers: CertificatesOfAuthority): Boolean =
+    answers match {
+      case CertificatesOfAuthority(Some(Yes), fcaArticles, _)          =>
+        fcaArticles.forall(_.isEmpty)
+      case CertificatesOfAuthority(Some(No), _, financialOrganisation) =>
+        financialOrganisation.forall(_.isEmpty)
+      case _                                                           => false
+    }
 }
