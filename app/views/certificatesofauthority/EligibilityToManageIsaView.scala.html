@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukButton
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import controllers.certificatesofauthority.routes._
 
 @this(layout: templates.Layout,
         govukButton: GovukButton,
@@ -49,6 +50,6 @@
 
     @govukButton(Button(
         content = Text(messages("site.continue")),
-        href = None))
+        href = Some(CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode).url)))
 
 }
