@@ -25,20 +25,19 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.*
 import viewmodels.govuk.summarylist.*
 import views.html.certificatesofauthority.CoaCheckYourAnswersView
-import views.html.isaproducts.IsaProductsCheckYourAnswersView
 
 import javax.inject.Inject
 
-class CoaCheckYourAnswersController @Inject()(
-                                               override val messagesApi: MessagesApi,
-                                               identify: IdentifierAction,
-                                               getData: DataRetrievalAction,
-                                               requireData: DataRequiredAction,
-                                               val controllerComponents: MessagesControllerComponents,
-                                               view: CoaCheckYourAnswersView
-                                             ) extends FrontendBaseController
-  with I18nSupport
-  with Logging {
+class CoaCheckYourAnswersController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: CoaCheckYourAnswersView
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   // TODO: Create ticket to ensure CYA validates required journeyData before loading
   def onPageLoad(): Action[AnyContent] =

@@ -19,7 +19,7 @@ package navigation
 import base.SpecBase
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
-import controllers.routes.{CheckYourAnswersController, IndexController}
+import controllers.routes.IndexController
 import models.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}

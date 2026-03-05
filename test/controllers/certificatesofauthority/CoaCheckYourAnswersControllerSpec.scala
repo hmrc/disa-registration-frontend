@@ -22,10 +22,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.checkAnswers.{CertificatesOfAuthorityYesNoSummary, FcaArticlesSummary, FinancialOrganisationSummary}
-import viewmodels.checkAnswers.isaproducts.{InnovativeFinancialProductsSummary, IsaProductsSummary, PeerToPeerPlatformNumberSummary, PeerToPeerPlatformSummary}
 import viewmodels.govuk.SummaryListFluency
 import views.html.certificatesofauthority.CoaCheckYourAnswersView
-import views.html.isaproducts.IsaProductsCheckYourAnswersView
 
 class CoaCheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency {
 
@@ -53,7 +51,8 @@ class CoaCheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency
 
     "must return OK and correctly load the check your answers page - when certificatesYesNo = No" in {
 
-      val journeyData: JourneyData = testJourneyData.copy(certificatesOfAuthority = Some(testCoaAnswersWithFinancialOrg))
+      val journeyData: JourneyData =
+        testJourneyData.copy(certificatesOfAuthority = Some(testCoaAnswersWithFinancialOrg))
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
@@ -76,6 +75,7 @@ class CoaCheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency
   def expectedSummaryRows(journeyData: JourneyData): Seq[SummaryListRow] = Seq(
     CertificatesOfAuthorityYesNoSummary.row(journeyData),
     FcaArticlesSummary.row(journeyData),
-    FinancialOrganisationSummary.row(journeyData)).flatten
+    FinancialOrganisationSummary.row(journeyData)
+  ).flatten
 
 }
