@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.certificatesofauthority
 
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import pages.PageWithoutDependents
 
-case object FcaArticlesPage extends PageWithoutDependents[CertificatesOfAuthority] {
+case object FinancialOrganisationPage extends PageWithoutDependents[CertificatesOfAuthority] {
 
-  override def toString: String = "fcaArticles"
+  override def toString: String = "financialOrganisation"
 
-  override def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority =
-    sectionAnswers.copy(fcaArticles = None)
+  def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority =
+    sectionAnswers.copy(financialOrganisation = None)
 }

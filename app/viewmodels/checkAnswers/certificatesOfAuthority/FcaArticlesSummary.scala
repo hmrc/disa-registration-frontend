@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.certificatesOfAuthority
 
-import controllers.certificatesofauthority.routes.CertificatesOfAuthorityYesNoController
+import controllers.certificatesofauthority.routes
 import models.CheckMode
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
@@ -26,23 +26,27 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object CertificatesOfAuthorityYesNoSummary {
+object FcaArticlesSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.certificatesOfAuthority.flatMap(_.certificatesYesNo).map { answer =>
+    answers.certificatesOfAuthority.flatMap(_.fcaArticles).map { answers =>
 
       val value = ValueViewModel(
         HtmlContent(
-          HtmlFormat.escape(messages(s"certificatesOfAuthorityYesNo.$answer"))
+          answers
+            .map { answer =>
+              HtmlFormat.escape(messages(s"fcaArticles.$answer")).toString
+            }
+            .mkString("<br>")
         )
       )
 
       SummaryListRowViewModel(
-        key = "certificatesOfAuthorityYesNo.checkYourAnswersLabel",
+        key = "fcaArticles.checkYourAnswersLabel",
         value = value,
         actions = Seq(
-          ActionItemViewModel("site.change", CertificatesOfAuthorityYesNoController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("certificatesOfAuthorityYesNo.change.hidden"))
+          ActionItemViewModel("site.change", routes.FcaArticlesController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("fcaArticles.change.hidden"))
         )
       )
     }

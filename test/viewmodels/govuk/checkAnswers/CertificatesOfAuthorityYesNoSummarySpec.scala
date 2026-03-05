@@ -24,7 +24,7 @@ import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, Cert
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.Aliases.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
-import viewmodels.checkAnswers.CertificatesOfAuthorityYesNoSummary
+import viewmodels.checkAnswers.certificatesOfAuthority.CertificatesOfAuthorityYesNoSummary
 import viewmodels.govuk.all.{ActionItemViewModel, FluentActionItem, SummaryListRowViewModel, ValueViewModel}
 
 class CertificatesOfAuthorityYesNoSummarySpec extends SpecBase {

@@ -21,6 +21,7 @@ import models.journeydata.certificatesofauthority.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
 import models.journeydata.certificatesofauthority.FinancialOrganisation.EuropeanInstitution
+import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 
 class CertificatesOfAuthorityYesNoPageSpec extends SpecBase {
 

@@ -21,7 +21,7 @@ import models.journeydata.JourneyData
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.checkAnswers.{CertificatesOfAuthorityYesNoSummary, FcaArticlesSummary, FinancialOrganisationSummary}
+import viewmodels.checkAnswers.certificatesOfAuthority.{CertificatesOfAuthorityYesNoSummary, FcaArticlesSummary, FinancialOrganisationSummary}
 import viewmodels.govuk.SummaryListFluency
 import views.html.certificatesofauthority.CoaCheckYourAnswersView
 

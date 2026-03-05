@@ -22,11 +22,12 @@ import controllers.routes
 import models.*
 import models.journeydata.TaskListSection
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo._
+import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
 import pages.*
+import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}

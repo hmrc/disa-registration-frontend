@@ -23,7 +23,7 @@ import handlers.JourneyHandler.clearStalePages
 import models.Mode
 import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, CertificatesOfAuthorityYesNo}
 import navigation.Navigator
-import pages.CertificatesOfAuthorityYesNoPage
+import pages.certificatesofauthority.CertificatesOfAuthorityYesNoPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

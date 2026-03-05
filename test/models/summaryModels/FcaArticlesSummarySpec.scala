@@ -23,7 +23,7 @@ import models.journeydata.JourneyData
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.FcaArticles.{Article14, Article21, Article25}
 import org.scalatest.matchers.must.Matchers.*
-import viewmodels.checkAnswers.FcaArticlesSummary
+import viewmodels.checkAnswers.certificatesOfAuthority.FcaArticlesSummary
 
 class FcaArticlesSummarySpec extends SpecBase {
 

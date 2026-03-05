@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package pages
+package pages.certificatesofauthority
 
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
+import pages.{Page, PageWithDependents}
 
 case object CertificatesOfAuthorityYesNoPage extends PageWithDependents[CertificatesOfAuthority] {
 
