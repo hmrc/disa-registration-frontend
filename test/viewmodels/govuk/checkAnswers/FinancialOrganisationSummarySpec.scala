@@ -25,7 +25,7 @@ import models.journeydata.certificatesofauthority.FinancialOrganisation.Bank
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.Aliases.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
-import viewmodels.checkAnswers.FinancialOrganisationSummary
+import viewmodels.checkAnswers.certificatesOfAuthority.FinancialOrganisationSummary
 import viewmodels.govuk.all.{ActionItemViewModel, FluentActionItem, SummaryListRowViewModel, ValueViewModel}
 
 class FinancialOrganisationSummarySpec extends SpecBase {

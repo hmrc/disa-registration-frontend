@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.certificatesOfAuthority
 
 import controllers.certificatesofauthority.routes.FinancialOrganisationController
 import models.CheckMode
@@ -37,7 +37,7 @@ object FinancialOrganisationSummary {
             .map { answer =>
               HtmlFormat.escape(messages(s"financialOrganisation.$answer")).toString
             }
-            .mkString(",<br>")
+            .mkString("<br>")
         )
       )
 

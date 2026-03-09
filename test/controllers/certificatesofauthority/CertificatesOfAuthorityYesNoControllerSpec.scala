@@ -20,9 +20,10 @@ import base.SpecBase
 import controllers.certificatesofauthority.routes.CertificatesOfAuthorityYesNoController
 import forms.CertificatesOfAuthorityYesNoFormProvider
 import models.journeydata.JourneyData
-import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Yes
+import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, CertificatesOfAuthorityYesNo}
 import models.{CheckMode, NormalMode}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
@@ -39,7 +40,8 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
   lazy val routeUrl: String  = CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode).url
   lazy val submitUrl: String = CertificatesOfAuthorityYesNoController.onSubmit(NormalMode).url
 
-  val onwardRoute = "/obligations/enrolment/isa"
+  val onwardRouteFcaArticle   = "/obligations/enrolment/isa/fca-articles"
+  val onwardRouteFinancialOrg = "/obligations/enrolment/isa/financial-organisation"
 
   val formProvider                             = new CertificatesOfAuthorityYesNoFormProvider()
   val form: Form[CertificatesOfAuthorityYesNo] = formProvider()
@@ -104,57 +106,59 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
       }
     }
 
-    CertificatesOfAuthorityYesNo.values.foreach { answer =>
-      s"must redirect to the next page when valid data ($answer) is submitted" in {
+    s"must redirect to the next page when valid data (No) is submitted" in {
 
-        val expectedSection = CertificatesOfAuthority(certificatesYesNo = Some(answer))
+      val expectedSection = CertificatesOfAuthority(certificatesYesNo = Some(No))
 
-        when(
-          mockJourneyAnswersService
-            .update(eqTo(expectedSection), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
-        ) thenReturn Future.successful(expectedSection)
+      when(
+        mockJourneyAnswersService.update(eqTo(expectedSection), any[String], any[String])(
+          any[Writes[CertificatesOfAuthority]],
+          any
+        )
+      ).thenReturn(Future.successful(expectedSection))
 
-        val application =
-          applicationBuilder(journeyData = Some(emptyJourneyData))
-            .build()
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData))
+          .build()
 
-        running(application) {
-          val request =
-            FakeRequest(POST, submitUrl)
-              .withFormUrlEncodedBody(("value", answer.toString))
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody(("value", No.toString))
 
-          val result = route(application, request).value
+        val result = route(application, request).value
 
-          verify(mockJourneyAnswersService, atMostOnce)
-            .update(eqTo(expectedSection), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute
-        }
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRouteFinancialOrg
       }
+    }
 
-      s"must redirect to the next page when valid data ($answer) is submitted and no existing data was found" in {
+    s"must redirect to the next page when valid data (Yes) is submitted" in {
 
-        val expectedSection = CertificatesOfAuthority(certificatesYesNo = Some(answer))
+      val expectedSection = CertificatesOfAuthority(certificatesYesNo = Some(Yes))
 
-        when(
-          mockJourneyAnswersService
-            .update(eqTo(expectedSection), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
-        ) thenReturn Future.successful(expectedSection)
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
+      ) thenReturn Future.successful(expectedSection)
 
-        val application =
-          applicationBuilder(journeyData = Some(emptyJourneyData))
-            .build()
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData))
+          .build()
 
-        running(application) {
-          val request =
-            FakeRequest(POST, submitUrl)
-              .withFormUrlEncodedBody(("value", answer.toString))
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody(("value", Yes.toString))
 
-          val result = route(application, request).value
+        val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual onwardRoute
-        }
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRouteFcaArticle
       }
     }
 
@@ -192,28 +196,67 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
       }
     }
 
-    "must submit with CheckMode and redirect" in {
+    "must clear CertificatesOfAuthorityYesNo when changed to Yes in CheckMode" in {
 
-      val expectedSection = CertificatesOfAuthority(certificatesYesNo = Some(Yes))
+      val existingSection                                 = testCoaAnswersWithFinancialOrg
+      val updatedSection                                  = testCoaAnswersWithArticles.copy(fcaArticles = None)
+      val journeyData                                     = testJourneyData.copy(certificatesOfAuthority = Some(existingSection))
+      val captor: ArgumentCaptor[CertificatesOfAuthority] =
+        ArgumentCaptor.forClass(classOf[CertificatesOfAuthority])
 
-      when(
-        mockJourneyAnswersService
-          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
-      ) thenReturn Future.successful(expectedSection)
+      when(mockJourneyAnswersService.update(captor.capture(), any[String], any[String])(any(), any()))
+        .thenReturn(Future.successful(updatedSection))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(journeyData))
           .build()
 
       running(application) {
+
         val request =
           FakeRequest(POST, CertificatesOfAuthorityYesNoController.onSubmit(CheckMode).url)
-            .withFormUrlEncodedBody(("value", Yes.toString))
+            .withFormUrlEncodedBody("value" -> Yes.toString)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute
+        redirectLocation(result).value mustEqual onwardRouteFcaArticle
+
+        val updatedSection = captor.getValue
+
+        updatedSection.financialOrganisation mustBe None
+      }
+    }
+
+    "must clear CertificatesOfAuthorityYesNo when changed to No in CheckMode" in {
+
+      val existingSection                                 = testCoaAnswersWithArticles
+      val updatedSection                                  = testCoaAnswersWithFinancialOrg.copy(financialOrganisation = None)
+      val journeyData                                     = testJourneyData.copy(certificatesOfAuthority = Some(existingSection))
+      val captor: ArgumentCaptor[CertificatesOfAuthority] =
+        ArgumentCaptor.forClass(classOf[CertificatesOfAuthority])
+
+      when(mockJourneyAnswersService.update(captor.capture(), any[String], any[String])(any(), any()))
+        .thenReturn(Future.successful(updatedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, CertificatesOfAuthorityYesNoController.onSubmit(CheckMode).url)
+            .withFormUrlEncodedBody("value" -> No.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRouteFinancialOrg
+
+        val updatedSection = captor.getValue
+
+        updatedSection.fcaArticles mustBe None
       }
     }
   }

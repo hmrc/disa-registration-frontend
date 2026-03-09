@@ -22,7 +22,7 @@ import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import navigation.Navigator
-import pages.FinancialOrganisationPage
+import pages.certificatesofauthority.FinancialOrganisationPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

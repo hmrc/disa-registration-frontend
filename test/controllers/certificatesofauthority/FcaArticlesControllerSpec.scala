@@ -22,8 +22,8 @@ import forms.FcaArticlesFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, FcaArticles}
 import models.journeydata.isaproducts.IsaProducts
-import models.NormalMode
-import models.journeydata.certificatesofauthority.FcaArticles.Article14
+import models.{CheckMode, NormalMode}
+import models.journeydata.certificatesofauthority.FcaArticles.{Article14, Article21}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
-  val onwardRoute = "/obligations/enrolment/isa"
+  val onwardRoute = "/obligations/enrolment/isa/certificates-of-authority-check-your-answers"
 
   lazy val fcaArticlesRoute = routes.FcaArticlesController.onPageLoad(NormalMode).url
 
@@ -177,6 +177,51 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         val request =
           FakeRequest(POST, fcaArticlesRoute)
             .withFormUrlEncodedBody(("value[0]", Article14.toString))
+
+        val result = route(application, request).value
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedUpdated), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute
+      }
+    }
+
+    "must update existing CertificatesOfAuthority when valid data is submitted - checkmode" in {
+
+      val existingCertificates =
+        CertificatesOfAuthority(
+          fcaArticles = Some(Seq(Article14)),
+          certificatesYesNo = None
+        )
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          certificatesOfAuthority = Some(existingCertificates)
+        )
+
+      val expectedUpdated =
+        existingCertificates.copy(
+          fcaArticles = Some(Seq(Article14, Article21))
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedUpdated), any[String], any[String])(any[Writes[CertificatesOfAuthority]], any)
+      ).thenReturn(Future.successful(expectedUpdated))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, routes.FcaArticlesController.onPageLoad(CheckMode).url)
+            .withFormUrlEncodedBody(("value[0]", Article14.toString), ("value[1]", Article21.toString))
 
         val result = route(application, request).value
 
