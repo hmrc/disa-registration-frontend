@@ -27,7 +27,16 @@ trait StringFieldBehaviours extends FieldBehaviours {
 
       forAll(stringsLongerThan(maxLength) -> "longString") { (string: String) =>
         val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-        result.errors must contain only lengthError
+        result.errors must contain(lengthError)
+      }
+    }
+
+  def fieldWithMinLength(form: Form[_], fieldName: String, minLength: Int, lengthError: FormError): Unit =
+    s"not bind strings shorter than $minLength characters" in {
+
+      forAll(stringsShorterThan(minLength) -> "shortString") { (string: String) =>
+        val result = form.bind(Map(fieldName -> string)).apply(fieldName)
+        result.errors must contain(lengthError)
       }
     }
 
@@ -36,7 +45,7 @@ trait StringFieldBehaviours extends FieldBehaviours {
 
       forAll(stringsNotMatching(pattern) -> "notMatchingString") { (string: String) =>
         val result = form.bind(Map(fieldName -> string)).apply(fieldName)
-        result.errors must contain only error
+        result.errors must contain(error)
       }
     }
 }

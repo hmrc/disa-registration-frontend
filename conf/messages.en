@@ -131,6 +131,16 @@ firmReferenceNumber.change.hidden = Change FCA number
 firmReferenceNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 firmReferenceNumber.link.text = you can check the ISA managers list to find your number
 
+organisationTelephoneNumber.title = What is the telephone number of your organisation?
+organisationTelephoneNumber.heading = What is the telephone number of your organisation?
+organisationTelephoneNumber.hint = This number will only be used by HMRC to speak to ISA managers or liaison officers during the audit process
+organisationTelephoneNumber.checkYourAnswersLabel = Organisation telephone number
+organisationTelephoneNumber.error.required = Enter the phone number of your organisation. Use a UK phone number, like 01642 123 456 or 07777 777 777
+organisationTelephoneNumber.error.tooLong = The phone number you have entered is too long. For example, a UK phone number, like 01642 123 456 or 07777 777 777
+organisationTelephoneNumber.error.tooShort = The phone number you have entered is too short. Enter a UK phone number, like 01642 123 456 or 07777 777 777
+organisationTelephoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a a UK phone number, like 01642 123 456 or 07777 777 777
+organisationTelephoneNumber.change.hidden = organisation telephone number
+
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
 isaProducts.heading = Which ISA products does your organisation offer?
