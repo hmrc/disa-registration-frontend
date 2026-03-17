@@ -1,4 +1,4 @@
-service.name = disa-registration-frontend
+service.name = Manage ISAs
 
 site.back = Back
 site.remove = Remove
