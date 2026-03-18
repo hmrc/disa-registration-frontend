@@ -59,6 +59,11 @@ POST       /firm-reference-number                        controllers.orgdetails.
 GET        /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
+GET        /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = NormalMode)
+POST       /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = NormalMode)
+GET        /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = CheckMode)
+
 ## ISA Products
 GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
 POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
