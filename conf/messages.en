@@ -109,13 +109,13 @@ tradingUsingDifferentName.title = Does your organisation trade using a different
 tradingUsingDifferentName.heading = Does your organisation trade using a different name?
 tradingUsingDifferentName.checkYourAnswersLabel = Does your organisation trade using a different name?
 tradingUsingDifferentName.error.required = Select yes if your organisation trades using a different name
-tradingUsingDifferentName.change.hidden = Change trading using different a name
+tradingUsingDifferentName.change.hidden = trading using different a name
 
 tradingName.title = What is your organisation’s trading name?
 tradingName.heading = What is your organisation’s trading name?
 tradingName.checkYourAnswersLabel = tradingName
 tradingName.error.required = Enter the trading name of your organisation
-tradingName.change.hidden = Change trading name
+tradingName.change.hidden = trading name
 
 firmReferenceNumber.title = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
 firmReferenceNumber.heading = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
@@ -127,7 +127,7 @@ firmReferenceNumber.p4 = If you’re already registered as an ISA manager with H
 firmReferenceNumber.checkYourAnswersLabel = FCA number
 firmReferenceNumber.error.required = You must tell us your organisation reference number
 firmReferenceNumber.error.pattern = Enter the organisation reference number in the correct format. It’s usually 6 or 7 numbers
-firmReferenceNumber.change.hidden = Change FCA number
+firmReferenceNumber.change.hidden = FCA number
 firmReferenceNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 firmReferenceNumber.link.text = you can check the ISA managers list to find your number
 
@@ -142,7 +142,7 @@ isaProducts.innovativeFinanceIsas = Innovative Finance ISAs
 isaProducts.error.required = Select the ISA products your organisation offers
 isaProducts.checkYourAnswersLabel = Products
 isaProducts.hint = Select all that apply
-isaProducts.change.hidden = Change ISA products
+isaProducts.change.hidden = ISA products
 
 innovativeFinancialProducts.title = Which types of innovative finance products will your organisation offer?
 innovativeFinancialProducts.heading = Which types of innovative finance products will your organisation offer?
@@ -152,7 +152,7 @@ innovativeFinancialProducts.crowdfundedDebentures = Crowdfunded debentures
 innovativeFinancialProducts.longTermAssetFunds = Long-Term Asset Funds (LTAFs) and other funds with extended redemption periods
 innovativeFinancialProducts.checkYourAnswersLabel = Innovative finance products
 innovativeFinancialProducts.error.required = Select which types of innovative finance products your organisation will offer
-innovativeFinancialProducts.change.hidden = Change innovative finance products
+innovativeFinancialProducts.change.hidden = innovative finance products
 
 peerToPeerPlatform.title = Which platform does your organisation use to offer peer-to-peer loans?
 peerToPeerPlatform.heading = Which platform does your organisation use to offer peer-to-peer loans?
@@ -162,7 +162,7 @@ peerToPeerPlatform.details.content.p1 = Peer-to-peer loans are direct transactio
 peerToPeerPlatform.details.content.p2 = These parties are brought together by an electronic platform which introduces and arranges the loan documentation between the lender and the borrower.
 peerToPeerPlatform.details.content.p3 = It then manages the payment of interest and repayment of the principal according to the terms agreed between the parties.
 peerToPeerPlatform.details.content.link = Find out more about peer-to-peer loans
-peerToPeerPlatform.change.hidden = Change platform name
+peerToPeerPlatform.change.hidden = platform name
 peerToPeerPlatform.checkYourAnswersLabel = Platform name
 
 
@@ -171,7 +171,7 @@ peerToPeerPlatformNumber.heading = What is the FCA, FRN of {0}?
 peerToPeerPlatformNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 peerToPeerPlatformNumber.error.required = You must tell us your {0} reference number
 peerToPeerPlatformNumber.error.pattern = Enter the {0} reference number in the correct format. It’s usually 6 or 7 numbers
-peerToPeerPlatformNumber.change.hidden = Change platform FCA
+peerToPeerPlatformNumber.change.hidden = platform FCA
 peerToPeerPlatformNumber.checkYourAnswersLabel = Platform FCA FRN
 
 ### Signatories
