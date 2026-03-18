@@ -18,20 +18,24 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import controllers.certificatesofauthority.routes._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
 @this(layout: templates.Layout,
         govukButton: GovukButton,
-        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper)
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+        hmrcPageHeading: HmrcPageHeading
+)
 
 @(guidanceHref: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("eligibilityToManageIsa.title"), Some(messages("sectionTitle.certificatesOfAuthority")))) {
 
-    <h1 class="govuk-heading-xl">
-        <span class="govuk-visually-hidden">@messages("section.caption.hidden")</span>
-        <span class="govuk-caption-l">@messages("sectionTitle.certificatesOfAuthority")</span>
-        @messages("eligibilityToManageIsa.heading")
-    </h1>
+    @hmrcPageHeading(PageHeading(
+      text = messages("eligibilityToManageIsa.heading"),
+      section = Some(messages("sectionTitle.certificatesOfAuthority")),
+      headingClasses = Some("govuk-heading-l"),
+      captionClasses = Some("govuk-caption-l")
+    ))
 
     <div class="govuk-body">
     <p>@messages("eligibilityToManageIsa.p1")</p>

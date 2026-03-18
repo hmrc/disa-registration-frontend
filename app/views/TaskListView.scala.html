@@ -15,9 +15,11 @@
  *@
 
 @import models.NormalMode
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
 @this(
-  layout: templates.Layout
+  layout: templates.Layout,
+  hmrcPageHeading: HmrcPageHeading
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -25,7 +27,10 @@
 @layout(pageTitle = titleNoForm(messages("taskList.title"))) {
 
   <div>
-    <h1 class="govuk-heading-xl">@messages("taskList.title")</h1>
+    @hmrcPageHeading(PageHeading(
+      text = messages("taskList.heading"),
+      headingClasses = Some("govuk-heading-l")
+    ))
   </div>
 
   <a class="govuk-link" href="@controllers.isaproducts.routes.IsaProductsController.onPageLoad(NormalMode).url">ISA Products</a>

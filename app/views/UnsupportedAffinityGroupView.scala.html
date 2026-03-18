@@ -14,8 +14,11 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+
 @this(
-    layout: templates.Layout
+    layout: templates.Layout,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @(affinityGroup: String, loginHref: String, guidanceHref: String)(implicit request: Request[_], messages: Messages)
@@ -26,7 +29,11 @@
     showBackLink = false
 ) {
 
-    <h1 class="govuk-heading-l">@messages("unsupportedAffinityGroup.heading")</h1>
+    @hmrcPageHeading(PageHeading(
+        text = messages("unsupportedAffinityGroup.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
+
     <div class = "govuk-body">
         <p>@messages(s"unsupportedAffinityGroup.paragraph1.$affinityGroup")</p>
         <p>@messages("unsupportedAffinityGroup.paragraph2") <a href="@loginHref" class="govuk-link">@messages("unsupportedAffinityGroup.linkText")</a>@messages("fullStop")</p>

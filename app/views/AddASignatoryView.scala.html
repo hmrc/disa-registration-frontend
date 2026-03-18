@@ -14,10 +14,13 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+
 @this(
   layout: templates.Layout,
   govukDetails: GovukDetails,
-  govukButton: GovukButton
+  govukButton: GovukButton,
+  hmrcPageHeading: HmrcPageHeading
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -25,10 +28,12 @@
 @layout(pageTitle = titleNoForm(messages("addASignatory.title"), Some(messages("sectionTitle.signatories")))) {
 
   <div>
-    <h1 class="govuk-heading-xl">
-      <span class="govuk-caption-l">@messages("sectionTitle.signatories")</span>
-      @messages("addASignatory.heading")
-    </h1>
+    @hmrcPageHeading(PageHeading(
+      text = messages("addASignatory.heading"),
+      section = Some(messages("sectionTitle.signatories")),
+      headingClasses = Some("govuk-heading-l"),
+      captionClasses = Some("govuk-caption-l")
+    ))
 
     <p class="govuk-body">@messages("addASignatory.p1")</p>
 
