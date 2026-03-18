@@ -36,6 +36,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
     "must return OK for Organisation users" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val view        = application.injector.instanceOf[AddLiaisonOfficerView]
 
       running(application) {
         val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
@@ -56,16 +57,14 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
           messagesApi = application.injector.instanceOf[play.api.i18n.MessagesApi],
           identify = authAction,
           controllerComponents = application.injector.instanceOf[play.api.mvc.MessagesControllerComponents],
-          view = application.injector.instanceOf[AddLiaisonOfficerView]
+          view = view
         )
 
         val request = FakeRequest(GET, routes.AddLiaisonOfficerController.onPageLoad().url)
         val result  = controller.onPageLoad()(request)
 
         status(result) mustEqual OK
-        contentAsString(result) must include(
-          "Add liaison officer - Liaison officers - disa-registration-frontend - GOV.UK"
-        )
+        contentAsString(result) must equal(view()(request, messages(application)).toString)
       }
     }
 
