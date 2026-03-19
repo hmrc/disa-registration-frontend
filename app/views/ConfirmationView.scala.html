@@ -14,14 +14,21 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+
 @this(
-        layout: templates.Layout,
+    layout: templates.Layout,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @(submissionReceiptId: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("confirmation.title"))) {
 
-  <h1 class="govuk-heading-xl">@messages("confirmation.heading")</h1>
+  @hmrcPageHeading(PageHeading(
+    text = messages("confirmation.heading"),
+    headingClasses = Some("govuk-heading-l")
+  ))
+
   <p class="govuk-body">submissionReceiptId is @submissionReceiptId</p>
 }

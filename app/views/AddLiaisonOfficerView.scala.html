@@ -15,11 +15,13 @@
  *@
 
 @import play.twirl.api.StringInterpolation
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
 @this(
   layout: templates.Layout,
   govukDetails: GovukDetails,
-  govukButton: GovukButton
+  govukButton: GovukButton,
+  hmrcPageHeading: HmrcPageHeading
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -27,10 +29,12 @@
 @layout(pageTitle = titleNoForm(messages("addLiaisonOfficer.title"), Some(messages("sectionTitle.liaisonOfficers")))) {
 
   <div>
-    <h1 class="govuk-heading-xl">
-      <span class="govuk-caption-l">@messages("sectionTitle.liaisonOfficers")</span>
-      @messages("addLiaisonOfficer.heading")
-    </h1>
+    @hmrcPageHeading(PageHeading(
+      text = messages("addLiaisonOfficer.heading"),
+      section = Some(messages("sectionTitle.liaisonOfficers")),
+      headingClasses = Some("govuk-heading-l"),
+      captionClasses = Some("govuk-caption-l")
+    ))
 
     <p class="govuk-body">@messages("addLiaisonOfficer.p1")</p>
     <p class="govuk-body">@messages("addLiaisonOfficer.p2")</p>

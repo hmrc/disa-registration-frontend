@@ -14,16 +14,22 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+
 @this(
     layout: templates.Layout,
-    govukSummaryList: GovukSummaryList
+    govukSummaryList: GovukSummaryList,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @(list: SummaryList)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
+    @hmrcPageHeading(PageHeading(
+        text = messages("checkYourAnswers.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
     @govukSummaryList(list)
 }

@@ -14,8 +14,11 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+
 @this(
-    layout: templates.Layout
+    layout: templates.Layout,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -25,7 +28,10 @@
     timeout   = false
 ) {
 
-    <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>
+    @hmrcPageHeading(PageHeading(
+        text = messages("unauthorised.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
     <p class="govuk-body">@messages("unauthorised.guidance")</p>
 }

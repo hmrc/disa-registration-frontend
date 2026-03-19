@@ -14,23 +14,24 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+
 @this(
-        layout: templates.Layout,
-        formHelper: FormWithCSRF,
-        govukButton: GovukButton,
-        govukSummaryList: GovukSummaryList,
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukButton: GovukButton,
+    govukSummaryList: GovukSummaryList,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @(list: SummaryList)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"),Some(messages("sectionTitle.isaProducts")))) {
-    <span class="govuk-caption-xl">
-        <span class="govuk-visually-hidden">
-            @messages("section.caption.hidden")
-        </span>
-        @messages("sectionTitle.isaProducts")
-    </span>
-    <h1 class="govuk-heading-l">@messages("checkYourAnswers.heading")</h1>
+        @hmrcPageHeading(PageHeading(
+            text = messages("checkYourAnswers.heading"),
+            headingClasses = Some("govuk-heading-l")
+        ))
+
         @formHelper(action = routes.IndexController.onPageLoad(), Symbol("autoComplete") -> "off") {
 
             @govukSummaryList(list)

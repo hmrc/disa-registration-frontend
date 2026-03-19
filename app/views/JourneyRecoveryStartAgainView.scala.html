@@ -14,16 +14,22 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("journeyRecovery.startAgain.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("journeyRecovery.startAgain.heading")</h1>
+    @hmrcPageHeading(PageHeading(
+        text = messages("journeyRecovery.startAgain.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
     <p class="govuk-body">@messages("journeyRecovery.startAgain.guidance")</p>
 

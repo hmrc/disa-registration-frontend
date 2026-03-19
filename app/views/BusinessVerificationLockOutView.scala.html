@@ -14,8 +14,11 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+
 @this(
-        layout: templates.Layout
+    layout: templates.Layout,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -30,8 +33,11 @@
 }
 
 @layout(pageTitle = titleNoForm(messages("bvLockout.title")), showBackLink = false) {
- 
-    <h1 class="govuk-heading-l">@messages("bvLockout.title")</h1>
+
+    @hmrcPageHeading(PageHeading(
+        text = messages("bvLockout.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
  
     @p("bvLockout.p1")
     @p("bvLockout.p2")

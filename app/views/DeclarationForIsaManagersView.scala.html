@@ -15,24 +15,25 @@
  *@
 
 @import controllers.routes.DeclarationForIsaManagersController
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
 @this(
-        layout: templates.Layout,
-        govukButton: GovukButton,
-        formHelper: FormWithCSRF
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    formHelper: FormWithCSRF,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @(showJuniorContent: Boolean)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("declarationForIsaManagers.title"), Some(messages("sectionTitle.submit")))) {
 
-    <span class="govuk-caption-l">
-        <span class="govuk-visually-hidden">
-            @messages("section.caption.hidden")
-        </span>
-        @messages("sectionTitle.submit")
-    </span>
-    <h1 class="govuk-heading-l">@messages("declarationForIsaManagers.heading")</h1>
+    @hmrcPageHeading(PageHeading(
+        text = messages("declarationForIsaManagers.heading"),
+        section = Some(messages("sectionTitle.submit")),
+        headingClasses = Some("govuk-heading-l"),
+        captionClasses = Some("govuk-caption-l")
+    ))
 
     <p class="govuk-body">@messages("declarationForIsaManagers.p1")</p>
 

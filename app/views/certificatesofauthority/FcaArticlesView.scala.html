@@ -17,13 +17,15 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 @import controllers.certificatesofauthority.routes
 @import models.journeydata.certificatesofauthority.FcaArticles
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukCheckboxes: GovukCheckboxes,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -36,11 +38,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        <h1 class="govuk-heading-xl">
-            <span class="govuk-visually-hidden">@messages("section.caption.hidden")</span>
-            <span class="govuk-caption-l">@messages("sectionTitle.certificatesOfAuthority")</span>
-            @messages("fcaArticles.heading")
-        </h1>
+        @hmrcPageHeading(PageHeading(
+            text = messages("fcaArticles.heading"),
+            section = Some(messages("sectionTitle.certificatesOfAuthority")),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-l")
+        ))
 
         <p class="govuk-body">@messages("fcaArticles.p1")</p>
 

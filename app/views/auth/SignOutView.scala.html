@@ -15,10 +15,12 @@
  *@
 
 @import config.FrontendAppConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
 @this(
     layout: templates.Layout,
-    config: FrontendAppConfig
+    config: FrontendAppConfig,
+    hmrcPageHeading: HmrcPageHeading
 )
 
 @(updatesInSession: Boolean)(implicit request: Request[_], messages: Messages)
@@ -32,7 +34,10 @@
     showSignOut  = false
 ) {
 
-    <h1 class="govuk-heading-xl">@messages(s"$prefixKey.heading")</h1>
+    @hmrcPageHeading(PageHeading(
+        text = messages(s"$prefixKey.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
     <p class="govuk-body">@messages("page.signOut.paragraph1")</p>
     <p class="govuk-body">
