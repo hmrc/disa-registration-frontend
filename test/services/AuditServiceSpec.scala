@@ -211,7 +211,7 @@ class AuditServiceSpec extends SpecBase {
 
       (detail \ EventData.credId.toString).as[String] mustEqual credentials.providerId
       (detail \ EventData.providerType.toString).as[String] mustEqual credentials.providerType
-      (detail \ EventData.enrolmentId.toString).as[String] mustEqual testEnrolmentId
+      (detail \ EventData.internalRegistrationId.toString).as[String] mustEqual testEnrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
 
@@ -288,7 +288,7 @@ class AuditServiceSpec extends SpecBase {
 
       (detail \ EventData.credId.toString).as[String] mustEqual credentials.providerId
       (detail \ EventData.providerType.toString).as[String] mustEqual credentials.providerType
-      (detail \ EventData.enrolmentId.toString).as[String] mustEqual testEnrolmentId
+      (detail \ EventData.internalRegistrationId.toString).as[String] mustEqual testEnrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
       (detail \ EventData.journeyType.toString).as[String] mustEqual EventData.startEnrolment.toString

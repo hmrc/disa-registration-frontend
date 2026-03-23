@@ -44,7 +44,8 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
               postCode = Some("post code"),
               uprn = None
             )
-          )
+          ),
+          companyName = Some(testString)
         )
       ),
       isaProducts = Some(IsaProducts(Some(IsaProduct.values), Some(testString), Some(testString))),
@@ -85,7 +86,8 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
           "addressLine2": "address line 2",
           "addressLine3": "address line 3",
           "postCode": "post code"
-        }
+        },
+        "companyName":"test"
       },
       "organisationDetails": {
         "registeredToManageIsa": true,
@@ -137,7 +139,8 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "addressLine3": "address line 3",
         "postCode": "post code",
         "uprn": null
-      }
+      },
+      "companyName":"test"
     },
     "enrolmentId": "$testEnrolmentId",
     "status": "Active",
