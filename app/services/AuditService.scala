@@ -43,9 +43,9 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     journeyData: JourneyData
   )(implicit hc: HeaderCarrier): Future[Unit] = {
     val data = Json.obj(
-      EventData.credId.toString                 -> request.credentials.providerId,
       EventData.providerType.toString           -> request.credentials.providerType,
       EventData.internalRegistrationId.toString -> journeyData.enrolmentId,
+      EventData.credId.toString                 -> request.credentials.providerId,
       EventData.credentialRole.toString         -> request.credentialRole.toString,
       EventData.groupId.toString                -> request.groupId,
       EventData.journeyType.toString            -> EventData.startEnrolment.toString
@@ -57,9 +57,9 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
 
   def auditContinuation[A](request: DataRequest[A], sectionName: String)(implicit hc: HeaderCarrier): Future[Unit] =
     val data = Json.obj(
-      EventData.credId.toString                 -> request.credentials.providerId,
       EventData.providerType.toString           -> request.credentials.providerType,
       EventData.internalRegistrationId.toString -> request.journeyData.enrolmentId,
+      EventData.credId.toString                 -> request.credentials.providerId,
       EventData.credentialRole.toString         -> request.credentialRole.toString,
       EventData.groupId.toString                -> request.groupId,
       EventData.groupName.toString              -> request.journeyData.businessVerification
@@ -81,18 +81,25 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
   )(implicit hc: HeaderCarrier): Future[Unit] = {
     implicit val payloadWrites: OWrites[JourneyData] = auditWrites
     val baseData                                     = Json.obj(
-      EventData.credId.toString           -> credentials.providerId,
       EventData.providerType.toString     -> credentials.providerType,
+      EventData.credId.toString           -> credentials.providerId,
       EventData.credentialRole.toString   -> credentialRole.toString,
       EventData.submissionStatus.toString -> status.toString,
       EventData.payload.toString          -> journeyData
     )
 
+    val failureData: String => JsObject = reason =>
+      Json.obj(
+        EventData.groupId.toString                -> journeyData.groupId,
+        EventData.groupName.toString              -> journeyData.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
+        EventData.internalRegistrationId.toString -> journeyData.enrolmentId,
+        EventData.failureReason.toString          -> JsString(reason)
+      )
+
     val auditData: JsObject =
       failureReason match {
-        case Some(r) if status == SubmissionResult.Failure =>
-          baseData - EventData.payload.toString + (EventData.failureReason.toString -> JsString(r))
-        case _                                             => baseData
+        case Some(reason) => baseData - EventData.payload.toString ++ failureData(reason)
+        case _            => baseData
       }
 
     val event = createAuditEvent(EnrolmentSubmitted, auditData)
