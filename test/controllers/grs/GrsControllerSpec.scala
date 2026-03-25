@@ -74,7 +74,7 @@ class GrsControllerSpec extends SpecBase {
                 Some(true),
                 Some(true),
                 Some("1234567890"),
-                Some(testString),
+                companyName = Some(testString),
                 registeredAddress = Some(
                   RegisteredAddress(
                     addressLine1 = Some("address line 1"),
@@ -108,7 +108,7 @@ class GrsControllerSpec extends SpecBase {
                 Some(true),
                 Some(false),
                 Some("1234567890"),
-                Some(testString),
+                companyName = Some(testString),
                 registeredAddress = Some(
                   RegisteredAddress(
                     addressLine1 = Some("address line 1"),
@@ -142,7 +142,7 @@ class GrsControllerSpec extends SpecBase {
                 None,
                 None,
                 Some("1234567890"),
-                Some(testString),
+                companyName = Some(testString),
                 registeredAddress = Some(
                   RegisteredAddress(
                     addressLine1 = Some("address line 1"),
@@ -176,7 +176,7 @@ class GrsControllerSpec extends SpecBase {
                 Some(false),
                 Some(true),
                 Some("1234567890"),
-                Some(testString),
+                companyName = Some(testString),
                 registeredAddress = Some(
                   RegisteredAddress(
                     addressLine1 = Some("address line 1"),

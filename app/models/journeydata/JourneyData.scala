@@ -19,7 +19,6 @@ package models.journeydata
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
-import play.api.libs.json.{Format, Json}
 import play.api.libs.json.{Format, Json, OWrites}
 
 case class JourneyData(
