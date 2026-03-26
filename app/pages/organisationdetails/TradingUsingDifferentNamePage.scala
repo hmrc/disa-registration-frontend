@@ -23,6 +23,6 @@ case object TradingUsingDifferentNamePage extends PageWithoutDependents[Organisa
 
   override def toString: String = "tradingUsingDifferentName"
 
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
-    sectionAnswers.copy(tradingUsingDifferentName = None)
+  def clearAnswer(answers: OrganisationDetails): OrganisationDetails =
+    answers.copy(tradingUsingDifferentName = None)
 }

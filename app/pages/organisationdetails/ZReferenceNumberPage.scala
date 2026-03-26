@@ -23,5 +23,5 @@ case object ZReferenceNumberPage extends PageWithoutDependents[OrganisationDetai
 
   override def toString: String = "zReferenceNumber"
 
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(zRefNumber = None)
+  def clearAnswer(answers: OrganisationDetails): OrganisationDetails = answers.copy(zRefNumber = None)
 }

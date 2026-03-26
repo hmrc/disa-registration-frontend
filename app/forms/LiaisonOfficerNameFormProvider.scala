@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package pages.certificatesofauthority
+package forms
 
-import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import pages.PageWithoutDependents
+import forms.LiaisonOfficerNameFormProvider.regexPattern
 
-case object FcaArticlesPage extends PageWithoutDependents[CertificatesOfAuthority] {
+import javax.inject.Inject
+import forms.mappings.Mappings
+import play.api.data.Form
 
-  override def toString: String = "fcaArticles"
+class LiaisonOfficerNameFormProvider @Inject() extends Mappings {
 
-  override def clearAnswer(answers: CertificatesOfAuthority): CertificatesOfAuthority =
-    answers.copy(fcaArticles = None)
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("liaisonOfficerName.error.required")
+        .transform(_.trim, identity)
+        .verifying(regexp(regexPattern, "liaisonOfficerName.error.invalid"))
+    )
+}
+
+object LiaisonOfficerNameFormProvider {
+  private[forms] val regexPattern = "^[A-Za-z' -]+$"
 }

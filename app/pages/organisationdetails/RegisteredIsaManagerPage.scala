@@ -23,6 +23,6 @@ object RegisteredIsaManagerPage extends PageWithoutDependents[OrganisationDetail
 
   override def toString: String = "registeredIsaManager"
 
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
-    sectionAnswers.copy(registeredToManageIsa = None)
+  def clearAnswer(answers: OrganisationDetails): OrganisationDetails =
+    answers.copy(registeredToManageIsa = None)
 }

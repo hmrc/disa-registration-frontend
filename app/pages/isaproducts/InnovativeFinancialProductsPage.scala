@@ -23,10 +23,10 @@ case object InnovativeFinancialProductsPage extends PageWithDependents[IsaProduc
 
   override def toString: String = "innovativeFinancialProducts"
 
-  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts =
-    sectionAnswers.copy(innovativeFinancialProducts = None)
+  override def clearAnswer(answers: IsaProducts): IsaProducts =
+    answers.copy(innovativeFinancialProducts = None)
 
-  override def pagesToClear(currentAnswers: IsaProducts): List[Page[IsaProducts]] = {
+  override def pagesToClear(currentAnswers: IsaProducts): List[ClearablePage[IsaProducts]] = {
     val dependenciesNeedClearing = !hasP2pWith36H(currentAnswers) && hasExistingDependentAnswer(currentAnswers)
 
     if (dependenciesNeedClearing)

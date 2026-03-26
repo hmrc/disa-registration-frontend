@@ -22,9 +22,9 @@ import pages.{Page, PageWithDependents}
 case object IsaProductsPage extends PageWithDependents[IsaProducts] {
   override def toString: String = "isaProducts"
 
-  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers.copy(isaProducts = None)
+  override def clearAnswer(answers: IsaProducts): IsaProducts = answers.copy(isaProducts = None)
 
-  override def pagesToClear(currentAnswers: IsaProducts): List[Page[IsaProducts]] =
+  override def pagesToClear(currentAnswers: IsaProducts): List[ClearablePage[IsaProducts]] =
     val dependenciesNeedClearing =
       !containsInnovativeFinance(currentAnswers) && hasExistingDependentAnswer(currentAnswers)
 

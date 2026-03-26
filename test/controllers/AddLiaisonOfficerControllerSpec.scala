@@ -18,6 +18,8 @@ package controllers
 
 import base.SpecBase
 import controllers.actions.AuthenticatedIdentifierAction
+import controllers.liaisonofficers.AddLiaisonOfficerController
+import controllers.liaisonofficers.routes._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.BodyParsers
@@ -60,7 +62,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
           view = view
         )
 
-        val request = FakeRequest(GET, routes.AddLiaisonOfficerController.onPageLoad().url)
+        val request = FakeRequest(GET, AddLiaisonOfficerController.onPageLoad().url)
         val result  = controller.onPageLoad()(request)
 
         status(result) mustEqual OK
@@ -92,7 +94,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
           view = application.injector.instanceOf[AddLiaisonOfficerView]
         )
 
-        val request = FakeRequest(GET, routes.AddLiaisonOfficerController.onPageLoad().url)
+        val request = FakeRequest(GET, AddLiaisonOfficerController.onPageLoad().url)
         val result  = controller.onPageLoad()(request)
 
         status(result) mustEqual SEE_OTHER

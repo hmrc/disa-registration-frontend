@@ -23,6 +23,6 @@ case object OrganisationTelephoneNumberPage extends PageWithoutDependents[Organi
 
   override def toString: String = "organisationTelephoneNumber"
 
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
-    sectionAnswers.copy(orgTelephoneNumber = None)
+  def clearAnswer(answers: OrganisationDetails): OrganisationDetails =
+    answers.copy(orgTelephoneNumber = None)
 }

@@ -30,6 +30,6 @@ class FakeNavigator(desiredRoute: Call) extends Navigator {
     mode: Mode
   ): Call = desiredRoute
 
-  override def nextPage[A <: TaskListSection](page: PageWithoutDependents[A], updated: A, mode: Mode): Call =
+  override def nextPage[A <: TaskListSection](page: Page[A], updated: A, mode: Mode): Call =
     desiredRoute
 }

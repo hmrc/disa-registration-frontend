@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package pages.certificatesofauthority
+package models.journeydata.liaisonofficers
 
-import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import pages.PageWithoutDependents
+import models.journeydata.TaskListSection
+import play.api.libs.json.{Json, OFormat}
 
-case object FcaArticlesPage extends PageWithoutDependents[CertificatesOfAuthority] {
+case class LiaisonOfficers(liaisonOfficers: Seq[LiaisonOfficer] = Seq.empty[LiaisonOfficer]) extends TaskListSection {
+  override def sectionName: String = LiaisonOfficers.sectionName
+}
 
-  override def toString: String = "fcaArticles"
-
-  override def clearAnswer(answers: CertificatesOfAuthority): CertificatesOfAuthority =
-    answers.copy(fcaArticles = None)
+object LiaisonOfficers {
+  val sectionName: String                       = "liaisonOfficers"
+  implicit val format: OFormat[LiaisonOfficers] = Json.format[LiaisonOfficers]
 }

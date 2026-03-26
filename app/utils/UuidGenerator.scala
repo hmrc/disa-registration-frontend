@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package pages.certificatesofauthority
+package utils
 
-import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import pages.PageWithoutDependents
+import java.util.UUID
+import javax.inject.Singleton
 
-case object FcaArticlesPage extends PageWithoutDependents[CertificatesOfAuthority] {
-
-  override def toString: String = "fcaArticles"
-
-  override def clearAnswer(answers: CertificatesOfAuthority): CertificatesOfAuthority =
-    answers.copy(fcaArticles = None)
+@Singleton
+class UuidGenerator {
+  def generate(): String = UUID.randomUUID().toString
 }

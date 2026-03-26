@@ -51,7 +51,7 @@ class Navigator @Inject() () {
     }
   }
 
-  def nextPage[A <: TaskListSection](page: PageWithoutDependents[A], updated: A, mode: Mode): Call =
+  def nextPage[A <: TaskListSection](page: Page[A], updated: A, mode: Mode): Call =
     mode match {
       case NormalMode =>
         normalRoutes(page, updated)
