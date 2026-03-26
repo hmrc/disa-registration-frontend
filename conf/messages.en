@@ -207,7 +207,7 @@ addLiaisonOfficer.details.content.p2 = They provide their name, telephone number
 liaisonOfficerName.title = What is the full name of the liaison officer?
 liaisonOfficerName.heading = What is the full name of the liaison officer?
 liaisonOfficerName.hint = You must have at least 1 liaison officer to register your organisation as an ISA manager. You can add up to 15 liaison officers.
-liaisonOfficerName.error.required = Enter the full name of the liaison officer you're adding
+liaisonOfficerName.error.required = Enter the full name of the liaison officer you’re adding
 liaisonOfficerName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
 
 ### Certificates of Authority

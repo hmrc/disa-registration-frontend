@@ -33,5 +33,5 @@ class LiaisonOfficerNameFormProvider @Inject() extends Mappings {
 }
 
 object LiaisonOfficerNameFormProvider {
-  private[forms] val regexPattern = "^[A-Za-z' -]+$"
+  private[forms] val regexPattern = "^[\\p{L}'’ -]+$"
 }
