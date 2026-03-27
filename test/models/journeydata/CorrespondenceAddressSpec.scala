@@ -23,20 +23,16 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
-class CorrespondenceAddressSpec
-  extends AnyFreeSpec
-    with Matchers
-    with ScalaCheckPropertyChecks
-    with OptionValues {
+class CorrespondenceAddressSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 
   "CorrespondenceAddress" - {
 
     "must serialise and deserialise with all fields present" in {
 
       val gen = for {
-        line1 <- Gen.alphaStr.suchThat(_.nonEmpty)
-        line2 <- Gen.alphaStr.suchThat(_.nonEmpty)
-        line3 <- Gen.alphaStr.suchThat(_.nonEmpty)
+        line1    <- Gen.alphaStr.suchThat(_.nonEmpty)
+        line2    <- Gen.alphaStr.suchThat(_.nonEmpty)
+        line3    <- Gen.alphaStr.suchThat(_.nonEmpty)
         postCode <- Gen.alphaStr.suchThat(_.nonEmpty)
       } yield CorrespondenceAddress(
         Some(line1),

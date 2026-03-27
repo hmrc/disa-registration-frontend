@@ -24,11 +24,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.Json
 
-class CreateJourneyResponseSpec
-  extends AnyFreeSpec
-    with Matchers
-    with ScalaCheckPropertyChecks
-    with OptionValues {
+class CreateJourneyResponseSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with OptionValues {
 
   "CreateJourneyResponse" - {
 
