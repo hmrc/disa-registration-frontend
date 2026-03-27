@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import models.GetOrCreateJourneyData
-import models.journeydata.{BusinessVerification, JourneyData}
+import models.journeydata.{BusinessVerification, JourneyData, RegisteredAddress}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -46,7 +46,15 @@ class StartControllerSpec extends SpecBase {
             BusinessVerification(
               businessRegistrationPassed = Some(true),
               businessVerificationPassed = Some(true),
-              ctUtr = Some("1234567890")
+              ctUtr = Some("1234567890"),
+              registeredAddress = Some(
+                RegisteredAddress(
+                  addressLine1 = Some("address line 1"),
+                  addressLine2 = Some("address line 2"),
+                  addressLine3 = Some("address line 3"),
+                  postCode = Some("postcode")
+                )
+              )
             )
           )
         )
@@ -74,7 +82,15 @@ class StartControllerSpec extends SpecBase {
             BusinessVerification(
               businessRegistrationPassed = Some(true),
               businessVerificationPassed = Some(false),
-              ctUtr = Some("1234567890")
+              ctUtr = Some("1234567890"),
+              registeredAddress = Some(
+                RegisteredAddress(
+                  addressLine1 = Some("address line 1"),
+                  addressLine2 = Some("address line 2"),
+                  addressLine3 = Some("address line 3"),
+                  postCode = Some("postcode")
+                )
+              )
             )
           )
         )
@@ -120,7 +136,15 @@ class StartControllerSpec extends SpecBase {
             BusinessVerification(
               businessRegistrationPassed = None,
               businessVerificationPassed = None,
-              ctUtr = None
+              ctUtr = None,
+              registeredAddress = Some(
+                RegisteredAddress(
+                  addressLine1 = Some("address line 1"),
+                  addressLine2 = Some("address line 2"),
+                  addressLine3 = Some("address line 3"),
+                  postCode = Some("postcode")
+                )
+              )
             )
           )
         )

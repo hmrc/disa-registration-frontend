@@ -141,6 +141,10 @@ organisationTelephoneNumber.error.tooShort = The phone number you have entered i
 organisationTelephoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a a UK phone number, like 01642 123 456 or 07777 777 777
 organisationTelephoneNumber.change.hidden = organisation telephone number
 
+registeredAddressCorrespondence.title = Do you want us to use the registered address to send you letters?
+registeredAddressCorrespondence.heading = Do you want us to use the registered address to send you letters?
+registeredAddressCorrespondence.error.required = Select yes if you want HMRC to use the address given for correspondence
+
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
 isaProducts.heading = Which ISA products does your organisation offer?

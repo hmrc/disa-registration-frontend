@@ -18,7 +18,7 @@ package controllers.grs
 
 import base.SpecBase
 import models.grs.*
-import models.journeydata.BusinessVerification
+import models.journeydata.{BusinessVerification, RegisteredAddress}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -47,7 +47,15 @@ class GrsControllerSpec extends SpecBase {
       identifiersMatch = true,
       businessRegistrationStatus = businessRegistrationStatus,
       businessVerificationStatus = businessVerificationStatus,
-      bpSafeId = Some("X00000123456789")
+      bpSafeId = Some("X00000123456789"),
+      registeredAddress = Some(
+        RegisteredAddress(
+          addressLine1 = Some("address line 1"),
+          addressLine2 = Some("address line 2"),
+          addressLine3 = Some("address line 3"),
+          postCode = Some("postcode")
+        )
+      )
     )
 
   "GrsController" - {
@@ -60,7 +68,23 @@ class GrsControllerSpec extends SpecBase {
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
-          .thenReturn(Future.successful(BusinessVerification(Some(true), Some(true), Some("1234567890"))))
+          .thenReturn(
+            Future.successful(
+              BusinessVerification(
+                Some(true),
+                Some(true),
+                Some("1234567890"),
+                registeredAddress = Some(
+                  RegisteredAddress(
+                    addressLine1 = Some("address line 1"),
+                    addressLine2 = Some("address line 2"),
+                    addressLine3 = Some("address line 3"),
+                    postCode = Some("postcode")
+                  )
+                )
+              )
+            )
+          )
 
         running(application) {
           val request = fakeRequest
@@ -77,7 +101,23 @@ class GrsControllerSpec extends SpecBase {
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
-          .thenReturn(Future.successful(BusinessVerification(Some(true), Some(false), Some("1234567890"))))
+          .thenReturn(
+            Future.successful(
+              BusinessVerification(
+                Some(true),
+                Some(false),
+                Some("1234567890"),
+                registeredAddress = Some(
+                  RegisteredAddress(
+                    addressLine1 = Some("address line 1"),
+                    addressLine2 = Some("address line 2"),
+                    addressLine3 = Some("address line 3"),
+                    postCode = Some("postcode")
+                  )
+                )
+              )
+            )
+          )
 
         running(application) {
           val request = fakeRequest
@@ -94,7 +134,23 @@ class GrsControllerSpec extends SpecBase {
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
-          .thenReturn(Future.successful(BusinessVerification(None, None, Some("1234567890"))))
+          .thenReturn(
+            Future.successful(
+              BusinessVerification(
+                None,
+                None,
+                Some("1234567890"),
+                registeredAddress = Some(
+                  RegisteredAddress(
+                    addressLine1 = Some("address line 1"),
+                    addressLine2 = Some("address line 2"),
+                    addressLine3 = Some("address line 3"),
+                    postCode = Some("postcode")
+                  )
+                )
+              )
+            )
+          )
 
         running(application) {
           val request = fakeRequest
@@ -111,7 +167,23 @@ class GrsControllerSpec extends SpecBase {
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
-          .thenReturn(Future.successful(BusinessVerification(Some(false), Some(true), Some("1234567890"))))
+          .thenReturn(
+            Future.successful(
+              BusinessVerification(
+                Some(false),
+                Some(true),
+                Some("1234567890"),
+                registeredAddress = Some(
+                  RegisteredAddress(
+                    addressLine1 = Some("address line 1"),
+                    addressLine2 = Some("address line 2"),
+                    addressLine3 = Some("address line 3"),
+                    postCode = Some("postcode")
+                  )
+                )
+              )
+            )
+          )
 
         running(application) {
           val request = fakeRequest

@@ -22,7 +22,7 @@ import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
-import pages.FirmReferenceNumberPage
+import pages.organisationdetails.FirmReferenceNumberPage
 import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}

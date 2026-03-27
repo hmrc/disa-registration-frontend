@@ -23,7 +23,7 @@ import handlers.JourneyHandler.clearStalePages
 import models.Mode
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.Navigator
-import pages.InnovativeFinancialProductsPage
+import pages.isaproducts.InnovativeFinancialProductsPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

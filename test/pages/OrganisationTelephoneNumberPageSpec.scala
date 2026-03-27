@@ -18,6 +18,7 @@ package pages
 
 import base.SpecBase
 import models.journeydata.OrganisationDetails
+import pages.organisationdetails.OrganisationTelephoneNumberPage
 
 class OrganisationTelephoneNumberPageSpec extends SpecBase {
 

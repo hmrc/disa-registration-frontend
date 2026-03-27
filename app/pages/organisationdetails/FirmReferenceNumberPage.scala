@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package pages.organisationdetails
 
 import models.journeydata.OrganisationDetails
+import pages.PageWithoutDependents
 
-object RegisteredIsaManagerPage extends PageWithoutDependents[OrganisationDetails] {
+case object FirmReferenceNumberPage extends PageWithoutDependents[OrganisationDetails] {
 
-  override def toString: String = "registeredIsaManager"
+  override def toString: String = "firmReferenceNumber"
 
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
-    sectionAnswers.copy(registeredToManageIsa = None)
+  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(fcaNumber = None)
 }

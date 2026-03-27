@@ -62,6 +62,7 @@ class GrsController @Inject() (
     grs: GRSResponse,
     existing: Option[BusinessVerification]
   ): BusinessVerification = {
+    println(Console.GREEN + grs + Console.RESET)
     val verificationPassed: Option[Boolean] =
       grs.businessVerificationStatus.map {
         case BvPass => true
@@ -76,14 +77,16 @@ class GrsController @Inject() (
         ev.copy(
           businessVerificationPassed = verificationPassed,
           businessRegistrationPassed = registrationPassed,
-          ctUtr = grs.ctutr
+          ctUtr = grs.ctutr,
+          registeredAddress = grs.registeredAddress
         )
       )
       .getOrElse(
         BusinessVerification(
           businessVerificationPassed = verificationPassed,
           businessRegistrationPassed = registrationPassed,
-          ctUtr = grs.ctutr
+          ctUtr = grs.ctutr,
+          registeredAddress = grs.registeredAddress
         )
       )
   }

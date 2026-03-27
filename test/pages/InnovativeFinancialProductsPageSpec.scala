@@ -20,6 +20,7 @@ import base.SpecBase
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import org.scalatest.matchers.should.Matchers.shouldBe
+import pages.isaproducts.{InnovativeFinancialProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 
 class InnovativeFinancialProductsPageSpec extends SpecBase {
 

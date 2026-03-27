@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import pages.organisationdetails.ZReferenceNumberPage
 
 class ZReferenceNumberPageSpec extends SpecBase {
 

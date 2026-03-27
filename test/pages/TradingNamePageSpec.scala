@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import pages.organisationdetails.TradingNamePage
 
 class TradingNamePageSpec extends SpecBase {
 

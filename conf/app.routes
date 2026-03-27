@@ -59,6 +59,11 @@ POST       /firm-reference-number                        controllers.orgdetails.
 GET        /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
+GET        /registered-address-correspondence            controllers.orgdetails.RegisteredAddressCorrespondenceController.onPageLoad(mode: Mode = NormalMode)
+POST       /registered-address-correspondence            controllers.orgdetails.RegisteredAddressCorrespondenceController.onSubmit(mode: Mode = NormalMode)
+GET        /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onSubmit(mode: Mode = CheckMode)
+
 GET        /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)

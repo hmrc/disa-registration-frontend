@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package pages.isaproducts
 
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.isaproducts.IsaProducts
+import pages.PageWithoutDependents
 
-case class CorrespondenceAddress(
-  addressLine1: Option[String] = None,
-  addressLine2: Option[String] = None,
-  addressLine3: Option[String] = None,
-  postCode: Option[String] = None
-)
+case object PeerToPeerPlatformPage extends PageWithoutDependents[IsaProducts] {
 
-object CorrespondenceAddress {
-  implicit val format: OFormat[CorrespondenceAddress] = Json.format[CorrespondenceAddress]
+  override def toString: String = "peerToPeerPlatform"
+
+  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers.copy(p2pPlatform = None)
 }

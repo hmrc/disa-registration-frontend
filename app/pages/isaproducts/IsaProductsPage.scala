@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package pages
+package pages.isaproducts
 
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
+import pages.{Page, PageWithDependents}
 
 case object IsaProductsPage extends PageWithDependents[IsaProducts] {
   override def toString: String = "isaProducts"

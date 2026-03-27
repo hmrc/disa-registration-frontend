@@ -17,7 +17,7 @@
 package utils
 
 import generators.Generators
-import models.journeydata.JourneyData
+import models.journeydata.{BusinessVerification, CorrespondenceAddress, JourneyData, RegisteredAddress}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
@@ -60,4 +60,26 @@ trait TestData extends Generators {
 
   val testJourneyData: JourneyData =
     JourneyData(groupId = testGroupId, enrolmentId = testEnrolmentId, isaProducts = Some(testIsaProductsAnswers))
+
+  val testRegisteredAddress: RegisteredAddress = RegisteredAddress(
+    addressLine1 = Some("testLine1"),
+    addressLine2 = Some("test town"),
+    addressLine3 = Some("test city"),
+    postCode = Some("AA11AA"),
+    uprn = None
+  )
+
+  val testCorrespondenceAddress: CorrespondenceAddress = CorrespondenceAddress(
+    addressLine1 = Some("testLine1"),
+    addressLine2 = Some("test town"),
+    addressLine3 = Some("test city"),
+    postCode = Some("AA11AA")
+  )
+
+  val testBV: BusinessVerification = BusinessVerification(
+    businessRegistrationPassed = Some(true),
+    businessVerificationPassed = Some(true),
+    ctUtr = Some("1234567890"),
+    registeredAddress = Some(testRegisteredAddress)
+  )
 }
