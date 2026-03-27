@@ -19,12 +19,12 @@ package models.journeydata
 import play.api.libs.json.*
 
 case class RegisteredAddress(
-                                        addressLine1: Option[String] = None,
-                                        addressLine2: Option[String] = None,
-                                        addressLine3: Option[String] = None,
-                                        postCode: Option[String] = None,
-                                        uprn: Option[String] = None
-                                      )
+  addressLine1: Option[String] = None,
+  addressLine2: Option[String] = None,
+  addressLine3: Option[String] = None,
+  postCode: Option[String] = None,
+  uprn: Option[String] = None
+)
 
 object RegisteredAddress {
 

@@ -62,7 +62,6 @@ class GrsController @Inject() (
     grs: GRSResponse,
     existing: Option[BusinessVerification]
   ): BusinessVerification = {
-    println(Console.GREEN + grs + Console.RESET)
     val verificationPassed: Option[Boolean] =
       grs.businessVerificationStatus.map {
         case BvPass => true

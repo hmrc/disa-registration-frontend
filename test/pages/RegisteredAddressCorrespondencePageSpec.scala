@@ -62,7 +62,7 @@ class RegisteredAddressCorrespondencePageSpec extends SpecBase {
           registeredToManageIsa = Some(true),
           registeredAddressCorrespondence = None
         )
-        val result = RegisteredAddressCorrespondencePage.clearAnswer(original)
+        val result   = RegisteredAddressCorrespondencePage.clearAnswer(original)
         result.registeredAddressCorrespondence mustBe None
         result mustBe original
       }

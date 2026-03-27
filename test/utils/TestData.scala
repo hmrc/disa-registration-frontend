@@ -17,7 +17,7 @@
 package utils
 
 import generators.Generators
-import models.journeydata.{BusinessVerification, CorrespondenceAddress, JourneyData, RegisteredAddress}
+import models.journeydata.{BusinessVerification, CorrespondenceAddress, JourneyData, OrganisationDetails, RegisteredAddress}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
@@ -51,6 +51,9 @@ trait TestData extends Generators {
       certificatesYesNo = Some(No),
       financialOrganisation = Some(Seq(EuropeanInstitution))
     )
+
+  val testOrganisationDetails: OrganisationDetails =
+    OrganisationDetails(registeredToManageIsa = Some(true))
 
   val testCoaAnswersWithArticles: CertificatesOfAuthority =
     CertificatesOfAuthority(

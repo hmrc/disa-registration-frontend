@@ -19,14 +19,14 @@ package controllers.orgdetails
 import base.SpecBase
 import controllers.*
 import forms.RegisteredAddressCorrespondenceFormProvider
-import models.{CheckMode, NormalMode}
 import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails, RegisteredAddress}
+import models.{CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.libs.json.Writes
-import play.api.mvc.{Call, RequestHeader}
+import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.HeaderCarrier
@@ -61,7 +61,10 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, testRegisteredAddress)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, testRegisteredAddress)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -102,7 +105,10 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testRegisteredAddress)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testRegisteredAddress)(
+          request,
+          messages(application)
+        ).toString
       }
     }
   }
@@ -147,7 +153,9 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual orgdetails.routes.OrganisationTelephoneNumberController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual orgdetails.routes.OrganisationTelephoneNumberController
+          .onPageLoad(NormalMode)
+          .url
       }
     }
 
@@ -165,8 +173,12 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         correspondenceAddress = None
       )
 
-      when(mockJourneyAnswersService.update(eqTo(expectedUpdatedSection), any[String], any[String])
-        (any[Writes[OrganisationDetails]], any)).thenReturn(Future.successful(expectedUpdatedSection))
+      when(
+        mockJourneyAnswersService.update(eqTo(expectedUpdatedSection), any[String], any[String])(
+          any[Writes[OrganisationDetails]],
+          any
+        )
+      ).thenReturn(Future.successful(expectedUpdatedSection))
 
       val application = applicationBuilder(journeyData = Some(initialJourneyData)).build()
 
@@ -195,14 +207,19 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         correspondenceAddress = None
       )
 
-      when(mockJourneyAnswersService.update(eqTo(expectedUpdatedSection), any[String], any[String])
-        (any[Writes[OrganisationDetails]], any)).thenReturn(Future.successful(expectedUpdatedSection))
+      when(
+        mockJourneyAnswersService.update(eqTo(expectedUpdatedSection), any[String], any[String])(
+          any[Writes[OrganisationDetails]],
+          any
+        )
+      ).thenReturn(Future.successful(expectedUpdatedSection))
 
       val application = applicationBuilder(journeyData = Some(initialJourneyData)).build()
 
       running(application) {
-        val request = FakeRequest(POST, orgdetails.routes.RegisteredAddressCorrespondenceController.onPageLoad(CheckMode).url)
-          .withFormUrlEncodedBody("value" -> "false")
+        val request =
+          FakeRequest(POST, orgdetails.routes.RegisteredAddressCorrespondenceController.onPageLoad(CheckMode).url)
+            .withFormUrlEncodedBody("value" -> "false")
 
         val result = route(application, request).value
 
@@ -232,7 +249,10 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, testRegisteredAddress)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testRegisteredAddress)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -265,8 +285,12 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         businessVerification = Some(testBV.copy(registeredAddress = Some(testRegisteredAddress)))
       )
 
-      when(mockJourneyAnswersService.update(any[OrganisationDetails], any[String], any[String])
-        (any[Writes[OrganisationDetails]], any)).thenReturn(Future.failed(new Exception))
+      when(
+        mockJourneyAnswersService.update(any[OrganisationDetails], any[String], any[String])(
+          any[Writes[OrganisationDetails]],
+          any
+        )
+      ).thenReturn(Future.failed(new Exception))
 
       val application = applicationBuilder(journeyData = Some(initialJourneyData))
         .build()
