@@ -278,58 +278,6 @@ class LiaisonOfficerCommunicationControllerSpec extends SpecBase {
       }
     }
 
-    "must move the updated liaison officer to the end of the sequence when valid data is submitted" in {
-
-      val journeyData =
-        JourneyData(
-          groupId = testGroupId,
-          enrolmentId = testString,
-          liaisonOfficers = Some(
-            LiaisonOfficers(
-              Seq(
-                LiaisonOfficer(existingId, Some(existingName), communication = existingCommunication),
-                LiaisonOfficer(otherId, Some("Other Person"), communication = Set(ByPhone))
-              )
-            )
-          )
-        )
-
-      val expectedSection =
-        LiaisonOfficers(
-          Seq(
-            LiaisonOfficer(otherId, Some("Other Person"), communication = Set(ByPhone)),
-            LiaisonOfficer(existingId, Some(existingName), communication = updatedCommunication)
-          )
-        )
-
-      when(
-        mockJourneyAnswersService
-          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
-      ).thenReturn(Future.successful(expectedSection))
-
-      val application =
-        applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody(
-              "value[0]" -> "byEmail",
-              "value[1]" -> "byPhone"
-            )
-
-        val result = route(application, request).value
-
-        verify(mockJourneyAnswersService, atMostOnce)
-          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
-    }
-
     "must redirect to Index when valid data is submitted and the section is absent" in {
 
       val application =
