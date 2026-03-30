@@ -33,6 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 trait IdentifierAction
     extends ActionBuilder[IdentifierRequest, AnyContent]
@@ -56,7 +57,9 @@ class AuthenticatedIdentifierAction @Inject() (
       case Some(groupId) ~ Some(Organisation) ~ Some(credentials) ~ Some(role) =>
         sessionRepository
           .keepAlive(credentials.providerId)
-          .recover { case e => logger.warn(s"Failed to keep session alive for userId: [${credentials.providerId}]", e) }
+          .recover { case NonFatal(e) =>
+            logger.warn(s"Failed to keep session alive for userId: [${credentials.providerId}]", e)
+          }
           .flatMap(_ => block(IdentifierRequest(request, groupId, credentials, role)))
       case _ ~ _ ~ None ~ _ | _ ~ _ ~ _ ~ None                                 =>
         logger.warn(s"Authorisation failed due to missing credentials or credentialRole")

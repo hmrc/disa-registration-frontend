@@ -28,6 +28,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class StartController @Inject() (
   override val messagesApi: MessagesApi,
@@ -56,7 +57,7 @@ class StartController @Inject() (
         case _           =>
           genericRegistrationService.getGRSJourneyStartUrl
             .map(url => Redirect(url))
-            .recover { case ex =>
+            .recover { case NonFatal(ex) =>
               logger.error("Failed to fetch GRS journey URL", ex)
               Redirect(controllers.routes.InternalServerErrorController.onPageLoad())
             }

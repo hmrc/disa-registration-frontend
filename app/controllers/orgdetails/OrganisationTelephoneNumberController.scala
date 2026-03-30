@@ -32,6 +32,7 @@ import views.html.orgdetails.OrganisationTelephoneNumberView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class OrganisationTelephoneNumberController @Inject() (
   override val messagesApi: MessagesApi,
@@ -86,7 +87,7 @@ class OrganisationTelephoneNumberController @Inject() (
                   )
                 )
               }
-              .recoverWith { case e =>
+              .recoverWith { case NonFatal(e) =>
                 logger.warn(
                   s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
                 )

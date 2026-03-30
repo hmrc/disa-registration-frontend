@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class AuthController @Inject() (
   val controllerComponents: MessagesControllerComponents,
@@ -41,7 +42,7 @@ class AuthController @Inject() (
   def signOut(): Action[AnyContent] = identify.async { implicit request =>
     sessionRepository
       .findAndDelete(request.credentials.providerId)
-      .recover { case e =>
+      .recover { case NonFatal(e) =>
         logger.warn(s"Failed to find and clear session for userId: [${request.credentials.providerId}]", e)
         None
       }
