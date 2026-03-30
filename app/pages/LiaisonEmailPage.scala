@@ -17,11 +17,8 @@
 package pages
 
 import models.journeydata.liaisonofficers.LiaisonOfficers
-import play.api.libs.json.JsPath
 
 case object LiaisonEmailPage extends Page[LiaisonOfficers] {
-
-  override def path: JsPath = JsPath \ toString
 
   override def toString: String = "liaisonEmail"
 }

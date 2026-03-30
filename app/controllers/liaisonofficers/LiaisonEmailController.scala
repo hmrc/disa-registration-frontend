@@ -17,59 +17,108 @@
 package controllers.liaisonofficers
 
 import controllers.actions.*
+import controllers.routes.*
 import forms.LiaisonEmailFormProvider
 import handlers.ErrorHandler
 import models.Mode
+import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.LiaisonEmailPage
+import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.LiaisonEmailView
+import views.html.liaisonofficers.LiaisonEmailView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
-class LiaisonEmailController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        journeyAnswersService: JourneyAnswersService,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        errorHandler: ErrorHandler,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: LiaisonEmailFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: LiaisonEmailView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class LiaisonEmailController @Inject() (
+  override val messagesApi: MessagesApi,
+  journeyAnswersService: JourneyAnswersService,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  errorHandler: ErrorHandler,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: LiaisonEmailFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: LiaisonEmailView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      val preparedForm = for {
-        liaisonOfficers <- request.journeyData.liaisonOfficers.map(_.liaisonOfficers)
-        liaisonOfficer  <- liaisonOfficers.find(_.id == id)
-        name            <- liaisonOfficer.email
-      } yield form.fill(name)
-      
-      Ok(view(id, preparedForm, mode))
-  }
-  
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onPageLoad(id: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      findLiaisonOfficerWithDetails(id).fold {
+        Redirect(IndexController.onPageLoad())
+      } { case (liaisonOfficer, name, number) =>
+        val preparedForm = number.fold(form)(form.fill)
+        Ok(view(id, name, preparedForm, mode))
+      }
+    }
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+  def onSubmit(id: String, mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            findLiaisonOfficerWithDetails(id).fold {
+              Future.successful(Redirect(TaskListController.onPageLoad()))
+            } { case (_, name, _) =>
+              Future.successful(BadRequest(view(id, name, formWithErrors, mode)))
+            },
+          answer =>
+            updatedSectionWithEmail(id, answer).fold {
+              Future.successful(Redirect(TaskListController.onPageLoad()))
+            } { updatedSection =>
+              journeyAnswersService
+                .update(updatedSection, request.groupId, request.credentials.providerId)
+                .map { savedSection =>
+                  Redirect(
+                    navigator.nextPage(
+                      LiaisonEmailPage,
+                      savedSection,
+                      mode
+                    )
+                  )
+                }
+                .recoverWith { case NonFatal(e) =>
+                  logger.warn(
+                    s"Failed updating answers for section [${LiaisonOfficers.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                  )
+                  errorHandler.internalServerError
+                }
+            }
+        )
+    }
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(LiaisonEmailPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(LiaisonEmailPage, mode, updatedAnswers))
-      )
-  }
+  private def findLiaisonOfficer(id: String)(implicit request: DataRequest[_]): Option[LiaisonOfficer] =
+    request.journeyData.liaisonOfficers.flatMap(_.liaisonOfficers.find(_.id == id))
+
+  private def findLiaisonOfficerWithDetails(
+    id: String
+  )(implicit request: DataRequest[_]): Option[(LiaisonOfficer, String, Option[String])] =
+    findLiaisonOfficer(id).flatMap { liaisonOfficer =>
+      for {
+        name <- liaisonOfficer.fullName
+        email = liaisonOfficer.email
+      } yield (liaisonOfficer, name, email)
+    }
+
+  private def updatedSectionWithEmail(id: String, email: String)(implicit
+    request: DataRequest[_]
+  ): Option[LiaisonOfficers] =
+    request.journeyData.liaisonOfficers.flatMap { section =>
+      val (matching, others) = section.liaisonOfficers.partition(_.id == id)
+      matching.headOption.map { liaisonOfficer =>
+        section.copy(liaisonOfficers = others :+ liaisonOfficer.copy(email = Some(email)))
+      }
+    }
 }
