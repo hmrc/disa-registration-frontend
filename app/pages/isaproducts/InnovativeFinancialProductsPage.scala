@@ -17,7 +17,7 @@
 package pages.isaproducts
 
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
-import pages.{Page, PageWithDependents}
+import pages.{ClearablePage, Page, PageWithDependents}
 
 case object InnovativeFinancialProductsPage extends PageWithDependents[IsaProducts] {
 

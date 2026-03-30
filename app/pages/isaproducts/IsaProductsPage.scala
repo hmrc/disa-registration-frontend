@@ -17,7 +17,7 @@
 package pages.isaproducts
 
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
-import pages.{Page, PageWithDependents}
+import pages.{ClearablePage, Page, PageWithDependents}
 
 case object IsaProductsPage extends PageWithDependents[IsaProducts] {
   override def toString: String = "isaProducts"

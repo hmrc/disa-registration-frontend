@@ -28,17 +28,24 @@ class LiaisonOfficerNameFormProviderSpec extends StringFieldBehaviours {
 
   val form = new LiaisonOfficerNameFormProvider()()
 
-  def validNameString: Gen[String] = {
-    val validChar = Gen.oneOf(
-      ('a' to 'z') ++
-        ('A' to 'Z') ++
-        Seq(' ', '-', '\'')
+  val unicodeLetter: Gen[Char] =
+    Gen
+      .choose(Char.MinValue, Char.MaxValue)
+      .suchThat(Character.isLetter)
+
+  val validChar: Gen[Char] =
+    Gen.frequency(
+      20 -> unicodeLetter,
+      1  -> Gen.const(' '),
+      1  -> Gen.const('-'),
+      1  -> Gen.const('\''),
+      1  -> Gen.const('’')
     )
 
-    Gen.choose(1, 50).flatMap { n =>
+  val validString: Gen[String] =
+    Gen.choose(1, 35).flatMap { n =>
       Gen.listOfN(n, validChar).map(_.mkString)
     }
-  }
 
   ".value" - {
 
@@ -47,7 +54,7 @@ class LiaisonOfficerNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      validNameString
+      validString
     )
 
     behave like fieldWithPattern(
