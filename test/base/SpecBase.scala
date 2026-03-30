@@ -42,7 +42,7 @@ import services.{AuditService, GrsService, JourneyAnswersService, SubmissionServ
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.{JourneyDataBuilder, TestData}
+import utils.{JourneyDataBuilder, TestData, UuidGenerator}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -81,6 +81,7 @@ trait SpecBase
   protected val mockRequestBuilder: RequestBuilder                       = mock[RequestBuilder]
   protected val mockErrorHandler: ErrorHandler                           = mock[ErrorHandler]
   protected val mockSessionRepository: SessionRepository                 = mock[SessionRepository]
+  protected val mockUuidGenerator: UuidGenerator                         = mock[UuidGenerator]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -94,7 +95,8 @@ trait SpecBase
       mockAppConfig,
       mockRequestBuilder,
       mockGrsService,
-      mockSessionRepository
+      mockSessionRepository,
+      mockUuidGenerator
     )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))

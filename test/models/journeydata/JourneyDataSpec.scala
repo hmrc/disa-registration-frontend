@@ -21,6 +21,7 @@ import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Y
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
 import models.journeydata.certificatesofauthority.FinancialOrganisation.Bank
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
+import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
 
@@ -65,7 +66,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
           financialOrganisation = Some(Seq(Bank))
         )
       ),
-      liaisonOfficers = Some(LiaisonOfficers(Some("L"), Some("LO"))),
+      liaisonOfficers = Some(LiaisonOfficers(Seq(LiaisonOfficer(testString, Some(testString))))),
       signatories = None,
       outsourcedAdministration = Some(OutsourcedAdministration(Some("O1"), Some("O2"))),
       feesCommissionsAndIncentives = Some(FeesCommissionsAndIncentives(Some("F1"), Some("F2")))
@@ -110,8 +111,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "financialOrganisation": ["bank"]
       },
       "liaisonOfficers": {
-        "dataItem": "L",
-        "dataItem2": "LO"
+        "liaisonOfficers":[{"id":"test","fullName":"test"}]
       },
       "outsourcedAdministration": {
         "dataItem": "O1",
@@ -165,8 +165,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       "financialOrganisation": ["bank"]
     },
     "liaisonOfficers": {
-      "dataItem": "L",
-      "dataItem2": "LO"
+      "liaisonOfficers":[{"id":"test","fullName":"test"}]
     },
     "outsourcedAdministration": {
       "dataItem": "O1",

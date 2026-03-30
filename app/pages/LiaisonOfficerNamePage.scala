@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package pages.certificatesofauthority
+package pages
 
-import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import pages.PageWithoutDependents
+import models.journeydata.liaisonofficers.LiaisonOfficers
 
-case object FcaArticlesPage extends PageWithoutDependents[CertificatesOfAuthority] {
-
-  override def toString: String = "fcaArticles"
-
-  override def clearAnswer(answers: CertificatesOfAuthority): CertificatesOfAuthority =
-    answers.copy(fcaArticles = None)
-}
+case object LiaisonOfficerNamePage extends Page[LiaisonOfficers]
