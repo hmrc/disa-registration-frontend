@@ -20,7 +20,7 @@ import controllers.actions.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.AddLiaisonOfficerView
+import views.html.liaisonofficers.AddLiaisonOfficerView
 
 import javax.inject.Inject
 

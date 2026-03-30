@@ -118,6 +118,11 @@ POST       /liaison-officer-name                         controllers.liaisonoffi
 GET        /change-liaison-officer-name                  controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
 POST       /change-liaison-officer-name                  controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String, mode: Mode = CheckMode)
 
+GET        /liaison-officer-phone-number                 controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /liaison-officer-phone-number                 controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-phone-mumber          controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-liaison-officer-phone-mumber          controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onSubmit(id: String, mode: Mode = CheckMode)
+
 GET        /add-liaison-officer                          controllers.liaisonofficers.AddLiaisonOfficerController.onPageLoad()
 
 ## Signatories

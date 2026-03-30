@@ -210,6 +210,15 @@ liaisonOfficerName.hint = You must have at least 1 liaison officer to register y
 liaisonOfficerName.error.required = Enter the full name of the liaison officer you’re adding
 liaisonOfficerName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
 
+liaisonOfficerPhoneNumber.title = What is {0}’s phone number?
+liaisonOfficerPhoneNumber.heading = What is {0}’s phone number?
+liaisonOfficerPhoneNumber.p1 = This is the phone number that HMRC will use if there is a need to contact the liaison officer.
+liaisonOfficerPhoneNumber.hint = This can be either a UK mobile or landline number
+liaisonOfficerPhoneNumber.error.required = Enter the phone number of the liaison officer you’re adding. Use a UK phone number, like 01642 123 456 or 07777 777 777
+liaisonOfficerPhoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a UK phone number, like 01642 123 456 or 07777 777 777
+liaisonOfficerPhoneNumber.error.tooLong = The phone number you have entered is too long. Enter a UK phone number, like 01642 123 456 or 07777 777 777
+liaisonOfficerPhoneNumber.error.tooShort = The phone number you have entered is too short. Enter a UK phone number, like 01642 123 456 or 07777 777 777
+
 ### Certificates of Authority
 
 eligibilityToManageIsa.title = Eligibility to manage ISAs
@@ -284,7 +293,6 @@ CoaCheckYourAnswers.heading = Check your certificates of authority
 taskList.title = Task List
 taskList.heading = Task List
 
-
 ### Business Verification Lockout
 bvLockout.title = The details you’ve entered do not match our records
 bvLockout.heading = The details you’ve entered do not match our records
@@ -316,4 +324,3 @@ declarationForIsaManagers.action = I agree, submit
 ## Confirmation
 confirmation.title = confirmation dummy
 confirmation.heading = confirmation dummy
-

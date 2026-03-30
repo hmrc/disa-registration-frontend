@@ -34,6 +34,7 @@ import views.html.orgdetails.RegisteredIsaManagerView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class RegisteredIsaManagerController @Inject() (
   override val messagesApi: MessagesApi,
@@ -77,7 +78,7 @@ class RegisteredIsaManagerController @Inject() (
             .map { updatedSection =>
               Redirect(navigator.nextPage(RegisteredIsaManagerPage, updatedSection, mode))
             }
-            .recoverWith { case e =>
+            .recoverWith { case NonFatal(e) =>
               logger.warn(
                 s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
               )

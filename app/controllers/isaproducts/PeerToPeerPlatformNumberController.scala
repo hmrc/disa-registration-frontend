@@ -34,6 +34,7 @@ import views.html.isaproducts.PeerToPeerPlatformNumberView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class PeerToPeerPlatformNumberController @Inject() (
   override val messagesApi: MessagesApi,
@@ -75,7 +76,7 @@ class PeerToPeerPlatformNumberController @Inject() (
                 .map { updatedSection =>
                   Redirect(navigator.nextPage(PeerToPeerPlatformNumberPage, updatedSection, mode))
                 }
-                .recoverWith { case e =>
+                .recoverWith { case NonFatal(e) =>
                   logger.warn(
                     s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
                   )

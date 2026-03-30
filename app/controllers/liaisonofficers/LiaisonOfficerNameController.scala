@@ -30,10 +30,11 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.UuidGenerator
-import views.html.LiaisonOfficerNameView
+import views.html.liaisonofficers.LiaisonOfficerNameView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class LiaisonOfficerNameController @Inject() (
   override val messagesApi: MessagesApi,
@@ -97,7 +98,7 @@ class LiaisonOfficerNameController @Inject() (
                   )
                 )
               }
-              .recoverWith { case e =>
+              .recoverWith { case NonFatal(e) =>
                 logger.warn(
                   s"Failed updating answers for section [${LiaisonOfficers.sectionName}] for groupId [${request.groupId}] with error: [$e]"
                 )

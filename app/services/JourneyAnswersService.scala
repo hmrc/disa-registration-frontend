@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector, sessionRepository: SessionRepository)(
   implicit executionContext: ExecutionContext
@@ -43,7 +44,7 @@ class JourneyAnswersService @Inject() (connector: DisaRegistrationConnector, ses
       .flatMap { result =>
         sessionRepository
           .upsertAndMarkUpdatesInSession(userId)
-          .recover { case e => logger.warn(s"Failed to mark updates in session for userId: [$userId]", e) }
+          .recover { case NonFatal(e) => logger.warn(s"Failed to mark updates in session for userId: [$userId]", e) }
           .map(_ => result)
       }
   }
