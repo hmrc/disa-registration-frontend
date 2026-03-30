@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.liaisonofficers
 
 import controllers.actions.*
 import forms.LiaisonEmailFormProvider
 import handlers.ErrorHandler
-
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
 import pages.LiaisonEmailPage
@@ -31,6 +29,7 @@ import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.LiaisonEmailView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class LiaisonEmailController @Inject()(
@@ -48,7 +47,7 @@ class LiaisonEmailController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode, id: String): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       val preparedForm = for {
         liaisonOfficers <- request.journeyData.liaisonOfficers.map(_.liaisonOfficers)
@@ -56,7 +55,7 @@ class LiaisonEmailController @Inject()(
         name            <- liaisonOfficer.email
       } yield form.fill(name)
       
-      Ok(view(preparedForm, mode))
+      Ok(view(id, preparedForm, mode))
   }
   
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {

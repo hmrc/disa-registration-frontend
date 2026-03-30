@@ -22,7 +22,7 @@ import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
-import pages.FirmReferenceNumberPage
+import pages.organisationdetails.FirmReferenceNumberPage
 import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -34,6 +34,7 @@ import views.html.orgdetails.FirmReferenceNumberView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class FirmReferenceNumberController @Inject() (
   override val messagesApi: MessagesApi,
@@ -73,7 +74,7 @@ class FirmReferenceNumberController @Inject() (
             .map { updatedSection =>
               Redirect(navigator.nextPage(FirmReferenceNumberPage, updatedSection, mode))
             }
-            .recoverWith { case e =>
+            .recoverWith { case NonFatal(e) =>
               logger.warn(
                 s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
               )

@@ -23,7 +23,7 @@ import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import navigation.Navigator
-import pages.IsaProductsPage
+import pages.isaproducts.IsaProductsPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -34,6 +34,7 @@ import views.html.isaproducts.IsaProductsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class IsaProductsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -92,7 +93,7 @@ class IsaProductsController @Inject() (
                 )
               )
             }
-            .recoverWith { case e =>
+            .recoverWith { case NonFatal(e) =>
               logger.warn(
                 s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
               )

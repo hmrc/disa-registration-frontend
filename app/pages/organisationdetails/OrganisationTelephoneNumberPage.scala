@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.organisationdetails
 
-import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.OrganisationDetails
+import pages.PageWithoutDependents
 
-case object PeerToPeerPlatformPage extends PageWithoutDependents[IsaProducts] {
+case object OrganisationTelephoneNumberPage extends PageWithoutDependents[OrganisationDetails] {
 
-  override def toString: String = "peerToPeerPlatform"
+  override def toString: String = "organisationTelephoneNumber"
 
-  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers.copy(p2pPlatform = None)
+  def clearAnswer(answers: OrganisationDetails): OrganisationDetails =
+    answers.copy(orgTelephoneNumber = None)
 }

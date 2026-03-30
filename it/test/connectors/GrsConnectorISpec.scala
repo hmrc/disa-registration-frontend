@@ -17,6 +17,7 @@
 package connectors
 
 import models.grs.*
+import models.journeydata.RegisteredAddress
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.BaseIntegrationSpec
@@ -32,7 +33,7 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
     )
 
   val connector: GrsConnector = app.injector.instanceOf[GrsConnector]
-  
+
   "GrsConnector.fetchJourneyData" should {
 
     val testJourneyId = "testJourneyId"
@@ -47,11 +48,15 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
         |    "companyNumber": "01234567",
         |    "dateOfIncorporation": "2020-01-01",
         |    "unsanitisedCHROAddress": {
-        |      "addressLine1": "1 Test Street",
-        |      "addressLine2": "Test Area",
-        |      "locality": "Test Town",
-        |      "postalCode": "TE57 1NG",
-        |      "country": "GB"
+        |      "address_line_1":"testLine1",
+        |      "address_line_2":"test town",
+        |      "care_of":"test name",
+        |      "country":"United Kingdom",
+        |      "locality":"test city",
+        |      "po_box":"123",
+        |      "postal_code":"AA11AA",
+        |      "premises":"1",
+        |      "region":"test region"
         |    }
         |  },
         |  "identifiersMatch": true,
@@ -81,8 +86,14 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
         identifiersMatch = true,
         businessRegistrationStatus = RegisteredStatus,
         businessVerificationStatus = Some(BvPass),
-        bpSafeId = Some("X00000123456789")
-      )
+        bpSafeId = Some("X00000123456789"),
+        registeredAddress = Some(RegisteredAddress(
+          addressLine1 = Some("testLine1"),
+          addressLine2 = Some("test town"),
+          addressLine3 = Some("test city"),
+          postCode = Some("AA11AA"),
+          uprn = None
+        )))
     }
 
     "propagate exception when backend returns an error status (404)" in {

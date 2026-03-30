@@ -18,7 +18,12 @@ package models.journeydata
 
 import play.api.libs.json.{Json, OFormat}
 
-case class CorrespondenceAddress(useThisAddress: Boolean, address: Option[String])
+case class CorrespondenceAddress(
+  addressLine1: Option[String] = None,
+  addressLine2: Option[String] = None,
+  addressLine3: Option[String] = None,
+  postCode: Option[String] = None
+)
 
 object CorrespondenceAddress {
   implicit val format: OFormat[CorrespondenceAddress] = Json.format[CorrespondenceAddress]

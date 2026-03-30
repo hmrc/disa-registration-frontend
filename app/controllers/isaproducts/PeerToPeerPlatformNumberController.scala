@@ -23,7 +23,7 @@ import models.Mode
 import models.journeydata.isaproducts.IsaProducts
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.PeerToPeerPlatformNumberPage
+import pages.isaproducts.PeerToPeerPlatformNumberPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -34,6 +34,7 @@ import views.html.isaproducts.PeerToPeerPlatformNumberView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class PeerToPeerPlatformNumberController @Inject() (
   override val messagesApi: MessagesApi,
@@ -75,7 +76,7 @@ class PeerToPeerPlatformNumberController @Inject() (
                 .map { updatedSection =>
                   Redirect(navigator.nextPage(PeerToPeerPlatformNumberPage, updatedSection, mode))
                 }
-                .recoverWith { case e =>
+                .recoverWith { case NonFatal(e) =>
                   logger.warn(
                     s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
                   )

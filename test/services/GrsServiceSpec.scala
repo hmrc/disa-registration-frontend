@@ -20,6 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import connectors.GrsConnector
 import models.grs.*
+import models.journeydata.RegisteredAddress
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -70,7 +71,6 @@ class GrsServiceSpec extends SpecBase {
     }
 
     "fetchGRSJourneyData" - {
-
       val testJourneyId   = "testJourneyId"
       val testGRSResponse = GRSResponse(
         companyNumber = "01234567",
@@ -82,7 +82,15 @@ class GrsServiceSpec extends SpecBase {
         identifiersMatch = true,
         businessRegistrationStatus = RegisteredStatus,
         businessVerificationStatus = Some(BvPass),
-        bpSafeId = Some("X00000123456789")
+        bpSafeId = Some("X00000123456789"),
+        registeredAddress = Some(
+          RegisteredAddress(
+            addressLine1 = Some("address line 1"),
+            addressLine2 = Some("address line 2"),
+            addressLine3 = Some("address line 3"),
+            postCode = Some("postcode")
+          )
+        )
       )
 
       "must return GRSResponse when connector returns it successfully" in {

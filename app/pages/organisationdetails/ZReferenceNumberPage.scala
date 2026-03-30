@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package pages.organisationdetails
 
 import models.journeydata.OrganisationDetails
+import pages.PageWithoutDependents
 
-case object TradingUsingDifferentNamePage extends PageWithoutDependents[OrganisationDetails] {
+case object ZReferenceNumberPage extends PageWithoutDependents[OrganisationDetails] {
 
-  override def toString: String = "tradingUsingDifferentName"
+  override def toString: String = "zReferenceNumber"
 
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
-    sectionAnswers.copy(tradingUsingDifferentName = None)
+  def clearAnswer(answers: OrganisationDetails): OrganisationDetails = answers.copy(zRefNumber = None)
 }

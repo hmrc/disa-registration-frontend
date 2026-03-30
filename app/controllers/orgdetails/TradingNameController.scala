@@ -22,7 +22,7 @@ import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
-import pages.TradingNamePage
+import pages.organisationdetails.TradingNamePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,6 +32,7 @@ import views.html.TradingNameView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class TradingNameController @Inject() (
   override val messagesApi: MessagesApi,
@@ -77,7 +78,7 @@ class TradingNameController @Inject() (
             .map { updatedSection =>
               Redirect(navigator.nextPage(TradingNamePage, updatedSection, mode))
             }
-            .recoverWith { case e =>
+            .recoverWith { case NonFatal(e) =>
               logger.warn(
                 s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
               )

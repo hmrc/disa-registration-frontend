@@ -23,6 +23,6 @@ case object FcaArticlesPage extends PageWithoutDependents[CertificatesOfAuthorit
 
   override def toString: String = "fcaArticles"
 
-  override def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority =
-    sectionAnswers.copy(fcaArticles = None)
+  override def clearAnswer(answers: CertificatesOfAuthority): CertificatesOfAuthority =
+    answers.copy(fcaArticles = None)
 }

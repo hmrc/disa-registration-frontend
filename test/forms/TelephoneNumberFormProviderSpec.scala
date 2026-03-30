@@ -16,21 +16,22 @@
 
 package forms
 
-import forms.OrganisationTelephoneNumberFormProvider.digitsOnlyPattern
+import forms.TelephoneNumberFormProvider.digitsOnlyPattern
 import forms.behaviours.StringFieldBehaviours
 import play.api.data.FormError
 
 import scala.collection.immutable.ArraySeq
 
-class OrganisationTelephoneNumberFormProviderSpec extends StringFieldBehaviours {
+class TelephoneNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey          = "organisationTelephoneNumber.error.required"
-  val tooLongKey           = "organisationTelephoneNumber.error.tooLong"
-  val tooShortKey          = "organisationTelephoneNumber.error.tooShort"
-  val invalidKey           = "organisationTelephoneNumber.error.invalid"
+  val prefix               = "test"
+  val requiredKey          = s"$prefix.error.required"
+  val tooLongKey           = s"$prefix.error.tooLong"
+  val tooShortKey          = s"$prefix.error.tooShort"
+  val invalidKey           = s"$prefix.error.invalid"
   val maxLength, minLength = 11
 
-  val form = new OrganisationTelephoneNumberFormProvider()()
+  val form = new TelephoneNumberFormProvider()(prefix)
 
   ".value" - {
 

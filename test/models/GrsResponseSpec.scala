@@ -18,6 +18,7 @@ package models
 
 import base.SpecBase
 import models.grs.{BvPass, GRSResponse, RegisteredStatus}
+import models.journeydata.RegisteredAddress
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.libs.json.*
@@ -28,23 +29,34 @@ class GrsResponseSpec extends SpecBase {
 
   private val testGRSJsonResponse: JsValue = Json.parse(
     """
-        |{
-        |  "companyProfile": {
-        |    "companyName": "Test Company Ltd",
-        |    "companyNumber": "01234567",
-        |    "dateOfIncorporation": "2020-01-01"
-        |  },
-        |  "identifiersMatch": true,
-        |  "registration": {
-        |    "registrationStatus": "REGISTERED",
-        |    "registeredBusinessPartnerId": "X00000123456789"
-        |  },
-        |  "ctutr": "1234567890",
-        |  "businessVerification": {
-        |    "verificationStatus": "PASS"
-        |  }
-        |}
-        |""".stripMargin
+      |{
+      |  "companyProfile": {
+      |    "companyName": "Test Company Ltd",
+      |    "companyNumber": "01234567",
+      |    "dateOfIncorporation": "2020-01-01",
+      |    "unsanitisedCHROAddress": {
+      |      "address_line_1":"address line 1",
+      |      "address_line_2":"address line 2",
+      |      "care_of":"test name",
+      |      "country":"United Kingdom",
+      |      "locality":"test city",
+      |      "po_box":"123",
+      |      "postal_code":"AA11AA",
+      |      "premises":"1",
+      |      "region":"test region"
+      |    }
+      |  },
+      |  "identifiersMatch": true,
+      |  "registration": {
+      |    "registrationStatus": "REGISTERED",
+      |    "registeredBusinessPartnerId": "X00000123456789"
+      |  },
+      |  "ctutr": "1234567890",
+      |  "businessVerification": {
+      |    "verificationStatus": "PASS"
+      |  }
+      |}
+      |""".stripMargin
   )
 
   "GRSResponse Reads" - {
@@ -66,21 +78,29 @@ class GrsResponseSpec extends SpecBase {
       grsResponse.businessRegistrationStatus shouldBe RegisteredStatus
       grsResponse.businessVerificationStatus shouldBe Some(BvPass)
       grsResponse.bpSafeId                   shouldBe Some("X00000123456789")
+      grsResponse.registeredAddress          shouldBe Some(
+        RegisteredAddress(
+          addressLine1 = Some("address line 1"),
+          addressLine2 = Some("address line 2"),
+          addressLine3 = Some("test city"),
+          postCode = Some("AA11AA")
+        )
+      )
     }
 
     "successfully read when optional fields are missing" in {
       val minimalJson = Json.parse(
         """
-            |{
-            |  "companyProfile": {
-            |    "companyNumber": "01234567"
-            |  },
-            |  "identifiersMatch": false,
-            |  "registration": {
-            |    "registrationStatus": "REGISTERED"
-            |  }
-            |}
-            |""".stripMargin
+          |{
+          |  "companyProfile": {
+          |    "companyNumber": "01234567"
+          |  },
+          |  "identifiersMatch": false,
+          |  "registration": {
+          |    "registrationStatus": "REGISTERED"
+          |  }
+          |}
+          |""".stripMargin
       )
 
       val result = minimalJson.validate[GRSResponse]
@@ -101,12 +121,12 @@ class GrsResponseSpec extends SpecBase {
     "fail when mandatory fields are missing" in {
       val invalidJson = Json.parse(
         """
-            |{
-            |  "companyProfile": {
-            |    "companyName": "Test Company Ltd"
-            |  }
-            |}
-            |""".stripMargin
+          |{
+          |  "companyProfile": {
+          |    "companyName": "Test Company Ltd"
+          |  }
+          |}
+          |""".stripMargin
       )
 
       val result = invalidJson.validate[GRSResponse]
@@ -124,22 +144,35 @@ class GrsResponseSpec extends SpecBase {
         ctutr = Some("1234567890"),
         chrn = None,
         dateOfIncorporation = Some(LocalDate.of(2020, 1, 1)),
-        countryOfIncorporation = "GB",
         identifiersMatch = true,
         businessRegistrationStatus = RegisteredStatus,
         businessVerificationStatus = Some(BvPass),
-        bpSafeId = Some("X00000123456789")
+        bpSafeId = Some("X00000123456789"),
+        registeredAddress = Some(
+          RegisteredAddress(
+            addressLine1 = Some("address line 1"),
+            addressLine2 = Some("address line 2"),
+            addressLine3 = Some("address line 3"),
+            postCode = Some("postcode")
+          )
+        )
       )
 
       val json = Json.toJson(grsResponse)
 
-      (json \ "companyNumber").as[String]              shouldBe "01234567"
-      (json \ "companyName").as[String]                shouldBe "Test Company Ltd"
-      (json \ "ctutr").as[String]                      shouldBe "1234567890"
-      (json \ "identifiersMatch").as[Boolean]          shouldBe true
-      (json \ "businessRegistrationStatus").as[String] shouldBe "REGISTERED"
-      (json \ "businessVerificationStatus").as[String] shouldBe "PASS"
-      (json \ "bpSafeId").as[String]                   shouldBe "X00000123456789"
+      (json \ "companyNumber").as[String]                shouldBe "01234567"
+      (json \ "companyName").as[String]                  shouldBe "Test Company Ltd"
+      (json \ "ctutr").as[String]                        shouldBe "1234567890"
+      (json \ "identifiersMatch").as[Boolean]            shouldBe true
+      (json \ "businessRegistrationStatus").as[String]   shouldBe "REGISTERED"
+      (json \ "businessVerificationStatus").as[String]   shouldBe "PASS"
+      (json \ "bpSafeId").as[String]                     shouldBe "X00000123456789"
+      (json \ "registeredAddress").as[RegisteredAddress] shouldBe RegisteredAddress(
+        addressLine1 = Some("address line 1"),
+        addressLine2 = Some("address line 2"),
+        addressLine3 = Some("address line 3"),
+        postCode = Some("postcode")
+      )
     }
   }
 }

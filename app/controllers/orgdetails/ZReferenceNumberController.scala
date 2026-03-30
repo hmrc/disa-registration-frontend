@@ -23,6 +23,7 @@ import models.Mode
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.*
+import pages.organisationdetails.ZReferenceNumberPage
 import play.api.i18n.I18nSupport
 import play.api.i18n.Lang.logger
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,6 +33,7 @@ import views.html.orgdetails.ZReferenceNumberView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class ZReferenceNumberController @Inject() (
   val controllerComponents: MessagesControllerComponents,
@@ -74,7 +76,7 @@ class ZReferenceNumberController @Inject() (
             .map { updatedSection =>
               Redirect(navigator.nextPage(ZReferenceNumberPage, updatedSection, mode))
             }
-            .recoverWith { case e =>
+            .recoverWith { case NonFatal(e) =>
               logger.warn(
                 s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
               )

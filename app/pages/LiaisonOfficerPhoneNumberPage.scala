@@ -16,12 +16,6 @@
 
 package pages
 
-import models.journeydata.OrganisationDetails
+import models.journeydata.liaisonofficers.LiaisonOfficers
 
-case object OrganisationTelephoneNumberPage extends PageWithoutDependents[OrganisationDetails] {
-
-  override def toString: String = "organisationTelephoneNumber"
-
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
-    sectionAnswers.copy(orgTelephoneNumber = None)
-}
+case object LiaisonOfficerPhoneNumberPage extends Page[LiaisonOfficers]

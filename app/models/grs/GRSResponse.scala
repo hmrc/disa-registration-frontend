@@ -16,6 +16,7 @@
 
 package models.grs
 
+import models.journeydata.RegisteredAddress
 import play.api.libs.json.*
 
 import java.time.LocalDate
@@ -30,7 +31,8 @@ case class GRSResponse(
   identifiersMatch: Boolean,
   businessRegistrationStatus: BusinessRegistrationStatus,
   businessVerificationStatus: Option[BusinessVerificationStatus],
-  bpSafeId: Option[String]
+  bpSafeId: Option[String],
+  registeredAddress: Option[RegisteredAddress]
 )
 
 object GRSResponse {
@@ -48,8 +50,9 @@ object GRSResponse {
       (JsPath \ "registration" \ "registeredBusinessPartnerId").readNullable[String]
     ctutr                      <- (JsPath \ "ctutr").readNullable[String]
     businessVerificationStatus <-
-      (JsPath \ "businessVerification" \ "verificationStatus")
-        .readNullable[BusinessVerificationStatus]
+      (JsPath \ "businessVerification" \ "verificationStatus").readNullable[BusinessVerificationStatus]
+    registeredAddress          <-
+      (JsPath \ "companyProfile" \ "unsanitisedCHROAddress").readNullable(RegisteredAddress.grsReads)
 
   } yield GRSResponse(
     companyNumber = companyNumber,
@@ -61,6 +64,7 @@ object GRSResponse {
     identifiersMatch = identifiersMatch,
     businessRegistrationStatus = businessRegistrationStatus,
     businessVerificationStatus = businessVerificationStatus,
-    bpSafeId = bpSafeId
+    bpSafeId = bpSafeId,
+    registeredAddress = registeredAddress
   )
 }

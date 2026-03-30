@@ -19,6 +19,7 @@ package pages
 import base.SpecBase
 import models.journeydata.isaproducts.IsaProducts
 import org.scalatest.matchers.should.Matchers.shouldBe
+import pages.isaproducts.PeerToPeerPlatformNumberPage
 
 class PeerToPeerPlatformNumberPageSpec extends SpecBase {
 

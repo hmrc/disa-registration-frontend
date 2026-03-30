@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class GetOrCreateJourneyDataActionImpl @Inject() (
   journeyAnswersService: JourneyAnswersService,
@@ -46,13 +47,13 @@ class GetOrCreateJourneyDataActionImpl @Inject() (
         if (response.isNewEnrolmentJourney)
           auditService
             .auditNewEnrolmentStarted(request, response.journeyData)
-            .recover { case e =>
+            .recover { case NonFatal(e) =>
               logger.warn(s"Failed to audit EnrolmentStarted for groupId [${request.groupId}]", e)
             }
 
         Future.successful(Right(fromRequest(request, response.journeyData)))
       }
-      .recoverWith { case e: Throwable =>
+      .recoverWith { case NonFatal(e) =>
         logger.error(s"Failed to getOrCreateJourneyData for groupId: [${request.groupId}]", e)
         errorHandler.internalServerError(request).map(Left.apply)
       }

@@ -17,12 +17,12 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import forms.OrganisationTelephoneNumberFormProvider
+import forms.TelephoneNumberFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
-import pages.OrganisationTelephoneNumberPage
+import pages.organisationdetails.OrganisationTelephoneNumberPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,6 +32,7 @@ import views.html.orgdetails.OrganisationTelephoneNumberView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class OrganisationTelephoneNumberController @Inject() (
   override val messagesApi: MessagesApi,
@@ -41,7 +42,7 @@ class OrganisationTelephoneNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: OrganisationTelephoneNumberFormProvider,
+  formProvider: TelephoneNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: OrganisationTelephoneNumberView
 )(implicit ec: ExecutionContext)
@@ -49,7 +50,7 @@ class OrganisationTelephoneNumberController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form = formProvider("organisationTelephoneNumber")
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
@@ -86,7 +87,7 @@ class OrganisationTelephoneNumberController @Inject() (
                   )
                 )
               }
-              .recoverWith { case e =>
+              .recoverWith { case NonFatal(e) =>
                 logger.warn(
                   s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
                 )
