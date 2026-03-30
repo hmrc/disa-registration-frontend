@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,10 @@
 package controllers
 
 import controllers.actions.*
-import models.grs.{BvPass, GRSResponse, RegisteredStatus}
-import models.journeydata.BusinessVerification
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{GrsService, JourneyAnswersService}
+import services.GrsOrchestrationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -32,8 +30,7 @@ class GrsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  journeyAnswersService: JourneyAnswersService,
-  grsService: GrsService,
+  grsOrchestrationService: GrsOrchestrationService,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -42,11 +39,14 @@ class GrsController @Inject() (
 
   def grsCallback(journeyId: String): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
-      grsService.fetchGRSJourneyData(journeyId).flatMap { grsResponse =>
-        val businessVerification =
-          buildBusinessVerification(grsResponse, request.journeyData.flatMap(_.businessVerification))
-
-        journeyAnswersService.update(businessVerification, request.groupId, request.credentials.providerId).map { _ =>
+      grsOrchestrationService
+        .processGrsJourney(
+          journeyId,
+          request.journeyData.flatMap(_.businessVerification),
+          request.groupId,
+          request.credentials.providerId
+        )
+        .map { businessVerification =>
           Redirect(
             (businessVerification.businessRegistrationPassed, businessVerification.businessVerificationPassed) match {
               case (Some(true), Some(true)) => routes.TaskListController.onPageLoad()
@@ -55,38 +55,5 @@ class GrsController @Inject() (
             }
           ).withSession(request.session)
         }
-      }
     }
-
-  private def buildBusinessVerification(
-    grs: GRSResponse,
-    existing: Option[BusinessVerification]
-  ): BusinessVerification = {
-    val verificationPassed: Option[Boolean] =
-      grs.businessVerificationStatus.map {
-        case BvPass => true
-        case _      => false
-      }
-
-    val registrationPassed: Option[Boolean] =
-      Some(grs.businessRegistrationStatus == RegisteredStatus)
-
-    existing
-      .map(ev =>
-        ev.copy(
-          businessVerificationPassed = verificationPassed,
-          businessRegistrationPassed = registrationPassed,
-          ctUtr = grs.ctutr,
-          registeredAddress = grs.registeredAddress
-        )
-      )
-      .getOrElse(
-        BusinessVerification(
-          businessVerificationPassed = verificationPassed,
-          businessRegistrationPassed = registrationPassed,
-          ctUtr = grs.ctutr,
-          registeredAddress = grs.registeredAddress
-        )
-      )
-  }
 }

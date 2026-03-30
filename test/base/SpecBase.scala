@@ -17,7 +17,7 @@
 package base
 
 import config.FrontendAppConfig
-import connectors.DisaRegistrationConnector
+import connectors.{AddressLookupConnector, DisaRegistrationConnector}
 import controllers.actions.*
 import handlers.ErrorHandler
 import models.journeydata.JourneyData
@@ -38,7 +38,7 @@ import play.api.mvc.Results.{BadRequest, InternalServerError}
 import play.api.test.FakeRequest
 import play.api.{Application, inject}
 import repositories.SessionRepository
-import services.{AuditService, GrsService, JourneyAnswersService, SubmissionService}
+import services.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -47,7 +47,7 @@ import utils.{JourneyDataBuilder, TestData}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SpecBase
-    extends AnyFreeSpec
+  extends AnyFreeSpec
     with Matchers
     with TryValues
     with OptionValues
@@ -67,20 +67,23 @@ trait SpecBase
   def messages(key: String)(implicit app: Application): String = messages(app).messages(key)
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  implicit val hc: HeaderCarrier    = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   // Mocks
-  protected val mockAuditConnector: AuditConnector                       = mock[AuditConnector]
+  protected val mockAuditConnector: AuditConnector = mock[AuditConnector]
   protected val mockDisaRegistrationConnector: DisaRegistrationConnector = mock[DisaRegistrationConnector]
-  protected val mockJourneyAnswersService: JourneyAnswersService         = mock[JourneyAnswersService]
-  protected val mockSubmissionService: SubmissionService                 = mock[SubmissionService]
-  protected val mockGrsService: GrsService                               = mock[GrsService]
-  protected val mockAuditService: AuditService                           = mock[AuditService]
-  protected val mockHttpClient: HttpClientV2                             = mock[HttpClientV2]
-  protected val mockAppConfig: FrontendAppConfig                         = mock[FrontendAppConfig]
-  protected val mockRequestBuilder: RequestBuilder                       = mock[RequestBuilder]
-  protected val mockErrorHandler: ErrorHandler                           = mock[ErrorHandler]
-  protected val mockSessionRepository: SessionRepository                 = mock[SessionRepository]
+  protected val mockJourneyAnswersService: JourneyAnswersService = mock[JourneyAnswersService]
+  protected val mockSubmissionService: SubmissionService = mock[SubmissionService]
+  protected val mockGrsService: GrsService = mock[GrsService]
+  protected val mockAuditService: AuditService = mock[AuditService]
+  protected val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
+  protected val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
+  protected val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
+  protected val mockErrorHandler: ErrorHandler = mock[ErrorHandler]
+  protected val mockSessionRepository: SessionRepository = mock[SessionRepository]
+  protected val mockAddressLookupService: AddressLookupService = mock[AddressLookupService]
+  protected val mockAddressLookupConnector: AddressLookupConnector = mock[AddressLookupConnector]
+  protected val mockGrsOrchestrationService: GrsOrchestrationService = mock[GrsOrchestrationService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -94,16 +97,19 @@ trait SpecBase
       mockAppConfig,
       mockRequestBuilder,
       mockGrsService,
-      mockSessionRepository
+      mockSessionRepository,
+      mockAddressLookupService,
+      mockAddressLookupConnector,
+      mockGrsOrchestrationService
     )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))
   }
 
   protected def applicationBuilder(
-    journeyData: Option[JourneyData],
-    overrides: GuiceableModule*
-  ): GuiceApplicationBuilder =
+                                    journeyData: Option[JourneyData],
+                                    overrides: GuiceableModule*
+                                  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         inject.bind[DataRequiredAction].to[DataRequiredActionImpl],
@@ -117,7 +123,9 @@ trait SpecBase
           .toInstance(new FakeAuditContinuationAction(journeyData.getOrElse(emptyJourneyData))),
         inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
         inject.bind[GrsService].toInstance(mockGrsService),
-        inject.bind[ErrorHandler].toInstance(mockErrorHandler)
+        inject.bind[ErrorHandler].toInstance(mockErrorHandler),
+        inject.bind[GrsOrchestrationService].toInstance(mockGrsOrchestrationService),
+        inject.bind[AddressLookupService].toInstance(mockAddressLookupService)
       )
       .overrides(overrides: _*)
 
