@@ -24,14 +24,13 @@ import models.Mode
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.LiaisonEmailPage
+import pages.LiaisonOfficerEmailPage
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.liaisonofficers.LiaisonOfficerEmailView
-
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -57,8 +56,8 @@ class LiaisonOfficerEmailController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       findLiaisonOfficerWithDetails(id).fold {
         Redirect(IndexController.onPageLoad())
-      } { case (liaisonOfficer, name, number) =>
-        val preparedForm = number.fold(form)(form.fill)
+      } { case (liaisonOfficer, name, email) =>
+        val preparedForm = email.fold(form)(form.fill)
         Ok(view(id, name, preparedForm, mode))
       }
     }
@@ -83,7 +82,7 @@ class LiaisonOfficerEmailController @Inject() (
                 .map { savedSection =>
                   Redirect(
                     navigator.nextPage(
-                      LiaisonEmailPage,
+                      LiaisonOfficerEmailPage,
                       savedSection,
                       mode
                     )

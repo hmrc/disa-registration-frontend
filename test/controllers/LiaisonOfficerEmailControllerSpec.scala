@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import controllers.liaisonofficers.routes.LiaisonOfficerEmailController
 import controllers.routes.IndexController
-import forms.TelephoneNumberFormProvider
+import forms.LiaisonOfficerEmailFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.{CheckMode, NormalMode}
@@ -40,17 +40,17 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  private val existingId   = "existing-id-123"
-  private val otherId      = "other-id-123"
-  private val existingName = "Jane Smith"
-  private val existingEmail    = "existing.email@email.com"
-  private val newEmail    = "new.email@email.com"
+  private val existingId    = "existing-id-123"
+  private val otherId       = "other-id-123"
+  private val existingName  = "Jane Smith"
+  private val existingEmail = "existing.email@email.com"
+  private val newEmail      = "new.email@email.com"
 
   lazy val routeUrl: String  = LiaisonOfficerEmailController.onPageLoad(existingId, NormalMode).url
   lazy val submitUrl: String = LiaisonOfficerEmailController.onSubmit(existingId, NormalMode).url
 
-  val formProvider: TelephoneNumberFormProvider = new TelephoneNumberFormProvider()
-  val form: Form[String]                        = formProvider("liaisonOfficerEmail")
+  val formProvider: LiaisonOfficerEmailFormProvider = new LiaisonOfficerEmailFormProvider()
+  val form: Form[String]                            = formProvider()
 
   "LiaisonOfficerEmailController" - {
 

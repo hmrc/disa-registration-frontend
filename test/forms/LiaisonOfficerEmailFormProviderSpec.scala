@@ -31,20 +31,30 @@ class LiaisonOfficerEmailFormProviderSpec extends StringFieldBehaviours {
 
   private val localPartGen: Gen[String] =
     Gen.choose(1, 20).flatMap { n =>
-      Gen.listOfN(n, Gen.oneOf(
-        Gen.alphaNumChar,
-        Gen.const('-'),
-        Gen.const('.')
-      )).map(_.mkString)
+      Gen
+        .listOfN(
+          n,
+          Gen.oneOf(
+            Gen.alphaNumChar,
+            Gen.const('-'),
+            Gen.const('.')
+          )
+        )
+        .map(_.mkString)
     }
 
   private val domainPartGen: Gen[String] =
     Gen.choose(1, 20).flatMap { n =>
-      Gen.listOfN(n, Gen.oneOf(
-        Gen.alphaNumChar,
-        Gen.const('-'),
-        Gen.const('.')
-      )).map(_.mkString)
+      Gen
+        .listOfN(
+          n,
+          Gen.oneOf(
+            Gen.alphaNumChar,
+            Gen.const('-'),
+            Gen.const('.')
+          )
+        )
+        .map(_.mkString)
     }
 
   private val tldGen: Gen[String] =
