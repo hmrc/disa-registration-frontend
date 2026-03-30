@@ -32,7 +32,7 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import utils.UuidGenerator
-import views.html.LiaisonOfficerNameView
+import views.html.liaisonofficers.LiaisonOfficerNameView
 
 import scala.concurrent.Future
 

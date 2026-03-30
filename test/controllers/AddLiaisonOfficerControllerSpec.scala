@@ -26,7 +26,7 @@ import play.api.mvc.BodyParsers
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.AffinityGroup
-import views.html.AddLiaisonOfficerView
+import views.html.liaisonofficers.AddLiaisonOfficerView
 
 import scala.concurrent.{ExecutionContext, Future}
 

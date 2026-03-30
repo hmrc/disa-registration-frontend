@@ -17,7 +17,7 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import forms.OrganisationTelephoneNumberFormProvider
+import forms.TelephoneNumberFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.OrganisationDetails
@@ -41,7 +41,7 @@ class OrganisationTelephoneNumberController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: OrganisationTelephoneNumberFormProvider,
+  formProvider: TelephoneNumberFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: OrganisationTelephoneNumberView
 )(implicit ec: ExecutionContext)
@@ -49,7 +49,7 @@ class OrganisationTelephoneNumberController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form = formProvider("organisationTelephoneNumber")
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 

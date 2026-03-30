@@ -30,7 +30,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.UuidGenerator
-import views.html.LiaisonOfficerNameView
+import views.html.liaisonofficers.LiaisonOfficerNameView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

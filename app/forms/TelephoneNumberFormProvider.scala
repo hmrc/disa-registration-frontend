@@ -16,25 +16,25 @@
 
 package forms
 
-import forms.OrganisationTelephoneNumberFormProvider.{digitsOnlyPattern, whitespacePattern}
+import forms.TelephoneNumberFormProvider.{digitsOnlyPattern, whitespacePattern}
 
 import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 
-class OrganisationTelephoneNumberFormProvider @Inject() extends Mappings {
+class TelephoneNumberFormProvider @Inject() () extends Mappings {
 
-  def apply(): Form[String] =
+  def apply(keyPrefix: String): Form[String] =
     Form(
-      "value" -> text("organisationTelephoneNumber.error.required")
+      "value" -> text(s"$keyPrefix.error.required")
         .transform(formToModel => formToModel.replaceAll(whitespacePattern, ""), identity: String => String)
-        .verifying(regexp(digitsOnlyPattern, "organisationTelephoneNumber.error.invalid"))
-        .verifying(minLength(11, "organisationTelephoneNumber.error.tooShort"))
-        .verifying(maxLength(11, "organisationTelephoneNumber.error.tooLong"))
+        .verifying(regexp(digitsOnlyPattern, s"$keyPrefix.error.invalid"))
+        .verifying(minLength(11, s"$keyPrefix.error.tooShort"))
+        .verifying(maxLength(11, s"$keyPrefix.error.tooLong"))
     )
 }
 
-object OrganisationTelephoneNumberFormProvider {
+object TelephoneNumberFormProvider {
   private[forms] val whitespacePattern = "\\s+"
   private[forms] val digitsOnlyPattern = "^\\d+$"
 }
