@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.organisationdetails
 
-import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.OrganisationDetails
+import pages.PageWithoutDependents
 
-case object PeerToPeerPlatformNumberPage extends PageWithoutDependents[IsaProducts] {
+object RegisteredIsaManagerPage extends PageWithoutDependents[OrganisationDetails] {
 
-  override def toString: String = "peerToPeerPlatformNumber"
+  override def toString: String = "registeredIsaManager"
 
-  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers.copy(p2pPlatformNumber = None)
+  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
+    sectionAnswers.copy(registeredToManageIsa = None)
 }

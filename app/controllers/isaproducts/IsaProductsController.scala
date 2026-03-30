@@ -23,7 +23,7 @@ import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import navigation.Navigator
-import pages.IsaProductsPage
+import pages.isaproducts.IsaProductsPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

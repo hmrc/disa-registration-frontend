@@ -21,6 +21,7 @@ import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoans
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.IsaProducts
 import org.scalatest.matchers.should.Matchers.shouldBe
+import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 
 class IsaProductsPageSpec extends SpecBase {
 

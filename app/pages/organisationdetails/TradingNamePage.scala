@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package pages.organisationdetails
 
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.OrganisationDetails
+import pages.PageWithoutDependents
 
-case class CorrespondenceAddress(
-  addressLine1: Option[String] = None,
-  addressLine2: Option[String] = None,
-  addressLine3: Option[String] = None,
-  postCode: Option[String] = None
-)
+case object TradingNamePage extends PageWithoutDependents[OrganisationDetails] {
 
-object CorrespondenceAddress {
-  implicit val format: OFormat[CorrespondenceAddress] = Json.format[CorrespondenceAddress]
+  override def toString: String = "tradingName"
+
+  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(tradingName = None)
 }

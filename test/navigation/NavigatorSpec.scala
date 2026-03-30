@@ -19,6 +19,7 @@ package navigation
 import base.SpecBase
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
+import controllers.orgdetails.routes.*
 import controllers.routes.IndexController
 import models.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
@@ -31,6 +32,8 @@ import org.mockito.Mockito.{spy, verify, when}
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
+import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
+import pages.organisationdetails.RegisteredAddressCorrespondencePage
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -212,6 +215,32 @@ class NavigatorSpec extends SpecBase {
       result shouldBe CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode)
     }
 
+    "route RegisteredAddressCorrespondencePage to OrganisationTelephoneNumberController if yes submitted" in {
+      val result: Call = navigator.normalRoutes(
+        RegisteredAddressCorrespondencePage,
+        testOrganisationDetails.copy(registeredAddressCorrespondence = Some(true))
+      )
+      result shouldBe OrganisationTelephoneNumberController.onPageLoad(NormalMode)
+    }
+
+    "route RegisteredAddressCorrespondencePage to Address Lookup page if no submitted" in {
+      val result: Call =
+        navigator.normalRoutes(
+          RegisteredAddressCorrespondencePage,
+          testOrganisationDetails.copy(registeredAddressCorrespondence = Some(false))
+        )
+      result shouldBe IndexController.onPageLoad()
+    }
+
+    "route to RegisteredAddressCorrespondencePage if no answer is present for registeredAddressCorrespondence" in {
+      val result: Call =
+        navigator.normalRoutes(
+          RegisteredAddressCorrespondencePage,
+          testOrganisationDetails.copy(registeredAddressCorrespondence = None)
+        )
+      result shouldBe IndexController.onPageLoad()
+    }
+
     "route FcaArticlesPage to ISA products CYA" in {
       val result: Call = navigator.normalRoutes(FcaArticlesPage, coaAnswers)
       result shouldBe CoaCheckYourAnswersController.onPageLoad()
@@ -265,6 +294,11 @@ class NavigatorSpec extends SpecBase {
     "route FinancialOrganisationPage to COA CYA" in {
       navigator.checkRouteMap(FinancialOrganisationPage) shouldBe
         CoaCheckYourAnswersController.onPageLoad()
+    }
+
+    "route RegisteredAddressCorrespondencePage to COA CYA" in {
+      navigator.checkRouteMap(RegisteredAddressCorrespondencePage) shouldBe
+        IndexController.onPageLoad()
     }
 
     "route unknown page to Index" in {

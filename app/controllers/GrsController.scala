@@ -76,14 +76,16 @@ class GrsController @Inject() (
         ev.copy(
           businessVerificationPassed = verificationPassed,
           businessRegistrationPassed = registrationPassed,
-          ctUtr = grs.ctutr
+          ctUtr = grs.ctutr,
+          registeredAddress = grs.registeredAddress
         )
       )
       .getOrElse(
         BusinessVerification(
           businessVerificationPassed = verificationPassed,
           businessRegistrationPassed = registrationPassed,
-          ctUtr = grs.ctutr
+          ctUtr = grs.ctutr,
+          registeredAddress = grs.registeredAddress
         )
       )
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,13 @@ import base.SpecBase
 import controllers.orgdetails
 import forms.RegisteredIsaManagerFormProvider
 import models.NormalMode
-import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.ArgumentMatchers.{any, argThat}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.inject.bind
-import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -43,117 +41,234 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
   val formProvider        = new RegisteredIsaManagerFormProvider()
   val form: Form[Boolean] = formProvider()
 
-  lazy val registeredIsaManagerRoute: String =
+  lazy val routePath: String =
     orgdetails.routes.RegisteredIsaManagerController.onPageLoad(NormalMode).url
 
-  "RegisteredIsaManager Controller onPageload" - {
+  "onPageLoad" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK with empty form when no existing answer" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val app = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
-      running(application) {
-        val request = FakeRequest(GET, registeredIsaManagerRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[RegisteredIsaManagerView]
+      running(app) {
+        val request = FakeRequest(GET, routePath)
+        val result  = route(app, request).value
+        val view    = app.injector.instanceOf[RegisteredIsaManagerView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+
+        contentAsString(result) mustEqual
+          view(form, NormalMode)(request, messages(app)).toString
       }
     }
 
-    "must populate the view correctly on a GET when the question has previously been answered" in {
+    "must return empty form when organisationDetails exists but answer is None" in {
 
-      val journeyData = JourneyData(
+      val jd = JourneyData(
         groupId = testGroupId,
         enrolmentId = testString,
-        organisationDetails = Some(OrganisationDetails(registeredToManageIsa = Some(true)))
+        organisationDetails = Some(
+          OrganisationDetails(registeredToManageIsa = None)
+        )
       )
 
-      val application = applicationBuilder(journeyData = Some(journeyData)).build()
+      val app = applicationBuilder(journeyData = Some(jd)).build()
 
-      running(application) {
-        val request = FakeRequest(GET, registeredIsaManagerRoute)
-
-        val view = application.injector.instanceOf[RegisteredIsaManagerView]
-
-        val result = route(application, request).value
+      running(app) {
+        val request = FakeRequest(GET, routePath)
+        val result  = route(app, request).value
+        val view    = app.injector.instanceOf[RegisteredIsaManagerView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+
+        contentAsString(result) mustEqual
+          view(form, NormalMode)(request, messages(app)).toString
+      }
+    }
+
+    "must pre-populate form when answer exists" in {
+
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        organisationDetails = Some(
+          OrganisationDetails(registeredToManageIsa = Some(true))
+        )
+      )
+
+      val app = applicationBuilder(journeyData = Some(jd)).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routePath)
+        val result  = route(app, request).value
+        val view    = app.injector.instanceOf[RegisteredIsaManagerView]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view(form.fill(true), NormalMode)(request, messages(app)).toString
       }
     }
   }
-  "RegisteredIsaManager Controller onSubmit" - {
 
-    "must redirect to the next page when valid data is submitted and stored" in {
+  "onSubmit" - {
 
-      val expectedJourneyData = OrganisationDetails(registeredToManageIsa = Some(true))
+    "must create OrganisationDetails when none exists (true)" in {
 
       when(
         mockJourneyAnswersService
-          .update(eqTo(expectedJourneyData), any[String], any[String])(any[Writes[OrganisationDetails]], any)
-      ) thenReturn Future.successful(expectedJourneyData)
+          .update(any[OrganisationDetails], any[String], any[String])(any(), any)
+      ).thenReturn(Future.successful(OrganisationDetails(Some(true))))
 
-      val application =
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        organisationDetails = None
+      )
+
+      val app =
+        applicationBuilder(journeyData = Some(jd))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routePath)
+            .withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockJourneyAnswersService).update(
+          argThat[OrganisationDetails](_.registeredToManageIsa.contains(true)),
+          any[String],
+          any[String]
+        )(any(), any())
+      }
+    }
+
+    "must create OrganisationDetails when none exists (false)" in {
+
+      when(
+        mockJourneyAnswersService
+          .update(any[OrganisationDetails], any[String], any[String])(any(), any)
+      ).thenReturn(Future.successful(OrganisationDetails(Some(false))))
+
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        organisationDetails = None
+      )
+
+      val app =
+        applicationBuilder(journeyData = Some(jd))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routePath)
+            .withFormUrlEncodedBody("value" -> "false")
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockJourneyAnswersService).update(
+          argThat[OrganisationDetails](_.registeredToManageIsa.contains(false)),
+          any[String],
+          any[String]
+        )(any(), any())
+      }
+    }
+
+    "must update existing OrganisationDetails and preserve fields" in {
+
+      val existing = OrganisationDetails(
+        registeredToManageIsa = Some(false),
+        tradingName = Some("keep-me")
+      )
+
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        organisationDetails = Some(existing)
+      )
+
+      when(
+        mockJourneyAnswersService
+          .update(any[OrganisationDetails], any[String], any[String])(any(), any)
+      ).thenReturn(Future.successful(existing.copy(registeredToManageIsa = Some(true))))
+
+      val app =
+        applicationBuilder(journeyData = Some(jd))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routePath)
+            .withFormUrlEncodedBody("value" -> "true")
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockJourneyAnswersService).update(
+          argThat[OrganisationDetails](od =>
+            od.registeredToManageIsa.contains(true) &&
+              od.tradingName.contains("keep-me")
+          ),
+          any[String],
+          any[String]
+        )(any(), any())
+      }
+    }
+
+    "must return BAD_REQUEST and render errors when invalid form submitted" in {
+
+      val app = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routePath)
+            .withFormUrlEncodedBody("value" -> "")
+
+        val boundForm = form.bind(Map("value" -> ""))
+
+        val view = app.injector.instanceOf[RegisteredIsaManagerView]
+
+        val result = route(app, request).value
+
+        status(result) mustEqual BAD_REQUEST
+
+        contentAsString(result) mustEqual
+          view(boundForm, NormalMode)(request, messages(app)).toString
+      }
+    }
+
+    "must return 500 when service fails" in {
+
+      when(
+        mockJourneyAnswersService
+          .update(any[OrganisationDetails], any[String], any[String])(any(), any)
+      ).thenReturn(Future.failed(new Exception("boom")))
+
+      val app =
         applicationBuilder(journeyData = Some(emptyJourneyData))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
-      running(application) {
+      running(app) {
         val request =
-          FakeRequest(POST, registeredIsaManagerRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+          FakeRequest(POST, routePath)
+            .withFormUrlEncodedBody("value" -> "true")
 
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
-    }
-
-    "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, registeredIsaManagerRoute)
-            .withFormUrlEncodedBody(("value", ""))
-
-        val boundForm = form.bind(Map("value" -> ""))
-
-        val view = application.injector.instanceOf[RegisteredIsaManagerView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
-      }
-    }
-
-    "must return Internal Server Error when updateJourneyAnswers returns a fail exception" in {
-
-      when(
-        mockJourneyAnswersService
-          .update(any[OrganisationDetails], any[String], any[String])(any[Writes[OrganisationDetails]], any)
-      ) thenReturn Future.failed(new Exception)
-
-      val application =
-        applicationBuilder(journeyData = None)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, registeredIsaManagerRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        await(route(application, request).value)
+        await(route(app, request).value)
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
       }

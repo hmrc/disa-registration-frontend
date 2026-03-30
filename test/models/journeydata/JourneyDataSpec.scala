@@ -17,9 +17,9 @@
 package models.journeydata
 
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import models.journeydata.certificatesofauthority.FinancialOrganisation.Bank
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Yes
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
+import models.journeydata.certificatesofauthority.FinancialOrganisation.Bank
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
@@ -34,12 +34,30 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         BusinessVerification(
           businessRegistrationPassed = Some(true),
           businessVerificationPassed = Some(true),
-          ctUtr = Some("12345678")
+          ctUtr = Some("12345678"),
+          registeredAddress = Some(
+            RegisteredAddress(
+              addressLine1 = Some("address line 1"),
+              addressLine2 = Some("address line 2"),
+              addressLine3 = Some("address line 3"),
+              postCode = Some("post code"),
+              uprn = None
+            )
+          )
         )
       ),
       isaProducts = Some(IsaProducts(Some(IsaProduct.values), Some(testString), Some(testString))),
-      organisationDetails =
-        Some(OrganisationDetails(Some(true), Some("Z1"), Some(true), Some(testString), Some(testString), None)),
+      organisationDetails = Some(
+        OrganisationDetails(
+          registeredToManageIsa = Some(true),
+          zRefNumber = Some("Z1"),
+          tradingUsingDifferentName = Some(true),
+          tradingName = Some(testString),
+          fcaNumber = Some(testString),
+          correspondenceAddress = None,
+          orgTelephoneNumber = None
+        )
+      ),
       certificatesOfAuthority = Some(
         CertificatesOfAuthority(
           certificatesYesNo = Some(Yes),
@@ -56,9 +74,18 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
   override val expectedJsonFromWrites: JsValue = Json.parse(s"""
     {
       "groupId": "$testGroupId",
-      "enrolmentId":"2b2825af-d5a6-4518-a6cb-67ddb4e66952",
-      "businessVerification": { "businessRegistrationPassed": true, "businessVerificationPassed": true, "ctUtr": "12345678"},
       "enrolmentId": "$testEnrolmentId",
+      "businessVerification": {
+        "businessRegistrationPassed": true,
+        "businessVerificationPassed": true,
+        "ctUtr": "12345678",
+        "registeredAddress": {
+          "addressLine1": "address line 1",
+          "addressLine2": "address line 2",
+          "addressLine3": "address line 3",
+          "postCode": "post code"
+        }
+      },
       "organisationDetails": {
         "registeredToManageIsa": true,
         "zRefNumber": "Z1",
@@ -67,42 +94,91 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "fcaNumber": "test"
       },
       "isaProducts": {
-        "isaProducts" : ["cashIsas","cashJuniorIsas","stocksAndSharesIsas","stocksAndSharesJuniorIsas","innovativeFinanceIsas"],
+        "isaProducts": [
+          "cashIsas",
+          "cashJuniorIsas",
+          "stocksAndSharesIsas",
+          "stocksAndSharesJuniorIsas",
+          "innovativeFinanceIsas"
+        ],
         "p2pPlatform": "test",
         "p2pPlatformNumber": "test"
       },
-      "certificatesOfAuthority": {  "certificatesYesNo":"yes", "fcaArticles": ["article14"], "financialOrganisation": ["bank"]},
-      "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
-      "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
-      "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" }
+      "certificatesOfAuthority": {
+        "certificatesYesNo": "yes",
+        "fcaArticles": ["article14"],
+        "financialOrganisation": ["bank"]
+      },
+      "liaisonOfficers": {
+        "dataItem": "L",
+        "dataItem2": "LO"
+      },
+      "outsourcedAdministration": {
+        "dataItem": "O1",
+        "dataItem2": "O2"
+      },
+      "feesCommissionsAndIncentives": {
+        "dataItem": "F1",
+        "dataItem2": "F2"
+      }
     }
   """)
 
   override val incomingJsonToRead: JsValue = Json.parse(s"""
-      {
-        "groupId": "$testGroupId",
-        "businessVerification": { "businessRegistrationPassed": true, "businessVerificationPassed": true, "ctUtr": "12345678"},
-        "enrolmentId": "$testEnrolmentId",
-        "status": "Active",
-        "organisationDetails": {
-          "registeredToManageIsa": true,
-          "zRefNumber": "Z1",
-          "tradingUsingDifferentName": true,
-          "tradingName": "test",
-          "fcaNumber": "test"
-        },
-        "isaProducts": {
-          "isaProducts" : ["cashIsas","cashJuniorIsas","stocksAndSharesIsas","stocksAndSharesJuniorIsas","innovativeFinanceIsas"],
-          "p2pPlatform": "test",
-          "p2pPlatformNumber": "test"
-        },
-        "certificatesOfAuthority": {"certificatesYesNo":"yes", "fcaArticles": ["article14"], "financialOrganisation": ["bank"]},
-        "liaisonOfficers": { "dataItem": "L", "dataItem2": "LO" },
-        "outsourcedAdministration": { "dataItem": "O1", "dataItem2": "O2" },
-        "feesCommissionsAndIncentives": { "dataItem": "F1", "dataItem2": "F2" },
-        "lastUpdated": "2025-10-21T10:00:00Z"
+  {
+    "groupId": "$testGroupId",
+    "businessVerification": {
+      "businessRegistrationPassed": true,
+      "businessVerificationPassed": true,
+      "ctUtr": "12345678",
+      "registeredAddress": {
+        "addressLine1": "address line 1",
+        "addressLine2": "address line 2",
+        "addressLine3": "address line 3",
+        "postCode": "post code",
+        "uprn": null
       }
-    """)
+    },
+    "enrolmentId": "$testEnrolmentId",
+    "status": "Active",
+    "organisationDetails": {
+      "registeredToManageIsa": true,
+      "zRefNumber": "Z1",
+      "tradingUsingDifferentName": true,
+      "tradingName": "test",
+      "fcaNumber": "test"
+    },
+    "isaProducts": {
+      "isaProducts": [
+        "cashIsas",
+        "cashJuniorIsas",
+        "stocksAndSharesIsas",
+        "stocksAndSharesJuniorIsas",
+        "innovativeFinanceIsas"
+      ],
+      "p2pPlatform": "test",
+      "p2pPlatformNumber": "test"
+    },
+    "certificatesOfAuthority": {
+      "certificatesYesNo": "yes",
+      "fcaArticles": ["article14"],
+      "financialOrganisation": ["bank"]
+    },
+    "liaisonOfficers": {
+      "dataItem": "L",
+      "dataItem2": "LO"
+    },
+    "outsourcedAdministration": {
+      "dataItem": "O1",
+      "dataItem2": "O2"
+    },
+    "feesCommissionsAndIncentives": {
+      "dataItem": "F1",
+      "dataItem2": "F2"
+    },
+    "lastUpdated": "2025-10-21T10:00:00Z"
+  }
+  """)
 
   override implicit val format: Format[JourneyData] = JourneyData.format
 }

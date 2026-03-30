@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,24 @@
 
 package models.journeydata
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.*
 
-case class CorrespondenceAddress(
+case class RegisteredAddress(
   addressLine1: Option[String] = None,
   addressLine2: Option[String] = None,
   addressLine3: Option[String] = None,
-  postCode: Option[String] = None
+  postCode: Option[String] = None,
+  uprn: Option[String] = None
 )
 
-object CorrespondenceAddress {
-  implicit val format: OFormat[CorrespondenceAddress] = Json.format[CorrespondenceAddress]
+object RegisteredAddress {
+
+  val grsReads: Reads[RegisteredAddress] = for {
+    addressLine1 <- (JsPath \ "address_line_1").readNullable[String]
+    addressLine2 <- (JsPath \ "address_line_2").readNullable[String]
+    addressLine3 <- (JsPath \ "locality").readNullable[String]
+    postCode     <- (JsPath \ "postal_code").readNullable[String]
+  } yield RegisteredAddress(addressLine1, addressLine2, addressLine3, postCode)
+
+  implicit val format: OFormat[RegisteredAddress] = Json.format[RegisteredAddress]
 }

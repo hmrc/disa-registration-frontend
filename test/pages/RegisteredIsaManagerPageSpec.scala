@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import pages.organisationdetails.RegisteredIsaManagerPage
 
 class RegisteredIsaManagerPageSpec extends SpecBase {
 

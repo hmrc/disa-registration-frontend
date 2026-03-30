@@ -17,13 +17,12 @@
 package controllers.certificatesofauthority
 
 import base.SpecBase
-import controllers.certificatesofauthority.routes
 import forms.FcaArticlesFormProvider
 import models.journeydata.JourneyData
+import models.journeydata.certificatesofauthority.FcaArticles.{Article14, Article21}
 import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, FcaArticles}
 import models.journeydata.isaproducts.IsaProducts
 import models.{CheckMode, NormalMode}
-import models.journeydata.certificatesofauthority.FcaArticles.{Article14, Article21}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import org.scalatestplus.mockito.MockitoSugar

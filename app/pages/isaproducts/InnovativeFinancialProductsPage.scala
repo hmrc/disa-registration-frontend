@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package pages
+package pages.isaproducts
 
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
+import pages.{Page, PageWithDependents}
 
 case object InnovativeFinancialProductsPage extends PageWithDependents[IsaProducts] {
 

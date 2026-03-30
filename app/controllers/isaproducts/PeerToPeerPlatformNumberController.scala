@@ -23,7 +23,7 @@ import models.Mode
 import models.journeydata.isaproducts.IsaProducts
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.PeerToPeerPlatformNumberPage
+import pages.isaproducts.PeerToPeerPlatformNumberPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

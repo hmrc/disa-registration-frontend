@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package pages.organisationdetails
 
 import models.journeydata.OrganisationDetails
+import pages.PageWithoutDependents
 
-case object OrganisationTelephoneNumberPage extends PageWithoutDependents[OrganisationDetails] {
+case object ZReferenceNumberPage extends PageWithoutDependents[OrganisationDetails] {
 
-  override def toString: String = "organisationTelephoneNumber"
+  override def toString: String = "zReferenceNumber"
 
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
-    sectionAnswers.copy(orgTelephoneNumber = None)
+  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(zRefNumber = None)
 }
