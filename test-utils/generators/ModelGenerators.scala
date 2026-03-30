@@ -18,9 +18,15 @@ package generators
 
 import models.journeydata.certificatesofauthority.{FcaArticles, FinancialOrganisation}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct}
+import models.journeydata.liaisonofficers.LiaisonOfficerCommunication
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {}
+
+implicit lazy val arbitraryLiaisonOfficerCommunication: Arbitrary[LiaisonOfficerCommunication] =
+  Arbitrary {
+    Gen.oneOf(LiaisonOfficerCommunication.values)
+  }
 
 implicit lazy val arbitraryFcaArticles: Arbitrary[FcaArticles] =
   Arbitrary {
