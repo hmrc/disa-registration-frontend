@@ -15,7 +15,8 @@
  *@
 
 @import viewmodels.InputWidth._
-@import controllers.liaisonofficers.routes.LiaisonEmailController
+@import controllers.liaisonofficers.routes.LiaisonOfficerEmailController
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 
 @this(
     layout: templates.Layout,
@@ -27,9 +28,9 @@
 
 @(id: String, name: String, form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("liaisonEmail.title"))) {
+@layout(pageTitle = title(form, messages("liaisonOfficerEmail.title", name), Some(messages("sectionTitle.liaisonOfficers")))) {
 
-    @formHelper(action = LiaisonEmailController.onSubmit(id, mode)) {
+    @formHelper(action = LiaisonOfficerEmailController.onSubmit(id, mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -38,10 +39,12 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("liaisonEmail.heading")).asPageHeading()
+                label = LabelViewModel(messages("liaisonOfficerEmail.heading", name)).asPageHeading()
             )
-            .withHint(Hint(content = Text(messages("liaisonEmail.hint"))))
+            .withHint(Hint(content = Text(messages("liaisonOfficerEmail.hint"))))
             .withWidth(Full)
+            .withHeadingAndSectionCaption(Text(messages("liaisonOfficerEmail.heading", name)), Text(messages("sectionTitle.liaisonOfficers")))
+
         )
 
         @govukButton(

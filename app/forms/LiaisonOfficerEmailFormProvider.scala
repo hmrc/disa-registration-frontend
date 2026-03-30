@@ -21,13 +21,13 @@ import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 
-class LiaisonEmailFormProvider @Inject() extends Mappings {
+class LiaisonOfficerEmailFormProvider @Inject() extends Mappings {
 
   private val emailRegex = """^[a-zA-Z0-9-.]+@[a-zA-Z0-9-.]+\.[a-zA-Z]{2,}$"""
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("liaisonEmail.error.required")
-        .verifying(regexp(emailRegex, "liaisonEmail.error.invalid"))
+      "value" -> text("liaisonOfficerEmail.error.required")
+        .verifying(regexp(emailRegex, "liaisonOfficerEmail.error.invalid"))
     )
 }

@@ -21,8 +21,8 @@ import play.api.libs.json.{Json, OFormat}
 case class LiaisonOfficer(
   id: String,
   fullName: Option[String] = None,
-  email: Option[String] = None,
-  phoneNumber: Option[String] = None
+  phoneNumber: Option[String] = None,
+  email: Option[String] = None
 )
 
 object LiaisonOfficer {

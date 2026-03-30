@@ -18,7 +18,7 @@ package controllers.liaisonofficers
 
 import controllers.actions.*
 import controllers.routes.*
-import forms.LiaisonEmailFormProvider
+import forms.LiaisonOfficerEmailFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
@@ -30,13 +30,13 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.liaisonofficers.LiaisonEmailView
+import views.html.liaisonofficers.LiaisonOfficerEmailView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class LiaisonEmailController @Inject() (
+class LiaisonOfficerEmailController @Inject() (
   override val messagesApi: MessagesApi,
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
@@ -44,9 +44,9 @@ class LiaisonEmailController @Inject() (
   errorHandler: ErrorHandler,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: LiaisonEmailFormProvider,
+  formProvider: LiaisonOfficerEmailFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: LiaisonEmailView
+  view: LiaisonOfficerEmailView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -70,13 +70,13 @@ class LiaisonEmailController @Inject() (
         .fold(
           formWithErrors =>
             findLiaisonOfficerWithDetails(id).fold {
-              Future.successful(Redirect(TaskListController.onPageLoad()))
+              Future.successful(Redirect(IndexController.onPageLoad()))
             } { case (_, name, _) =>
               Future.successful(BadRequest(view(id, name, formWithErrors, mode)))
             },
           answer =>
             updatedSectionWithEmail(id, answer).fold {
-              Future.successful(Redirect(TaskListController.onPageLoad()))
+              Future.successful(Redirect(IndexController.onPageLoad()))
             } { updatedSection =>
               journeyAnswersService
                 .update(updatedSection, request.groupId, request.credentials.providerId)
