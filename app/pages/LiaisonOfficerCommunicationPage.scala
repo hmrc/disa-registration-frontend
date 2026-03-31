@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package models.journeydata.liaisonofficers
+package pages
 
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.liaisonofficers.LiaisonOfficers
 
-case class LiaisonOfficer(
-  id: String,
-  fullName: Option[String] = None,
-  phoneNumber: Option[String] = None,
-  communication: Set[LiaisonOfficerCommunication] = Set.empty[LiaisonOfficerCommunication]
-)
-
-object LiaisonOfficer {
-  implicit val format: OFormat[LiaisonOfficer] = Json.format[LiaisonOfficer]
-}
+case object LiaisonOfficerCommunicationPage extends Page[LiaisonOfficers]

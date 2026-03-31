@@ -44,7 +44,7 @@ class LiaisonOfficerNameFormProviderSpec extends StringFieldBehaviours {
 
   val validString: Gen[String] =
     Gen.choose(1, 35).flatMap { n =>
-      Gen.listOfN(n, validChar).map(_.mkString)
+      Gen.listOfN(n, validChar).map(_.mkString).suchThat(_.trim.nonEmpty)
     }
 
   ".value" - {
