@@ -39,11 +39,10 @@
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("liaisonOfficerEmail.heading", name)).asPageHeading()
+                label = HmrcPageHeadingLabel.apply(Text(messages("liaisonOfficerEmail.heading", name)), HmrcSectionCaption(messages("sectionTitle.liaisonOfficers")), "govuk-label--l"),
             )
             .withHint(Hint(content = Text(messages("liaisonOfficerEmail.hint"))))
             .withWidth(Full)
-            .withHeadingAndSectionCaption(Text(messages("liaisonOfficerEmail.heading", name)), Text(messages("sectionTitle.liaisonOfficers")))
 
         )
 
