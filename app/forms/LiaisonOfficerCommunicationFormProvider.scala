@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package models.journeydata.liaisonofficers
+package forms
 
-import play.api.libs.json.{Json, OFormat}
+import forms.mappings.Mappings
+import models.journeydata.liaisonofficers.LiaisonOfficerCommunication
+import play.api.data.Form
+import play.api.data.Forms.set
 
-case class LiaisonOfficer(
-  id: String,
-  fullName: Option[String] = None,
-  phoneNumber: Option[String] = None,
-  communication: Set[LiaisonOfficerCommunication] = Set.empty[LiaisonOfficerCommunication],
-  email: Option[String] = None
-)
+import javax.inject.Inject
 
-object LiaisonOfficer {
-  implicit val format: OFormat[LiaisonOfficer] = Json.format[LiaisonOfficer]
+class LiaisonOfficerCommunicationFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[Set[LiaisonOfficerCommunication]] =
+    Form(
+      "value" -> set(enumerable[LiaisonOfficerCommunication]("liaisonOfficerCommunication.error.required"))
+        .verifying(nonEmptySet("liaisonOfficerCommunication.error.required"))
+    )
 }

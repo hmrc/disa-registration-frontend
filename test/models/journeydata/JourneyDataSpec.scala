@@ -21,6 +21,7 @@ import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Y
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
 import models.journeydata.certificatesofauthority.FinancialOrganisation.Bank
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
+import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.ByEmail
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
@@ -44,7 +45,8 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
               postCode = Some("post code"),
               uprn = None
             )
-          )
+          ),
+          companyName = Some(testString)
         )
       ),
       isaProducts = Some(IsaProducts(Some(IsaProduct.values), Some(testString), Some(testString))),
@@ -66,7 +68,8 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
           financialOrganisation = Some(Seq(Bank))
         )
       ),
-      liaisonOfficers = Some(LiaisonOfficers(Seq(LiaisonOfficer(testString, Some(testString))))),
+      liaisonOfficers =
+        Some(LiaisonOfficers(Seq(LiaisonOfficer(testString, Some(testString), Some(testString), Set(ByEmail))))),
       signatories = None,
       outsourcedAdministration = Some(OutsourcedAdministration(Some("O1"), Some("O2"))),
       feesCommissionsAndIncentives = Some(FeesCommissionsAndIncentives(Some("F1"), Some("F2")))
@@ -85,7 +88,8 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
           "addressLine2": "address line 2",
           "addressLine3": "address line 3",
           "postCode": "post code"
-        }
+        },
+        "companyName":"test"
       },
       "organisationDetails": {
         "registeredToManageIsa": true,
@@ -111,7 +115,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "financialOrganisation": ["bank"]
       },
       "liaisonOfficers": {
-        "liaisonOfficers":[{"id":"test","fullName":"test"}]
+        "liaisonOfficers":[{"id":"test","fullName":"test","phoneNumber":"test","communication":["byEmail"]}]
       },
       "outsourcedAdministration": {
         "dataItem": "O1",
@@ -137,7 +141,8 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "addressLine3": "address line 3",
         "postCode": "post code",
         "uprn": null
-      }
+      },
+      "companyName":"test"
     },
     "enrolmentId": "$testEnrolmentId",
     "status": "Active",
@@ -165,7 +170,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       "financialOrganisation": ["bank"]
     },
     "liaisonOfficers": {
-      "liaisonOfficers":[{"id":"test","fullName":"test"}]
+      "liaisonOfficers":[{"id":"test","fullName":"test","phoneNumber":"test","communication":["byEmail"]}]
     },
     "outsourcedAdministration": {
       "dataItem": "O1",

@@ -225,6 +225,13 @@ liaisonOfficerPhoneNumber.error.invalid = The phone number must not include lett
 liaisonOfficerPhoneNumber.error.tooLong = The phone number you have entered is too long. Enter a UK phone number, like 01642 123 456 or 07777 777 777
 liaisonOfficerPhoneNumber.error.tooShort = The phone number you have entered is too short. Enter a UK phone number, like 01642 123 456 or 07777 777 777
 
+liaisonOfficerCommunication.title = How should we communicate with {0}?
+liaisonOfficerCommunication.heading = How should we communicate with {0}?
+liaisonOfficerCommunication.hint = Select all that apply
+liaisonOfficerCommunication.byEmail = By email
+liaisonOfficerCommunication.byPhone = By phone
+liaisonOfficerCommunication.byPost = By post
+liaisonOfficerCommunication.error.required = Select the ways you want HMRC to communicate with this liaison officer
 
 ### Certificates of Authority
 
