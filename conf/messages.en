@@ -203,6 +203,8 @@ addLiaisonOfficer.p2 = You can add up to 15 liaison officers.
 addLiaisonOfficer.details.summary = What is a liaison officer?
 addLiaisonOfficer.details.content.p1 = Liaison officers act as a point of contact between the ISA manager and HMRC.
 addLiaisonOfficer.details.content.p2 = They provide their name, telephone number and email address and are individuals an organisation appoints to provide day-to-day contact with HMRC.
+addLiaisonOfficer.button = Add a liaison officer
+addLiaisonOfficer.link = Return to Manage ISAs
 
 liaisonOfficerName.title = What is the full name of the liaison officer?
 liaisonOfficerName.heading = What is the full name of the liaison officer?
