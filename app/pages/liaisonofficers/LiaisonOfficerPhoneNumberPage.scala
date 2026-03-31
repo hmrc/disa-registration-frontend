@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.liaisonofficers
 
 import models.journeydata.liaisonofficers.LiaisonOfficers
+import pages.Page
 
 case object LiaisonOfficerPhoneNumberPage extends Page[LiaisonOfficers]

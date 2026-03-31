@@ -16,12 +16,18 @@
 
 package generators
 
+import models.YesNoAnswer
 import models.journeydata.certificatesofauthority.{FcaArticles, FinancialOrganisation}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct}
 import models.journeydata.liaisonofficers.LiaisonOfficerCommunication
 import org.scalacheck.{Arbitrary, Gen}
 
 trait ModelGenerators {}
+
+implicit lazy val arbitraryYesNoAnswer: Arbitrary[YesNoAnswer] =
+  Arbitrary {
+    Gen.oneOf(YesNoAnswer.values)
+  }
 
 implicit lazy val arbitraryLiaisonOfficerCommunication: Arbitrary[LiaisonOfficerCommunication] =
   Arbitrary {

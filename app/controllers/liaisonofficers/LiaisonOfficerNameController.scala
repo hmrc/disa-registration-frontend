@@ -22,7 +22,7 @@ import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import navigation.Navigator
-import pages.LiaisonOfficerNamePage
+import pages.liaisonofficers.LiaisonOfficerNamePage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

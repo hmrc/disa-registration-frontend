@@ -137,6 +137,9 @@ GET        /add-liaison-officer                          controllers.liaisonoffi
 
 GET        /check-added-liaison-officer                 controllers.liaisonofficers.LoCheckYourAnswersController.onPageLoad(id: String)
 
+GET        /remove-liaison-officer                        controllers.liaisonofficers.RemoveLiaisonOfficerController.onPageLoad(id: String)
+POST       /remove-liaison-officer                        controllers.liaisonofficers.RemoveLiaisonOfficerController.onSubmit(id: String)
+
 ## Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
 

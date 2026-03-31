@@ -24,13 +24,14 @@ import models.Mode
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.LiaisonOfficerEmailPage
+import pages.liaisonofficers.LiaisonOfficerEmailPage
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.liaisonofficers.LiaisonOfficerEmailView
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
