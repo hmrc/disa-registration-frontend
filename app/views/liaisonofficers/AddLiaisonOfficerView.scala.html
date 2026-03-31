@@ -16,6 +16,8 @@
 
 @import play.twirl.api.StringInterpolation
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+@import controllers.routes.TaskListController
+@import controllers.liaisonofficers.routes.LiaisonOfficerNameController
 
 @this(
   layout: templates.Layout,
@@ -49,8 +51,13 @@
       )
     ))
 
-    @govukButton(
-      ButtonViewModel(messages("site.continue"))
-    )
+    <div class="govuk-button-group">
+        @govukButton(
+          ButtonViewModel(messages("addLiaisonOfficer.button"))
+            .asLink(LiaisonOfficerNameController.onPageLoad(None, NormalMode).url)
+        )
+
+        <a class="govuk-link" href="@TaskListController.onPageLoad()">@messages("addLiaisonOfficer.link")</a>
+    </div>
   </div>
 }
