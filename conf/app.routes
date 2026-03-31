@@ -135,6 +135,8 @@ POST       /change-liaison-officer-communication                  controllers.li
 
 GET        /add-liaison-officer                          controllers.liaisonofficers.AddLiaisonOfficerController.onPageLoad()
 
+GET        /check-added-liaison-officer                 controllers.liaisonofficers.LoCheckYourAnswersController.onPageLoad(id: String)
+
 ## Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
 

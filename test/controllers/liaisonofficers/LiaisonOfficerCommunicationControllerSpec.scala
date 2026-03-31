@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.liaisonofficers
 
 import base.SpecBase
-import controllers.liaisonofficers.routes.LiaisonOfficerEmailController
+import controllers.liaisonofficers.routes.LiaisonOfficerCommunicationController
 import controllers.routes.IndexController
-import forms.LiaisonOfficerEmailFormProvider
+import forms.LiaisonOfficerCommunicationFormProvider
 import models.journeydata.JourneyData
-import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
+import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
+import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication, LiaisonOfficers}
 import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -32,29 +33,29 @@ import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.liaisonofficers.LiaisonOfficerEmailView
+import views.html.liaisonofficers.LiaisonOfficerCommunicationView
 
 import scala.concurrent.Future
 
-class LiaisonOfficerEmailControllerSpec extends SpecBase {
+class LiaisonOfficerCommunicationControllerSpec extends SpecBase {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  private val existingId    = "existing-id-123"
-  private val otherId       = "other-id-123"
-  private val existingName  = "Jane Smith"
-  private val existingEmail = "existing.email@email.com"
-  private val newEmail      = "new.email@email.com"
+  private val existingId            = "existing-id-123"
+  private val otherId               = "other-id-123"
+  private val existingName          = "Jane Smith"
+  private val existingCommunication = Set[LiaisonOfficerCommunication](ByEmail)
+  private val updatedCommunication  = Set[LiaisonOfficerCommunication](ByEmail, ByPhone)
 
-  lazy val routeUrl: String  = LiaisonOfficerEmailController.onPageLoad(existingId, NormalMode).url
-  lazy val submitUrl: String = LiaisonOfficerEmailController.onSubmit(existingId, NormalMode).url
+  lazy val routeUrl: String  = LiaisonOfficerCommunicationController.onPageLoad(existingId, NormalMode).url
+  lazy val submitUrl: String = LiaisonOfficerCommunicationController.onSubmit(existingId, NormalMode).url
 
-  val formProvider: LiaisonOfficerEmailFormProvider = new LiaisonOfficerEmailFormProvider()
-  val form: Form[String]                            = formProvider()
+  val formProvider: LiaisonOfficerCommunicationFormProvider = new LiaisonOfficerCommunicationFormProvider()
+  val form: Form[Set[LiaisonOfficerCommunication]]          = formProvider()
 
-  "LiaisonOfficerEmailController" - {
+  "LiaisonOfficerCommunicationController" - {
 
-    "must return OK and the correct view for a GET when the liaison officer exists and has no email" in {
+    "must return OK and the correct view for a GET when the liaison officer exists with no communication preferences selected" in {
 
       val journeyData =
         JourneyData(
@@ -63,7 +64,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(existingId, Some(existingName), email = None)
+                LiaisonOfficer(existingId, Some(existingName), communication = Set.empty)
               )
             )
           )
@@ -76,10 +77,10 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[LiaisonOfficerEmailView]
+        val view = application.injector.instanceOf[LiaisonOfficerCommunicationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form, NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form.fill(Set.empty), NormalMode)(
           request,
           messages(application)
         ).toString
@@ -95,8 +96,8 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(otherId, Some("Other Person"), email = Some("email@email.com")),
-                LiaisonOfficer(existingId, Some(existingName), email = Some(existingEmail))
+                LiaisonOfficer(otherId, Some("Other Person"), communication = Set(ByPhone)),
+                LiaisonOfficer(existingId, Some(existingName), communication = existingCommunication)
               )
             )
           )
@@ -109,10 +110,10 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[LiaisonOfficerEmailView]
+        val view = application.injector.instanceOf[LiaisonOfficerCommunicationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingEmail), NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingCommunication), NormalMode)(
           request,
           messages(application)
         ).toString
@@ -128,7 +129,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(otherId, Some("Other Person"), email = Some("email@email.com"))
+                LiaisonOfficer(otherId, Some("Other Person"), communication = Set(ByPhone))
               )
             )
           )
@@ -155,7 +156,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(existingId, None, email = Some(existingEmail))
+                LiaisonOfficer(existingId, None, communication = existingCommunication)
               )
             )
           )
@@ -182,7 +183,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(existingId, Some(existingName), email = None)
+                LiaisonOfficer(existingId, Some(existingName), communication = Set.empty)
               )
             )
           )
@@ -193,11 +194,11 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody("value[0]" -> "")
 
-        val boundForm = form.bind(Map("value" -> ""))
+        val boundForm = form.bind(Map("value[0]" -> ""))
 
-        val view = application.injector.instanceOf[LiaisonOfficerEmailView]
+        val view = application.injector.instanceOf[LiaisonOfficerCommunicationView]
 
         val result = route(application, request).value
 
@@ -216,7 +217,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody(("value", ""))
+            .withFormUrlEncodedBody("value[0]" -> "")
 
         val result = route(application, request).value
 
@@ -234,8 +235,8 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(otherId, Some("Other Person"), email = Some("email@email.com")),
-                LiaisonOfficer(existingId, Some(existingName), email = Some(existingEmail))
+                LiaisonOfficer(otherId, Some("Other Person"), communication = Set(ByPhone)),
+                LiaisonOfficer(existingId, Some(existingName), communication = existingCommunication)
               )
             )
           )
@@ -244,8 +245,8 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       val expectedSection =
         LiaisonOfficers(
           Seq(
-            LiaisonOfficer(otherId, Some("Other Person"), email = Some("email@email.com")),
-            LiaisonOfficer(existingId, Some(existingName), email = Some(newEmail))
+            LiaisonOfficer(otherId, Some("Other Person"), communication = Set(ByPhone)),
+            LiaisonOfficer(existingId, Some(existingName), communication = updatedCommunication)
           )
         )
 
@@ -262,7 +263,10 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody(("value", newEmail))
+            .withFormUrlEncodedBody(
+              "value[0]" -> "byEmail",
+              "value[1]" -> "byPhone"
+            )
 
         val result = route(application, request).value
 
@@ -284,7 +288,10 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody(("value", newEmail))
+            .withFormUrlEncodedBody(
+              "value[0]" -> "byEmail",
+              "value[1]" -> "byPhone"
+            )
 
         val result = route(application, request).value
 
@@ -302,7 +309,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(otherId, Some("Other Person"), email = Some("email@email.com"))
+                LiaisonOfficer(otherId, Some("Other Person"), communication = Set(ByPhone))
               )
             )
           )
@@ -316,7 +323,10 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody(("value", newEmail))
+            .withFormUrlEncodedBody(
+              "value[0]" -> "byEmail",
+              "value[1]" -> "byPhone"
+            )
 
         val result = route(application, request).value
 
@@ -334,7 +344,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(existingId, Some(existingName), email = Some(existingEmail))
+                LiaisonOfficer(existingId, Some(existingName), communication = existingCommunication)
               )
             )
           )
@@ -353,7 +363,10 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody(("value", newEmail))
+            .withFormUrlEncodedBody(
+              "value[0]" -> "byEmail",
+              "value[1]" -> "byPhone"
+            )
 
         await(route(application, request).value)
 
@@ -370,7 +383,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(existingId, Some(existingName), email = Some(existingEmail))
+                LiaisonOfficer(existingId, Some(existingName), communication = existingCommunication)
               )
             )
           )
@@ -379,14 +392,14 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, LiaisonOfficerEmailController.onPageLoad(existingId, CheckMode).url)
+        val request = FakeRequest(GET, LiaisonOfficerCommunicationController.onPageLoad(existingId, CheckMode).url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[LiaisonOfficerEmailView]
+        val view = application.injector.instanceOf[LiaisonOfficerCommunicationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingEmail), CheckMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingCommunication), CheckMode)(
           request,
           messages(application)
         ).toString
@@ -402,7 +415,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
-                LiaisonOfficer(existingId, Some(existingName), email = Some(existingEmail))
+                LiaisonOfficer(existingId, Some(existingName), communication = existingCommunication)
               )
             )
           )
@@ -411,7 +424,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       val expectedSection =
         LiaisonOfficers(
           Seq(
-            LiaisonOfficer(existingId, Some(existingName), email = Some(newEmail))
+            LiaisonOfficer(existingId, Some(existingName), communication = updatedCommunication)
           )
         )
 
@@ -427,8 +440,11 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, LiaisonOfficerEmailController.onSubmit(existingId, CheckMode).url)
-            .withFormUrlEncodedBody(("value", newEmail))
+          FakeRequest(POST, LiaisonOfficerCommunicationController.onSubmit(existingId, CheckMode).url)
+            .withFormUrlEncodedBody(
+              "value[0]" -> "byEmail",
+              "value[1]" -> "byPhone"
+            )
 
         val result = route(application, request).value
 
