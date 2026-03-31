@@ -18,7 +18,6 @@ package controllers.liaisonofficers
 
 import base.SpecBase
 import controllers.actions.AuthenticatedIdentifierAction
-import controllers.liaisonofficers.AddLiaisonOfficerController
 import controllers.liaisonofficers.routes.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

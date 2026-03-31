@@ -33,14 +33,6 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
 
     "return JSON response when backend returns 200 OK" in {
 
-      val requestBody =
-        """
-          |{
-          |  "postcode": "BB00 0BB",
-          |  "filter": "Test"
-          |}
-          |""".stripMargin
-
       val responseBody =
         """
           |[
