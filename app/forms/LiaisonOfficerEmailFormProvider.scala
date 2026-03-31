@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package models.journeydata.liaisonofficers
+package forms
 
-import models.journeydata.TaskListSection
-import play.api.libs.json.{Json, OFormat}
+import javax.inject.Inject
 
-case class LiaisonOfficers(liaisonOfficers: Seq[LiaisonOfficer] = Seq.empty[LiaisonOfficer]) extends TaskListSection {
-  override def sectionName: String = LiaisonOfficers.sectionName
-}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-object LiaisonOfficers {
-  val sectionName: String                       = "liaisonOfficers"
-  implicit val format: OFormat[LiaisonOfficers] = Json.format[LiaisonOfficers]
+class LiaisonOfficerEmailFormProvider @Inject() extends Mappings {
+
+  private val emailRegex =
+    """^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"""
+
+  def apply(): Form[String] =
+    Form(
+      "value" -> text("liaisonOfficerEmail.error.required")
+        .verifying(regexp(emailRegex, "liaisonOfficerEmail.error.invalid"))
+    )
 }

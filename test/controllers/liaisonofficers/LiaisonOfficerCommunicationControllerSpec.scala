@@ -21,8 +21,8 @@ import controllers.liaisonofficers.routes.LiaisonOfficerCommunicationController
 import controllers.routes.IndexController
 import forms.LiaisonOfficerCommunicationFormProvider
 import models.journeydata.JourneyData
-import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication, LiaisonOfficers}
 import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
+import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication, LiaisonOfficers}
 import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.liaisonofficers
 
 import base.SpecBase
 import controllers.actions.AuthenticatedIdentifierAction
 import controllers.liaisonofficers.AddLiaisonOfficerController
-import controllers.liaisonofficers.routes._
+import controllers.liaisonofficers.routes.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.BodyParsers
