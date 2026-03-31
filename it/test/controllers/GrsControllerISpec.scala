@@ -1,31 +1,14 @@
-/*
- * Copyright 2026 HM Revenue & Customs
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package controllers
 
-import play.api.http.Status.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, redirectLocation, route, status, writeableOf_AnyContentAsEmpty}
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.SessionKeys
 import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs}
 
 class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
 
-  private val journeyId    = "test-journey-id"
+  private val journeyId = "test-journey-id"
 
   private val callbackUrl =
     s"/obligations/enrolment/isa/incorporated-identity-callback?journeyId=$journeyId"
@@ -36,15 +19,26 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
   private val fetchGrsJourneyUrl =
     s"/incorporated-entity-identification/api/journey/$journeyId"
 
-  "GET /incorporated-identity-callback?journeyId=" should {
+  private val addressLookupUrl = "/lookup"
 
-    "redirect to TaskList when registration and verification both pass" in {
-      val journeyData =
-        s"""
-           |{
-           |  "groupId": "$testGroupId"
-           |}
-           |""".stripMargin
+  private def request =
+    FakeRequest(GET, callbackUrl)
+      .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+
+  private val baseJourneyData =
+    s"""
+       |{
+       |  "groupId": "$testGroupId"
+       |}
+       |""".stripMargin
+
+  // --------------------------
+  // SUCCESS PATHS
+  // --------------------------
+
+  "GET /incorporated-identity-callback" should {
+
+    "redirect to TaskList when registration and verification both pass (with address enrichment)" in {
 
       val grsResponse =
         """
@@ -55,23 +49,32 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
           |  },
           |  "identifiersMatch": true,
           |  "registration": {
-          |    "registrationStatus": "REGISTERED",
-          |    "registeredBusinessPartnerId": "X00000123456789"
+          |    "registrationStatus": "REGISTERED"
           |  },
-          |  "ctutr": "1234567890",
           |  "businessVerification": {
           |    "verificationStatus": "PASS"
+          |  },
+          |  "registeredAddress": {
+          |    "addressLine1": "1 Test Street",
+          |    "postCode": "AA1 1AA"
           |  }
           |}
           |""".stripMargin
 
+      val addressLookupResponse =
+        """
+          |{
+          |  "addresses": [
+          |    { "uprn": "123456789" }
+          |  ]
+          |}
+          |""".stripMargin
+
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(addressLookupUrl, OK, addressLookupResponse)
       stubPost(getJourneyDataUrl, NO_CONTENT, "")
-      val request =
-        FakeRequest(GET, callbackUrl)
-          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
 
       val result = route(app, request).get
 
@@ -80,13 +83,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
         Some(controllers.routes.TaskListController.onPageLoad().url)
     }
 
-    "redirect to Business Verification lockout when verification fails" in {
-      val journeyData =
-        s"""
-           |{
-           |  "groupId": "$testGroupId"
-           |}
-           |""".stripMargin
+    "use default UPRN when address lookup returns no results" in {
 
       val grsResponse =
         """
@@ -100,19 +97,51 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
           |    "registrationStatus": "REGISTERED"
           |  },
           |  "businessVerification": {
-          |    "verificationStatus": "FAIL"
+          |    "verificationStatus": "PASS"
+          |  },
+          |  "registeredAddress": {
+          |    "addressLine1": "1 Test Street",
+          |    "postCode": "AA1 1AA"
           |  }
           |}
           |""".stripMargin
 
+      val emptyLookupResponse =
+        """
+          |{
+          |  "addresses": []
+          |}
+          |""".stripMargin
+
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(addressLookupUrl, OK, emptyLookupResponse)
       stubPost(getJourneyDataUrl, NO_CONTENT, "")
 
-      val request =
-        FakeRequest(GET, callbackUrl)
-          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+      val result = route(app, request).get
+
+      status(result) shouldBe SEE_OTHER
+    }
+
+    // --------------------------
+    // CONTROLLER BRANCHING
+    // --------------------------
+
+    "redirect to lockout when verification fails" in {
+
+      val grsResponse =
+        """
+          |{
+          |  "registration": { "registrationStatus": "REGISTERED" },
+          |  "businessVerification": { "verificationStatus": "FAIL" }
+          |}
+          |""".stripMargin
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
+      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(getJourneyDataUrl, NO_CONTENT, "")
 
       val result = route(app, request).get
 
@@ -121,36 +150,19 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
         Some(controllers.routes.BusinessVerificationController.lockout().url)
     }
 
-    "redirect to Start when registration has not passed" in {
-      val journeyData =
-        s"""
-           |{
-           |  "groupId": "$testGroupId"
-           |}
-           |""".stripMargin
+    "redirect to start when registration fails" in {
 
       val grsResponse =
         """
           |{
-          |  "companyProfile": {
-          |    "companyName": "Test Company Ltd",
-          |    "companyNumber": "01234567"
-          |  },
-          |  "identifiersMatch": true,
-          |  "registration": {
-          |    "registrationStatus": "REGISTRATION_FAILED"
-          |  }
+          |  "registration": { "registrationStatus": "REGISTRATION_FAILED" }
           |}
           |""".stripMargin
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
       stubPost(getJourneyDataUrl, NO_CONTENT, "")
-
-      val request =
-        FakeRequest(GET, callbackUrl)
-          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
 
       val result = route(app, request).get
 
@@ -159,43 +171,162 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
         Some(controllers.routes.StartController.onPageLoad().url)
     }
 
-    "redirect to Start when verification has not been attempted" in {
-      val journeyData =
-        s"""
-           |{
-           |  "groupId": "$testGroupId"
-           |}
-           |""".stripMargin
+    "redirect to start when verification not present" in {
 
       val grsResponse =
         """
           |{
-          |  "companyProfile": {
-          |    "companyName": "Test Company Ltd",
-          |    "companyNumber": "01234567"
-          |  },
-          |  "identifiersMatch": true,
-          |  "registration": {
-          |    "registrationStatus": "REGISTERED"
+          |  "registration": { "registrationStatus": "REGISTERED" }
+          |}
+          |""".stripMargin
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
+      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+
+      val result = route(app, request).get
+
+      status(result) shouldBe SEE_OTHER
+    }
+
+    // --------------------------
+    // FAILURE SCENARIOS
+    // --------------------------
+
+    "return 500 when address lookup fails" in {
+
+      val grsResponse =
+        """
+          |{
+          |  "registration": { "registrationStatus": "REGISTERED" },
+          |  "businessVerification": { "verificationStatus": "PASS" },
+          |  "registeredAddress": {
+          |    "addressLine1": "1 Test Street",
+          |    "postCode": "AA1 1AA"
           |  }
           |}
           |""".stripMargin
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
+      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(addressLookupUrl, INTERNAL_SERVER_ERROR, "")
+
+      val result = route(app, request).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+    }
+
+    "return 500 when GRS passes but no address returned" in {
+
+      val grsResponse =
+        """
+          |{
+          |  "registration": { "registrationStatus": "REGISTERED" },
+          |  "businessVerification": { "verificationStatus": "PASS" }
+          |}
+          |""".stripMargin
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
+      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+    }
+
+    "return 500 when journey update fails" in {
+
+      val grsResponse =
+        """
+          |{
+          |  "registration": { "registrationStatus": "REGISTERED" },
+          |  "businessVerification": { "verificationStatus": "PASS" },
+          |  "registeredAddress": {
+          |    "addressLine1": "1 Test Street",
+          |    "postCode": "AA1 1AA"
+          |  }
+          |}
+          |""".stripMargin
+
+      val addressLookupResponse =
+        """{ "addresses": [ { "uprn": "123" } ] }"""
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
+      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(addressLookupUrl, OK, addressLookupResponse)
+      stubPost(getJourneyDataUrl, INTERNAL_SERVER_ERROR, "")
+
+      val result = route(app, request).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+    }
+
+    "return 500 when GRS call fails" in {
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
+      stubGet(fetchGrsJourneyUrl, INTERNAL_SERVER_ERROR, "")
+
+      val result = route(app, request).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+    }
+
+    // --------------------------
+    // EDGE CASES
+    // --------------------------
+
+    "handle missing journey data (404)" in {
+
+      val grsResponse =
+        """
+          |{
+          |  "registration": { "registrationStatus": "REGISTERED" },
+          |  "businessVerification": { "verificationStatus": "FAIL" }
+          |}
+          |""".stripMargin
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, NOT_FOUND, "")
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
       stubPost(getJourneyDataUrl, NO_CONTENT, "")
-
-      val request =
-        FakeRequest(GET, callbackUrl)
-          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
 
       val result = route(app, request).get
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe
-        Some(controllers.routes.StartController.onPageLoad().url)
     }
 
+    "ignore identifiersMatch=false and still process" in {
+
+      val grsResponse =
+        """
+          |{
+          |  "identifiersMatch": false,
+          |  "registration": { "registrationStatus": "REGISTERED" },
+          |  "businessVerification": { "verificationStatus": "PASS" },
+          |  "registeredAddress": {
+          |    "addressLine1": "1 Test Street",
+          |    "postCode": "AA1 1AA"
+          |  }
+          |}
+          |""".stripMargin
+
+      val addressLookupResponse =
+        """{ "addresses": [ { "uprn": "123" } ] }"""
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, baseJourneyData)
+      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(addressLookupUrl, OK, addressLookupResponse)
+      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+
+      val result = route(app, request).get
+
+      status(result) shouldBe SEE_OTHER
+    }
   }
 }

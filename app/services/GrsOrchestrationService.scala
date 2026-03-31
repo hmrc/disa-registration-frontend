@@ -25,19 +25,18 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class GrsOrchestrationService @Inject() (
-                                          grsService: GrsService,
-                                          addressLookupService: AddressLookupService,
-                                          journeyAnswersService: JourneyAnswersService
-                                        )(implicit ec: ExecutionContext)
-  extends Logging {
+  grsService: GrsService,
+  addressLookupService: AddressLookupService,
+  journeyAnswersService: JourneyAnswersService
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def processGrsJourney(
-                         journeyId: String,
-                         existing: Option[BusinessVerification],
-                         groupId: String,
-                         providerId: String
-                       )(implicit hc: HeaderCarrier): Future[BusinessVerification] = {
-
+    journeyId: String,
+    existing: Option[BusinessVerification],
+    groupId: String,
+    providerId: String
+  )(implicit hc: HeaderCarrier): Future[BusinessVerification] =
     grsService.fetchGRSJourneyData(journeyId).flatMap { grsResponse =>
 
       val businessVerification =
@@ -55,17 +54,16 @@ class GrsOrchestrationService @Inject() (
           .map(_ => updated)
       }
     }
-  }
 
   private def enrichAddressIfEligible(
-                                       grsResponse: GRSResponse,
-                                       bv: BusinessVerification
-                                     )(implicit hc: HeaderCarrier): Future[Option[RegisteredAddress]] = {
+    grsResponse: GRSResponse,
+    bv: BusinessVerification
+  )(implicit hc: HeaderCarrier): Future[Option[RegisteredAddress]] = {
 
     val isPassed =
       (bv.businessRegistrationPassed, bv.businessVerificationPassed) match {
         case (Some(true), Some(true)) => true
-        case _ => false
+        case _                        => false
       }
 
     if (!isPassed) {
@@ -74,19 +72,23 @@ class GrsOrchestrationService @Inject() (
       grsResponse.registeredAddress match {
 
         case Some(address) =>
-          addressLookupService.getUprn(address).map { uprn =>
-            Some(address.copy(uprn = Some(uprn)))
-          }.recoverWith {
-            case e =>
+          addressLookupService
+            .getUprn(address)
+            .map { uprn =>
+              Some(address.copy(uprn = Some(uprn)))
+            }
+            .recoverWith { case e =>
               logger.error(
                 s"Address lookup failed for registered address: $address",
                 e
               )
-              Future.failed(new RuntimeException(
-                s"Address lookup failed for postcode ${address.postCode.getOrElse("unknown")}",
-                e
-              ))
-          }
+              Future.failed(
+                new RuntimeException(
+                  s"Address lookup failed for postcode ${address.postCode.getOrElse("unknown")}",
+                  e
+                )
+              )
+            }
 
         case None =>
           logger.error("GRS/BV passed but no registered address returned")
@@ -95,11 +97,10 @@ class GrsOrchestrationService @Inject() (
     }
   }
 
-
   private def buildBusinessVerification(
-                                         grs: GRSResponse,
-                                         existing: Option[BusinessVerification]
-                                       ): BusinessVerification = {
+    grs: GRSResponse,
+    existing: Option[BusinessVerification]
+  ): BusinessVerification = {
 
     val verificationPassed =
       grs.businessVerificationStatus.map(_ == models.grs.BvPass)
@@ -108,12 +109,14 @@ class GrsOrchestrationService @Inject() (
       Some(grs.businessRegistrationStatus == models.grs.RegisteredStatus)
 
     existing
-      .map(_.copy(
-        businessVerificationPassed = verificationPassed,
-        businessRegistrationPassed = registrationPassed,
-        ctUtr = grs.ctutr,
-        registeredAddress = grs.registeredAddress
-      ))
+      .map(
+        _.copy(
+          businessVerificationPassed = verificationPassed,
+          businessRegistrationPassed = registrationPassed,
+          ctUtr = grs.ctutr,
+          registeredAddress = grs.registeredAddress
+        )
+      )
       .getOrElse(
         BusinessVerification(
           businessVerificationPassed = verificationPassed,

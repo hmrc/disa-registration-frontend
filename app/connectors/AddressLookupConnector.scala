@@ -17,19 +17,17 @@
 package connectors
 
 import models.AddressLookupRequest
-import play.api.libs.json.{JsValue, Json, Writes}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.StringContextOps
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-
 class AddressLookupConnector @Inject() (
-                                         httpClient: HttpClientV2
-                                       )(implicit ec: ExecutionContext) {
+  httpClient: HttpClientV2
+)(implicit ec: ExecutionContext) {
 
   private val baseUrl = "http://address-lookup"
 

@@ -25,8 +25,8 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddressLookupService @Inject() (
-                                       connector: AddressLookupConnector
-                                     )(implicit ec: ExecutionContext) {
+  connector: AddressLookupConnector
+)(implicit ec: ExecutionContext) {
 
   private val DefaultUprn = "100000000000"
 

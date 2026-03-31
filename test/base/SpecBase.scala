@@ -47,7 +47,7 @@ import utils.{JourneyDataBuilder, TestData}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SpecBase
-  extends AnyFreeSpec
+    extends AnyFreeSpec
     with Matchers
     with TryValues
     with OptionValues
@@ -67,23 +67,23 @@ trait SpecBase
   def messages(key: String)(implicit app: Application): String = messages(app).messages(key)
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   // Mocks
-  protected val mockAuditConnector: AuditConnector = mock[AuditConnector]
+  protected val mockAuditConnector: AuditConnector                       = mock[AuditConnector]
   protected val mockDisaRegistrationConnector: DisaRegistrationConnector = mock[DisaRegistrationConnector]
-  protected val mockJourneyAnswersService: JourneyAnswersService = mock[JourneyAnswersService]
-  protected val mockSubmissionService: SubmissionService = mock[SubmissionService]
-  protected val mockGrsService: GrsService = mock[GrsService]
-  protected val mockAuditService: AuditService = mock[AuditService]
-  protected val mockHttpClient: HttpClientV2 = mock[HttpClientV2]
-  protected val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
-  protected val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
-  protected val mockErrorHandler: ErrorHandler = mock[ErrorHandler]
-  protected val mockSessionRepository: SessionRepository = mock[SessionRepository]
-  protected val mockAddressLookupService: AddressLookupService = mock[AddressLookupService]
-  protected val mockAddressLookupConnector: AddressLookupConnector = mock[AddressLookupConnector]
-  protected val mockGrsOrchestrationService: GrsOrchestrationService = mock[GrsOrchestrationService]
+  protected val mockJourneyAnswersService: JourneyAnswersService         = mock[JourneyAnswersService]
+  protected val mockSubmissionService: SubmissionService                 = mock[SubmissionService]
+  protected val mockGrsService: GrsService                               = mock[GrsService]
+  protected val mockAuditService: AuditService                           = mock[AuditService]
+  protected val mockHttpClient: HttpClientV2                             = mock[HttpClientV2]
+  protected val mockAppConfig: FrontendAppConfig                         = mock[FrontendAppConfig]
+  protected val mockRequestBuilder: RequestBuilder                       = mock[RequestBuilder]
+  protected val mockErrorHandler: ErrorHandler                           = mock[ErrorHandler]
+  protected val mockSessionRepository: SessionRepository                 = mock[SessionRepository]
+  protected val mockAddressLookupService: AddressLookupService           = mock[AddressLookupService]
+  protected val mockAddressLookupConnector: AddressLookupConnector       = mock[AddressLookupConnector]
+  protected val mockGrsOrchestrationService: GrsOrchestrationService     = mock[GrsOrchestrationService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -107,9 +107,9 @@ trait SpecBase
   }
 
   protected def applicationBuilder(
-                                    journeyData: Option[JourneyData],
-                                    overrides: GuiceableModule*
-                                  ): GuiceApplicationBuilder =
+    journeyData: Option[JourneyData],
+    overrides: GuiceableModule*
+  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         inject.bind[DataRequiredAction].to[DataRequiredActionImpl],

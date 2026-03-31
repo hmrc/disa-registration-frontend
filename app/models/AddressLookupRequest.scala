@@ -19,9 +19,9 @@ package models
 import play.api.libs.json.{Json, OFormat, Writes}
 
 case class AddressLookupRequest(
-                                 postcode: String,
-                                 filter: Option[String]
-                               )
+  postcode: String,
+  filter: Option[String]
+)
 
 object AddressLookupRequest {
   implicit val writes: OFormat[AddressLookupRequest] = Json.format[AddressLookupRequest]
