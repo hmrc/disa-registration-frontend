@@ -26,20 +26,21 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class EnrichRegisteredAddressAction @Inject()(uprnService: RegisteredAddressUprnService)(implicit ec: ExecutionContext)
-  extends ActionFilter[OptionalDataRequest]
+class EnrichRegisteredAddressUprnAction @Inject() (uprnService: RegisteredAddressUprnService)(implicit
+  ec: ExecutionContext
+) extends ActionFilter[OptionalDataRequest]
     with Logging {
 
   override protected def filter[A](
-                                    request: OptionalDataRequest[A]
-                                  ): Future[Option[Result]] = {
+    request: OptionalDataRequest[A]
+  ): Future[Option[Result]] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     uprnService
       .enrichUprnIfMissing(
-        groupId        = request.groupId,
-        providerId     = request.credentials.providerId,
+        groupId = request.groupId,
+        providerId = request.credentials.providerId,
         journeyDataOpt = request.journeyData
       )
       .map(_ => None)

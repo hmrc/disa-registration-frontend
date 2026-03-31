@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,34 @@
 package controllers
 
 import base.SpecBase
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.RegisteredAddressUprnService
 import views.html.TaskListView
+
+import scala.concurrent.Future
 
 class TaskListControllerSpec extends SpecBase {
 
   "TaskListController" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and render the view when UPRN enrichment succeeds" in {
+      when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
+        .thenReturn(Future.successful(()))
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(
+        journeyData = Some(emptyJourneyData)
+      ).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.TaskListController.onPageLoad().url)
+
+        val request =
+          FakeRequest(GET, routes.TaskListController.onPageLoad().url)
+            .withSession("authToken" -> "mock-bearer-token")
 
         val result = route(application, request).value
 
@@ -38,7 +52,28 @@ class TaskListControllerSpec extends SpecBase {
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual
+          view()(request, messages(application)).toString
+      }
+    }
+
+    "must still return OK even if UPRN enrichment fails (non-blocking)" in {
+      when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val application = applicationBuilder(
+        journeyData = Some(emptyJourneyData)
+      ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.TaskListController.onPageLoad().url)
+            .withSession("authToken" -> "mock-bearer-token")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
       }
     }
   }

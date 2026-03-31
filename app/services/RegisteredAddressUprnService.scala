@@ -23,22 +23,22 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegisteredAddressUprnService @Inject()(
-                                              addressLookupService: AddressLookupService,
-                                              journeyAnswersService: JourneyAnswersService
-                                            )(implicit ec: ExecutionContext)
-  extends Logging {
+class RegisteredAddressUprnService @Inject() (
+  addressLookupService: AddressLookupService,
+  journeyAnswersService: JourneyAnswersService
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def enrichUprnIfMissing(
-                              groupId: String,
-                              providerId: String,
-                              journeyDataOpt: Option[JourneyData]
-                            )(implicit hc: HeaderCarrier): Future[Unit] = {
+    groupId: String,
+    providerId: String,
+    journeyDataOpt: Option[JourneyData]
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
 
     val journeyData = for {
       journeyData <- journeyDataOpt
-      bv <- journeyData.businessVerification
-      address <- bv.registeredAddress
+      bv          <- journeyData.businessVerification
+      address     <- bv.registeredAddress
     } yield (bv, address)
 
     journeyData match {
@@ -52,22 +52,20 @@ class RegisteredAddressUprnService @Inject()(
           case Some(_) =>
             logger.debug(s"UPRN already present for groupId: $groupId, skipping lookup")
             Future.unit
-          case None =>
+          case None    =>
             findAndPersist(address, bv, groupId, providerId)
         }
     }
-  }.recover {
-    case e =>
-      logger.error(s"Unexpected failure during UPRN enrichment for groupId: $groupId", e)
+  }.recover { case e =>
+    logger.error(s"Unexpected failure during UPRN enrichment for groupId: $groupId", e)
   }
 
   private def findAndPersist(
-                              address: RegisteredAddress,
-                              bv: BusinessVerification,
-                              groupId: String,
-                              providerId: String
-                            )(implicit hc: HeaderCarrier): Future[Unit] = {
-
+    address: RegisteredAddress,
+    bv: BusinessVerification,
+    groupId: String,
+    providerId: String
+  )(implicit hc: HeaderCarrier): Future[Unit] =
     addressLookupService
       .getUprn(address)
       .flatMap {
@@ -75,16 +73,13 @@ class RegisteredAddressUprnService @Inject()(
           logger.info(s"UPRN resolved for groupId: $groupId")
 
           val updatedAddress = address.copy(uprn = Some(uprn))
-          val updatedBV = bv.copy(registeredAddress = Some(updatedAddress))
+          val updatedBV      = bv.copy(registeredAddress = Some(updatedAddress))
 
           journeyAnswersService
             .update(updatedBV, groupId, providerId)
-            .map(_ =>
-              logger.info(s"Registered address updated with UPRN for groupId: $groupId")
-            )
-            .recover {
-              case e =>
-                logger.error(s"Failed to persist updated address for groupId: $groupId", e)
+            .map(_ => logger.info(s"Registered address updated with UPRN for groupId: $groupId"))
+            .recover { case e =>
+              logger.error(s"Failed to persist updated address for groupId: $groupId", e)
             }
 
         case None =>
@@ -93,5 +88,4 @@ class RegisteredAddressUprnService @Inject()(
           )
           Future.unit
       }
-  }
 }

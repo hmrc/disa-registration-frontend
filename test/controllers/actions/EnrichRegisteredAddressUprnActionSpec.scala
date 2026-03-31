@@ -29,10 +29,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
-class EnrichRegisteredAddressActionSpec extends SpecBase with MockitoSugar {
+class EnrichRegisteredAddressUprnActionSpec extends SpecBase with MockitoSugar {
 
-  class Harness(service: RegisteredAddressUprnService)
-    extends EnrichRegisteredAddressAction(service) {
+  class Harness(service: RegisteredAddressUprnService) extends EnrichRegisteredAddressUprnAction(service) {
 
     def callFilter[A](request: OptionalDataRequest[A]): Future[Option[Result]] =
       filter(request)
@@ -53,7 +52,7 @@ class EnrichRegisteredAddressActionSpec extends SpecBase with MockitoSugar {
       journeyData = journeyData
     )
 
-  "EnrichRegisteredAddressAction" - {
+  "EnrichRegisteredAddressUprnAction" - {
 
     "when enrichment succeeds" - {
 

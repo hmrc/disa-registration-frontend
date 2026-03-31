@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.FrontendAppConfig
 import models.AddressLookupRequest
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -26,12 +27,12 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddressLookupConnector @Inject() (
-  httpClient: HttpClientV2
+  httpClient: HttpClientV2,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext) {
 
-  private val baseUrl = "http://address-lookup"
-
   def searchAddress(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[JsValue] = {
+    val url = s"${appConfig.addressLookupBaseUrl}/lookup"
 
     val requestBody = AddressLookupRequest(
       postcode = postcode,
@@ -39,7 +40,7 @@ class AddressLookupConnector @Inject() (
     )
 
     httpClient
-      .post(url"$baseUrl/lookup")
+      .post(url"$url")
       .withBody(Json.toJson(requestBody))
       .execute[JsValue]
   }

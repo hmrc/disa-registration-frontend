@@ -70,21 +70,21 @@ trait SpecBase
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   // Mocks
-  protected val mockAuditConnector: AuditConnector                        = mock[AuditConnector]
-  protected val mockDisaRegistrationConnector: DisaRegistrationConnector  = mock[DisaRegistrationConnector]
-  protected val mockJourneyAnswersService: JourneyAnswersService          = mock[JourneyAnswersService]
-  protected val mockSubmissionService: SubmissionService                  = mock[SubmissionService]
-  protected val mockGrsService: GrsService                                = mock[GrsService]
-  protected val mockAuditService: AuditService                            = mock[AuditService]
-  protected val mockHttpClient: HttpClientV2                              = mock[HttpClientV2]
-  protected val mockAppConfig: FrontendAppConfig                          = mock[FrontendAppConfig]
-  protected val mockRequestBuilder: RequestBuilder                        = mock[RequestBuilder]
-  protected val mockErrorHandler: ErrorHandler                            = mock[ErrorHandler]
-  protected val mockSessionRepository: SessionRepository                  = mock[SessionRepository]
-  protected val mockAddressLookupService: AddressLookupService            = mock[AddressLookupService]
-  protected val mockAddressLookupConnector: AddressLookupConnector        = mock[AddressLookupConnector]
-  protected val mockGrsOrchestrationService: RegisteredAddressUprnService = mock[RegisteredAddressUprnService]
-  protected val mockUuidGenerator: UuidGenerator                          = mock[UuidGenerator]
+  protected val mockAuditConnector: AuditConnector                             = mock[AuditConnector]
+  protected val mockDisaRegistrationConnector: DisaRegistrationConnector       = mock[DisaRegistrationConnector]
+  protected val mockJourneyAnswersService: JourneyAnswersService               = mock[JourneyAnswersService]
+  protected val mockSubmissionService: SubmissionService                       = mock[SubmissionService]
+  protected val mockGrsService: GrsService                                     = mock[GrsService]
+  protected val mockAuditService: AuditService                                 = mock[AuditService]
+  protected val mockHttpClient: HttpClientV2                                   = mock[HttpClientV2]
+  protected val mockAppConfig: FrontendAppConfig                               = mock[FrontendAppConfig]
+  protected val mockRequestBuilder: RequestBuilder                             = mock[RequestBuilder]
+  protected val mockErrorHandler: ErrorHandler                                 = mock[ErrorHandler]
+  protected val mockSessionRepository: SessionRepository                       = mock[SessionRepository]
+  protected val mockAddressLookupService: AddressLookupService                 = mock[AddressLookupService]
+  protected val mockAddressLookupConnector: AddressLookupConnector             = mock[AddressLookupConnector]
+  protected val mockRegisteredAddressUprnService: RegisteredAddressUprnService = mock[RegisteredAddressUprnService]
+  protected val mockUuidGenerator: UuidGenerator                               = mock[UuidGenerator]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -101,7 +101,7 @@ trait SpecBase
       mockSessionRepository,
       mockAddressLookupService,
       mockAddressLookupConnector,
-      mockGrsOrchestrationService,
+      mockRegisteredAddressUprnService,
       mockUuidGenerator
     )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
@@ -126,7 +126,7 @@ trait SpecBase
         inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
         inject.bind[GrsService].toInstance(mockGrsService),
         inject.bind[ErrorHandler].toInstance(mockErrorHandler),
-        inject.bind[RegisteredAddressUprnService].toInstance(mockGrsOrchestrationService),
+        inject.bind[RegisteredAddressUprnService].toInstance(mockRegisteredAddressUprnService),
         inject.bind[AddressLookupService].toInstance(mockAddressLookupService)
       )
       .overrides(overrides: _*)

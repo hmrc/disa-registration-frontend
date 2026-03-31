@@ -29,6 +29,7 @@ class TaskListController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  getUprn: EnrichRegisteredAddressUprnAction,
   val controllerComponents: MessagesControllerComponents,
   view: TaskListView
 ) extends FrontendBaseController
@@ -36,7 +37,7 @@ class TaskListController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData) { implicit request =>
+    (identify andThen getData andThen getUprn) { implicit request =>
       Ok(view())
     }
 }
