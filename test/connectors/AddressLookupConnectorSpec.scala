@@ -23,8 +23,8 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.inject
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 
 import scala.concurrent.Future
 
@@ -58,7 +58,15 @@ class AddressLookupConnectorSpec extends SpecBase {
         val jsonResponse: JsValue = Json.parse(
           """
             |[
-            |  { "id": "GB1", "uprn": 123456789 }
+            |  {
+            |    "id": "GB690091234501",
+            |    "uprn": 690091234501,
+            |    "address": {
+            |      "lines": ["1 Test Street"],
+            |      "town": "Testtown",
+            |      "postcode": "AA00 0AA"
+            |    }
+            |  }
             |]
             |""".stripMargin
         )
@@ -78,7 +86,14 @@ class AddressLookupConnectorSpec extends SpecBase {
         val response: JsValue = Json.parse(
           """
             |[
-            |  { "id": "GB200000698110", "uprn": 200000698110 }
+            |  {
+            |    "id": "GB200000698110",
+            |    "uprn": 200000698110,
+            |    "address": {
+            |      "lines": ["Test Street"],
+            |      "postcode": "BB00 0BB"
+            |    }
+            |  }
             |]
             |""".stripMargin
         )

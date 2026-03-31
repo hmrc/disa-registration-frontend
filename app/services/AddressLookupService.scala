@@ -68,8 +68,8 @@ class AddressLookupService @Inject() (
   }
 
   private def extractUprn(json: JsValue): Option[String] =
-    (json \ "addresses")
+    json
       .asOpt[Seq[JsValue]]
       .flatMap(_.headOption)
-      .flatMap(addr => (addr \ "uprn").asOpt[String])
+      .flatMap(addr => (addr \ "uprn").asOpt[Long].map(_.toString))
 }

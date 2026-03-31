@@ -32,8 +32,7 @@ class AddressLookupConnector @Inject() (
 )(implicit ec: ExecutionContext) {
 
   def searchAddress(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[JsValue] = {
-    val url = s"${appConfig.addressLookupBaseUrl}/lookup"
-
+    val url         = s"${appConfig.addressLookupBaseUrl}/lookup"
     val requestBody = AddressLookupRequest(
       postcode = postcode,
       filter = filter

@@ -46,17 +46,16 @@ class AddressLookupServiceSpec extends SpecBase {
 
         val jsonResponse = Json.parse(
           """
-            |{
-            |  "addresses": [
-            |    {
-            |      "uprn": "123456789012",
-            |      "address": {
-            |        "lines": ["line1", "line2"],
-            |        "postcode": "AA1 1AA"
-            |      }
+            |[
+            |  {
+            |    "id": "GB123",
+            |    "uprn": 123456789012,
+            |    "address": {
+            |      "lines": ["line1", "line2"],
+            |      "postcode": "AA1 1AA"
             |    }
-            |  ]
-            |}
+            |  }
+            |]
             |""".stripMargin
         )
 
@@ -75,16 +74,14 @@ class AddressLookupServiceSpec extends SpecBase {
 
         val jsonResponse = Json.parse(
           """
-            |{
-            |  "addresses": [
-            |    {
-            |      "address": {
-            |        "lines": ["10 Test Street"],
-            |        "postcode": "AA1 1AA"
-            |      }
+            |[
+            |  {
+            |    "address": {
+            |      "lines": ["10 Test Street"],
+            |      "postcode": "AA1 1AA"
             |    }
-            |  ]
-            |}
+            |  }
+            |]
             |""".stripMargin
         )
 
@@ -96,13 +93,11 @@ class AddressLookupServiceSpec extends SpecBase {
         result shouldBe Some("100000000000")
       }
 
-      "must return default UPRN when addresses list is empty" in {
+      "must return default UPRN when response list is empty" in {
 
         val jsonResponse = Json.parse(
           """
-            |{
-            |  "addresses": []
-            |}
+            |[]
             |""".stripMargin
         )
 
@@ -114,25 +109,7 @@ class AddressLookupServiceSpec extends SpecBase {
         result shouldBe Some("100000000000")
       }
 
-      "must return default UPRN when addresses field is missing" in {
-
-        val jsonResponse = Json.parse(
-          """
-            |{
-            |  "someOtherField": "value"
-            |}
-            |""".stripMargin
-        )
-
-        when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
-          .thenReturn(Future.successful(jsonResponse))
-
-        val result = service.getUprn(address).futureValue
-
-        result shouldBe Some("100000000000")
-      }
-
-      "must return None when connector fails" in {
+      "must return default UPRN when connector fails" in {
 
         val exception = new RuntimeException("Connector failed")
 
@@ -153,6 +130,47 @@ class AddressLookupServiceSpec extends SpecBase {
         }
 
         thrown.getMessage should include("Postcode is required")
+      }
+
+      "must return UPRN from first address when multiple are returned" in {
+
+        val jsonResponse = Json.parse(
+          """
+            |[
+            |  {
+            |    "id": "GB1",
+            |    "uprn": 999999999991,
+            |    "address": {
+            |      "lines": ["First Street"],
+            |      "postcode": "AA1 1AA"
+            |    }
+            |  },
+            |  {
+            |    "id": "GB2",
+            |    "uprn": 999999999999,
+            |    "address": {
+            |      "lines": ["Second Street"],
+            |      "postcode": "AA1 1AA"
+            |    }
+            |  },
+            |  {
+            |    "id": "GB3",
+            |    "uprn": 123456789012,
+            |    "address": {
+            |      "lines": ["Third Street"],
+            |      "postcode": "AA1 1AA"
+            |    }
+            |  }
+            |]
+            |""".stripMargin
+        )
+
+        when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
+          .thenReturn(Future.successful(jsonResponse))
+
+        val result = service.getUprn(address).futureValue
+
+        result shouldBe Some("999999999991")
       }
     }
   }

@@ -16,14 +16,15 @@
 
 package connectors
 
+import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlEqualTo, verify}
 import play.api.libs.json.Json
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.BaseIntegrationSpec
-import utils.WiremockHelper.{stubPost}
+import utils.WiremockHelper.stubPost
 
 class AddressLookupConnectorISpec extends BaseIntegrationSpec {
-  
+
   val connector: AddressLookupConnector = app.injector.instanceOf[AddressLookupConnector]
 
   private val basePath = "/lookup"
@@ -60,12 +61,14 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
     "send correct request body to downstream" in {
 
       val expectedRequestBody =
-        """
-          |{
-          |  "postcode": "BB00 0BB",
-          |  "filter": "Test"
-          |}
-          |""".stripMargin
+        Json.parse(
+          """
+            |{
+            |  "postcode": "BB00 0BB",
+            |  "filter": "Test"
+            |}
+            |""".stripMargin
+        )
 
       val responseBody =
         """
@@ -79,9 +82,12 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
 
       stubPost(basePath, 200, responseBody)
 
-      val result = await(connector.searchAddress("BB00 0BB", Some("Test")))
+      await(connector.searchAddress("BB00 0BB", Some("Test")))
 
-      result shouldBe Json.parse(responseBody)
+      verify(
+        postRequestedFor(urlEqualTo(basePath))
+          .withRequestBody(equalToJson(expectedRequestBody.toString))
+      )
     }
 
     "propagate UpstreamErrorResponse when backend returns an error" in {
