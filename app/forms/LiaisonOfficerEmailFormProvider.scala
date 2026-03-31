@@ -23,7 +23,8 @@ import play.api.data.Form
 
 class LiaisonOfficerEmailFormProvider @Inject() extends Mappings {
 
-  private val emailRegex = """^[a-zA-Z0-9-.]+@[a-zA-Z0-9-.]+\.[a-zA-Z]{2,}$"""
+  private val emailRegex =
+    """^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"""
 
   def apply(): Form[String] =
     Form(

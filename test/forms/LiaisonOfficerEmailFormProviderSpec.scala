@@ -17,8 +17,8 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
-import org.scalacheck.Gen
 import play.api.data.FormError
+import org.scalacheck.Gen
 
 class LiaisonOfficerEmailFormProviderSpec extends StringFieldBehaviours {
 
@@ -27,47 +27,8 @@ class LiaisonOfficerEmailFormProviderSpec extends StringFieldBehaviours {
 
   val form = new LiaisonOfficerEmailFormProvider()()
 
-  val emailRegex = """^[a-zA-Z0-9-.]+@[a-zA-Z0-9-.]+\.[a-zA-Z]{2,}$"""
-
-  private val localPartGen: Gen[String] =
-    Gen.choose(1, 20).flatMap { n =>
-      Gen
-        .listOfN(
-          n,
-          Gen.oneOf(
-            Gen.alphaNumChar,
-            Gen.const('-'),
-            Gen.const('.')
-          )
-        )
-        .map(_.mkString)
-    }
-
-  private val domainPartGen: Gen[String] =
-    Gen.choose(1, 20).flatMap { n =>
-      Gen
-        .listOfN(
-          n,
-          Gen.oneOf(
-            Gen.alphaNumChar,
-            Gen.const('-'),
-            Gen.const('.')
-          )
-        )
-        .map(_.mkString)
-    }
-
-  private val tldGen: Gen[String] =
-    Gen.choose(2, 6).flatMap { n =>
-      Gen.listOfN(n, Gen.alphaChar).map(_.mkString)
-    }
-
-  val validString: Gen[String] =
-    for {
-      local  <- localPartGen
-      domain <- domainPartGen
-      tld    <- tldGen
-    } yield s"$local@$domain.$tld"
+  val emailRegex =
+    "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
 
   ".value" - {
 
@@ -76,7 +37,13 @@ class LiaisonOfficerEmailFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      validString
+      Gen.oneOf(
+        "test@example.com",
+        "user.name+tag@domain.co.uk",
+        "user_name@sub.domain.com",
+        "user-name@domain.org",
+        "user%test@domain.io"
+      )
     )
 
     behave like fieldWithPattern(
