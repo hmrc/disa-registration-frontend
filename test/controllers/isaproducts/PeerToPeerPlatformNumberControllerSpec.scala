@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.isaproducts
 
 import base.SpecBase
 import controllers.isaproducts.routes.PeerToPeerPlatformNumberController

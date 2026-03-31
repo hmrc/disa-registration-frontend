@@ -211,12 +211,16 @@ liaisonOfficerName.heading = What is the full name of the liaison officer?
 liaisonOfficerName.hint = You must have at least 1 liaison officer to register your organisation as an ISA manager. You can add up to 15 liaison officers.
 liaisonOfficerName.error.required = Enter the full name of the liaison officer you’re adding
 liaisonOfficerName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
+liaisonOfficerName.checkYourAnswersLabel = Name
+liaisonOfficerName.change.hidden = name of liaison officer
 
 liaisonOfficerEmail.title = What is the email address of {0}?
 liaisonOfficerEmail.heading = What is the email address of {0}?
 liaisonOfficerEmail.hint = This is the email address that HMRC will use to contact the liaison officer
 liaisonOfficerEmail.error.required = Enter the email address of the liaison officer you’re adding. Use a name, @ symbol and a domain name, like yourname@example.com
 liaisonOfficerEmail.error.invalid = Enter an email address in the correct format, like name@example.com
+liaisonOfficerEmail.checkYourAnswersLabel = Email address
+liaisonOfficerEmail.change.hidden = email address
 
 liaisonOfficerPhoneNumber.title = What is {0}’s phone number?
 liaisonOfficerPhoneNumber.heading = What is {0}’s phone number?
@@ -226,6 +230,8 @@ liaisonOfficerPhoneNumber.error.required = Enter the phone number of the liaison
 liaisonOfficerPhoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a UK phone number, like 01642 123 456 or 07777 777 777
 liaisonOfficerPhoneNumber.error.tooLong = The phone number you have entered is too long. Enter a UK phone number, like 01642 123 456 or 07777 777 777
 liaisonOfficerPhoneNumber.error.tooShort = The phone number you have entered is too short. Enter a UK phone number, like 01642 123 456 or 07777 777 777
+liaisonOfficerPhoneNumber.checkYourAnswersLabel = UK phone number
+liaisonOfficerPhoneNumber.change.hidden = UK phone number
 
 liaisonOfficerCommunication.title = How should we communicate with {0}?
 liaisonOfficerCommunication.heading = How should we communicate with {0}?
@@ -234,6 +240,11 @@ liaisonOfficerCommunication.byEmail = By email
 liaisonOfficerCommunication.byPhone = By phone
 liaisonOfficerCommunication.byPost = By post
 liaisonOfficerCommunication.error.required = Select the ways you want HMRC to communicate with this liaison officer
+liaisonOfficerCommunication.checkYourAnswersLabel = Communication preferences
+liaisonOfficerCommunication.change.hidden = communication preferences
+
+liaisonOfficerCya.title = Check added liaison officer
+liaisonOfficerCya.heading = Check added liaison officer
 
 ### Certificates of Authority
 

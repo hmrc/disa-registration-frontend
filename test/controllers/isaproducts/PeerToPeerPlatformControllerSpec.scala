@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.isaproducts
 
 import base.SpecBase
 import controllers.isaproducts.routes.PeerToPeerPlatformController
 import forms.PeerToPeerPlatformFormProvider
 import models.NormalMode
+import models.journeydata.JourneyData
 import models.journeydata.isaproducts.IsaProducts
-import models.journeydata.{JourneyData, OrganisationDetails}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
