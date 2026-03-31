@@ -47,6 +47,7 @@ class StartControllerSpec extends SpecBase {
               businessRegistrationPassed = Some(true),
               businessVerificationPassed = Some(true),
               ctUtr = Some("1234567890"),
+              companyName = Some(testString),
               registeredAddress = Some(
                 RegisteredAddress(
                   addressLine1 = Some("address line 1"),
@@ -83,6 +84,7 @@ class StartControllerSpec extends SpecBase {
               businessRegistrationPassed = Some(true),
               businessVerificationPassed = Some(false),
               ctUtr = Some("1234567890"),
+              companyName = Some(testString),
               registeredAddress = Some(
                 RegisteredAddress(
                   addressLine1 = Some("address line 1"),
@@ -137,6 +139,7 @@ class StartControllerSpec extends SpecBase {
               businessRegistrationPassed = None,
               businessVerificationPassed = None,
               ctUtr = None,
+              companyName = Some(testString),
               registeredAddress = Some(
                 RegisteredAddress(
                   addressLine1 = Some("address line 1"),

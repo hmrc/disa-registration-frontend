@@ -18,6 +18,7 @@ package services
 
 import base.SpecBase
 import config.FrontendAppConfig
+import models.journeydata.BusinessVerification
 import models.journeydata.isaproducts.IsaProducts
 import models.requests.{DataRequest, IdentifierRequest}
 import models.submission.SubmissionResult
@@ -92,10 +93,35 @@ class AuditServiceSpec extends SpecBase {
       (detail \ EventData.providerType.toString).as[String] mustEqual testString
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.submissionStatus.toString).as[String] mustEqual SubmissionResult.Success.toString
+      (detail \ EventData.payload.toString \ EventData.groupName.toString).as[String] mustEqual "unknown"
 
       (detail \ EventData.payload.toString).toOption.isDefined mustEqual true
 
       (detail \ EventData.failureReason.toString).toOption mustEqual None
+    }
+
+    "must send an EnrolmentStarted event with groupName obtained from GRS" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubAuditResult(Success)
+
+      val journeyData =
+        testJourneyData.copy(businessVerification = Some(testBV))
+
+      service
+        .auditEnrolmentSubmission(
+          status = SubmissionResult.Success,
+          credentials = credentials,
+          credentialRole = credentialRole,
+          journeyData = journeyData,
+          failureReason = None
+        )
+        .futureValue mustEqual ()
+
+      val event = captureEvent()
+
+      val detail = event.detail.as[JsObject]
+
+      (detail \ EventData.payload.toString \ EventData.groupName.toString).as[String] mustEqual testString
     }
 
     "must include failureReason when status is Failure and a failure reason is provided" in {
@@ -211,12 +237,45 @@ class AuditServiceSpec extends SpecBase {
 
       (detail \ EventData.credId.toString).as[String] mustEqual credentials.providerId
       (detail \ EventData.providerType.toString).as[String] mustEqual credentials.providerType
-      (detail \ EventData.enrolmentId.toString).as[String] mustEqual testEnrolmentId
+      (detail \ EventData.internalRegistrationId.toString).as[String] mustEqual testEnrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
+      (detail \ EventData.groupName.toString).as[String] mustEqual "unknown"
 
       (detail \ EventData.journeyType.toString).as[String] mustEqual EventData.continueEnrolment.toString
       (detail \ EventData.continuingSection.toString).as[String] mustEqual sectionName
+    }
+
+    "must send an EnrolmentStarted event with groupName obtained from GRS" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubAuditResult(Success)
+
+      val sectionName = IsaProducts.sectionName
+
+      val journeyData =
+        testJourneyData.copy(businessVerification = Some(testBV))
+
+      val dataReq: DataRequest[AnyContent] =
+        DataRequest(
+          request = FakeRequest(),
+          groupId = testGroupId,
+          credentials = credentials,
+          credentialRole = credentialRole,
+          journeyData = journeyData
+        )
+
+      service
+        .auditContinuation(
+          request = dataReq,
+          sectionName = sectionName
+        )
+        .futureValue mustEqual ()
+
+      val event = captureEvent()
+
+      val detail = event.detail.as[JsObject]
+
+      (detail \ EventData.groupName.toString).as[String] mustEqual testString
     }
 
     "must complete successfully even when auditing is Disabled" in {
@@ -288,7 +347,7 @@ class AuditServiceSpec extends SpecBase {
 
       (detail \ EventData.credId.toString).as[String] mustEqual credentials.providerId
       (detail \ EventData.providerType.toString).as[String] mustEqual credentials.providerType
-      (detail \ EventData.enrolmentId.toString).as[String] mustEqual testEnrolmentId
+      (detail \ EventData.internalRegistrationId.toString).as[String] mustEqual testEnrolmentId
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.groupId.toString).as[String] mustEqual testGroupId
       (detail \ EventData.journeyType.toString).as[String] mustEqual EventData.startEnrolment.toString
