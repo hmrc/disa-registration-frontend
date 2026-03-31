@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package models.journeydata.liaisonofficers
+package pages
 
-import models.journeydata.TaskListSection
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.liaisonofficers.LiaisonOfficers
 
-case class LiaisonOfficers(liaisonOfficers: Seq[LiaisonOfficer] = Seq.empty[LiaisonOfficer]) extends TaskListSection {
-  override def sectionName: String = LiaisonOfficers.sectionName
-}
+case object LiaisonOfficerEmailPage extends Page[LiaisonOfficers] {
 
-object LiaisonOfficers {
-  val sectionName: String                       = "liaisonOfficers"
-  implicit val format: OFormat[LiaisonOfficers] = Json.format[LiaisonOfficers]
+  override def toString: String = "liaisonOfficerEmail"
 }

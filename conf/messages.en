@@ -212,6 +212,12 @@ liaisonOfficerName.hint = You must have at least 1 liaison officer to register y
 liaisonOfficerName.error.required = Enter the full name of the liaison officer you’re adding
 liaisonOfficerName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
 
+liaisonOfficerEmail.title = What is the email address of {0}?
+liaisonOfficerEmail.heading = What is the email address of {0}?
+liaisonOfficerEmail.hint = This is the email address that HMRC will use to contact the liaison officer
+liaisonOfficerEmail.error.required = Enter the email address of the liaison officer you’re adding. Use a name, @ symbol and a domain name, like yourname@example.com
+liaisonOfficerEmail.error.invalid = Enter an email address in the correct format, like name@example.com
+
 liaisonOfficerPhoneNumber.title = What is {0}’s phone number?
 liaisonOfficerPhoneNumber.heading = What is {0}’s phone number?
 liaisonOfficerPhoneNumber.p1 = This is the phone number that HMRC will use if there is a need to contact the liaison officer.
@@ -302,6 +308,7 @@ CoaCheckYourAnswers.heading = Check your certificates of authority
 ### Task List
 taskList.title = Task List
 taskList.heading = Task List
+
 
 ### Business Verification Lockout
 bvLockout.title = The details you’ve entered do not match our records
