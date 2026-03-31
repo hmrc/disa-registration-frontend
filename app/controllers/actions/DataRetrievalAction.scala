@@ -26,6 +26,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class DataRetrievalActionImpl @Inject() (
   journeyAnswersService: JourneyAnswersService,
@@ -53,7 +54,7 @@ class DataRetrievalActionImpl @Inject() (
           )
         )
       }
-      .recoverWith { case e: Throwable =>
+      .recoverWith { case NonFatal(e) =>
         logger.warn(s"Failed to retrieve answers for user with groupId: [${request.groupId}] with error: [$e]")
         errorHandler.internalServerError(request).map(Left.apply)
       }

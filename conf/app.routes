@@ -112,9 +112,26 @@ POST       /change-financial-organisation                controllers.certificate
 
 GET        /certificates-of-authority-check-your-answers controllers.certificatesofauthority.CoaCheckYourAnswersController.onPageLoad()
 
-## LOs and Signatories
+## LOs
+GET        /liaison-officer-name                         controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
+POST       /liaison-officer-name                         controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-name                  controllers.liaisonofficers.LiaisonOfficerNameController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
+POST       /change-liaison-officer-name                  controllers.liaisonofficers.LiaisonOfficerNameController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET        /liaison-officer-phone-number                 controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /liaison-officer-phone-number                 controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-phone-mumber          controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-liaison-officer-phone-mumber          controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET        /liaison-officer-communication                        controllers.liaisonofficers.LiaisonOfficerCommunicationController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /liaison-officer-communication                        controllers.liaisonofficers.LiaisonOfficerCommunicationController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-communication                  controllers.liaisonofficers.LiaisonOfficerCommunicationController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-liaison-officer-communication                  controllers.liaisonofficers.LiaisonOfficerCommunicationController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET        /add-liaison-officer                          controllers.liaisonofficers.AddLiaisonOfficerController.onPageLoad()
+
+## Signatories
 GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
-GET        /add-liaison-officer                          controllers.AddLiaisonOfficerController.onPageLoad()
 
 ## Declare & Submit
 

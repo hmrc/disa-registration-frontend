@@ -23,5 +23,5 @@ case object TradingNamePage extends PageWithoutDependents[OrganisationDetails] {
 
   override def toString: String = "tradingName"
 
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails = sectionAnswers.copy(tradingName = None)
+  def clearAnswer(answers: OrganisationDetails): OrganisationDetails = answers.copy(tradingName = None)
 }

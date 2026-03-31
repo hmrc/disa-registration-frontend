@@ -18,7 +18,7 @@ package controllers.orgdetails
 
 import base.SpecBase
 import controllers.orgdetails.routes.OrganisationTelephoneNumberController
-import forms.OrganisationTelephoneNumberFormProvider
+import forms.TelephoneNumberFormProvider
 import models.journeydata.{JourneyData, OrganisationDetails}
 import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
@@ -41,8 +41,8 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
   lazy val routeUrl: String  = OrganisationTelephoneNumberController.onPageLoad(NormalMode).url
   lazy val submitUrl: String = OrganisationTelephoneNumberController.onSubmit(NormalMode).url
 
-  val formProvider       = new OrganisationTelephoneNumberFormProvider()
-  val form: Form[String] = formProvider()
+  val formProvider       = new TelephoneNumberFormProvider()
+  val form: Form[String] = formProvider("organisationTelephoneNumber")
 
   private val testTelNo = "12345678910"
 

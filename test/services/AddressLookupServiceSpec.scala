@@ -20,8 +20,10 @@ import base.SpecBase
 import models.journeydata.RegisteredAddress
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.matchers.should.Matchers.shouldBe
+import org.scalatest.matchers.should.Matchers.{should, shouldBe}
 import play.api.libs.json.Json
+import play.api.test.Helpers.await
+import play.api.test.Helpers.defaultAwaitTimeout
 
 import scala.concurrent.Future
 
@@ -49,10 +51,7 @@ class AddressLookupServiceSpec extends SpecBase {
             |    {
             |      "uprn": "123456789012",
             |      "address": {
-            |        "lines": [
-            |          "line1",
-            |          "line2"
-            |        ],
+            |        "lines": ["line1", "line2"],
             |        "postcode": "AA1 1AA"
             |      }
             |    }
@@ -66,9 +65,10 @@ class AddressLookupServiceSpec extends SpecBase {
 
         val result = service.getUprn(address).futureValue
 
-        result shouldBe "123456789012"
+        result shouldBe Some("123456789012")
 
-        verify(mockAddressLookupConnector).searchAddress("AA1 1AA", Some("line1"))
+        verify(mockAddressLookupConnector)
+          .searchAddress("AA1 1AA", Some("line1"))
       }
 
       "must return default UPRN when uprn is missing" in {
@@ -93,7 +93,7 @@ class AddressLookupServiceSpec extends SpecBase {
 
         val result = service.getUprn(address).futureValue
 
-        result shouldBe "100000000000"
+        result shouldBe Some("100000000000")
       }
 
       "must return default UPRN when addresses list is empty" in {
@@ -111,7 +111,7 @@ class AddressLookupServiceSpec extends SpecBase {
 
         val result = service.getUprn(address).futureValue
 
-        result shouldBe "100000000000"
+        result shouldBe Some("100000000000")
       }
 
       "must return default UPRN when addresses field is missing" in {
@@ -129,19 +129,30 @@ class AddressLookupServiceSpec extends SpecBase {
 
         val result = service.getUprn(address).futureValue
 
-        result shouldBe "100000000000"
+        result shouldBe Some("100000000000")
       }
 
-      "must propagate connector failure" in {
+      "must return None when connector fails" in {
 
         val exception = new RuntimeException("Connector failed")
 
         when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
           .thenReturn(Future.failed(exception))
 
-        val thrown = service.getUprn(address).failed.futureValue
+        val result = service.getUprn(address).futureValue
 
-        thrown shouldBe exception
+        result shouldBe None
+      }
+
+      "must throw IllegalArgumentException when postcode is missing" in {
+
+        val invalidAddress = address.copy(postCode = None)
+
+        val thrown = intercept[IllegalArgumentException] {
+          await(service.getUprn(invalidAddress))
+        }
+
+        thrown.getMessage should include("Postcode is required")
       }
     }
   }

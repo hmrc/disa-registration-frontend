@@ -33,6 +33,7 @@ import views.html.orgdetails.RegisteredAddressCorrespondenceView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class RegisteredAddressCorrespondenceController @Inject() (
   override val messagesApi: MessagesApi,
@@ -96,7 +97,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
                 .map { updated =>
                   Redirect(navigator.nextPage(RegisteredAddressCorrespondencePage, updated, mode))
                 }
-                .recoverWith { case e =>
+                .recoverWith { case NonFatal(e) =>
                   logger.warn(
                     s"Failed updating answers for section [${updatedOrganisationDetails.sectionName}] for groupId [${request.groupId}] with error: [$e]"
                   )

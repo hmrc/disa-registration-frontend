@@ -29,6 +29,7 @@ import views.html.DeclarationForIsaManagersView
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
+import scala.util.control.NonFatal
 
 class DeclarationForIsaManagersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -65,7 +66,7 @@ class DeclarationForIsaManagersController @Inject() (
         logger.info(s"Successful submission by IM with groupId [${request.groupId}]")
         Redirect(ConfirmationController.onPageLoad(submissionReceiptId))
       }
-      .recoverWith { case e: Throwable =>
+      .recoverWith { case NonFatal(e) =>
         logger.error(
           s"Unexpected response from the backend submitting declaration for groupId [${request.groupId}] with error: [${e.getMessage}]"
         )

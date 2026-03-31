@@ -18,7 +18,8 @@ package models.journeydata
 
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.isaproducts.IsaProducts
-import play.api.libs.json.{Format, Json}
+import models.journeydata.liaisonofficers.LiaisonOfficers
+import play.api.libs.json.{Format, Json, OWrites}
 
 case class JourneyData(
   groupId: String,
@@ -35,4 +36,19 @@ case class JourneyData(
 
 object JourneyData {
   implicit val format: Format[JourneyData] = Json.format[JourneyData]
+
+  val auditWrites: OWrites[JourneyData] = OWrites[JourneyData] { jd =>
+    Json.obj(
+      "groupId"                      -> jd.groupId,
+      "groupName"                    -> jd.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
+      "internalRegistrationId"       -> jd.enrolmentId,
+      "organisationDetails"          -> jd.organisationDetails,
+      "isaProducts"                  -> jd.isaProducts,
+      "certificatesOfAuthority"      -> jd.certificatesOfAuthority,
+      "liaisonOfficers"              -> jd.liaisonOfficers,
+      "signatories"                  -> jd.signatories,
+      "outsourcedAdministration"     -> jd.outsourcedAdministration,
+      "feesCommissionsAndIncentives" -> jd.feesCommissionsAndIncentives
+    )
+  }
 }

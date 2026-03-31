@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package controllers.grs
 
 import base.SpecBase
+import models.grs.*
 import models.journeydata.{BusinessVerification, RegisteredAddress}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.when
@@ -30,138 +31,201 @@ class GrsControllerSpec extends SpecBase {
 
   val journeyId = "testJourneyId"
 
-  private def fakeRequest =
-    FakeRequest(GET, controllers.routes.GrsController.grsCallback(journeyId).url)
+  private def fakeRequest = FakeRequest(GET, controllers.routes.GrsController.grsCallback(journeyId).url)
 
-  private def bv(
-    regPassed: Option[Boolean],
-    verPassed: Option[Boolean]
-  ) = BusinessVerification(
-    businessVerificationPassed = verPassed,
-    businessRegistrationPassed = regPassed,
-    ctUtr = Some("1234567890"),
-    registeredAddress = Some(
-      RegisteredAddress(
-        addressLine1 = Some("line1"),
-        addressLine2 = Some("line2"),
-        addressLine3 = Some("line3"),
-        postCode = Some("AA1 1AA")
+  private def baseGRSResponse(
+    businessRegistrationStatus: BusinessRegistrationStatus = RegisteredStatus,
+    businessVerificationStatus: Option[BusinessVerificationStatus] = Some(BvPass)
+  ) =
+    GRSResponse(
+      companyNumber = "01234567",
+      companyName = Some("Test Co"),
+      ctutr = Some("1234567890"),
+      chrn = None,
+      dateOfIncorporation = None,
+      countryOfIncorporation = "GB",
+      identifiersMatch = true,
+      businessRegistrationStatus = businessRegistrationStatus,
+      businessVerificationStatus = businessVerificationStatus,
+      bpSafeId = Some("X00000123456789"),
+      registeredAddress = Some(
+        RegisteredAddress(
+          addressLine1 = Some("address line 1"),
+          addressLine2 = Some("address line 2"),
+          addressLine3 = Some("address line 3"),
+          postCode = Some("postcode")
+        )
       )
     )
-  )
 
   "GrsController" - {
 
-    "must redirect to TaskList when both registration and verification pass" in {
+    "grsCallback" - {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      "must redirect to TaskList when both registration and verification pass" in {
+        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val grsResponse = baseGRSResponse()
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+          .thenReturn(Future.successful(grsResponse))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
+          .thenReturn(
+            Future.successful(
+              BusinessVerification(
+                Some(true),
+                Some(true),
+                Some("1234567890"),
+                companyName = Some(testString),
+                registeredAddress = Some(
+                  RegisteredAddress(
+                    addressLine1 = Some("address line 1"),
+                    addressLine2 = Some("address line 2"),
+                    addressLine3 = Some("address line 3"),
+                    postCode = Some("postcode")
+                  )
+                )
+              )
+            )
+          )
 
-      val verification = bv(Some(true), Some(true))
+        running(application) {
+          val request = fakeRequest
+          val result  = route(application, request).value
 
-      when(
-        mockGrsOrchestrationService.processGrsJourney(
-          eqTo(journeyId),
-          any(),
-          any[String],
-          any[String]
-        )(any())
-      ).thenReturn(Future.successful(verification))
-
-      running(application) {
-        val result = route(application, fakeRequest).value
-
-        status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe controllers.routes.TaskListController.onPageLoad().url
+          status(result)                 shouldBe SEE_OTHER
+          redirectLocation(result).value shouldBe controllers.routes.TaskListController.onPageLoad().url
+        }
       }
-    }
 
-    "must redirect to Lockout when business verification fails" in {
+      "must redirect to Lockout when business verification fails" in {
+        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val grsResponse = baseGRSResponse(businessVerificationStatus = Some(BvFail))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+          .thenReturn(Future.successful(grsResponse))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
+          .thenReturn(
+            Future.successful(
+              BusinessVerification(
+                Some(true),
+                Some(false),
+                Some("1234567890"),
+                companyName = Some(testString),
+                registeredAddress = Some(
+                  RegisteredAddress(
+                    addressLine1 = Some("address line 1"),
+                    addressLine2 = Some("address line 2"),
+                    addressLine3 = Some("address line 3"),
+                    postCode = Some("postcode")
+                  )
+                )
+              )
+            )
+          )
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        running(application) {
+          val request = fakeRequest
+          val result  = route(application, request).value
 
-      val verification = bv(Some(true), Some(false))
-
-      when(
-        mockGrsOrchestrationService.processGrsJourney(
-          eqTo(journeyId),
-          any(),
-          any[String],
-          any[String]
-        )(any())
-      ).thenReturn(Future.successful(verification))
-
-      running(application) {
-        val result = route(application, fakeRequest).value
-
-        status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe controllers.routes.BusinessVerificationController.lockout().url
+          status(result)                 shouldBe SEE_OTHER
+          redirectLocation(result).value shouldBe controllers.routes.BusinessVerificationController.lockout().url
+        }
       }
-    }
 
-    "must redirect to lockout when both BV and registration fail" in {
+      "must redirect to Start when no business registration/verification data present)" in {
+        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+          .thenReturn(Future.successful(grsResponse))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
+          .thenReturn(
+            Future.successful(
+              BusinessVerification(
+                None,
+                None,
+                Some("1234567890"),
+                companyName = Some(testString),
+                registeredAddress = Some(
+                  RegisteredAddress(
+                    addressLine1 = Some("address line 1"),
+                    addressLine2 = Some("address line 2"),
+                    addressLine3 = Some("address line 3"),
+                    postCode = Some("postcode")
+                  )
+                )
+              )
+            )
+          )
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        running(application) {
+          val request = fakeRequest
+          val result  = route(application, request).value
 
-      val verification = bv(Some(false), Some(false))
-
-      when(
-        mockGrsOrchestrationService.processGrsJourney(
-          eqTo(journeyId),
-          any(),
-          any[String],
-          any[String]
-        )(any())
-      ).thenReturn(Future.successful(verification))
-
-      running(application) {
-        val result = route(application, fakeRequest).value
-
-        status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe controllers.routes.BusinessVerificationController.lockout().url
+          status(result)                 shouldBe SEE_OTHER
+          redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
+        }
       }
-    }
 
-    "must redirect to Start when registration fails and verification is empty" in {
+      "must redirect to Start when business registration fails - (Not sure how this is possible in prod)" in {
+        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+          .thenReturn(Future.successful(grsResponse))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
+          .thenReturn(
+            Future.successful(
+              BusinessVerification(
+                Some(false),
+                Some(true),
+                Some("1234567890"),
+                companyName = Some(testString),
+                registeredAddress = Some(
+                  RegisteredAddress(
+                    addressLine1 = Some("address line 1"),
+                    addressLine2 = Some("address line 2"),
+                    addressLine3 = Some("address line 3"),
+                    postCode = Some("postcode")
+                  )
+                )
+              )
+            )
+          )
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        running(application) {
+          val request = fakeRequest
+          val result  = route(application, request).value
 
-      val verification = bv(None, None)
-
-      when(
-        mockGrsOrchestrationService.processGrsJourney(
-          eqTo(journeyId),
-          any(),
-          any[String],
-          any[String]
-        )(any())
-      ).thenReturn(Future.successful(verification))
-
-      running(application) {
-        val result = route(application, fakeRequest).value
-
-        status(result)                 shouldBe SEE_OTHER
-        redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
+          status(result)                 shouldBe SEE_OTHER
+          redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
+        }
       }
-    }
 
-    "must propagate exception if orchestration service fails (e.g. address lookup failure)" in {
+      "must propagate exception if journeyAnswersService fails" in {
+        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val grsResponse = baseGRSResponse()
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+          .thenReturn(Future.successful(grsResponse))
+        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
+          .thenReturn(Future.failed(new Exception("Update journeyAnswersService failed - Service Down")))
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        running(application) {
+          val request = fakeRequest
+          val thrown  = route(application, request).value.failed.futureValue
 
-      when(
-        mockGrsOrchestrationService.processGrsJourney(
-          eqTo(journeyId),
-          any(),
-          any[String],
-          any[String]
-        )(any())
-      ).thenReturn(Future.failed(new RuntimeException("Address lookup failed")))
+          thrown.getMessage mustBe "Update journeyAnswersService failed - Service Down"
+        }
+      }
 
-      running(application) {
-        val request = fakeRequest
-        val thrown  = route(application, request).value.failed.futureValue
+      "must propagate exception if grsService fails" in {
+        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
-        thrown.getMessage shouldBe "Address lookup failed"
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+          .thenReturn(Future.failed(new Exception("GRS failed - Service Down")))
+
+        running(application) {
+          val request = fakeRequest
+          val thrown  = route(application, request).value.failed.futureValue
+
+          thrown.getMessage mustBe "GRS failed - Service Down"
+        }
       }
     }
   }

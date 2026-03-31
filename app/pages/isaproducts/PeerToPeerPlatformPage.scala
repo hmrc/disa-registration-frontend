@@ -23,5 +23,5 @@ case object PeerToPeerPlatformPage extends PageWithoutDependents[IsaProducts] {
 
   override def toString: String = "peerToPeerPlatform"
 
-  override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers.copy(p2pPlatform = None)
+  override def clearAnswer(answers: IsaProducts): IsaProducts = answers.copy(p2pPlatform = None)
 }

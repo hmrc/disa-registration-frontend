@@ -26,6 +26,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class AuditContinuationActionImpl @Inject() (
   sessionRepository: SessionRepository,
@@ -48,7 +49,7 @@ class AuditContinuationActionImpl @Inject() (
             case true =>
               auditService
                 .auditContinuation(request, sectionName)
-                .recover { case e =>
+                .recover { case NonFatal(e) =>
                   logger.warn(s"auditContinuation failed for groupId: [${request.groupId}]", e)
                 }
                 .map(_ => request)
@@ -56,7 +57,7 @@ class AuditContinuationActionImpl @Inject() (
             case false =>
               Future.successful(request)
           }
-          .recover { case e =>
+          .recover { case NonFatal(e) =>
             logger.warn(s"AuditContinuationAction failed for groupId: [${request.groupId}]", e)
             request
           }

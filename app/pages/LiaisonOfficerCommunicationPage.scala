@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package pages
 
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.liaisonofficers.LiaisonOfficers
 
-case class LiaisonOfficers(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "liaisonOfficers"
-}
-
-object LiaisonOfficers {
-  implicit val format: OFormat[LiaisonOfficers] = Json.format[LiaisonOfficers]
-}
+case object LiaisonOfficerCommunicationPage extends Page[LiaisonOfficers]

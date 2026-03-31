@@ -18,18 +18,18 @@ package pages.certificatesofauthority
 
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
-import pages.{Page, PageWithDependents}
+import pages.{ClearablePage, PageWithDependents}
 
 case object CertificatesOfAuthorityYesNoPage extends PageWithDependents[CertificatesOfAuthority] {
 
   override def toString: String = "certificatesOfAuthorityYesNo"
 
-  def clearAnswer(sectionAnswers: CertificatesOfAuthority): CertificatesOfAuthority =
-    sectionAnswers.copy(certificatesYesNo = None)
+  def clearAnswer(answers: CertificatesOfAuthority): CertificatesOfAuthority =
+    answers.copy(certificatesYesNo = None)
 
   def pagesToClear(
     currentAnswers: CertificatesOfAuthority
-  ): List[Page[CertificatesOfAuthority]] =
+  ): List[ClearablePage[CertificatesOfAuthority]] =
     currentAnswers.certificatesYesNo match {
       case Some(Yes) =>
         List(FinancialOrganisationPage)

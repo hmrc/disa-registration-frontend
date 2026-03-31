@@ -32,6 +32,7 @@ import views.html.certificatesofauthority.FinancialOrganisationView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class FinancialOrganisationController @Inject() (
   override val messagesApi: MessagesApi,
@@ -86,7 +87,7 @@ class FinancialOrganisationController @Inject() (
                   )
                 )
               }
-              .recoverWith { case e =>
+              .recoverWith { case NonFatal(e) =>
                 logger.warn(
                   s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
                 )
