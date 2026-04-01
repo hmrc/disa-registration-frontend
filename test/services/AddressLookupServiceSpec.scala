@@ -17,6 +17,7 @@
 package services
 
 import base.SpecBase
+import config.Constants.defaultUprn
 import models.journeydata.RegisteredAddress
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
@@ -90,7 +91,7 @@ class AddressLookupServiceSpec extends SpecBase {
 
         val result = service.getUprn(address).futureValue
 
-        result shouldBe Some("100000000000")
+        result shouldBe Some(defaultUprn)
       }
 
       "must return default UPRN when response list is empty" in {
@@ -106,7 +107,7 @@ class AddressLookupServiceSpec extends SpecBase {
 
         val result = service.getUprn(address).futureValue
 
-        result shouldBe Some("100000000000")
+        result shouldBe Some(defaultUprn)
       }
 
       "must return default UPRN when connector fails" in {

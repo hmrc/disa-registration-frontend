@@ -25,7 +25,9 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
+//TODO: this action will need to be updated to consume a RequiredDataAction once we have built stubs for GRS/BV/AddressLookup
 class EnrichRegisteredAddressUprnAction @Inject() (uprnService: RegisteredAddressUprnService)(implicit
   ec: ExecutionContext
 ) extends ActionFilter[OptionalDataRequest]
@@ -44,7 +46,7 @@ class EnrichRegisteredAddressUprnAction @Inject() (uprnService: RegisteredAddres
         journeyDataOpt = request.journeyData
       )
       .map(_ => None)
-      .recover { case e =>
+      .recover { case NonFatal(e) =>
         logger.warn(
           s"Non-blocking UPRN enrichment failed for groupId: ${request.groupId}",
           e

@@ -22,6 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class RegisteredAddressUprnService @Inject() (
   addressLookupService: AddressLookupService,
@@ -56,7 +57,7 @@ class RegisteredAddressUprnService @Inject() (
             findAndPersist(address, bv, groupId, providerId)
         }
     }
-  }.recover { case e =>
+  }.recover { case NonFatal(e) =>
     logger.error(s"Unexpected failure during UPRN enrichment for groupId: $groupId", e)
   }
 
@@ -78,7 +79,7 @@ class RegisteredAddressUprnService @Inject() (
           journeyAnswersService
             .update(updatedBV, groupId, providerId)
             .map(_ => logger.info(s"Registered address updated with UPRN for groupId: $groupId"))
-            .recover { case e =>
+            .recover { case NonFatal(e) =>
               logger.error(s"Failed to persist updated address for groupId: $groupId", e)
             }
 

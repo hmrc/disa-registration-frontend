@@ -17,6 +17,7 @@
 package services
 
 import base.SpecBase
+import config.Constants.defaultUprn
 import models.journeydata.{BusinessVerification, JourneyData, RegisteredAddress}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
@@ -140,13 +141,11 @@ class RegisteredAddressUprnServiceSpec extends SpecBase {
         val bv          = bvWith(Some(baseAddress))
         val journeyData = journeyDataWith(Some(bv))
 
-        val uprn = "100000000000"
-
         when(mockAddressLookupService.getUprn(eqTo(baseAddress))(any()))
-          .thenReturn(Future.successful(Some(uprn)))
+          .thenReturn(Future.successful(Some(defaultUprn)))
 
         val expectedBV = bv.copy(
-          registeredAddress = Some(baseAddress.copy(uprn = Some(uprn)))
+          registeredAddress = Some(baseAddress.copy(uprn = Some(defaultUprn)))
         )
 
         when(

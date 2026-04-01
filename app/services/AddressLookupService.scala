@@ -25,16 +25,16 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
+import config.Constants.defaultUprn
 
 class AddressLookupService @Inject() (
   connector: AddressLookupConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  private val DefaultUprn = "100000000000"
-
   def getUprn(address: RegisteredAddress)(implicit hc: HeaderCarrier): Future[Option[String]] = {
 
+    //TODO: Further discussion to be had around what happens if GRS/BV doesn't return all expected address fields
     val postcode = address.postCode.getOrElse {
       val message = s"Postcode is required for address lookup but was missing. Address: $address"
       logger.error(message)
@@ -55,7 +55,7 @@ class AddressLookupService @Inject() (
             logger.warn(
               s"No UPRN found in lookup response, using default. Postcode: $postcode, filter: $filter"
             )
-            Some(DefaultUprn)
+            Some(defaultUprn)
         }
       }
       .recover { case NonFatal(e) =>

@@ -17,7 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.AddressLookupRequest
+import models.requests.AddressLookupRequest
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
