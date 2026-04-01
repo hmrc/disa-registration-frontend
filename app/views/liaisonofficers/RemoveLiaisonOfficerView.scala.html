@@ -15,6 +15,7 @@
  *@
 
 @import controllers.liaisonofficers.routes.RemoveLiaisonOfficerController
+@import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
@@ -37,7 +38,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = LegendViewModel(messages("removeLiaisonOfficer.heading", name)).asPageHeading(),
+                legend = HmrcPageHeadingLegend.apply(Text(messages("removeLiaisonOfficer.heading", name)), HmrcSectionCaption(messages("sectionTitle.liaisonOfficers")), "govuk-fieldset__legend--l").asPageHeading(Large),
                 items  = YesNoAnswer.options
             )
         )
