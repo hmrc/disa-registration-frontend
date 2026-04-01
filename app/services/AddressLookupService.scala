@@ -34,7 +34,7 @@ class AddressLookupService @Inject() (
 
   def getUprn(address: RegisteredAddress)(implicit hc: HeaderCarrier): Future[Option[String]] = {
 
-    //TODO: Further discussion to be had around what happens if GRS/BV doesn't return all expected address fields
+    // TODO: Further discussion to be had around what happens if GRS/BV doesn't return all expected address fields
     val postcode = address.postCode.getOrElse {
       val message = s"Postcode is required for address lookup but was missing. Address: $address"
       logger.error(message)
