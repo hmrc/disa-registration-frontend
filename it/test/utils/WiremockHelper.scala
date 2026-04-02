@@ -55,7 +55,7 @@ object WiremockHelper extends Eventually with IntegrationPatience with CommonStu
 
 trait WiremockHelper {
 
-  import WiremockHelper._
+  import WiremockHelper.*
 
   lazy val wmConfig: WireMockConfiguration = wireMockConfig().port(wiremockPort)
   lazy val wireMockServer: WireMockServer  = new WireMockServer(wmConfig)
