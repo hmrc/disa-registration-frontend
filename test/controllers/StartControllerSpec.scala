@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@ import base.SpecBase
 import models.GetOrCreateJourneyData
 import models.journeydata.{BusinessVerification, JourneyData, RegisteredAddress}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
@@ -36,156 +37,159 @@ class StartControllerSpec extends SpecBase {
 
   "StartController" - {
 
-    "onPageLoad" - {
+    "must redirect to Business Verification lockout when user is locked out and BV not passed" in {
 
-      "must redirect to TaskList when business verification has passed" in {
-        val journeyData = JourneyData(
-          groupId = "groupId",
-          enrolmentId = "enrolmentId",
-          businessVerification = Some(
-            BusinessVerification(
-              businessRegistrationPassed = Some(true),
-              businessVerificationPassed = Some(true),
-              ctUtr = Some("1234567890"),
-              companyName = Some(testString),
-              registeredAddress = Some(
-                RegisteredAddress(
-                  addressLine1 = Some("address line 1"),
-                  addressLine2 = Some("address line 2"),
-                  addressLine3 = Some("address line 3"),
-                  postCode = Some("postcode")
-                )
+      val journeyData = emptyJourneyData
+
+      when(mockBvLockoutService.isUserLockedOut(any[String]))
+        .thenReturn(Future.successful(true))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val result = route(application, fakeRequest).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe
+          controllers.routes.BusinessVerificationController.lockout().url
+
+        verify(mockBvLockoutService).isUserLockedOut(any[String])
+      }
+    }
+
+    "must redirect to TaskList when business verification has passed (regardless of lockout)" in {
+
+      val journeyData = JourneyData(
+        groupId = "groupId",
+        enrolmentId = "enrolmentId",
+        businessVerification = Some(
+          BusinessVerification(
+            businessRegistrationPassed = Some(true),
+            businessVerificationPassed = Some(true),
+            ctUtr = Some("1234567890"),
+            companyName = Some(testString),
+            registeredAddress = Some(
+              RegisteredAddress(
+                addressLine1 = Some("address line 1"),
+                addressLine2 = Some("address line 2"),
+                addressLine3 = Some("address line 3"),
+                postCode = Some("postcode")
               )
             )
           )
         )
+      )
 
-        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
-          .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
+      // Even if locked out, should still go to TaskList
+      when(mockBvLockoutService.isUserLockedOut(any[String]))
+        .thenReturn(Future.successful(true))
 
-        val application =
-          applicationBuilder(journeyData = Some(journeyData)).build()
+      when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+        .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
 
-        running(application) {
-          val result = route(application, fakeRequest).value
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
 
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe
-            controllers.routes.TaskListController.onPageLoad().url
-        }
+      running(application) {
+        val result = route(application, fakeRequest).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe
+          controllers.routes.TaskListController.onPageLoad().url
       }
+    }
 
-      "must redirect to Business Verification lockout when verification has failed" in {
-        val journeyData = JourneyData(
-          groupId = "groupId",
-          enrolmentId = "enrolmentId",
-          businessVerification = Some(
-            BusinessVerification(
-              businessRegistrationPassed = Some(true),
-              businessVerificationPassed = Some(false),
-              ctUtr = Some("1234567890"),
-              companyName = Some(testString),
-              registeredAddress = Some(
-                RegisteredAddress(
-                  addressLine1 = Some("address line 1"),
-                  addressLine2 = Some("address line 2"),
-                  addressLine3 = Some("address line 3"),
-                  postCode = Some("postcode")
-                )
+    "must redirect to GRS journey start when BV has not passed and user is not locked out" in {
+
+      val journeyData = JourneyData(
+        groupId = "groupId",
+        enrolmentId = "enrolmentId",
+        businessVerification = Some(
+          BusinessVerification(
+            businessRegistrationPassed = Some(true),
+            businessVerificationPassed = Some(false),
+            ctUtr = Some("1234567890"),
+            companyName = Some(testString),
+            registeredAddress = Some(
+              RegisteredAddress(
+                addressLine1 = Some("address line 1"),
+                addressLine2 = Some("address line 2"),
+                addressLine3 = Some("address line 3"),
+                postCode = Some("postcode")
               )
             )
           )
         )
+      )
 
-        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
-          .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
+      when(mockBvLockoutService.isUserLockedOut(any[String]))
+        .thenReturn(Future.successful(false))
 
-        val application =
-          applicationBuilder(journeyData = Some(journeyData)).build()
+      when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+        .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
 
-        running(application) {
-          val result = route(application, fakeRequest).value
+      when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
+        .thenReturn(Future.successful("http://grs-start-url"))
 
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe
-            controllers.routes.BusinessVerificationController.lockout().url
-        }
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val result = route(application, fakeRequest).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe "http://grs-start-url"
       }
+    }
 
-      "must redirect to GRS journey start when no business verification data exists" in {
-        val application =
-          applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+    "must redirect to GRS journey start when no business verification exists and user is not locked out" in {
 
-        when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
-          .thenReturn(Future.successful("http://grs-start-url"))
+      when(mockBvLockoutService.isUserLockedOut(any[String]))
+        .thenReturn(Future.successful(false))
 
-        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
-          .thenReturn(Future.successful(GetOrCreateJourneyData(false, emptyJourneyData)))
+      when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+        .thenReturn(Future.successful(GetOrCreateJourneyData(false, emptyJourneyData)))
 
-        running(application) {
-          val result = route(application, fakeRequest).value
+      when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
+        .thenReturn(Future.successful("http://grs-start-url"))
 
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe "http://grs-start-url"
-        }
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData))
+          .build()
+
+      running(application) {
+        val result = route(application, fakeRequest).value
+
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe "http://grs-start-url"
       }
+    }
 
-      "must redirect to GRS journey start when business verification exists but is incomplete" in {
-        val journeyData = JourneyData(
-          groupId = "groupId",
-          enrolmentId = "enrolmentId",
-          businessVerification = Some(
-            BusinessVerification(
-              businessRegistrationPassed = None,
-              businessVerificationPassed = None,
-              ctUtr = None,
-              companyName = Some(testString),
-              registeredAddress = Some(
-                RegisteredAddress(
-                  addressLine1 = Some("address line 1"),
-                  addressLine2 = Some("address line 2"),
-                  addressLine3 = Some("address line 3"),
-                  postCode = Some("postcode")
-                )
-              )
-            )
-          )
-        )
+    "must redirect to Internal Server Error when GRS service fails" in {
 
-        val application =
-          applicationBuilder(journeyData = Some(journeyData)).build()
+      when(mockBvLockoutService.isUserLockedOut(any[String]))
+        .thenReturn(Future.successful(false))
 
-        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
-          .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
+      when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+        .thenReturn(Future.successful(GetOrCreateJourneyData(false, emptyJourneyData)))
 
-        when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
-          .thenReturn(Future.successful("http://grs-start-url"))
+      when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
+        .thenReturn(Future.failed(new Exception("GRS down")))
 
-        running(application) {
-          val result = route(application, fakeRequest).value
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData))
+          .build()
 
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe "http://grs-start-url"
-        }
-      }
+      running(application) {
+        val result = route(application, fakeRequest).value
 
-      "must redirect to Internal Server Error page when GRS service fails" in {
-        val application =
-          applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-
-        when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
-          .thenReturn(Future.successful(GetOrCreateJourneyData(false, emptyJourneyData)))
-
-        when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
-          .thenReturn(Future.failed(new Exception("GRS down")))
-
-        running(application) {
-          val result = route(application, fakeRequest).value
-
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe
-            controllers.routes.InternalServerErrorController.onPageLoad().url
-        }
+        status(result)                 shouldBe SEE_OTHER
+        redirectLocation(result).value shouldBe
+          controllers.routes.InternalServerErrorController.onPageLoad().url
       }
     }
   }

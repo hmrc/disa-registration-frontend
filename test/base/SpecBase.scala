@@ -37,7 +37,7 @@ import play.api.mvc.RequestHeader
 import play.api.mvc.Results.{BadRequest, InternalServerError}
 import play.api.test.FakeRequest
 import play.api.{Application, inject}
-import repositories.SessionRepository
+import repositories.{BusinessVerificationLockoutRepository, SessionRepository}
 import services.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
@@ -81,9 +81,12 @@ trait SpecBase
   protected val mockRequestBuilder: RequestBuilder                             = mock[RequestBuilder]
   protected val mockErrorHandler: ErrorHandler                                 = mock[ErrorHandler]
   protected val mockSessionRepository: SessionRepository                       = mock[SessionRepository]
+  protected val mockBvLockoutRepository: BusinessVerificationLockoutRepository =
+    mock[BusinessVerificationLockoutRepository]
   protected val mockAddressLookupService: AddressLookupService                 = mock[AddressLookupService]
   protected val mockAddressLookupConnector: AddressLookupConnector             = mock[AddressLookupConnector]
   protected val mockRegisteredAddressUprnService: RegisteredAddressUprnService = mock[RegisteredAddressUprnService]
+  protected val mockBvLockoutService: BusinessVerificationLockoutService       = mock[BusinessVerificationLockoutService]
   protected val mockUuidGenerator: UuidGenerator                               = mock[UuidGenerator]
 
   override def beforeEach(): Unit = {
@@ -102,7 +105,9 @@ trait SpecBase
       mockAddressLookupService,
       mockAddressLookupConnector,
       mockRegisteredAddressUprnService,
-      mockUuidGenerator
+      mockUuidGenerator,
+      mockBvLockoutService,
+      mockBvLockoutRepository
     )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))
@@ -127,7 +132,9 @@ trait SpecBase
         inject.bind[GrsService].toInstance(mockGrsService),
         inject.bind[ErrorHandler].toInstance(mockErrorHandler),
         inject.bind[RegisteredAddressUprnService].toInstance(mockRegisteredAddressUprnService),
-        inject.bind[AddressLookupService].toInstance(mockAddressLookupService)
+        inject.bind[AddressLookupService].toInstance(mockAddressLookupService),
+        inject.bind[BusinessVerificationLockoutService].toInstance(mockBvLockoutService),
+        inject.bind[BusinessVerificationLockoutRepository].toInstance(mockBvLockoutRepository)
       )
       .overrides(overrides: _*)
 

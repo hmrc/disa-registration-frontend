@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,10 @@
 package controllers
 
 import controllers.actions.*
-import forms.InnovativeFinancialProductsFormProvider
-import models.journeydata.isaproducts.InnovativeFinancialProduct
 import play.api.Logging
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.GrsService
+import services.{BusinessVerificationLockoutService, GrsService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -34,33 +31,46 @@ class StartController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getOrCreateJourneyData: GetOrCreateJourneyDataAction,
-  formProvider: InnovativeFinancialProductsFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  genericRegistrationService: GrsService
+  genericRegistrationService: GrsService,
+  businessVerificationLockoutService: BusinessVerificationLockoutService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
-
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getOrCreateJourneyData).async { implicit request =>
+
+      val providerId = request.credentials.providerId
+
       request.journeyData.businessVerification
         .flatMap(_.businessVerificationPassed) match {
-        case Some(true)  =>
-          Future.successful(Redirect(routes.TaskListController.onPageLoad()))
-        case Some(false) =>
-          // Implement logic to check kick out time from BV failed timestamp?
-          // Not sure if we can add ttl to sub objects in mongo doc? probs not?
-          Future.successful(Redirect(controllers.routes.BusinessVerificationController.lockout()))
-        case _           =>
-          genericRegistrationService.getGRSJourneyStartUrl
-            .map(url => Redirect(url))
-            .recover { case NonFatal(ex) =>
-              logger.error("Failed to fetch GRS journey URL", ex)
-              Redirect(controllers.routes.InternalServerErrorController.onPageLoad())
-            }
+
+        case Some(true) =>
+          Future.successful(
+            Redirect(routes.TaskListController.onPageLoad())
+          )
+
+        case _ =>
+          businessVerificationLockoutService.isUserLockedOut(providerId).flatMap {
+
+            case true =>
+              logger.warn(
+                s"[StartController][onPageLoad] User $providerId is locked out of Business Verification journey"
+              )
+              Future.successful(
+                Redirect(routes.BusinessVerificationController.lockout())
+              )
+
+            case false =>
+              genericRegistrationService.getGRSJourneyStartUrl
+                .map(url => Redirect(url))
+                .recover { case NonFatal(ex) =>
+                  logger.error("Failed to fetch GRS journey URL", ex)
+                  Redirect(routes.InternalServerErrorController.onPageLoad())
+                }
+          }
       }
     }
 }

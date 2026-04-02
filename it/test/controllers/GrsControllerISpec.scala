@@ -16,16 +16,18 @@
 
 package controllers
 
-import play.api.http.Status.*
+import org.mongodb.scala.*
+import org.scalatest.concurrent.ScalaFutures
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, redirectLocation, route, status, writeableOf_AnyContentAsEmpty}
+import play.api.test.Helpers.*
+import repositories.BusinessVerificationLockoutRepository
 import uk.gov.hmrc.http.SessionKeys
 import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs}
 
-class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
+class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with ScalaFutures {
 
-  private val journeyId    = "test-journey-id"
+  private val journeyId = "test-journey-id"
 
   private val callbackUrl =
     s"/obligations/enrolment/isa/incorporated-identity-callback?journeyId=$journeyId"
@@ -36,166 +38,175 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs {
   private val fetchGrsJourneyUrl =
     s"/incorporated-entity-identification/api/journey/$journeyId"
 
-  "GET /incorporated-identity-callback?journeyId=" should {
+  private lazy val lockoutRepo =
+    app.injector.instanceOf[BusinessVerificationLockoutRepository]
 
-    "redirect to TaskList when registration and verification both pass" in {
-      val journeyData =
+  private val testProviderId = "id"
+
+  private def baseGrsResponse(
+                               registrationStatus: String,
+                               verificationStatus: Option[String] = None
+                             ): String = {
+
+    val bvJson = verificationStatus
+      .map(v =>
         s"""
-           |{
-           |  "groupId": "$testGroupId"
+           |,
+           |"businessVerification": {
+           |  "verificationStatus": "$v"
            |}
            |""".stripMargin
+      )
+      .getOrElse("")
 
-      val grsResponse =
-        """
-          |{
-          |  "companyProfile": {
-          |    "companyName": "Test Company Ltd",
-          |    "companyNumber": "01234567"
-          |  },
-          |  "identifiersMatch": true,
-          |  "registration": {
-          |    "registrationStatus": "REGISTERED",
-          |    "registeredBusinessPartnerId": "X00000123456789"
-          |  },
-          |  "ctutr": "1234567890",
-          |  "businessVerification": {
-          |    "verificationStatus": "PASS"
-          |  }
-          |}
-          |""".stripMargin
+    s"""
+       |{
+       |  "companyProfile": {
+       |    "companyName": "Test Company Ltd",
+       |    "companyNumber": "01234567"
+       |  },
+       |  "identifiersMatch": true,
+       |  "registration": {
+       |    "registrationStatus": "$registrationStatus"
+       |  }
+       |  $bvJson
+       |}
+       |""".stripMargin
+  }
 
-      stubAuth()
-      stubGet(getJourneyDataUrl, OK, journeyData)
-      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
-      stubPost(getJourneyDataUrl, NO_CONTENT, "")
-      val request =
-        FakeRequest(GET, callbackUrl)
-          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+  private def isLockedOut: Boolean =
+    await(lockoutRepo.isLockedOut(testProviderId))
 
-      val result = route(app, request).get
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    await(lockoutRepo.collection.drop().toFuture())
+  }
 
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe
-        Some(controllers.routes.TaskListController.onPageLoad().url)
-    }
+  "GET /incorporated-identity-callback" should {
 
-    "redirect to Business Verification lockout when verification fails" in {
+    "redirect to TaskList when registration AND verification pass" in {
+
       val journeyData =
-        s"""
-           |{
-           |  "groupId": "$testGroupId"
-           |}
-           |""".stripMargin
+        s"""{ "groupId": "$testGroupId" }"""
 
       val grsResponse =
-        """
-          |{
-          |  "companyProfile": {
-          |    "companyName": "Test Company Ltd",
-          |    "companyNumber": "01234567"
-          |  },
-          |  "identifiersMatch": true,
-          |  "registration": {
-          |    "registrationStatus": "REGISTERED"
-          |  },
-          |  "businessVerification": {
-          |    "verificationStatus": "FAIL"
-          |  }
-          |}
-          |""".stripMargin
+        baseGrsResponse("REGISTERED", Some("PASS"))
 
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
       stubPost(getJourneyDataUrl, NO_CONTENT, "")
 
-      val request =
+      val result = route(app,
         FakeRequest(GET, callbackUrl)
           .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
-
-      val result = route(app, request).get
+      ).get
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe
-        Some(controllers.routes.BusinessVerificationController.lockout().url)
+        Some(routes.TaskListController.onPageLoad().url)
+
+      isLockedOut shouldBe false
     }
 
-    "redirect to Start when registration has not passed" in {
+    "lock user and redirect to lockout when verification FAILS" in {
+
       val journeyData =
-        s"""
-           |{
-           |  "groupId": "$testGroupId"
-           |}
-           |""".stripMargin
+        s"""{ "groupId": "$testGroupId" }"""
 
       val grsResponse =
-        """
-          |{
-          |  "companyProfile": {
-          |    "companyName": "Test Company Ltd",
-          |    "companyNumber": "01234567"
-          |  },
-          |  "identifiersMatch": true,
-          |  "registration": {
-          |    "registrationStatus": "REGISTRATION_FAILED"
-          |  }
-          |}
-          |""".stripMargin
+        baseGrsResponse("REGISTERED", Some("FAIL"))
 
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
       stubPost(getJourneyDataUrl, NO_CONTENT, "")
 
-      val request =
+      val result = route(app,
         FakeRequest(GET, callbackUrl)
           .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
-
-      val result = route(app, request).get
+      ).get
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe
-        Some(controllers.routes.StartController.onPageLoad().url)
+        Some(routes.BusinessVerificationController.lockout().url)
+
+      isLockedOut shouldBe true
     }
 
-    "redirect to Start when verification has not been attempted" in {
+    "redirect to Start when registration FAILS" in {
+
       val journeyData =
-        s"""
-           |{
-           |  "groupId": "$testGroupId"
-           |}
-           |""".stripMargin
+        s"""{ "groupId": "$testGroupId" }"""
 
       val grsResponse =
-        """
-          |{
-          |  "companyProfile": {
-          |    "companyName": "Test Company Ltd",
-          |    "companyNumber": "01234567"
-          |  },
-          |  "identifiersMatch": true,
-          |  "registration": {
-          |    "registrationStatus": "REGISTERED"
-          |  }
-          |}
-          |""".stripMargin
+        baseGrsResponse("REGISTRATION_FAILED", Some("PASS"))
 
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
       stubPost(getJourneyDataUrl, NO_CONTENT, "")
 
-      val request =
+      val result = route(app,
         FakeRequest(GET, callbackUrl)
           .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
-
-      val result = route(app, request).get
+      ).get
 
       status(result) shouldBe SEE_OTHER
       redirectLocation(result) shouldBe
-        Some(controllers.routes.StartController.onPageLoad().url)
+        Some(routes.StartController.onPageLoad().url)
+
+      isLockedOut shouldBe false
     }
 
+    "redirect to Start when registration NOT CALLED" in {
+
+      val journeyData =
+        s"""{ "groupId": "$testGroupId" }"""
+
+      val grsResponse =
+        baseGrsResponse("REGISTRATION_NOT_CALLED", None)
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+
+      val result = route(app,
+        FakeRequest(GET, callbackUrl)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+      ).get
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe
+        Some(routes.StartController.onPageLoad().url)
+
+      isLockedOut shouldBe false
+    }
+
+    "redirect to Start when verification is missing" in {
+
+      val journeyData =
+        s"""{ "groupId": "$testGroupId" }"""
+
+      val grsResponse =
+        baseGrsResponse("REGISTERED", None)
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+
+      val result = route(app,
+        FakeRequest(GET, callbackUrl)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+      ).get
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe
+        Some(routes.StartController.onPageLoad().url)
+
+      isLockedOut shouldBe false
+    }
   }
 }
