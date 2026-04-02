@@ -25,7 +25,6 @@ import scala.concurrent.Future
 
 class BusinessVerificationLockoutServiceSpec extends SpecBase {
 
-
   private val service = new BusinessVerificationLockoutService(mockBvLockoutRepository)
 
   override def beforeEach(): Unit = {

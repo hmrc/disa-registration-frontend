@@ -21,11 +21,11 @@ import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 case class BusinessVerificationLockout(
-                    userId: String,
-                    createdAt: Instant = Instant.now()
-                  )
+  userId: String,
+  createdAt: Instant = Instant.now()
+)
 
 object BusinessVerificationLockout {
-  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+  implicit val instantFormat: Format[Instant]              = MongoJavatimeFormats.instantFormat
   implicit val format: Format[BusinessVerificationLockout] = Json.format[BusinessVerificationLockout]
 }

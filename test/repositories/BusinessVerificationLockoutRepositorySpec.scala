@@ -37,7 +37,7 @@ class BusinessVerificationLockoutRepositorySpec extends SpecBase {
     MongoComponent(mongoUri)
 
   private val repository: BusinessVerificationLockoutRepository =
-    new BusinessVerificationLockoutRepository(mongoComponent, clock)
+    new BusinessVerificationLockoutRepository(mongoComponent, clock, mockAppConfig)
 
   override def beforeEach(): Unit = {
     super.beforeEach()

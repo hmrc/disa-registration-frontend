@@ -23,12 +23,12 @@ import scala.concurrent.Future
 
 @Singleton
 class BusinessVerificationLockoutService @Inject() (
-                                                     repository: BusinessVerificationLockoutRepository
-                                                   ) {
-  
+  repository: BusinessVerificationLockoutRepository
+) {
+
   def lockUserOut(userId: String): Future[Unit] =
     repository.lockUser(userId)
-  
+
   def isUserLockedOut(userId: String): Future[Boolean] =
     repository.isLockedOut(userId)
 }

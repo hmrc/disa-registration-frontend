@@ -16,43 +16,47 @@
 
 package repositories
 
+import config.FrontendAppConfig
 import models.grs.BusinessVerificationLockout
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
 import java.time.{Clock, Instant}
+import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BusinessVerificationLockoutRepository @Inject()(
-                                    mongoComponent: MongoComponent,
-                                    clock: Clock
-                                  )(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[BusinessVerificationLockout](
-    mongoComponent = mongoComponent,
-    collectionName = "BusinessVerificationLockouts",
-    domainFormat   = BusinessVerificationLockout.format,
-    indexes = Seq(
-      IndexModel(
-        Indexes.ascending("createdAt"),
-        IndexOptions()
-          .name("business-verification-lockout-expiry")
-          .expireAfter(14400, java.util.concurrent.TimeUnit.SECONDS) // 4 hours - make config fdriven
-      ),
-      IndexModel(
-        Indexes.ascending("userId"),
-        IndexOptions().unique(true)
+class BusinessVerificationLockoutRepository @Inject() (
+  mongoComponent: MongoComponent,
+  clock: Clock,
+  appConfig: FrontendAppConfig
+)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[BusinessVerificationLockout](
+      mongoComponent = mongoComponent,
+      collectionName = "BusinessVerificationLockouts",
+      domainFormat = BusinessVerificationLockout.format,
+      indexes = Seq(
+        IndexModel(
+          Indexes.ascending("createdAt"),
+          IndexOptions()
+            .name("business-verification-lockout-expiry")
+            .expireAfter(appConfig.bvLockoutTtl, TimeUnit.HOURS)
+        ),
+        IndexModel(
+          Indexes.ascending("userId"),
+          IndexOptions().unique(true)
+        )
       )
-    )
-  ) {
+    ) {
 
   private def now(): Instant = Instant.now(clock)
 
   def lockUser(userId: String): Future[Unit] =
     collection
-      .replaceOne(Filters.equal("userId", userId),
+      .replaceOne(
+        Filters.equal("userId", userId),
         BusinessVerificationLockout(userId = userId, createdAt = now()),
         org.mongodb.scala.model.ReplaceOptions().upsert(true)
       )
