@@ -42,7 +42,7 @@ class BusinessVerificationLockoutRepository @Inject() (
           Indexes.ascending("createdAt"),
           IndexOptions()
             .name("business-verification-lockout-expiry")
-            .expireAfter(appConfig.bvLockoutTtl, TimeUnit.HOURS)
+            .expireAfter(appConfig.bvLockoutTtl, TimeUnit.MINUTES)
         ),
         IndexModel(
           Indexes.ascending("ctutr"),
