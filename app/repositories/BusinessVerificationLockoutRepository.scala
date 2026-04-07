@@ -45,7 +45,7 @@ class BusinessVerificationLockoutRepository @Inject() (
             .expireAfter(appConfig.bvLockoutTtl, TimeUnit.HOURS)
         ),
         IndexModel(
-          Indexes.ascending("utr"),
+          Indexes.ascending("ctutr"),
           IndexOptions().unique(true)
         ),
         IndexModel(
@@ -56,12 +56,12 @@ class BusinessVerificationLockoutRepository @Inject() (
 
   private def now(): Instant = Instant.now(clock)
 
-  def lockOrg(groupId: String, utr: String): Future[Unit] =
+  def lockOrg(groupId: String, ctutr: String): Future[Unit] =
     collection
       .updateOne(
-        Filters.equal("utr", utr),
+        Filters.equal("ctutr", ctutr),
         Updates.combine(
-          Updates.setOnInsert("utr", utr),
+          Updates.setOnInsert("ctutr", ctutr),
           Updates.setOnInsert("createdAt", now()),
           Updates.addToSet("groupId", groupId)
         ),

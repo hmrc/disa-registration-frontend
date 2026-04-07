@@ -53,21 +53,21 @@ class BusinessVerificationLockoutRepositorySpec extends SpecBase {
       repository.isGroupLockedOut("group-1").futureValue mustBe false
     }
 
-    "lock a groupId under a utr and return true when checked" in {
-      repository.lockOrg("group-1", "utr-1").futureValue
+    "lock a groupId under a ctutr and return true when checked" in {
+      repository.lockOrg("group-1", "ctutr-1").futureValue
 
       repository.isGroupLockedOut("group-1").futureValue mustBe true
     }
 
-    "upsert a lockout when utr already exists and append groupId" in {
-      repository.lockOrg("group-1", "utr-1").futureValue
-      repository.lockOrg("group-2", "utr-1").futureValue
+    "upsert a lockout when ctutr already exists and append groupId" in {
+      repository.lockOrg("group-1", "ctutr-1").futureValue
+      repository.lockOrg("group-2", "ctutr-1").futureValue
 
       repository.isGroupLockedOut("group-1").futureValue mustBe true
       repository.isGroupLockedOut("group-2").futureValue mustBe true
 
       val record = await(
-        repository.collection.find(Filters.equal("utr", "utr-1")).head()
+        repository.collection.find(Filters.equal("ctutr", "ctutr-1")).head()
       )
 
       record.groupId must contain allOf ("group-1", "group-2")
@@ -75,43 +75,43 @@ class BusinessVerificationLockoutRepositorySpec extends SpecBase {
     }
 
     "not duplicate groupIds when locking same group multiple times" in {
-      repository.lockOrg("group-1", "utr-1").futureValue
-      repository.lockOrg("group-1", "utr-1").futureValue
+      repository.lockOrg("group-1", "ctutr-1").futureValue
+      repository.lockOrg("group-1", "ctutr-1").futureValue
 
       val record = await(
-        repository.collection.find(Filters.equal("utr", "utr-1")).head()
+        repository.collection.find(Filters.equal("ctutr", "ctutr-1")).head()
       )
 
       record.groupId.count(_ == "group-1") mustBe 1
     }
 
     "store createdAt when locking a group" in {
-      repository.lockOrg("group-2", "utr-2").futureValue
+      repository.lockOrg("group-2", "ctutr-2").futureValue
 
       val record = await(
-        repository.collection.find(Filters.equal("utr", "utr-2")).head()
+        repository.collection.find(Filters.equal("ctutr", "ctutr-2")).head()
       )
 
       record.createdAt mustBe fixedInstant
       record.groupId must contain("group-2")
     }
 
-    "handle multiple groups across different utrs independently" in {
-      repository.lockOrg("group-1", "utr-1").futureValue
-      repository.lockOrg("group-2", "utr-2").futureValue
+    "handle multiple groups across different ctutrs independently" in {
+      repository.lockOrg("group-1", "ctutr-1").futureValue
+      repository.lockOrg("group-2", "ctutr-2").futureValue
 
       repository.isGroupLockedOut("group-1").futureValue mustBe true
       repository.isGroupLockedOut("group-2").futureValue mustBe true
       repository.isGroupLockedOut("group-3").futureValue mustBe false
     }
 
-    "allow multiple groupIds under the same utr" in {
-      repository.lockOrg("group-1", "utr-1").futureValue
-      repository.lockOrg("group-2", "utr-1").futureValue
-      repository.lockOrg("group-3", "utr-1").futureValue
+    "allow multiple groupIds under the same ctutr" in {
+      repository.lockOrg("group-1", "ctutr-1").futureValue
+      repository.lockOrg("group-2", "ctutr-1").futureValue
+      repository.lockOrg("group-3", "ctutr-1").futureValue
 
       val record = await(
-        repository.collection.find(Filters.equal("utr", "utr-1")).head()
+        repository.collection.find(Filters.equal("ctutr", "ctutr-1")).head()
       )
 
       record.groupId must contain allOf ("group-1", "group-2", "group-3")

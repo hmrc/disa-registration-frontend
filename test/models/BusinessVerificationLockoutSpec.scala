@@ -28,14 +28,14 @@ class BusinessVerificationLockoutSpec extends JsonFormatSpec[BusinessVerificatio
 
   override val model: BusinessVerificationLockout =
     BusinessVerificationLockout(
-      utr = testString,
+      ctutr = testString,
       groupId = Seq(testGroupId),
       createdAt = testCreatedAt
     )
 
   override val expectedJsonFromWrites: JsValue =
     Json.obj(
-      "utr"       -> testString,
+      "ctutr"     -> testString,
       "groupId"   -> Seq(testGroupId),
       "createdAt" -> Json.toJson(testCreatedAt)(BusinessVerificationLockout.instantFormat)
     )

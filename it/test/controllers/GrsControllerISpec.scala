@@ -58,7 +58,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       )
       .getOrElse("")
 
-    val utrJson =
+    val ctutrJson =
       ctutr.map(u => s""""ctutr": "$u",""").getOrElse("")
 
     s"""
@@ -68,7 +68,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
        |    "companyNumber": "01234567"
        |  },
        |  "identifiersMatch": true,
-       |  $utrJson
+       |  $ctutrJson
        |  "registration": {
        |    "registrationStatus": "$registrationStatus"
        |  }

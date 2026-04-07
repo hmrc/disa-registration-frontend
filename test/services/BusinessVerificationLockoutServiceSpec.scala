@@ -38,10 +38,10 @@ class BusinessVerificationLockoutServiceSpec extends SpecBase {
       when(mockBvLockoutRepository.lockOrg(any[String], any[String]))
         .thenReturn(Future.successful(()))
 
-      val result = service.lockout("group-1", "utr-1").futureValue
+      val result = service.lockout("group-1", "ctutr-1").futureValue
 
       result mustBe (())
-      verify(mockBvLockoutRepository).lockOrg("group-1", "utr-1")
+      verify(mockBvLockoutRepository).lockOrg("group-1", "ctutr-1")
     }
 
     "isGroupLockedOut should return true when repository returns true" in {

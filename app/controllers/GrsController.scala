@@ -62,9 +62,9 @@ class GrsController @Inject() (
 
           case (_, _) if grsResponse.businessVerificationStatus.contains(BvFail) =>
             grsResponse.ctutr match {
-              case Some(utr) =>
+              case Some(ctutr) =>
                 businessVerificationLockoutService
-                  .lockout(request.groupId, utr)
+                  .lockout(request.groupId, ctutr)
                   .map { _ =>
                     Redirect(routes.BusinessVerificationController.lockout())
                   }
