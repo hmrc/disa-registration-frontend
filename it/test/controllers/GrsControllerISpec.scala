@@ -41,11 +41,10 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
   private lazy val lockoutRepo =
     app.injector.instanceOf[BusinessVerificationLockoutRepository]
 
-  private val testProviderId = "id"
-
   private def baseGrsResponse(
                                registrationStatus: String,
-                               verificationStatus: Option[String] = None
+                               verificationStatus: Option[String] = None,
+                               ctutr: Option[String] = Some("1234567890")
                              ): String = {
 
     val bvJson = verificationStatus
@@ -59,6 +58,9 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       )
       .getOrElse("")
 
+    val utrJson =
+      ctutr.map(u => s""""ctutr": "$u",""").getOrElse("")
+
     s"""
        |{
        |  "companyProfile": {
@@ -66,6 +68,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
        |    "companyNumber": "01234567"
        |  },
        |  "identifiersMatch": true,
+       |  $utrJson
        |  "registration": {
        |    "registrationStatus": "$registrationStatus"
        |  }
@@ -75,7 +78,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
   }
 
   private def isLockedOut: Boolean =
-    await(lockoutRepo.isLockedOut(testProviderId))
+    await(lockoutRepo.isGroupLockedOut(testGroupId))
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -109,7 +112,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       isLockedOut shouldBe false
     }
 
-    "lock user and redirect to lockout when verification FAILS" in {
+    "lock user and redirect to lockout when verification FAILS with UTR present" in {
 
       val journeyData =
         s"""{ "groupId": "$testGroupId" }"""
@@ -132,6 +135,31 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
         Some(routes.BusinessVerificationController.lockout().url)
 
       isLockedOut shouldBe true
+    }
+
+    "redirect to Start when verification FAILS but UTR is missing (no lockout)" in {
+
+      val journeyData =
+        s"""{ "groupId": "$testGroupId" }"""
+
+      val grsResponse =
+        baseGrsResponse("REGISTERED", Some("FAIL"), ctutr = None)
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubGet(fetchGrsJourneyUrl, OK, grsResponse)
+      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+
+      val result = route(app,
+        FakeRequest(GET, callbackUrl)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+      ).get
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe
+        Some(routes.StartController.onPageLoad().url)
+
+      isLockedOut shouldBe false
     }
 
     "redirect to Start when registration FAILS" in {

@@ -20,10 +20,7 @@ import java.time.Instant
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
-case class BusinessVerificationLockout(
-  userId: String,
-  createdAt: Instant = Instant.now()
-)
+case class BusinessVerificationLockout(utr: String, groupId: Seq[String], createdAt: Instant = Instant.now())
 
 object BusinessVerificationLockout {
   implicit val instantFormat: Format[Instant]              = MongoJavatimeFormats.instantFormat

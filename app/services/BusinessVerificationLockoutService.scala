@@ -26,9 +26,9 @@ class BusinessVerificationLockoutService @Inject() (
   repository: BusinessVerificationLockoutRepository
 ) {
 
-  def lockUserOut(userId: String): Future[Unit] =
-    repository.lockUser(userId)
+  def lockout(groupId: String, utr: String): Future[Unit] =
+    repository.lockOrg(groupId, utr)
 
-  def isUserLockedOut(userId: String): Future[Boolean] =
-    repository.isLockedOut(userId)
+  def isGroupLockedOut(groupId: String): Future[Boolean] =
+    repository.isGroupLockedOut(groupId)
 }

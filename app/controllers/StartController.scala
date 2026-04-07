@@ -41,9 +41,6 @@ class StartController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getOrCreateJourneyData).async { implicit request =>
-
-      val providerId = request.credentials.providerId
-
       request.journeyData.businessVerification
         .flatMap(_.businessVerificationPassed) match {
 
@@ -53,11 +50,10 @@ class StartController @Inject() (
           )
 
         case _ =>
-          businessVerificationLockoutService.isUserLockedOut(providerId).flatMap {
-
+          businessVerificationLockoutService.isGroupLockedOut(request.groupId).flatMap {
             case true =>
               logger.warn(
-                s"[StartController][onPageLoad] User $providerId is locked out of Business Verification journey"
+                s"[StartController][onPageLoad] GroupId: ${request.groupId} is locked out of Business Verification journey"
               )
               Future.successful(
                 Redirect(routes.BusinessVerificationController.lockout())

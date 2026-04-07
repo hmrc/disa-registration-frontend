@@ -43,8 +43,6 @@ class GrsController @Inject() (
 
   def grsCallback(journeyId: String): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
-
-      val internalId = request.credentials.providerId
       grsService.fetchGRSJourneyData(journeyId).flatMap { grsResponse =>
 
         val businessVerification =
@@ -57,17 +55,27 @@ class GrsController @Inject() (
 
           case (Some(BvPass), true) =>
             journeyAnswersService
-              .update(businessVerification, request.groupId, internalId)
+              .update(businessVerification, request.groupId, request.credentials.providerId)
               .map { _ =>
                 Redirect(routes.TaskListController.onPageLoad())
               }
 
           case (_, _) if grsResponse.businessVerificationStatus.contains(BvFail) =>
-            businessVerificationLockoutService.lockUserOut(internalId).map { _ =>
-              Redirect(routes.BusinessVerificationController.lockout())
-            }
+            grsResponse.ctutr match {
+              case Some(utr) =>
+                businessVerificationLockoutService
+                  .lockout(request.groupId, utr)
+                  .map { _ =>
+                    Redirect(routes.BusinessVerificationController.lockout())
+                  }
 
-          case _ =>
+              case None =>
+                logger.warn(s"[BV] Missing UTR on failed verification for groupId=${request.groupId}")
+                Future.successful(
+                  Redirect(routes.StartController.onPageLoad())
+                )
+            }
+          case _                                                                 =>
             Future.successful(
               Redirect(routes.StartController.onPageLoad())
             )

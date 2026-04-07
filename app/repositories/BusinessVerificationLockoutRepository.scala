@@ -18,7 +18,7 @@ package repositories
 
 import config.FrontendAppConfig
 import models.grs.BusinessVerificationLockout
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, UpdateOptions, Updates}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
@@ -45,27 +45,36 @@ class BusinessVerificationLockoutRepository @Inject() (
             .expireAfter(appConfig.bvLockoutTtl, TimeUnit.HOURS)
         ),
         IndexModel(
-          Indexes.ascending("userId"),
+          Indexes.ascending("utr"),
           IndexOptions().unique(true)
+        ),
+        IndexModel(
+          Indexes.ascending("groupId")
         )
       )
     ) {
 
   private def now(): Instant = Instant.now(clock)
 
-  def lockUser(userId: String): Future[Unit] =
+  def lockOrg(groupId: String, utr: String): Future[Unit] =
     collection
-      .replaceOne(
-        Filters.equal("userId", userId),
-        BusinessVerificationLockout(userId = userId, createdAt = now()),
-        org.mongodb.scala.model.ReplaceOptions().upsert(true)
+      .updateOne(
+        Filters.equal("utr", utr),
+        Updates.combine(
+          Updates.setOnInsert("utr", utr),
+          Updates.setOnInsert("createdAt", now()),
+          Updates.addToSet("groupId", groupId)
+        ),
+        UpdateOptions().upsert(true)
       )
       .toFuture()
       .map(_ => ())
 
-  def isLockedOut(userId: String): Future[Boolean] =
+  def isGroupLockedOut(groupId: String): Future[Boolean] =
     collection
-      .find(Filters.equal("userId", userId))
-      .headOption()
-      .map(_.isDefined)
+      .countDocuments(
+        Filters.equal("groupId", groupId)
+      )
+      .toFuture()
+      .map(_ > 0)
 }

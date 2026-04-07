@@ -17,9 +17,9 @@
 package services
 
 import base.SpecBase
-import repositories.BusinessVerificationLockoutRepository
-import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
+import repositories.BusinessVerificationLockoutRepository
 
 import scala.concurrent.Future
 
@@ -34,34 +34,34 @@ class BusinessVerificationLockoutServiceSpec extends SpecBase {
 
   "BusinessVerificationLockoutService" - {
 
-    "lockUserOut should call repository.lockUser" in {
-      when(mockBvLockoutRepository.lockUser(any[String]))
+    "lockout should call repository.lockOrg" in {
+      when(mockBvLockoutRepository.lockOrg(any[String], any[String]))
         .thenReturn(Future.successful(()))
 
-      val result = service.lockUserOut("user-1").futureValue
+      val result = service.lockout("group-1", "utr-1").futureValue
 
       result mustBe (())
-      verify(mockBvLockoutRepository).lockUser("user-1")
+      verify(mockBvLockoutRepository).lockOrg("group-1", "utr-1")
     }
 
-    "isUserLockedOut should return true when repository returns true" in {
-      when(mockBvLockoutRepository.isLockedOut("user-1"))
+    "isGroupLockedOut should return true when repository returns true" in {
+      when(mockBvLockoutRepository.isGroupLockedOut("group-1"))
         .thenReturn(Future.successful(true))
 
-      val result = service.isUserLockedOut("user-1").futureValue
+      val result = service.isGroupLockedOut("group-1").futureValue
 
       result mustBe true
-      verify(mockBvLockoutRepository).isLockedOut("user-1")
+      verify(mockBvLockoutRepository).isGroupLockedOut("group-1")
     }
 
-    "isUserLockedOut should return false when repository returns false" in {
-      when(mockBvLockoutRepository.isLockedOut("user-2"))
+    "isGroupLockedOut should return false when repository returns false" in {
+      when(mockBvLockoutRepository.isGroupLockedOut("group-2"))
         .thenReturn(Future.successful(false))
 
-      val result = service.isUserLockedOut("user-2").futureValue
+      val result = service.isGroupLockedOut("group-2").futureValue
 
       result mustBe false
-      verify(mockBvLockoutRepository).isLockedOut("user-2")
+      verify(mockBvLockoutRepository).isGroupLockedOut("group-2")
     }
   }
 }

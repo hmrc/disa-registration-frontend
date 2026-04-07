@@ -20,6 +20,7 @@ import base.SpecBase
 import models.grs.*
 import models.journeydata.{BusinessVerification, RegisteredAddress}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.test.FakeRequest
@@ -36,12 +37,13 @@ class GrsControllerSpec extends SpecBase {
 
   private def baseGRSResponse(
     businessRegistrationStatus: BusinessRegistrationStatus = RegisteredStatus,
-    businessVerificationStatus: Option[BusinessVerificationStatus] = Some(BvPass)
+    businessVerificationStatus: Option[BusinessVerificationStatus] = Some(BvPass),
+    ctutr: Option[String] = Some("1234567890")
   ) =
     GRSResponse(
       companyNumber = "01234567",
       companyName = Some("Test Co"),
-      ctutr = Some("1234567890"),
+      ctutr = ctutr,
       chrn = None,
       dateOfIncorporation = None,
       countryOfIncorporation = "GB",
@@ -97,17 +99,16 @@ class GrsControllerSpec extends SpecBase {
           redirectLocation(result).value shouldBe controllers.routes.TaskListController.onPageLoad().url
         }
       }
-      "must redirect to BusinessVerificationLockout when business verification fails and lock the user" in {
 
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData))
-          .build()
+      "must redirect to BusinessVerificationController when business verification fails and lock the user when UTR is present" in {
 
+        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse(businessVerificationStatus = Some(BvFail))
 
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
 
-        when(mockBvLockoutService.lockUserOut(any[String]))
+        when(mockBvLockoutService.lockout(eqTo(testGroupId), eqTo("1234567890")))
           .thenReturn(Future.successful(()))
 
         running(application) {
@@ -116,7 +117,30 @@ class GrsControllerSpec extends SpecBase {
           status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe controllers.routes.BusinessVerificationController.lockout().url
 
-          verify(mockBvLockoutService).lockUserOut(any[String])
+        }
+      }
+
+      "must redirect to Start when business verification fails but UTR is missing" in {
+
+        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+
+        val grsResponse =
+          baseGRSResponse(
+            businessVerificationStatus = Some(BvFail),
+            ctutr = None
+          )
+
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+          .thenReturn(Future.successful(grsResponse))
+
+        running(application) {
+          val result = route(application, fakeRequest).value
+
+          status(result)                 shouldBe SEE_OTHER
+          redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
+
+          verify(mockBvLockoutService, Mockito.never())
+            .lockout(any[String], any[String])
         }
       }
 

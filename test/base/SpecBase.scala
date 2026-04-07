@@ -41,6 +41,7 @@ import repositories.{BusinessVerificationLockoutRepository, SessionRepository}
 import services.*
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
+import uk.gov.hmrc.mongo.play.PlayMongoModule
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{JourneyDataBuilder, TestData, UuidGenerator}
 

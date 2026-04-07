@@ -39,13 +39,14 @@ class StartControllerSpec extends SpecBase {
 
     "must redirect to Business Verification lockout when user is locked out and BV not passed" in {
 
-      val journeyData = emptyJourneyData
-
-      when(mockBvLockoutService.isUserLockedOut(any[String]))
+      when(mockBvLockoutService.isGroupLockedOut(any[String]))
         .thenReturn(Future.successful(true))
 
+      when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
+        .thenReturn(Future.successful(GetOrCreateJourneyData(false, emptyJourneyData)))
+
       val application =
-        applicationBuilder(journeyData = Some(journeyData))
+        applicationBuilder(journeyData = Some(emptyJourneyData))
           .build()
 
       running(application) {
@@ -55,7 +56,7 @@ class StartControllerSpec extends SpecBase {
         redirectLocation(result).value shouldBe
           controllers.routes.BusinessVerificationController.lockout().url
 
-        verify(mockBvLockoutService).isUserLockedOut(any[String])
+        verify(mockBvLockoutService).isGroupLockedOut(any[String])
       }
     }
 
@@ -82,12 +83,8 @@ class StartControllerSpec extends SpecBase {
         )
       )
 
-      // Even if locked out, should still go to TaskList
-      when(mockBvLockoutService.isUserLockedOut(any[String]))
-        .thenReturn(Future.successful(true))
-
-      when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
-        .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
+      when(mockBvLockoutService.isGroupLockedOut(any[String]))
+        .thenReturn(Future.successful(true)) // even if locked, should ignore
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
@@ -125,11 +122,8 @@ class StartControllerSpec extends SpecBase {
         )
       )
 
-      when(mockBvLockoutService.isUserLockedOut(any[String]))
+      when(mockBvLockoutService.isGroupLockedOut(any[String]))
         .thenReturn(Future.successful(false))
-
-      when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
-        .thenReturn(Future.successful(GetOrCreateJourneyData(false, journeyData)))
 
       when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.successful("http://grs-start-url"))
@@ -143,16 +137,15 @@ class StartControllerSpec extends SpecBase {
 
         status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe "http://grs-start-url"
+
+        verify(mockBvLockoutService).isGroupLockedOut(any[String])
       }
     }
 
     "must redirect to GRS journey start when no business verification exists and user is not locked out" in {
 
-      when(mockBvLockoutService.isUserLockedOut(any[String]))
+      when(mockBvLockoutService.isGroupLockedOut(any[String]))
         .thenReturn(Future.successful(false))
-
-      when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
-        .thenReturn(Future.successful(GetOrCreateJourneyData(false, emptyJourneyData)))
 
       when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.successful("http://grs-start-url"))
@@ -171,11 +164,8 @@ class StartControllerSpec extends SpecBase {
 
     "must redirect to Internal Server Error when GRS service fails" in {
 
-      when(mockBvLockoutService.isUserLockedOut(any[String]))
+      when(mockBvLockoutService.isGroupLockedOut(any[String]))
         .thenReturn(Future.successful(false))
-
-      when(mockJourneyAnswersService.getOrCreateJourneyData(any)(any))
-        .thenReturn(Future.successful(GetOrCreateJourneyData(false, emptyJourneyData)))
 
       when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.failed(new Exception("GRS down")))

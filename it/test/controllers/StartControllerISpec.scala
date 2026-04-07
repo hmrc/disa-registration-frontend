@@ -32,9 +32,7 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
   private val controllerEndpoint = "/obligations/enrolment/isa/start"
   private val getOrCreateEnrolmentUrl = s"/disa-registration/journey/$testGroupId"
   private val grsStartUrl = "/incorporated-entity-identification/api/limited-company-journey"
-
-  private val testProviderId = "id"
-
+  
   override lazy val app: Application =
     new GuiceApplicationBuilder()
       .configure(config)
@@ -44,7 +42,7 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
     app.injector.instanceOf[BusinessVerificationLockoutRepository]
 
   private def lockUser(): Unit =
-    await(lockoutRepo.lockUser(testProviderId))
+    await(lockoutRepo.lockOrg(testGroupId, "1234567890"))
 
   private def clearLock(): Unit =
     await(lockoutRepo.collection.drop().toFuture())
