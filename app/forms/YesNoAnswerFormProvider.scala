@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import models.journeydata.liaisonofficers.LiaisonOfficers
+import javax.inject.Inject
 
-case object LiaisonOfficerEmailPage extends Page[LiaisonOfficers] {
+import forms.mappings.Mappings
+import play.api.data.Form
+import models.YesNoAnswer
 
-  override def toString: String = "liaisonOfficerEmail"
+class YesNoAnswerFormProvider @Inject() extends Mappings {
+
+  def apply(requiredKey: String): Form[YesNoAnswer] =
+    Form(
+      "value" -> enumerable[YesNoAnswer](requiredKey)
+    )
 }

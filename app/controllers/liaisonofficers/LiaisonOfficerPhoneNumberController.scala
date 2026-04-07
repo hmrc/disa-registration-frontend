@@ -24,7 +24,7 @@ import models.Mode
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.LiaisonOfficerPhoneNumberPage
+import pages.liaisonofficers.LiaisonOfficerPhoneNumberPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

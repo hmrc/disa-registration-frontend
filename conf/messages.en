@@ -246,6 +246,11 @@ liaisonOfficerCommunication.change.hidden = communication preferences
 liaisonOfficerCya.title = Check added liaison officer
 liaisonOfficerCya.heading = Check added liaison officer
 
+removeLiaisonOfficer.title = Are you sure you want to remove {0} as a liaison officer?
+removeLiaisonOfficer.heading = Are you sure you want to remove {0} as a liaison officer?
+removeLiaisonOfficer.error.required = Select yes if you want to remove this liaison officer
+
+
 ### Certificates of Authority
 
 eligibilityToManageIsa.title = Eligibility to manage ISAs
