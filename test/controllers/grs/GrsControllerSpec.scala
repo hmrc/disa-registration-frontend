@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ import base.SpecBase
 import models.grs.*
 import models.journeydata.{BusinessVerification, RegisteredAddress}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.when
+import org.mockito.Mockito
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -31,16 +32,18 @@ class GrsControllerSpec extends SpecBase {
 
   val journeyId = "testJourneyId"
 
-  private def fakeRequest = FakeRequest(GET, controllers.routes.GrsController.grsCallback(journeyId).url)
+  private def fakeRequest =
+    FakeRequest(GET, controllers.routes.GrsController.grsCallback(journeyId).url)
 
   private def baseGRSResponse(
     businessRegistrationStatus: BusinessRegistrationStatus = RegisteredStatus,
-    businessVerificationStatus: Option[BusinessVerificationStatus] = Some(BvPass)
+    businessVerificationStatus: Option[BusinessVerificationStatus] = Some(BvPass),
+    ctutr: Option[String] = Some("1234567890")
   ) =
     GRSResponse(
       companyNumber = "01234567",
       companyName = Some("Test Co"),
-      ctutr = Some("1234567890"),
+      ctutr = ctutr,
       chrn = None,
       dateOfIncorporation = None,
       countryOfIncorporation = "GB",
@@ -65,8 +68,10 @@ class GrsControllerSpec extends SpecBase {
       "must redirect to TaskList when both registration and verification pass" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse()
+
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
+
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
           .thenReturn(
             Future.successful(
@@ -74,7 +79,7 @@ class GrsControllerSpec extends SpecBase {
                 Some(true),
                 Some(true),
                 Some("1234567890"),
-                companyName = Some(testString),
+                companyName = Some("Test Co"),
                 registeredAddress = Some(
                   RegisteredAddress(
                     addressLine1 = Some("address line 1"),
@@ -88,53 +93,67 @@ class GrsControllerSpec extends SpecBase {
           )
 
         running(application) {
-          val request = fakeRequest
-          val result  = route(application, request).value
+          val result = route(application, fakeRequest).value
 
           status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe controllers.routes.TaskListController.onPageLoad().url
         }
       }
 
-      "must redirect to Lockout when business verification fails" in {
+      "must redirect to BusinessVerificationController when business verification fails and lock the user when UTR is present" in {
+
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse(businessVerificationStatus = Some(BvFail))
+
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
-        when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
-          .thenReturn(
-            Future.successful(
-              BusinessVerification(
-                Some(true),
-                Some(false),
-                Some("1234567890"),
-                companyName = Some(testString),
-                registeredAddress = Some(
-                  RegisteredAddress(
-                    addressLine1 = Some("address line 1"),
-                    addressLine2 = Some("address line 2"),
-                    addressLine3 = Some("address line 3"),
-                    postCode = Some("postcode")
-                  )
-                )
-              )
-            )
-          )
+
+        when(mockBvLockoutService.lockout(eqTo(testGroupId), eqTo("1234567890")))
+          .thenReturn(Future.successful(()))
 
         running(application) {
-          val request = fakeRequest
-          val result  = route(application, request).value
+          val result = route(application, fakeRequest).value
 
           status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe controllers.routes.BusinessVerificationController.lockout().url
+
         }
       }
 
-      "must redirect to Start when no business registration/verification data present)" in {
+      "must redirect to Start when business verification fails but UTR is missing" in {
+
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-        val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
+
+        val grsResponse =
+          baseGRSResponse(
+            businessVerificationStatus = Some(BvFail),
+            ctutr = None
+          )
+
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
+
+        running(application) {
+          val result = route(application, fakeRequest).value
+
+          status(result)                 shouldBe SEE_OTHER
+          redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
+
+          verify(mockBvLockoutService, Mockito.never())
+            .lockout(any[String], any[String])
+        }
+      }
+
+      "must redirect to Start when no business registration/verification data present" in {
+        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val grsResponse = baseGRSResponse(
+          businessRegistrationStatus = FailedStatus,
+          businessVerificationStatus = None
+        )
+
+        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+          .thenReturn(Future.successful(grsResponse))
+
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
           .thenReturn(
             Future.successful(
@@ -142,7 +161,7 @@ class GrsControllerSpec extends SpecBase {
                 None,
                 None,
                 Some("1234567890"),
-                companyName = Some(testString),
+                companyName = Some("Test Co"),
                 registeredAddress = Some(
                   RegisteredAddress(
                     addressLine1 = Some("address line 1"),
@@ -156,19 +175,20 @@ class GrsControllerSpec extends SpecBase {
           )
 
         running(application) {
-          val request = fakeRequest
-          val result  = route(application, request).value
+          val result = route(application, fakeRequest).value
 
           status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
         }
       }
 
-      "must redirect to Start when business registration fails - (Not sure how this is possible in prod)" in {
+      "must redirect to Start when business registration fails" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
+
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
+
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
           .thenReturn(
             Future.successful(
@@ -176,7 +196,7 @@ class GrsControllerSpec extends SpecBase {
                 Some(false),
                 Some(true),
                 Some("1234567890"),
-                companyName = Some(testString),
+                companyName = Some("Test Co"),
                 registeredAddress = Some(
                   RegisteredAddress(
                     addressLine1 = Some("address line 1"),
@@ -190,8 +210,7 @@ class GrsControllerSpec extends SpecBase {
           )
 
         running(application) {
-          val request = fakeRequest
-          val result  = route(application, request).value
+          val result = route(application, fakeRequest).value
 
           status(result)                 shouldBe SEE_OTHER
           redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
@@ -201,16 +220,16 @@ class GrsControllerSpec extends SpecBase {
       "must propagate exception if journeyAnswersService fails" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse()
+
         when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
+
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
           .thenReturn(Future.failed(new Exception("Update journeyAnswersService failed - Service Down")))
 
         running(application) {
-          val request = fakeRequest
-          val thrown  = route(application, request).value.failed.futureValue
-
-          thrown.getMessage mustBe "Update journeyAnswersService failed - Service Down"
+          val thrown = route(application, fakeRequest).value.failed.futureValue
+          thrown.getMessage shouldBe "Update journeyAnswersService failed - Service Down"
         }
       }
 
@@ -221,10 +240,8 @@ class GrsControllerSpec extends SpecBase {
           .thenReturn(Future.failed(new Exception("GRS failed - Service Down")))
 
         running(application) {
-          val request = fakeRequest
-          val thrown  = route(application, request).value.failed.futureValue
-
-          thrown.getMessage mustBe "GRS failed - Service Down"
+          val thrown = route(application, fakeRequest).value.failed.futureValue
+          thrown.getMessage shouldBe "GRS failed - Service Down"
         }
       }
     }

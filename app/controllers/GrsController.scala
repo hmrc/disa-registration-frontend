@@ -17,16 +17,16 @@
 package controllers
 
 import controllers.actions.*
-import models.grs.{BvPass, GRSResponse, RegisteredStatus}
+import models.grs.{BvFail, BvPass, GRSResponse, RegisteredStatus}
 import models.journeydata.BusinessVerification
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{GrsService, JourneyAnswersService}
+import services.{BusinessVerificationLockoutService, GrsService, JourneyAnswersService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class GrsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -34,6 +34,7 @@ class GrsController @Inject() (
   getData: DataRetrievalAction,
   journeyAnswersService: JourneyAnswersService,
   grsService: GrsService,
+  businessVerificationLockoutService: BusinessVerificationLockoutService,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -43,17 +44,41 @@ class GrsController @Inject() (
   def grsCallback(journeyId: String): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
       grsService.fetchGRSJourneyData(journeyId).flatMap { grsResponse =>
+
         val businessVerification =
           buildBusinessVerification(grsResponse, request.journeyData.flatMap(_.businessVerification))
 
-        journeyAnswersService.update(businessVerification, request.groupId, request.credentials.providerId).map { _ =>
-          Redirect(
-            (businessVerification.businessRegistrationPassed, businessVerification.businessVerificationPassed) match {
-              case (Some(true), Some(true)) => routes.TaskListController.onPageLoad()
-              case (_, Some(false))         => routes.BusinessVerificationController.lockout()
-              case _                        => routes.StartController.onPageLoad()
+        val verificationPassed = grsResponse.businessVerificationStatus
+        val registrationPassed = grsResponse.businessRegistrationStatus == RegisteredStatus
+
+        (verificationPassed, registrationPassed) match {
+
+          case (Some(BvPass), true) =>
+            journeyAnswersService
+              .update(businessVerification, request.groupId, request.credentials.providerId)
+              .map { _ =>
+                Redirect(routes.TaskListController.onPageLoad())
+              }
+
+          case (_, _) if grsResponse.businessVerificationStatus.contains(BvFail) =>
+            grsResponse.ctutr match {
+              case Some(ctutr) =>
+                businessVerificationLockoutService
+                  .lockout(request.groupId, ctutr)
+                  .map { _ =>
+                    Redirect(routes.BusinessVerificationController.lockout())
+                  }
+
+              case None =>
+                logger.warn(s"[BV] Missing UTR on failed verification for groupId=${request.groupId}")
+                Future.successful(
+                  Redirect(routes.StartController.onPageLoad())
+                )
             }
-          ).withSession(request.session)
+          case _                                                                 =>
+            Future.successful(
+              Redirect(routes.StartController.onPageLoad())
+            )
         }
       }
     }

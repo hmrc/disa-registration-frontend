@@ -58,9 +58,10 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
     "cy" -> Lang("cy")
   )
 
-  lazy val timeout: Int   = getInt("timeout-dialog.timeout")
-  lazy val countdown: Int = getInt("timeout-dialog.countdown")
-  lazy val cacheTtl: Long = getInt("mongodb.timeToLiveInSeconds")
+  lazy val timeout: Int       = getInt("timeout-dialog.timeout")
+  lazy val countdown: Int     = getInt("timeout-dialog.countdown")
+  lazy val cacheTtl: Long     = getInt("mongodb.timeToLiveInSeconds")
+  lazy val bvLockoutTtl: Long = getInt("bvLockout.timeToLiveInMinutes")
 
   lazy val listOfRegisteredIsaManagersUrl: String = getString("urls.external.listOfRegisteredIsaManagers")
   lazy val p2pLoansInformationUrl: String         = getString("urls.external.p2pLoansInformation")
