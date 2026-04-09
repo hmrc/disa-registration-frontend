@@ -143,6 +143,11 @@ POST       /remove-liaison-officer                       controllers.liaisonoffi
 ## Signatories
 GET        /add-a-signatory                              controllers.signatories.AddASignatoryController.onPageLoad()
 
+GET        /signatory-name                               controllers.signatories.SignatoryNameController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
+POST       /signatory-name                               controllers.signatories.SignatoryNameController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-signatory-name                        controllers.signatories.SignatoryNameController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
+POST       /change-signatory-name                        controllers.signatories.SignatoryNameController.onSubmit(id: String, mode: Mode = CheckMode)
+
 GET        /remove-signatory                             controllers.signatories.RemoveSignatoryController.onPageLoad(id: String)
 POST       /remove-signatory                             controllers.signatories.RemoveSignatoryController.onSubmit(id: String)
 
