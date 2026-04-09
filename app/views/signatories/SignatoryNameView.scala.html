@@ -15,7 +15,7 @@
  *@
 
 @import viewmodels.InputWidth._
-@import controllers.liaisonofficers.routes.LiaisonOfficerNameController
+@import controllers.signatories.routes.SignatoryNameController
 
 @this(
     layout: templates.Layout,
@@ -29,7 +29,7 @@
 
 @layout(pageTitle = title(form, messages("signatoryName.title"), Some(messages("sectionTitle.signatories")))) {
 
-    @formHelper(action = LiaisonOfficerNameController.onSubmit(id, mode)) {
+    @formHelper(action = SignatoryNameController.onSubmit(id, mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

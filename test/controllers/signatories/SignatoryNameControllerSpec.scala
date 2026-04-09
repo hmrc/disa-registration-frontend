@@ -20,7 +20,6 @@ import base.SpecBase
 import controllers.signatories.routes.SignatoryNameController
 import forms.SignatoryNameFormProvider
 import models.journeydata.JourneyData
-import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.{CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -48,7 +47,7 @@ class SignatoryNameControllerSpec extends SpecBase {
   lazy val submitUrl: String = SignatoryNameController.onSubmit(existingId, NormalMode).url
 
   val formProvider: SignatoryNameFormProvider = new SignatoryNameFormProvider()
-  val form: Form[String]                           = formProvider()
+  val form: Form[String]                      = formProvider()
 
   "SignatoryNameController" - {
 
