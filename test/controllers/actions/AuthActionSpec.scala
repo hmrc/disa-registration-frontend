@@ -344,5 +344,37 @@ class AuthActionSpec extends SpecBase {
         verify(mockSessionRepository, times(1)).keepAlive(testCredentials.providerId)
       }
     }
+
+    "the auth response does not match any expected pattern" - {
+
+      "must redirect to the unauthorised page (default case)" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            successfulAuthConnector(
+              groupId = None,
+              affinityGroup = None,
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser)
+            ),
+            appConfig,
+            mockSessionRepository,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+        }
+      }
+    }
   }
 }

@@ -37,7 +37,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class RemoveSignatoryController @Inject()(
+class RemoveSignatoryController @Inject() (
   override val messagesApi: MessagesApi,
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
@@ -82,8 +82,8 @@ class RemoveSignatoryController @Inject()(
 
   private def providingName(id: String, block: String => Future[Result])(implicit request: DataRequest[_]) =
     (for {
-      signatory   <- findSignatory(id)
-      name <- signatory.fullName
+      signatory <- findSignatory(id)
+      name      <- signatory.fullName
     } yield block(name))
       .getOrElse(Future.successful(Redirect(IndexController.onPageLoad())))
 

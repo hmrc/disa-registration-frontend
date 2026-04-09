@@ -23,11 +23,9 @@ import forms.YesNoAnswerFormProvider
 import models.YesNoAnswer.{No, Yes}
 import models.journeydata.JourneyData
 import models.journeydata.signatories.{Signatories, Signatory}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
-import play.api.inject.bind
 import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
@@ -38,7 +36,7 @@ import scala.concurrent.Future
 
 class RemoveSignatoryControllerSpec extends SpecBase {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/obligations/enrolment/isa")
 
   private val existingId   = "existing-id-123"
   private val otherId      = "other-id-123"
@@ -173,7 +171,6 @@ class RemoveSignatoryControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -210,7 +207,6 @@ class RemoveSignatoryControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -250,7 +246,6 @@ class RemoveSignatoryControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -279,7 +274,6 @@ class RemoveSignatoryControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -298,12 +292,39 @@ class RemoveSignatoryControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody("value" -> Yes.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Index when Yes is submitted but signatory is not found during update" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          signatories = Some(Signatories(Seq(existingSignatory)))
+        )
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+
+        val missingId = "missing-id"
+
+        val request =
+          FakeRequest(POST, RemoveSignatoryController.onSubmit(missingId).url)
             .withFormUrlEncodedBody("value" -> Yes.toString)
 
         val result = route(application, request).value
@@ -335,7 +356,6 @@ class RemoveSignatoryControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {

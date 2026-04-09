@@ -197,7 +197,7 @@ addASignatory.details.content = A signatory is the appointed person who will act
 
 removeSignatory.title = Are you sure you want to remove {0} as a signatory?
 removeSignatory.heading = Are you sure you want to remove {0} as a signatory?
-removeSignatory.error.required = Select yes if you want to remove [signatoryName] as a signatory
+removeSignatory.error.required = Select yes if you want to remove this signatory
 
 ### LOs
 addLiaisonOfficer.title = Add liaison officer
@@ -252,7 +252,7 @@ liaisonOfficerCya.heading = Check added liaison officer
 
 removeLiaisonOfficer.title = Are you sure you want to remove {0} as a liaison officer?
 removeLiaisonOfficer.heading = Are you sure you want to remove {0} as a liaison officer?
-removeLiaisonOfficer.error.required = Select yes if you want to remove this signatory
+removeLiaisonOfficer.error.required = Select yes if you want to remove this liaison officer
 
 
 ### Certificates of Authority
