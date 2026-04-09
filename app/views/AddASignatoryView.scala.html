@@ -27,7 +27,6 @@
 
 @layout(pageTitle = titleNoForm(messages("addASignatory.title"), Some(messages("sectionTitle.signatories")))) {
 
-  <div>
     @hmrcPageHeading(PageHeading(
       text = messages("addASignatory.heading"),
       section = Some(messages("sectionTitle.signatories")),
@@ -42,8 +41,12 @@
       content = Text(messages("addASignatory.details.content"))
     ))
 
-    @govukButton(
-      ButtonViewModel(messages("site.continue"))
-    )
-  </div>
+    <div class="govuk-button-group">
+        @govukButton(
+            ButtonViewModel(messages("addASignatory.details.button"))
+        )
+        <p class="govuk-body">
+            <a href="" class="govuk-link" target="_blank" rel="noreferrer noopener">@messages("addASignatory.details.link")</a>
+        </p>
+    </div>
 }
