@@ -32,7 +32,7 @@ import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, ZReferenceNumberPage}
-import pages.signatories.RemoveSignatoryPage
+import pages.signatories.{RemoveSignatoryPage, SignatoryNamePage}
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -73,6 +73,7 @@ class Navigator @Inject() () {
     case FinancialOrganisationPage           => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage => registeredAddressCorrespondenceNextPage(answers)
     case RemoveSignatoryPage                 => routes.IndexController.onPageLoad()
+    case SignatoryNamePage                   => routes.IndexController.onPageLoad()
     case _                                   => routes.IndexController.onPageLoad()
   }
 
@@ -87,6 +88,7 @@ class Navigator @Inject() () {
     case FcaArticlesPage                     => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage           => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage => IndexController.onPageLoad()
+    case SignatoryNamePage                   => IndexController.onPageLoad()
     case _                                   => routes.IndexController.onPageLoad()
   }
 

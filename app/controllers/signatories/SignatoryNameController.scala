@@ -35,19 +35,19 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class SignatoryNameController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         auditContinuation: AuditContinuationAction,
-                                         journeyAnswersService: JourneyAnswersService,
-                                         errorHandler: ErrorHandler,
-                                         formProvider: SignatoryNameFormProvider,
-                                         navigator: Navigator,
-                                         uuidGenerator: UuidGenerator,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: SignatoryNameView
+class SignatoryNameController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  auditContinuation: AuditContinuationAction,
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler,
+  formProvider: SignatoryNameFormProvider,
+  navigator: Navigator,
+  uuidGenerator: UuidGenerator,
+  val controllerComponents: MessagesControllerComponents,
+  view: SignatoryNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -60,10 +60,10 @@ class SignatoryNameController @Inject()(
       implicit request =>
 
         val preparedFormAndId = (for {
-          id              <- id
+          id          <- id
           signatories <- request.journeyData.signatories.map(_.signatories)
-          signatory  <- signatories.find(_.id == id)
-          name            <- signatory.fullName
+          signatory   <- signatories.find(_.id == id)
+          name        <- signatory.fullName
         } yield (form.fill(name), id))
           .getOrElse((form, uuidGenerator.generate()))
 
@@ -77,9 +77,9 @@ class SignatoryNameController @Inject()(
         .fold(
           formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode))),
           answer => {
-            val existingSection = request.journeyData.signatories
-            val upsertedSignatory      = Signatory(id, Some(answer))
-            val updatedSection  = existingSection match {
+            val existingSection   = request.journeyData.signatories
+            val upsertedSignatory = Signatory(id, Some(answer))
+            val updatedSection    = existingSection match {
               case Some(existing) =>
                 val existingSignatory = existing.signatories.filter(_.id != id)
                 existing.copy(signatories = existingSignatory :+ upsertedSignatory)
