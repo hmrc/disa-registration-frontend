@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package pages.signatories
 
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.signatories.Signatories
+import pages.Page
 
-case class Signatories(dataItem: Option[String], dataItem2: Option[String]) extends TaskListSection {
-  override def sectionName: String = "signatories"
-}
-
-object Signatories {
-  implicit val format: OFormat[Signatories] = Json.format[Signatories]
-}
+case object RemoveSignatoryPage extends Page[Signatories]
