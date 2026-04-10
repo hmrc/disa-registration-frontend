@@ -36,17 +36,18 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class SignatoryJobTitleController @Inject()(
-                                             override val messagesApi: MessagesApi,
-                                             journeyAnswersService: JourneyAnswersService,
-                                             navigator: Navigator,
-                                             identify: IdentifierAction,
-                                             errorHandler: ErrorHandler,
-                                             getData: DataRetrievalAction,
-                                             requireData: DataRequiredAction,
-                                             formProvider: SignatoryJobTitleFormProvider,
-                                             val controllerComponents: MessagesControllerComponents,
-                                             view: SignatoryJobTitleView)(implicit ec: ExecutionContext)
+class SignatoryJobTitleController @Inject() (
+  override val messagesApi: MessagesApi,
+  journeyAnswersService: JourneyAnswersService,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  errorHandler: ErrorHandler,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: SignatoryJobTitleFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: SignatoryJobTitleView
+)(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
@@ -56,8 +57,8 @@ class SignatoryJobTitleController @Inject()(
     (identify andThen getData andThen requireData) { implicit request =>
       findSignatoryWithDetails(id).fold {
         Redirect(IndexController.onPageLoad())
-      } { case (signatory, name, email) =>
-        val preparedForm = email.fold(form)(form.fill)
+      } { case (signatory, name, jobTitle) =>
+        val preparedForm = jobTitle.fold(form)(form.fill)
         Ok(view(id, name, preparedForm, mode))
       }
     }
@@ -106,7 +107,7 @@ class SignatoryJobTitleController @Inject()(
   )(implicit request: DataRequest[_]): Option[(Signatory, String, Option[String])] =
     findSignatory(id).flatMap { signatory =>
       for {
-        name <- signatory.fullName
+        name    <- signatory.fullName
         jobTitle = signatory.jobTitle
       } yield (signatory, name, jobTitle)
     }
