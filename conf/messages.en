@@ -197,6 +197,10 @@ addASignatory.details.content = A signatory is the appointed person who will act
 addASignatory.details.button = Add a signatory
 addASignatory.details.link = Return to Manage ISAs
 
+removeSignatory.title = Are you sure you want to remove {0} as a signatory?
+removeSignatory.heading = Are you sure you want to remove {0} as a signatory?
+removeSignatory.error.required = Select yes if you want to remove this signatory
+
 ### LOs
 addLiaisonOfficer.title = Add liaison officer
 addLiaisonOfficer.heading = Add liaison officer

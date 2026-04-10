@@ -128,20 +128,23 @@ POST       /liaison-officer-phone-number                 controllers.liaisonoffi
 GET        /change-liaison-officer-phone-mumber          controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onPageLoad(id: String, mode: Mode = CheckMode)
 POST       /change-liaison-officer-phone-mumber          controllers.liaisonofficers.LiaisonOfficerPhoneNumberController.onSubmit(id: String, mode: Mode = CheckMode)
 
-GET        /liaison-officer-communication                        controllers.liaisonofficers.LiaisonOfficerCommunicationController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /liaison-officer-communication                        controllers.liaisonofficers.LiaisonOfficerCommunicationController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-liaison-officer-communication                  controllers.liaisonofficers.LiaisonOfficerCommunicationController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-liaison-officer-communication                  controllers.liaisonofficers.LiaisonOfficerCommunicationController.onSubmit(id: String, mode: Mode = CheckMode)
+GET        /liaison-officer-communication                controllers.liaisonofficers.LiaisonOfficerCommunicationController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /liaison-officer-communication                controllers.liaisonofficers.LiaisonOfficerCommunicationController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-liaison-officer-communication         controllers.liaisonofficers.LiaisonOfficerCommunicationController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-liaison-officer-communication         controllers.liaisonofficers.LiaisonOfficerCommunicationController.onSubmit(id: String, mode: Mode = CheckMode)
 
 GET        /add-liaison-officer                          controllers.liaisonofficers.AddLiaisonOfficerController.onPageLoad()
 
-GET        /check-added-liaison-officer                 controllers.liaisonofficers.LoCheckYourAnswersController.onPageLoad(id: String)
+GET        /check-added-liaison-officer                  controllers.liaisonofficers.LoCheckYourAnswersController.onPageLoad(id: String)
 
-GET        /remove-liaison-officer                        controllers.liaisonofficers.RemoveLiaisonOfficerController.onPageLoad(id: String)
-POST       /remove-liaison-officer                        controllers.liaisonofficers.RemoveLiaisonOfficerController.onSubmit(id: String)
+GET        /remove-liaison-officer                       controllers.liaisonofficers.RemoveLiaisonOfficerController.onPageLoad(id: String)
+POST       /remove-liaison-officer                       controllers.liaisonofficers.RemoveLiaisonOfficerController.onSubmit(id: String)
 
 ## Signatories
-GET        /add-a-signatory                              controllers.AddASignatoryController.onPageLoad()
+GET        /add-a-signatory                              controllers.signatories.AddASignatoryController.onPageLoad()
+
+GET        /remove-signatory                             controllers.signatories.RemoveSignatoryController.onPageLoad(id: String)
+POST       /remove-signatory                             controllers.signatories.RemoveSignatoryController.onSubmit(id: String)
 
 ## Declare & Submit
 
