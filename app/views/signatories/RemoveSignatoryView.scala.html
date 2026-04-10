@@ -38,7 +38,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = HmrcPageHeadingLegend.apply(Text(messages("removeSignatory.heading", name)), HmrcSectionCaption(messages("sectionTitle.liaisonOfficers")), "govuk-fieldset__legend--l").asPageHeading(Large),
+                legend = HmrcPageHeadingLegend.apply(Text(messages("removeSignatory.heading", name)), HmrcSectionCaption(messages("sectionTitle.signatories")), "govuk-fieldset__legend--l").asPageHeading(Large),
                 items  = YesNoAnswer.options
             )
         )
