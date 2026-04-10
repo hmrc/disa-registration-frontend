@@ -148,6 +148,11 @@ POST       /signatory-name                               controllers.signatories
 GET        /change-signatory-name                        controllers.signatories.SignatoryNameController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
 POST       /change-signatory-name                        controllers.signatories.SignatoryNameController.onSubmit(id: String, mode: Mode = CheckMode)
 
+GET        /signatory-job-title                          controllers.signatories.SignatoryJobTitleController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /signatory-job-title                          controllers.signatories.SignatoryJobTitleController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-signatory-job-title                   controllers.signatories.SignatoryJobTitleController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-signatory-job-title                   controllers.signatories.SignatoryJobTitleController.onSubmit(id: String, mode: Mode = CheckMode)
+
 GET        /remove-signatory                             controllers.signatories.RemoveSignatoryController.onPageLoad(id: String)
 POST       /remove-signatory                             controllers.signatories.RemoveSignatoryController.onSubmit(id: String)
 

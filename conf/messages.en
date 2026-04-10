@@ -203,6 +203,13 @@ signatoryName.error.invalid = The full name must only include letters a to z, hy
 signatoryName.checkYourAnswersLabel = Name
 signatoryName.change.hidden = name of signatory
 
+signatoryJobTitle.title = What is the job title of {0} within the organisation?
+signatoryJobTitle.heading = What is the job title of {0} within the organisation?
+signatoryJobTitle.error.required = Enter the job title of the signatory you’re adding
+signatoryJobTitle.error.invalid = The job title must only include letters a to z, hyphens, spaces and apostrophes
+signatoryJobTitle.checkYourAnswersLabel = Job title
+signatoryJobTitle.change.hidden = job title of signatory
+
 removeSignatory.title = Are you sure you want to remove {0} as a signatory?
 removeSignatory.heading = Are you sure you want to remove {0} as a signatory?
 removeSignatory.error.required = Select yes if you want to remove this signatory
