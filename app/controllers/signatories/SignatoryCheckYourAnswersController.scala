@@ -47,10 +47,10 @@ class SignatoryCheckYourAnswersController @Inject()(
     }
 
   private def buildSummaryRows(id: String)(implicit request: DataRequest[_], messages: Messages) =
-    findSignatory(id).toSeq.flatMap { lo =>
+    findSignatory(id).toSeq.flatMap { signatory =>
       Seq(
-        SignatoryNameSummary.row(lo),
-        SignatoryJobTitleSummary.row(lo)
+        SignatoryNameSummary.row(signatory),
+        SignatoryJobTitleSummary.row(signatory)
       ).flatten
     }
 
