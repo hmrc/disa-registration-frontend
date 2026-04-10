@@ -195,6 +195,10 @@ addASignatory.p1 = You must have at least 1 signatory. The maximum is 25.
 addASignatory.details.summary = What is a signatory?
 addASignatory.details.content = A signatory is the appointed person who will act with the authority to sign formal documentation on behalf of your organisation.
 
+removeSignatory.title = Are you sure you want to remove {0} as a signatory?
+removeSignatory.heading = Are you sure you want to remove {0} as a signatory?
+removeSignatory.error.required = Select yes if you want to remove this signatory
+
 ### LOs
 addLiaisonOfficer.title = Add liaison officer
 addLiaisonOfficer.heading = Add liaison officer

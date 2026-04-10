@@ -27,6 +27,7 @@ import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import models.journeydata.signatories.{Signatories, Signatory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
@@ -34,6 +35,7 @@ import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.organisationdetails.RegisteredAddressCorrespondencePage
+import pages.signatories.RemoveSignatoryPage
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -60,6 +62,9 @@ class NavigatorSpec extends SpecBase {
 
   private val coaAnswers: CertificatesOfAuthority =
     CertificatesOfAuthority(certificatesYesNo = Some(Yes), fcaArticles = None, financialOrganisation = None)
+
+  private val signatoriesAnswers: Signatories =
+    Signatories(Seq(Signatory(id = testString, fullName = Some(testString), jobTitle = Some(testString))))
 
   "Navigator.nextPage(PageWithDependents)" - {
 
@@ -251,6 +256,11 @@ class NavigatorSpec extends SpecBase {
       result shouldBe CoaCheckYourAnswersController.onPageLoad()
     }
 
+    "route RemoveSignatoryPage to Index Controller" in {
+      val result: Call = navigator.normalRoutes(RemoveSignatoryPage, signatoriesAnswers)
+      result shouldBe IndexController.onPageLoad()
+    }
+
     "route unknown page to Index" in {
       case object UnknownPage extends PageWithoutDependents[IsaProducts] {
         override def clearAnswer(answers: IsaProducts): IsaProducts = answers
@@ -298,6 +308,11 @@ class NavigatorSpec extends SpecBase {
 
     "route RegisteredAddressCorrespondencePage to COA CYA" in {
       navigator.checkRouteMap(RegisteredAddressCorrespondencePage) shouldBe
+        IndexController.onPageLoad()
+    }
+
+    "route RemoveSignatoryPage to Index Controller" in {
+      navigator.checkRouteMap(RemoveSignatoryPage) shouldBe
         IndexController.onPageLoad()
     }
 

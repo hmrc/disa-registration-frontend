@@ -17,9 +17,10 @@
 package controllers
 
 import base.SpecBase
+import controllers.signatories.routes.AddASignatoryController
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import views.html.AddASignatoryView
+import play.api.test.Helpers.*
+import views.html.signatories.AddASignatoryView
 
 class AddASignatoryControllerSpec extends SpecBase {
 
@@ -30,7 +31,7 @@ class AddASignatoryControllerSpec extends SpecBase {
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.AddASignatoryController.onPageLoad().url)
+        val request = FakeRequest(GET, AddASignatoryController.onPageLoad().url)
 
         val result = route(application, request).value
 
