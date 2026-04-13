@@ -36,7 +36,6 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.organisationdetails.RegisteredAddressCorrespondencePage
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
-import pages.signatories.{RemoveSignatoryPage, SignatoryNamePage}
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
