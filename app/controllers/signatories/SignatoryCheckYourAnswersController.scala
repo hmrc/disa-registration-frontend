@@ -40,10 +40,14 @@ class SignatoryCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  // TODO: Create ticket to ensure CYA validates required journeyData before loading
   def onPageLoad(id: String): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view(SummaryListViewModel(buildSummaryRows(id))))
+      findSignatory(id) match {
+        case Some(signatory) if isValid(signatory) =>
+          Ok(view(SummaryListViewModel(buildSummaryRows(id))))
+        case _                                     =>
+          Redirect(controllers.routes.TaskListController.onPageLoad())
+      }
     }
 
   private def buildSummaryRows(id: String)(implicit request: DataRequest[_], messages: Messages) =
@@ -56,4 +60,8 @@ class SignatoryCheckYourAnswersController @Inject() (
 
   private def findSignatory(id: String)(implicit request: DataRequest[_]): Option[Signatory] =
     request.journeyData.signatories.flatMap(_.signatories.find(_.id == id))
+
+  private def isValid(signatory: Signatory): Boolean =
+    signatory.fullName.isDefined &&
+      signatory.jobTitle.isDefined
 }

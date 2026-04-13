@@ -18,6 +18,7 @@ package controllers.signatories
 
 import base.SpecBase
 import controllers.signatories.routes.SignatoryCheckYourAnswersController
+import controllers.routes.TaskListController
 import models.journeydata.JourneyData
 import models.journeydata.signatories.{Signatories, Signatory}
 import play.api.test.FakeRequest
@@ -33,9 +34,16 @@ class SignatoryCheckYourAnswersControllerSpec extends SpecBase {
 
   lazy val routeUrl: String = SignatoryCheckYourAnswersController.onPageLoad(existingId).url
 
+  private def buildJourneyData(signatories: Seq[Signatory]) =
+    JourneyData(
+      groupId = testGroupId,
+      enrolmentId = testString,
+      signatories = Some(Signatories(signatories))
+    )
+
   "SignatoryCheckYourAnswersController" - {
 
-    "must return OK and the correct view for a GET when the signatories exists" in {
+    "must return OK and the correct view when signatory has both fields defined" in {
 
       val signatory =
         Signatory(
@@ -44,23 +52,12 @@ class SignatoryCheckYourAnswersControllerSpec extends SpecBase {
           jobTitle = Some("Job Title")
         )
 
-      val journeyData =
-        JourneyData(
-          groupId = testGroupId,
-          enrolmentId = testString,
-          signatories = Some(
-            Signatories(
-              Seq(
-                Signatory(
-                  id = otherId,
-                  fullName = Some("Other Person"),
-                  jobTitle = Some("Other Job Title")
-                ),
-                signatory
-              )
-            )
-          )
+      val journeyData = buildJourneyData(
+        Seq(
+          Signatory(otherId, Some("Other Person"), Some("Other Job")),
+          signatory
         )
+      )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
@@ -81,6 +78,84 @@ class SignatoryCheckYourAnswersControllerSpec extends SpecBase {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect when signatory is not found" in {
+
+      val journeyData = buildJourneyData(Seq.empty)
+
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect when fullName is None" in {
+
+      val signatory =
+        Signatory(
+          id = existingId,
+          fullName = None,
+          jobTitle = Some("Job Title")
+        )
+
+      val application =
+        applicationBuilder(journeyData = Some(buildJourneyData(Seq(signatory)))).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect when jobTitle is None" in {
+
+      val signatory =
+        Signatory(
+          id = existingId,
+          fullName = Some("Jane Smith"),
+          jobTitle = None
+        )
+
+      val application =
+        applicationBuilder(journeyData = Some(buildJourneyData(Seq(signatory)))).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect when both fields are None" in {
+
+      val signatory =
+        Signatory(
+          id = existingId,
+          fullName = None,
+          jobTitle = None
+        )
+
+      val application =
+        applicationBuilder(journeyData = Some(buildJourneyData(Seq(signatory)))).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routeUrl)
+        val result  = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
   }

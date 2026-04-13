@@ -271,7 +271,7 @@ class NavigatorSpec extends SpecBase {
       val result: Call = navigator.normalRoutes(SignatoryJobTitlePage, signatoriesAnswers)
       result shouldBe IndexController.onPageLoad()
     }
-    
+
     "route unknown page to Index" in {
       case object UnknownPage extends PageWithoutDependents[IsaProducts] {
         override def clearAnswer(answers: IsaProducts): IsaProducts = answers
