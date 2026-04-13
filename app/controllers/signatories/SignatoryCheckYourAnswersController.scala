@@ -29,7 +29,7 @@ import views.html.signatories.SignatoryCheckYourAnswersView
 
 import javax.inject.Inject
 
-class SignatoryCheckYourAnswersController @Inject()(
+class SignatoryCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
