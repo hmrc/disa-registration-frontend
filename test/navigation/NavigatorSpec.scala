@@ -35,7 +35,11 @@ import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.organisationdetails.RegisteredAddressCorrespondencePage
+<<<<<<< HEAD
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
+=======
+import pages.signatories.{RemoveSignatoryPage, SignatoryNamePage}
+>>>>>>> main
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -270,7 +274,7 @@ class NavigatorSpec extends SpecBase {
       val result: Call = navigator.normalRoutes(SignatoryJobTitlePage, signatoriesAnswers)
       result shouldBe IndexController.onPageLoad()
     }
-
+    
     "route unknown page to Index" in {
       case object UnknownPage extends PageWithoutDependents[IsaProducts] {
         override def clearAnswer(answers: IsaProducts): IsaProducts = answers

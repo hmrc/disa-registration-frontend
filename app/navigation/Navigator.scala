@@ -33,6 +33,7 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, ZReferenceNumberPage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
+import pages.signatories.{RemoveSignatoryPage, SignatoryNamePage}
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
