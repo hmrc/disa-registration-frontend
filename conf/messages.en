@@ -292,7 +292,7 @@ removeLiaisonOfficer.error.required = Select yes if you want to remove this liai
 
 addedLiaisonOfficers.title = You have added {0}
 addedLiaisonOfficers.heading = You have added {0}
-addedLiaisonOfficers.guidance = You need to add at least 1 liaison officer. You can add a total of {0}
+addedLiaisonOfficers.guidance = You need to add at least <strong>1</strong> liaison officer. You can add a total of {0}
 addedLiaisonOfficers.complete = Complete
 addedLiaisonOfficers.inProgress = In progress
 addedLiaisonOfficers.legend = Do you want to add another liaison officer?

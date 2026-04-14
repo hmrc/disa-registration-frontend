@@ -50,7 +50,7 @@
             captionClasses = Some("govuk-caption-l")
         ))
 
-        <p class="govuk-body">@messages("addedLiaisonOfficers.guidance", appConfig.maxLiaisonOfficers.toString)</p>
+        <p class="govuk-body">@HtmlFormat.raw(messages("addedLiaisonOfficers.guidance", appConfig.maxLiaisonOfficers.toString))</p>
 
         @addedLiaisonOfficersViewModel(form, summary)
 
