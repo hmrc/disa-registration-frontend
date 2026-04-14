@@ -31,6 +31,7 @@ import viewmodels.checkAnswers.liaisonofficers.AddedLiaisonOfficerSummary
 import views.html.liaisonofficers.AddedLiaisonOfficersView
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class AddedLiaisonOfficersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -41,7 +42,8 @@ class AddedLiaisonOfficersController @Inject() (
   appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: AddedLiaisonOfficersView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   val form: Form[YesNoAnswer] = formProvider("addedLiaisonOfficers.error.required")

@@ -33,7 +33,7 @@
 
 @(form: Form[_], summary: AddedLiaisonOfficerSummary, mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("addedLiaisonOfficers.title"), Some(messages("sectionTitle.liaisonOfficers")))) {
+@layout(pageTitle = title(form, messages("addedLiaisonOfficers.title", summary.titleSuffix), Some(messages("sectionTitle.liaisonOfficers")))) {
 
     @formHelper(action = AddedLiaisonOfficersController.onSubmit(), Symbol("autoComplete") -> "off") {
 
@@ -42,7 +42,7 @@
         }
 
         @hmrcPageHeading(PageHeading(
-            text = messages("addedLiaisonOfficers.heading"),
+            text = messages("addedLiaisonOfficers.heading", summary.titleSuffix),
             section = Some(messages("sectionTitle.liaisonOfficers")),
             headingClasses = Some("govuk-heading-l"),
             captionClasses = Some("govuk-caption-l")
@@ -50,7 +50,7 @@
 
         <p class="govuk-body">@messages("addedLiaisonOfficers.guidance")</p>
 
-        @addedLiaisonOfficersViewModel(form, summary.inProgress, summary.complete)
+        @addedLiaisonOfficersViewModel(form, summary)
 
         @govukButton(
             ButtonViewModel(messages("site.saveAndContinue"))

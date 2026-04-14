@@ -34,7 +34,11 @@ import javax.inject.Inject
 case class AddedLiaisonOfficerSummary(
   inProgress: Seq[LiaisonOfficer],
   complete: Seq[LiaisonOfficer]
-)
+) {
+  def count: Int          = inProgress.size + complete.size
+  def titleSuffix: String =
+    if (count > 1) s"${count.toString} liaison officers" else s"${count.toString} liaison officer"
+}
 
 class AddedLiaisonOfficersViewModel @Inject() (
   govukSummaryList: GovukSummaryList,
@@ -44,39 +48,35 @@ class AddedLiaisonOfficersViewModel @Inject() (
 
   def apply(
     form: Form[_],
-    inProgress: Seq[LiaisonOfficer],
-    complete: Seq[LiaisonOfficer]
-  )(implicit messages: Messages): Html = {
-
-    val count = inProgress.size + complete.size
-
+    summary: AddedLiaisonOfficerSummary
+  )(implicit messages: Messages): Html =
     HtmlFormat.fill(
       Seq(
-        Option.when(complete.nonEmpty) {
+        Option.when(summary.complete.nonEmpty) {
           HtmlFormat.fill(
             Seq(
               Option
-                .when(inProgress.nonEmpty) {
+                .when(summary.inProgress.nonEmpty) {
                   Html(s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(
                       messages("addedLiaisonOfficers.complete")
                     )}</h2>""")
                 }
                 .getOrElse(HtmlFormat.empty),
-              govukSummaryList(SummaryListViewModel(rows = complete.flatMap(row)))
+              govukSummaryList(SummaryListViewModel(rows = summary.complete.flatMap(row)))
             )
           )
         },
-        Option.when(inProgress.nonEmpty) {
+        Option.when(summary.inProgress.nonEmpty) {
           HtmlFormat.fill(
             Seq(
               Html(s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(
                   messages("addedLiaisonOfficers.inProgress")
                 )}</h2>"""),
-              govukSummaryList(SummaryListViewModel(rows = inProgress.flatMap(row)))
+              govukSummaryList(SummaryListViewModel(rows = summary.inProgress.flatMap(row)))
             )
           )
         },
-        Option.when(count < appConfig.maxLos) {
+        Option.when(summary.count < appConfig.maxLos) {
           govukRadios(
             RadiosViewModel(
               field = form("value"),
@@ -88,7 +88,6 @@ class AddedLiaisonOfficersViewModel @Inject() (
         }
       ).flatten
     )
-  }
 
   private def row(liaisonOfficer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] =
     liaisonOfficer.fullName.map { answer =>
