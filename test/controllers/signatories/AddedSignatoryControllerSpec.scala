@@ -17,18 +17,19 @@
 package controllers.signatories
 
 import base.SpecBase
+import config.FrontendAppConfig
 import controllers.routes.TaskListController
 import controllers.signatories.routes.*
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.{NormalMode, YesNoAnswer}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.AddedSignatoriesSummary
+import viewmodels.checkAnswers.signatories.AddedSignatoriesSummary
 import views.html.signatories.AddedSignatoryView
 
 class AddedSignatoryControllerSpec extends SpecBase {
 
-  private val routeUrl = AddedSignatoryController.onPageLoad().url
+  private val routeUrl  = AddedSignatoryController.onPageLoad().url
   private val submitUrl = AddedSignatoryController.onSubmit().url
 
   private val signatory1 = Signatory("1", Some("Alice"), Some("Dev"))
@@ -46,6 +47,7 @@ class AddedSignatoryControllerSpec extends SpecBase {
       val application =
         applicationBuilder(journeyData = Some(journeyData(Seq(signatory1, signatory2))))
           .build()
+      val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -55,13 +57,11 @@ class AddedSignatoryControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[AddedSignatoryView]
 
         val (inProgress, complete) = Seq(signatory1, signatory2).partition(_.inProgress)
-        val count = inProgress.size + complete.size
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           form = new forms.YesNoAnswerFormProvider()("addedSignatory.error.required"),
-          AddedSignatoriesSummary(inProgress, complete),
-          count
+          AddedSignatoriesSummary(inProgress, complete, appConfig.maxSignatories)
         )(request, messages(application)).toString
       }
     }
@@ -153,6 +153,98 @@ class AddedSignatoryControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
+      }
+    }
+
+    "must redirect to task list when at max and no form value submitted" in {
+
+      val signatories =
+        (1 to mockAppConfig.maxSignatories)
+          .map(i => Signatory(i.toString, Some("Alice"), Some("Dev")))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData(signatories)))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, submitUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect to task list when at max even if invalid form submitted" in {
+
+      val signatories =
+        (1 to mockAppConfig.maxSignatories)
+          .map(i => Signatory(i.toString, Some("Alice"), Some("Dev")))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData(signatories)))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody("value" -> "")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect to task list when signatories section is empty" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData(Seq.empty)))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must return BAD_REQUEST when form invalid and below max" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData(Seq(signatory1))))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, submitUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+      }
+    }
+    "must NOT return BAD_REQUEST when form invalid and at max" in {
+
+      val signatories =
+        (1 to mockAppConfig.maxSignatories)
+          .map(i => Signatory(i.toString, Some("Alice"), Some("Dev")))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData(signatories)))
+          .build()
+
+      running(application) {
+        val request = FakeRequest(POST, submitUrl) // still invalid (no value)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
   }

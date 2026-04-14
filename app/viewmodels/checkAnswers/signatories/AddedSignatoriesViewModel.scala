@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.checkAnswers.signatories
 
 import config.FrontendAppConfig
 import controllers.signatories.routes.{RemoveSignatoryController, SignatoryNameController}
@@ -32,10 +32,10 @@ import viewmodels.implicits.*
 import javax.inject.Inject
 
 case class AddedSignatoriesSummary(
-                                    inProgress: Seq[Signatory],
-                                    complete: Seq[Signatory],
-                                    maxSignatories: Int
-                                  ) {
+  inProgress: Seq[Signatory],
+  complete: Seq[Signatory],
+  maxSignatories: Int
+) {
   def count: Int =
     inProgress.size + complete.size
 
@@ -51,27 +51,24 @@ case class AddedSignatoriesSummary(
     else "addedSignatory.heading"
 
   def title(implicit messages: Messages): String =
-      messages(titleKey, count)
+    messages(titleKey, count)
 
   def heading(implicit messages: Messages): String =
     messages(headingKey, count)
 
 }
 
-
-
-class AddedSignatoriesViewModel @Inject()(
-                                           govukSummaryList: GovukSummaryList,
-                                           govukRadios: GovukRadios,
-                                           appConfig: FrontendAppConfig
-                                         ) {
+class AddedSignatoriesViewModel @Inject() (
+  govukSummaryList: GovukSummaryList,
+  govukRadios: GovukRadios,
+  appConfig: FrontendAppConfig
+) {
 
   def apply(
-             form: Form[_],
-             inProgress: Seq[Signatory],
-             complete: Seq[Signatory]
-           )(implicit messages: Messages): Html = {
-
+    form: Form[_],
+    inProgress: Seq[Signatory],
+    complete: Seq[Signatory]
+  )(implicit messages: Messages): Html = {
 
     val count = inProgress.size + complete.size
 
@@ -83,27 +80,20 @@ class AddedSignatoriesViewModel @Inject()(
               Option
                 .when(inProgress.nonEmpty) {
                   Html(
-                    s"""<h2 class="govuk-heading-m">${
-                      HtmlFormat.escape(messages("addedSignatory.complete"))
-                    }</h2>""")
+                    s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(messages("addedSignatory.complete"))}</h2>"""
+                  )
                 }
                 .getOrElse(HtmlFormat.empty),
-
               govukSummaryList(
                 SummaryListViewModel(rows = complete.flatMap(row))
               )
             )
           )
         },
-
         Option.when(inProgress.nonEmpty) {
           HtmlFormat.fill(
             Seq(
-              Html(
-                s"""<h2 class="govuk-heading-m">${
-                  HtmlFormat.escape(messages("addedSignatory.inProgress"))
-                }</h2>"""),
-
+              Html(s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(messages("addedSignatory.inProgress"))}</h2>"""),
               govukSummaryList(
                 SummaryListViewModel(rows = inProgress.flatMap(row))
               )
@@ -140,7 +130,6 @@ class AddedSignatoriesViewModel @Inject()(
           ).withVisuallyHiddenText(
             messages("addedSignatory.summary.action.hidden", name)
           ),
-
           ActionItemViewModel(
             content = messages("site.remove"),
             href = RemoveSignatoryController

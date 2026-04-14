@@ -27,27 +27,25 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.AddedSignatoriesSummary
+import viewmodels.checkAnswers.signatories.AddedSignatoriesSummary
 import views.html.signatories.AddedSignatoryView
 
 import javax.inject.Inject
 
-class AddedSignatoryController @Inject()(
-                                          override val messagesApi: MessagesApi,
-                                          identify: IdentifierAction,
-                                          getData: DataRetrievalAction,
-                                          requireData: DataRequiredAction,
-                                          formProvider: YesNoAnswerFormProvider,
-                                          val controllerComponents: MessagesControllerComponents,
-                                          view: AddedSignatoryView,
-                                          appConfig: FrontendAppConfig
-                                        )()
-  extends FrontendBaseController
+class AddedSignatoryController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: YesNoAnswerFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: AddedSignatoryView,
+  appConfig: FrontendAppConfig
+)() extends FrontendBaseController
     with I18nSupport {
 
   val form: Form[YesNoAnswer] =
     formProvider("addedSignatory.error.required")
-
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     getInProgressAndCompleteSignatories.fold {
@@ -62,17 +60,25 @@ class AddedSignatoryController @Inject()(
       Redirect(TaskListController.onPageLoad())
     } { case (inProgress, complete) =>
       val count = inProgress.size + complete.size
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => BadRequest(view(formWithErrors, AddedSignatoriesSummary(inProgress, complete, appConfig.maxSignatories))),
-          {
-            case YesNoAnswer.Yes if count < appConfig.maxSignatories =>
-              Redirect(SignatoryNameController.onPageLoad(None, NormalMode)
-              )
-            case _ => Redirect(TaskListController.onPageLoad())
-          }
-        )
+
+      if (count >= appConfig.maxSignatories) {
+        Redirect(TaskListController.onPageLoad())
+      } else {
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              BadRequest(
+                view(formWithErrors, AddedSignatoriesSummary(inProgress, complete, appConfig.maxSignatories))
+              ),
+            {
+              case YesNoAnswer.Yes =>
+                Redirect(SignatoryNameController.onPageLoad(None, NormalMode))
+              case _               =>
+                Redirect(TaskListController.onPageLoad())
+            }
+          )
+      }
     }
   }
 

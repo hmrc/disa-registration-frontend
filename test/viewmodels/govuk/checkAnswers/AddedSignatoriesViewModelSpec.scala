@@ -24,10 +24,11 @@ import models.journeydata.signatories.Signatory
 import org.jsoup.Jsoup
 import play.api.data.Form
 import play.api.test.Helpers.*
+import viewmodels.checkAnswers.signatories.AddedSignatoriesViewModel
 
 class AddedSignatoriesViewModelSpec extends SpecBase {
 
-  private val formProvider = new forms.YesNoAnswerFormProvider()
+  private val formProvider  = new forms.YesNoAnswerFormProvider()
   private val form: Form[_] = formProvider("addedSignatory.error.required")
 
   private val inProgressSignatory =
@@ -139,7 +140,7 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
           Seq(completeSignatory)
         )(messages(app))
 
-        val doc = Jsoup.parse(html.toString)
+        val doc   = Jsoup.parse(html.toString)
         val links = doc.select("a").eachAttr("href")
 
         links must contain(SignatoryNameController.onPageLoad(Some("1"), CheckMode).url)

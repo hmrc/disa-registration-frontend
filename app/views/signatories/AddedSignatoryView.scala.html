@@ -17,7 +17,7 @@
 @import controllers.signatories.routes.{AddedSignatoryController, RemoveSignatoryController}
 @import models.journeydata.signatories.*
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
-@import viewmodels.*
+@import viewmodels.checkAnswers.signatories.*
 @import viewmodels.LegendSize.Large
 
 @this(
@@ -48,7 +48,7 @@
             captionClasses = Some("govuk-caption-l")
         ))
 
-        <p class="govuk-body">@messages("addedSignatory.p", summary.maxSignatories)</p>
+        <p class="govuk-body">@HtmlFormat.raw(messages("addedSignatory.p", summary.maxSignatories))</p>
 
         @addedSignatoriesViewModel(form, summary.inProgress, summary.complete)
 
