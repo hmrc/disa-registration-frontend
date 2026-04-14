@@ -76,7 +76,7 @@ class AddedLiaisonOfficersViewModel @Inject() (
             )
           )
         },
-        Option.when(summary.count < appConfig.maxLos) {
+        Option.when(summary.count < appConfig.maxLiaisonOfficers) {
           govukRadios(
             RadiosViewModel(
               field = form("value"),

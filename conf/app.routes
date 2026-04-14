@@ -140,8 +140,8 @@ GET        /check-added-liaison-officer                  controllers.liaisonoffi
 GET        /remove-liaison-officer                       controllers.liaisonofficers.RemoveLiaisonOfficerController.onPageLoad(id: String)
 POST       /remove-liaison-officer                       controllers.liaisonofficers.RemoveLiaisonOfficerController.onSubmit(id: String)
 
-GET        /added-liaison-officers                        controllers.liaisonofficers.AddedLiaisonOfficersController.onPageLoad(mode: Mode = NormalMode)
-POST       /added-liaison-officers                        controllers.liaisonofficers.AddedLiaisonOfficersController.onSubmit(mode: Mode = NormalMode)
+GET        /added-liaison-officers                        controllers.liaisonofficers.AddedLiaisonOfficersController.onPageLoad()
+POST       /added-liaison-officers                        controllers.liaisonofficers.AddedLiaisonOfficersController.onSubmit()
 
 ## Signatories
 GET        /add-a-signatory                              controllers.signatories.AddASignatoryController.onPageLoad()

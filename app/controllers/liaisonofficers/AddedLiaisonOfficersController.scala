@@ -22,7 +22,7 @@ import controllers.liaisonofficers.routes.LiaisonOfficerNameController
 import controllers.routes.TaskListController
 import forms.YesNoAnswerFormProvider
 import models.requests.DataRequest
-import models.{Mode, NormalMode, YesNoAnswer}
+import models.{NormalMode, YesNoAnswer}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,7 +31,6 @@ import viewmodels.checkAnswers.liaisonofficers.AddedLiaisonOfficerSummary
 import views.html.liaisonofficers.AddedLiaisonOfficersView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class AddedLiaisonOfficersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -42,21 +41,20 @@ class AddedLiaisonOfficersController @Inject() (
   appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: AddedLiaisonOfficersView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
   val form: Form[YesNoAnswer] = formProvider("addedLiaisonOfficers.error.required")
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     getInProgressAndCompleteLos.fold {
       Redirect(TaskListController.onPageLoad())
     } { case (inProgress, complete) =>
-      Ok(view(form, AddedLiaisonOfficerSummary(inProgress, complete), mode))
+      Ok(view(form, AddedLiaisonOfficerSummary(inProgress, complete)))
     }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     getInProgressAndCompleteLos.fold {
       Redirect(TaskListController.onPageLoad())
     } { case (inProgress, complete) =>
@@ -64,11 +62,11 @@ class AddedLiaisonOfficersController @Inject() (
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => BadRequest(view(formWithErrors, AddedLiaisonOfficerSummary(inProgress, complete), mode)),
+          formWithErrors => BadRequest(view(formWithErrors, AddedLiaisonOfficerSummary(inProgress, complete))),
           {
-            case YesNoAnswer.Yes if count < appConfig.maxLos =>
+            case YesNoAnswer.Yes if count < appConfig.maxLiaisonOfficers =>
               Redirect(LiaisonOfficerNameController.onPageLoad(None, NormalMode))
-            case _                                           => Redirect(TaskListController.onPageLoad())
+            case _                                                       => Redirect(TaskListController.onPageLoad())
           }
         )
     }

@@ -149,7 +149,7 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
         val viewModel = app.injector.instanceOf[AddedLiaisonOfficersViewModel]
 
         val complete =
-          (1 to appConfig.maxLos).map { i =>
+          (1 to appConfig.maxLiaisonOfficers).map { i =>
             LiaisonOfficer(
               id = s"id-$i",
               fullName = Some(s"Officer $i"),
@@ -178,7 +178,7 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
         val viewModel = app.injector.instanceOf[AddedLiaisonOfficersViewModel]
 
         val complete =
-          (1 to (appConfig.maxLos + 1)).map { i =>
+          (1 to (appConfig.maxLiaisonOfficers + 1)).map { i =>
             LiaisonOfficer(
               id = s"id-$i",
               fullName = Some(s"Officer $i"),

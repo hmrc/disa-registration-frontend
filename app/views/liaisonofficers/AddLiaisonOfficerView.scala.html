@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
 @import play.twirl.api.StringInterpolation
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import controllers.routes.TaskListController
@@ -23,7 +24,8 @@
   layout: templates.Layout,
   govukDetails: GovukDetails,
   govukButton: GovukButton,
-  hmrcPageHeading: HmrcPageHeading
+  hmrcPageHeading: HmrcPageHeading,
+  appConfig: FrontendAppConfig
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -39,7 +41,7 @@
     ))
 
     <p class="govuk-body">@messages("addLiaisonOfficer.p1")</p>
-    <p class="govuk-body">@messages("addLiaisonOfficer.p2")</p>
+    <p class="govuk-body">@messages("addLiaisonOfficer.p2", appConfig.maxLiaisonOfficers)</p>
 
     @govukDetails(Details(
       summary = Text(messages("addLiaisonOfficer.details.summary")),

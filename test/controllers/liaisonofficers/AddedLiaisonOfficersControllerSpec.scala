@@ -65,8 +65,7 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           form,
-          AddedLiaisonOfficerSummary(inProgress, complete),
-          NormalMode
+          AddedLiaisonOfficerSummary(inProgress, complete)
         )(request, messages(application)).toString
       }
     }
@@ -129,8 +128,7 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(
           boundForm,
-          AddedLiaisonOfficerSummary(inProgress, complete),
-          NormalMode
+          AddedLiaisonOfficerSummary(inProgress, complete)
         )(request, messages(application)).toString
       }
     }
@@ -160,7 +158,7 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
     }
 
     "must redirect to task list when Yes and at max" in {
-      val los = (1 to mockAppConfig.maxLos).map(i => loComplete.copy(id = i.toString))
+      val los = (1 to mockAppConfig.maxLiaisonOfficers).map(i => loComplete.copy(id = i.toString))
 
       val journeyData =
         JourneyData(
