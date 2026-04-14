@@ -16,6 +16,7 @@
 
 @import viewmodels.InputWidth._
 @import controllers.signatories.routes.SignatoryJobTitleController
+@import controllers.signatories.routes.SignatoryCheckYourAnswersController
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 
 @this(
@@ -47,6 +48,7 @@
 
         @govukButton(
             ButtonViewModel(messages("site.saveAndContinue"))
+            .asLink(SignatoryCheckYourAnswersController.onPageLoad(id).url)
         )
     }
 }

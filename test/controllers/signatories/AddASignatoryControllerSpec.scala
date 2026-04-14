@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.signatories
 
 import base.SpecBase
 import controllers.signatories.routes.AddASignatoryController

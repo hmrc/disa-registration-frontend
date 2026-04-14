@@ -100,4 +100,55 @@ class SignatorySpec extends SpecBase {
       Json.toJson(model) mustEqual expectedJson
     }
   }
+
+  "Signatory state helpers" - {
+
+    "must return complete when both fullName and jobTitle are defined" in {
+
+      val model = Signatory(
+        id = "1",
+        fullName = Some("Alice"),
+        jobTitle = Some("Dev")
+      )
+
+      model.isComplete mustBe true
+      model.inProgress mustBe false
+    }
+
+    "must return NOT complete when fullName is missing" in {
+
+      val model = Signatory(
+        id = "1",
+        fullName = None,
+        jobTitle = Some("Dev")
+      )
+
+      model.isComplete mustBe false
+      model.inProgress mustBe true
+    }
+
+    "must return NOT complete when jobTitle is missing" in {
+
+      val model = Signatory(
+        id = "1",
+        fullName = Some("Alice"),
+        jobTitle = None
+      )
+
+      model.isComplete mustBe false
+      model.inProgress mustBe true
+    }
+
+    "must return NOT complete when both fields are missing" in {
+
+      val model = Signatory(
+        id = "1",
+        fullName = None,
+        jobTitle = None
+      )
+
+      model.isComplete mustBe false
+      model.inProgress mustBe true
+    }
+  }
 }
