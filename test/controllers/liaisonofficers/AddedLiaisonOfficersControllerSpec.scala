@@ -101,7 +101,7 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
       }
     }
 
-    "must return BadRequest when POST with invalid data" in {
+    "must return BadRequest when invalid data is submitted and the count is below the maximum" in {
 
       val journeyData =
         JourneyData(
@@ -119,21 +119,21 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
 
         val boundForm = form.bind(Map("value" -> ""))
 
-        val view = application.injector.instanceOf[AddedLiaisonOfficersView]
-
+        val view   = application.injector.instanceOf[AddedLiaisonOfficersView]
         val result = route(application, request).value
-
-        val (inProgress, complete) = Seq(loInProgress).partition(_.inProgress)
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(
           boundForm,
-          AddedLiaisonOfficerSummary(inProgress, complete)
+          AddedLiaisonOfficerSummary(
+            inProgress = Seq(loInProgress),
+            complete = Seq.empty
+          )
         )(request, messages(application)).toString
       }
     }
 
-    "must redirect to liaison name page when Yes and below max" in {
+    "must redirect to LiaisonOfficerName when Yes is submitted and the count is below the maximum" in {
 
       val journeyData =
         JourneyData(
@@ -157,32 +157,7 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to task list when Yes and at max" in {
-      val los = (1 to mockAppConfig.maxLiaisonOfficers).map(i => loComplete.copy(id = i.toString))
-
-      val journeyData =
-        JourneyData(
-          groupId = testGroupId,
-          enrolmentId = testString,
-          liaisonOfficers = Some(LiaisonOfficers(los))
-        )
-
-      val application = applicationBuilder(journeyData = Some(journeyData)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody("value" -> Yes.toString)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
-      }
-    }
-
-    "must redirect to task list when No" in {
-
+    "must redirect to TaskList when No is submitted and the count is below the maximum" in {
       val journeyData =
         JourneyData(
           groupId = testGroupId,
@@ -196,6 +171,118 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
         val request =
           FakeRequest(POST, submitUrl)
             .withFormUrlEncodedBody("value" -> No.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect to TaskList when data is submitted and the count is equal to the maximum" in {
+
+      val application = applicationBuilder(Some(emptyJourneyData)).build()
+
+      running(application) {
+        val appConfig = application.injector.instanceOf[config.FrontendAppConfig]
+
+        val liaisonOfficers =
+          (1 to appConfig.maxLiaisonOfficers).map { i =>
+            LiaisonOfficer(
+              id = s"id-$i",
+              fullName = Some(s"Officer $i"),
+              email = Some(s"officer$i@example.com"),
+              phoneNumber = Some(s"0700000000$i"),
+              communication = Set(ByEmail)
+            )
+          }
+
+        val journeyData =
+          JourneyData(
+            groupId = testGroupId,
+            enrolmentId = testString,
+            liaisonOfficers = Some(LiaisonOfficers(liaisonOfficers))
+          )
+
+        val appWithData = applicationBuilder(journeyData = Some(journeyData)).build()
+
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody("value" -> Yes.toString)
+
+        val result = route(appWithData, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect to TaskList when data is submitted and the count is above the maximum" in {
+      val appConfig = app.injector.instanceOf[config.FrontendAppConfig]
+
+      val liaisonOfficers =
+        (1 to (appConfig.maxLiaisonOfficers + 1)).map { i =>
+          LiaisonOfficer(
+            id = s"id-$i",
+            fullName = Some(s"Officer $i"),
+            email = Some(s"officer$i@example.com"),
+            phoneNumber = Some(s"0700000000$i"),
+            communication = Set(ByEmail)
+          )
+        }
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(LiaisonOfficers(liaisonOfficers))
+        )
+
+      val application = applicationBuilder(Some(journeyData)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody("value" -> Yes.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect to TaskList when no liaison officers section exists" in {
+
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody("value" -> Yes.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect to TaskList when the liaison officers section is empty" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(LiaisonOfficers(Seq.empty))
+        )
+
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody("value" -> Yes.toString)
 
         val result = route(application, request).value
 

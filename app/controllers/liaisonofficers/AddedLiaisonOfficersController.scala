@@ -47,7 +47,7 @@ class AddedLiaisonOfficersController @Inject() (
   val form: Form[YesNoAnswer] = formProvider("addedLiaisonOfficers.error.required")
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getInProgressAndCompleteLos.fold {
+    getInProgressAndCompleteLiaisonOfficers.fold {
       Redirect(TaskListController.onPageLoad())
     } { case (inProgress, complete) =>
       Ok(view(form, AddedLiaisonOfficerSummary(inProgress, complete)))
@@ -55,24 +55,33 @@ class AddedLiaisonOfficersController @Inject() (
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getInProgressAndCompleteLos.fold {
+    getInProgressAndCompleteLiaisonOfficers.fold {
       Redirect(TaskListController.onPageLoad())
     } { case (inProgress, complete) =>
       val count = inProgress.size + complete.size
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => BadRequest(view(formWithErrors, AddedLiaisonOfficerSummary(inProgress, complete))),
-          {
-            case YesNoAnswer.Yes if count < appConfig.maxLiaisonOfficers =>
-              Redirect(LiaisonOfficerNameController.onPageLoad(None, NormalMode))
-            case _                                                       => Redirect(TaskListController.onPageLoad())
-          }
-        )
+
+      if (count >= appConfig.maxLiaisonOfficers) {
+        Redirect(TaskListController.onPageLoad())
+      } else {
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              BadRequest(
+                view(formWithErrors, AddedLiaisonOfficerSummary(inProgress, complete))
+              ),
+            {
+              case YesNoAnswer.Yes =>
+                Redirect(LiaisonOfficerNameController.onPageLoad(None, NormalMode))
+              case _               =>
+                Redirect(TaskListController.onPageLoad())
+            }
+          )
+      }
     }
   }
 
-  private def getInProgressAndCompleteLos(implicit request: DataRequest[_]) =
+  private def getInProgressAndCompleteLiaisonOfficers(implicit request: DataRequest[_]) =
     request.journeyData.liaisonOfficers
       .map(_.liaisonOfficers)
       .filter(_.nonEmpty)
