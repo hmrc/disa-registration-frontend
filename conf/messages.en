@@ -297,7 +297,7 @@ addedLiaisonOfficers.complete = Complete
 addedLiaisonOfficers.inProgress = In progress
 addedLiaisonOfficers.legend = Do you want to add another liaison officer?
 addedLiaisonOfficers.error.required = Select yes if you’d like to add another liaison officer
-addedLiaisonOfficers.summary.action.hidden = liaison officer
+addedLiaisonOfficers.summary.action.hidden = {0} details
 
 ### Certificates of Authority
 

@@ -100,11 +100,11 @@ class AddedLiaisonOfficersViewModel @Inject() (
           ActionItemViewModel(
             content = messages("site.change"),
             href = LiaisonOfficerNameController.onPageLoad(Some(liaisonOfficer.id), CheckMode).url
-          ).withVisuallyHiddenText(messages("addedLiaisonOfficers.summary.action.hidden")),
+          ).withVisuallyHiddenText(messages("addedLiaisonOfficers.summary.action.hidden", answer)),
           ActionItemViewModel(
             content = messages("site.remove"),
             href = RemoveLiaisonOfficerController.onPageLoad(liaisonOfficer.id).url
-          ).withVisuallyHiddenText(messages("addedLiaisonOfficers.summary.action.hidden"))
+          ).withVisuallyHiddenText(messages("addedLiaisonOfficers.summary.action.hidden", answer))
         )
       )
     }
