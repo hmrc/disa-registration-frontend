@@ -290,6 +290,14 @@ removeLiaisonOfficer.title = Are you sure you want to remove {0} as a liaison of
 removeLiaisonOfficer.heading = Are you sure you want to remove {0} as a liaison officer?
 removeLiaisonOfficer.error.required = Select yes if you want to remove this liaison officer
 
+addedLiaisonOfficers.title = You have added {0}
+addedLiaisonOfficers.heading = You have added {0}
+addedLiaisonOfficers.guidance = You need to add at least 1 liaison officer. You can add a total of 15
+addedLiaisonOfficers.complete = Complete
+addedLiaisonOfficers.inProgress = In progress
+addedLiaisonOfficers.legend = Do you want to add another liaison officer?
+addedLiaisonOfficers.error.required = Select yes if you’d like to add another liaison officer
+addedLiaisonOfficers.summary.action.hidden = liaison officer
 
 ### Certificates of Authority
 
