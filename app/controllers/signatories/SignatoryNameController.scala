@@ -91,7 +91,7 @@ class SignatoryNameController @Inject() (
               .map { updatedSection =>
                 Redirect(
                   navigator.nextPage(
-                    SignatoryNamePage,
+                    SignatoryNamePage(id),
                     updatedSection,
                     mode
                   )

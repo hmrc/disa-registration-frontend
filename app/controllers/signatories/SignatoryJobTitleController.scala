@@ -83,7 +83,7 @@ class SignatoryJobTitleController @Inject() (
                 .map { savedSection =>
                   Redirect(
                     navigator.nextPage(
-                      SignatoryJobTitlePage,
+                      SignatoryJobTitlePage(id),
                       savedSection,
                       mode
                     )

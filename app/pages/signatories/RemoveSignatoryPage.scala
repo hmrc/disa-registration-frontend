@@ -17,6 +17,6 @@
 package pages.signatories
 
 import models.journeydata.signatories.Signatories
-import pages.Page
+import pages.{IdentifiedPage, Page}
 
-case object RemoveSignatoryPage extends Page[Signatories]
+final case class RemoveSignatoryPage(id: String) extends IdentifiedPage[Signatories]

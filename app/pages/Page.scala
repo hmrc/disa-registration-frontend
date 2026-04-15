@@ -34,6 +34,10 @@ trait PageWithDependents[A <: TaskListSection] extends ClearablePage[A] {
   def resumeNormalMode(currentAnswers: A): Boolean
 }
 
+trait IdentifiedPage[A <: TaskListSection] extends Page[A] {
+  def id: String
+}
+
 object Page {
 
   implicit def toString[A <: TaskListSection](page: Page[A]): String =

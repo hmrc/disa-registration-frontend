@@ -19,7 +19,7 @@ package navigation
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
 import controllers.orgdetails.routes.*
-import controllers.routes
+import controllers.signatories.routes.*
 import controllers.routes.*
 import models.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
@@ -72,10 +72,10 @@ class Navigator @Inject() () {
     case FcaArticlesPage                     => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage           => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage => registeredAddressCorrespondenceNextPage(answers)
-    case RemoveSignatoryPage                 => routes.IndexController.onPageLoad()
-    case SignatoryNamePage                   => routes.IndexController.onPageLoad()
-    case SignatoryJobTitlePage               => routes.IndexController.onPageLoad()
-    case _                                   => routes.IndexController.onPageLoad()
+    case RemoveSignatoryPage(id)             => IndexController.onPageLoad()
+    case SignatoryNamePage(id)               => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
+    case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case _                                   => IndexController.onPageLoad()
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
@@ -89,19 +89,19 @@ class Navigator @Inject() () {
     case FcaArticlesPage                     => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage           => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage => IndexController.onPageLoad()
-    case SignatoryNamePage                   => IndexController.onPageLoad()
-    case SignatoryJobTitlePage               => IndexController.onPageLoad()
-    case _                                   => routes.IndexController.onPageLoad()
+    case SignatoryNamePage(id)               => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case _                                   => IndexController.onPageLoad()
   }
 
   private def isaProductsNextPage(answers: IsaProducts): Call =
-    answers.isaProducts.fold(routes.IndexController.onPageLoad()) { isaProducts =>
+    answers.isaProducts.fold(IndexController.onPageLoad()) { isaProducts =>
       if (isaProducts.contains(InnovativeFinanceIsas)) InnovativeFinancialProductsController.onPageLoad(NormalMode)
       else IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
   private def innovativeFinancialProductsNextPage(answers: IsaProducts): Call =
-    answers.innovativeFinancialProducts.fold(routes.IndexController.onPageLoad()) { ifps =>
+    answers.innovativeFinancialProducts.fold(IndexController.onPageLoad()) { ifps =>
       if (ifps.contains(PeertopeerLoansUsingAPlatformWith36hPermissions))
         PeerToPeerPlatformController.onPageLoad(NormalMode)
       else IsaProductsCheckYourAnswersController.onPageLoad()
@@ -120,7 +120,7 @@ class Navigator @Inject() () {
   private def registeredAddressCorrespondenceNextPage(
     answers: OrganisationDetails
   ): Call =
-    answers.registeredAddressCorrespondence.fold(routes.IndexController.onPageLoad()) {
+    answers.registeredAddressCorrespondence.fold(IndexController.onPageLoad()) {
       case true  =>
         OrganisationTelephoneNumberController.onPageLoad(NormalMode)
       case false =>
