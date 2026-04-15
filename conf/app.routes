@@ -158,6 +158,9 @@ POST       /change-signatory-job-title                   controllers.signatories
 
 GET        /check-added-signatory                        controllers.signatories.SignatoryCheckYourAnswersController.onPageLoad(id: String)
 
+GET        /added-signatories                            controllers.signatories.AddedSignatoryController.onPageLoad()
+POST       /added-signatories                            controllers.signatories.AddedSignatoryController.onSubmit()
+
 GET        /remove-signatory                             controllers.signatories.RemoveSignatoryController.onPageLoad(id: String)
 POST       /remove-signatory                             controllers.signatories.RemoveSignatoryController.onSubmit(id: String)
 

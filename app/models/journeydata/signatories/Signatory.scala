@@ -22,7 +22,13 @@ case class Signatory(
   id: String,
   fullName: Option[String] = None,
   jobTitle: Option[String] = None
-)
+) {
+  def isComplete: Boolean =
+    fullName.isDefined && jobTitle.isDefined
+
+  def inProgress: Boolean =
+    !isComplete
+}
 
 object Signatory {
   implicit val format: OFormat[Signatory] = Json.format[Signatory]
