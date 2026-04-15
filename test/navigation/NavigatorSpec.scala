@@ -19,6 +19,7 @@ package navigation
 import base.SpecBase
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
+import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
 import controllers.routes.IndexController
 import models.*
@@ -27,13 +28,15 @@ import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.signatories.{Signatories, Signatory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
-import org.scalatest.matchers.should.Matchers.{should, shouldBe}
+import org.scalatest.matchers.should.Matchers.shouldBe
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
+import pages.liaisonofficers.*
 import pages.organisationdetails.RegisteredAddressCorrespondencePage
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
@@ -65,6 +68,9 @@ class NavigatorSpec extends SpecBase {
 
   private val signatoriesAnswers: Signatories =
     Signatories(Seq(Signatory(id = testString, fullName = Some(testString), jobTitle = Some(testString))))
+
+  private val liaisonOfficersAnswers: LiaisonOfficers =
+    LiaisonOfficers(Seq(LiaisonOfficer(id = testString, fullName = Some(testString))))
 
   "Navigator.nextPage(PageWithDependents)" - {
 
@@ -271,6 +277,42 @@ class NavigatorSpec extends SpecBase {
       result shouldBe IndexController.onPageLoad()
     }
 
+    "route LiaisonOfficerNamePage to LiaisonOfficerEmailController" in {
+      val result: Call = navigator.normalRoutes(LiaisonOfficerNamePage(testString), liaisonOfficersAnswers)
+
+      result shouldBe LiaisonOfficerEmailController.onPageLoad(testString, NormalMode)
+    }
+
+    "route LiaisonOfficerEmailPage to LiaisonOfficerPhoneNumberController" in {
+      val result: Call = navigator.normalRoutes(LiaisonOfficerEmailPage(testString), liaisonOfficersAnswers)
+
+      result shouldBe LiaisonOfficerPhoneNumberController.onPageLoad(testString, NormalMode)
+    }
+
+    "route LiaisonOfficerPhoneNumberPage to LiaisonOfficerCommunicationController" in {
+      val result: Call = navigator.normalRoutes(LiaisonOfficerPhoneNumberPage(testString), liaisonOfficersAnswers)
+
+      result shouldBe LiaisonOfficerCommunicationController.onPageLoad(testString, NormalMode)
+    }
+
+    "route LiaisonOfficerCommunicationPage to LO CYA" in {
+      val result: Call = navigator.normalRoutes(LiaisonOfficerCommunicationPage(testString), liaisonOfficersAnswers)
+
+      result shouldBe LoCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route RemoveLiaisonOfficerPage to AddLiaisonOfficerController when no liaison officers remain" in {
+      val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, LiaisonOfficers(Nil))
+
+      result shouldBe AddLiaisonOfficerController.onPageLoad()
+    }
+
+    "route RemoveLiaisonOfficerPage to AddedLiaisonOfficersController when liaison officers remain" in {
+      val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, liaisonOfficersAnswers)
+
+      result shouldBe AddedLiaisonOfficersController.onPageLoad()
+    }
+
     "route unknown page to Index" in {
       case object UnknownPage extends PageWithoutDependents[IsaProducts] {
         override def clearAnswer(answers: IsaProducts): IsaProducts = answers
@@ -334,6 +376,26 @@ class NavigatorSpec extends SpecBase {
     "route SignatoryJobTitlePage to Index Controller" in {
       navigator.checkRouteMap(SignatoryJobTitlePage) shouldBe
         IndexController.onPageLoad()
+    }
+
+    "route LiaisonOfficerNamePage to LO CYA" in {
+      navigator.checkRouteMap(LiaisonOfficerNamePage(testString)) shouldBe
+        LoCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route LiaisonOfficerEmailPage to LO CYA" in {
+      navigator.checkRouteMap(LiaisonOfficerEmailPage(testString)) shouldBe
+        LoCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route LiaisonOfficerPhoneNumberPage to LO CYA" in {
+      navigator.checkRouteMap(LiaisonOfficerPhoneNumberPage(testString)) shouldBe
+        LoCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route LiaisonOfficerCommunicationPage to LO CYA" in {
+      navigator.checkRouteMap(LiaisonOfficerCommunicationPage(testString)) shouldBe
+        LoCheckYourAnswersController.onPageLoad(testString)
     }
 
     "route unknown page to Index" in {

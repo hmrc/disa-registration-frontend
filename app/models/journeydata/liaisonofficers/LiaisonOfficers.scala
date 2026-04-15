@@ -26,12 +26,14 @@ case class LiaisonOfficers(liaisonOfficers: Seq[LiaisonOfficer] = Seq.empty[Liai
     val exists = liaisonOfficers.exists(_.id == id)
 
     if (exists)
-      Some(copy(
+      Some(
+        copy(
           liaisonOfficers = liaisonOfficers.map {
             case lo if lo.id == id => lo.copy(fullName = Some(fullName))
-            case lo => lo
+            case lo                => lo
           }
-      ))
+        )
+      )
     else if (canAddAnother(max)) Some(copy(liaisonOfficers = liaisonOfficers :+ LiaisonOfficer(id, Some(fullName))))
     else None
   }

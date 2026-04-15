@@ -17,7 +17,9 @@
 package controllers.liaisonofficers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import controllers.liaisonofficers.routes.LiaisonOfficerNameController
+import controllers.routes.TaskListController
 import forms.LiaisonOfficerNameFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
@@ -25,7 +27,7 @@ import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{atMostOnce, verify, when}
+import org.mockito.Mockito.{atMostOnce, never, verify, when}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
@@ -50,6 +52,11 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
 
   val formProvider: LiaisonOfficerNameFormProvider = new LiaisonOfficerNameFormProvider()
   val form: Form[String]                           = formProvider()
+
+  val maxLiaisonOfficers: Int = app.injector.instanceOf[FrontendAppConfig].maxLiaisonOfficers
+
+  private def liaisonOfficers(count: Int): Seq[LiaisonOfficer] =
+    (1 to count).map(i => LiaisonOfficer(s"id-$i", Some(s"Person $i")))
 
   "LiaisonOfficerNameController" - {
 
@@ -130,6 +137,86 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
       }
     }
 
+    "must return OK on GET when editing an existing liaison officer and the maximum number has been reached" in {
+
+      val existingOfficer = LiaisonOfficer(existingId, Some("Existing Person"))
+      val others          = liaisonOfficers(maxLiaisonOfficers - 1)
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(
+            LiaisonOfficers(existingOfficer +: others)
+          )
+        )
+
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, LiaisonOfficerNameController.onPageLoad(Some(existingId), NormalMode).url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[LiaisonOfficerNameView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(existingId, form.fill("Existing Person"), NormalMode)(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must redirect to task list on GET when adding a new liaison officer and the maximum number has been reached" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(
+            LiaisonOfficers(liaisonOfficers(maxLiaisonOfficers))
+          )
+        )
+
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, LiaisonOfficerNameController.onPageLoad(None, NormalMode).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect to task list on GET when an unknown liaison officer id is provided and the maximum number has been reached" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(
+            LiaisonOfficers(liaisonOfficers(maxLiaisonOfficers))
+          )
+        )
+
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, LiaisonOfficerNameController.onPageLoad(Some("unknown-id"), NormalMode).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
     "must return BadRequest and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
@@ -202,6 +289,50 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
       }
     }
 
+    "must allow updating an existing liaison officer when the maximum number has been reached" in {
+
+      val existingOfficer = LiaisonOfficer(existingId, Some("Old Name"))
+      val others          = liaisonOfficers(maxLiaisonOfficers - 1)
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(
+            LiaisonOfficers(existingOfficer +: others)
+          )
+        )
+
+      val expectedSection =
+        LiaisonOfficers(
+          LiaisonOfficer(existingId, Some("Updated Name")) +: others
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
+      ).thenReturn(Future.successful(expectedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, LiaisonOfficerNameController.onSubmit(existingId, NormalMode).url)
+            .withFormUrlEncodedBody(("value", "Updated Name"))
+
+        val result = route(application, request).value
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
     "must redirect to the next page when valid data is submitted and existing section is present but liaison officer id is new" in {
 
       val journeyData =
@@ -247,6 +378,36 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must redirect to task list and not update when trying to add a new liaison officer beyond the maximum" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(
+            LiaisonOfficers(liaisonOfficers(maxLiaisonOfficers))
+          )
+        )
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, LiaisonOfficerNameController.onSubmit(newId, NormalMode).url)
+            .withFormUrlEncodedBody(("value", "New Person"))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+
+        verify(mockJourneyAnswersService, never())
+          .update(any[LiaisonOfficers], any[String], any[String])(any[Writes[LiaisonOfficers]], any)
       }
     }
 

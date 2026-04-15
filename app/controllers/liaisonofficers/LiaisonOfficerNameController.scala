@@ -63,18 +63,12 @@ class LiaisonOfficerNameController @Inject() (
   def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen auditContinuation(LiaisonOfficers.sectionName)) {
       implicit request =>
-
-        lazy val (liaisonOfficerId, preparedForm) =
-          (for {
-            existingId <- id
-            officers   <- request.journeyData.liaisonOfficers.map(_.liaisonOfficers)
-            officer    <- officers.find(_.id == existingId)
-            name       <- officer.fullName
-          } yield (existingId, form.fill(name)))
-            .getOrElse((uuidGenerator.generate(), form))
-
-        if (canAddAnother(appConfig)) Ok(view(liaisonOfficerId, preparedForm, mode))
-        else Redirect(TaskListController.onPageLoad())
+        existingOfficer(id) match {
+          case Some(officer) => Ok(view(officer.id, form.fill(officer.fullName.getOrElse("")), mode))
+          case None          =>
+            if (canAddAnother(appConfig)) Ok(view(uuidGenerator.generate(), form, mode))
+            else Redirect(TaskListController.onPageLoad())
+        }
     }
 
   def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -90,7 +84,7 @@ class LiaisonOfficerNameController @Inject() (
                 .upsertLiaisonOfficer(id, answer, appConfig.maxLiaisonOfficers)
 
             updatedSection match {
-              case None =>
+              case None                 =>
                 logger.info(s"Addition of liaison officer blocked by limit for groupId [${request.groupId}]")
                 Future.successful(Redirect(TaskListController.onPageLoad()))
               case Some(updatedSection) =>
@@ -116,5 +110,13 @@ class LiaisonOfficerNameController @Inject() (
         )
   }
 
-  private def canAddAnother(appConfig: FrontendAppConfig)(implicit request: DataRequest[_])   = request.journeyData.liaisonOfficers.forall(_.canAddAnother(appConfig.maxLiaisonOfficers))
+  private def existingOfficer(id: Option[String])(implicit request: DataRequest[_]): Option[LiaisonOfficer] =
+    for {
+      existingId <- id
+      officers   <- request.journeyData.liaisonOfficers.map(_.liaisonOfficers)
+      officer    <- officers.find(_.id == existingId)
+    } yield officer
+
+  private def canAddAnother(appConfig: FrontendAppConfig)(implicit request: DataRequest[_]): Boolean =
+    request.journeyData.liaisonOfficers.forall(_.canAddAnother(appConfig.maxLiaisonOfficers))
 }
