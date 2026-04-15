@@ -40,7 +40,8 @@ import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
 
-  private val navigator = new Navigator()
+  private val navigator   = new Navigator()
+  private val signatoryId = "testId"
 
   private def answersWithIsaProducts(products: Seq[IsaProduct]): IsaProducts =
     IsaProducts(
@@ -257,17 +258,17 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route RemoveSignatoryPage to Index Controller" in {
-      val result: Call = navigator.normalRoutes(RemoveSignatoryPage, signatoriesAnswers)
+      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), signatoriesAnswers)
       result shouldBe IndexController.onPageLoad()
     }
 
     "route SignatoryNamePage to Index Controller" in {
-      val result: Call = navigator.normalRoutes(SignatoryNamePage, signatoriesAnswers)
+      val result: Call = navigator.normalRoutes(SignatoryNamePage(signatoryId), signatoriesAnswers)
       result shouldBe IndexController.onPageLoad()
     }
 
     "route SignatoryJobTitlePage to Index Controller" in {
-      val result: Call = navigator.normalRoutes(SignatoryJobTitlePage, signatoriesAnswers)
+      val result: Call = navigator.normalRoutes(SignatoryJobTitlePage(signatoryId), signatoriesAnswers)
       result shouldBe IndexController.onPageLoad()
     }
 
@@ -322,17 +323,17 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route RemoveSignatoryPage to Index Controller" in {
-      navigator.checkRouteMap(RemoveSignatoryPage) shouldBe
+      navigator.checkRouteMap(RemoveSignatoryPage(signatoryId)) shouldBe
         IndexController.onPageLoad()
     }
 
     "route SignatoryNamePage to Index Controller" in {
-      navigator.checkRouteMap(SignatoryNamePage) shouldBe
+      navigator.checkRouteMap(SignatoryNamePage(signatoryId)) shouldBe
         IndexController.onPageLoad()
     }
 
     "route SignatoryJobTitlePage to Index Controller" in {
-      navigator.checkRouteMap(SignatoryJobTitlePage) shouldBe
+      navigator.checkRouteMap(SignatoryJobTitlePage(signatoryId)) shouldBe
         IndexController.onPageLoad()
     }
 
