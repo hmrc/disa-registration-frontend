@@ -31,6 +31,7 @@ import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.UuidGenerator
 import views.html.signatories.SignatoryNameView
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -77,13 +78,25 @@ class SignatoryNameController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode))),
           answer => {
-            val existingSection   = request.journeyData.signatories
-            val upsertedSignatory = Signatory(id, Some(answer))
-            val updatedSection    = existingSection match {
+            val updatedSection = request.journeyData.signatories match {
               case Some(existing) =>
-                val existingSignatory = existing.signatories.filter(_.id != id)
-                existing.copy(signatories = existingSignatory :+ upsertedSignatory)
-              case None           => Signatories(Seq(upsertedSignatory))
+                val exists             = existing.signatories.exists(_.id == id)
+                val updatedSignatories =
+                  if (exists) {
+                    existing.signatories.map {
+                      case s if s.id == id =>
+                        s.copy(fullName = Some(answer))
+                      case s               =>
+                        s
+                    }
+                  } else {
+                    existing.signatories :+ Signatory(id, Some(answer), jobTitle = None)
+                  }
+                existing.copy(signatories = updatedSignatories)
+              case None           =>
+                Signatories(
+                  Seq(Signatory(id, Some(answer), jobTitle = None))
+                )
             }
 
             journeyAnswersService
