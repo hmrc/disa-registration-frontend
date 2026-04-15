@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.liaisonofficers.routes.LiaisonOfficerNameController
 import forms.LiaisonOfficerNameFormProvider
 import models.journeydata.JourneyData
+import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
@@ -298,6 +299,177 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
         await(route(application, request).value)
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
+      }
+    }
+
+    "must preserve existing fields when updating a liaison officer name" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(
+            LiaisonOfficers(
+              Seq(
+                LiaisonOfficer(
+                  existingId,
+                  fullName = Some("Old Name"),
+                  phoneNumber = Some("0123456789"),
+                  email = Some("test@test.com"),
+                  communication = Set(ByEmail)
+                )
+              )
+            )
+          )
+        )
+
+      val expectedSection =
+        LiaisonOfficers(
+          Seq(
+            LiaisonOfficer(
+              existingId,
+              fullName = Some("Updated Name"),
+              phoneNumber = Some("0123456789"),
+              email = Some("test@test.com"),
+              communication = Set(ByEmail)
+            )
+          )
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
+      ).thenReturn(Future.successful(expectedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, LiaisonOfficerNameController.onSubmit(existingId, NormalMode).url)
+            .withFormUrlEncodedBody(("value", "Updated Name"))
+
+        val result = route(application, request).value
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
+
+        status(result) mustEqual SEE_OTHER
+      }
+    }
+
+    "must not modify other liaison officers when updating one" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(
+            LiaisonOfficers(
+              Seq(
+                LiaisonOfficer(
+                  "other-id",
+                  fullName = Some("Other Person"),
+                  phoneNumber = Some("0000000000"),
+                  email = Some("other@test.com"),
+                  communication = Set(ByPhone)
+                ),
+                LiaisonOfficer(
+                  existingId,
+                  fullName = Some("Old Name"),
+                  phoneNumber = Some("0123456789"),
+                  email = Some("test@test.com"),
+                  communication = Set(ByEmail)
+                )
+              )
+            )
+          )
+        )
+
+      val expectedSection =
+        LiaisonOfficers(
+          Seq(
+            LiaisonOfficer(
+              "other-id",
+              fullName = Some("Other Person"),
+              phoneNumber = Some("0000000000"),
+              email = Some("other@test.com"),
+              communication = Set(ByPhone)
+            ),
+            LiaisonOfficer(
+              existingId,
+              fullName = Some("Updated Name"),
+              phoneNumber = Some("0123456789"),
+              email = Some("test@test.com"),
+              communication = Set(ByEmail)
+            )
+          )
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
+      ).thenReturn(Future.successful(expectedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, LiaisonOfficerNameController.onSubmit(existingId, NormalMode).url)
+            .withFormUrlEncodedBody(("value", "Updated Name"))
+
+        route(application, request).value
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
+      }
+    }
+
+    "must add new liaison officer with default fields when id does not exist" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(
+            LiaisonOfficers(Seq.empty)
+          )
+        )
+
+      val expectedSection =
+        LiaisonOfficers(
+          Seq(
+            LiaisonOfficer(
+              newId,
+              fullName = Some("New Person"),
+              phoneNumber = None,
+              email = None,
+              communication = Set.empty
+            )
+          )
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
+      ).thenReturn(Future.successful(expectedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, LiaisonOfficerNameController.onSubmit(newId, NormalMode).url)
+            .withFormUrlEncodedBody(("value", "New Person"))
+
+        route(application, request).value
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[LiaisonOfficers]], any)
       }
     }
 
