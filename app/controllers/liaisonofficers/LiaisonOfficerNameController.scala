@@ -79,12 +79,18 @@ class LiaisonOfficerNameController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode))),
           answer => {
             val existingSection = request.journeyData.liaisonOfficers
-            val upsertedLO      = LiaisonOfficer(id, Some(answer))
             val updatedSection  = existingSection match {
               case Some(existing) =>
-                val existingLOs = existing.liaisonOfficers.filter(_.id != id)
-                existing.copy(liaisonOfficers = existingLOs :+ upsertedLO)
-              case None           => LiaisonOfficers(Seq(upsertedLO))
+                val exists     = existing.liaisonOfficers.exists(_.id == id)
+                val updatedLOs =
+                  if (exists) {
+                    existing.liaisonOfficers.map {
+                      case lo if lo.id == id => lo.copy(fullName = Some(answer))
+                      case lo                => lo
+                    }
+                  } else existing.liaisonOfficers :+ LiaisonOfficer(id, Some(answer))
+                existing.copy(liaisonOfficers = updatedLOs)
+              case None           => LiaisonOfficers(Seq(LiaisonOfficer(id, Some(answer))))
             }
 
             journeyAnswersService
