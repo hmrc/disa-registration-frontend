@@ -37,7 +37,7 @@ case class AddedLiaisonOfficerSummary(
 ) {
   def count: Int          = inProgress.size + complete.size
   def titleSuffix: String =
-    if (count > 1) s"${count.toString} liaison officers" else s"${count.toString} liaison officer"
+    if (count > 1) s"${count.toString} liaison officers" else "a liaison officer"
 }
 
 class AddedLiaisonOfficersViewModel @Inject() (
