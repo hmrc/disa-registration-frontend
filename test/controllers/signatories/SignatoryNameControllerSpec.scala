@@ -339,5 +339,132 @@ class SignatoryNameControllerSpec extends SpecBase {
         redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
+
+    "must preserve existing fields when updating a signatory name" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          signatories = Some(
+            Signatories(
+              Seq(
+                Signatory(existingId, Some("Old Name"), jobTitle = Some("Director"))
+              )
+            )
+          )
+        )
+
+      val expectedSection =
+        Signatories(
+          Seq(
+            Signatory(existingId, Some("Updated Name"), jobTitle = Some("Director"))
+          )
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
+      ).thenReturn(Future.successful(expectedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, SignatoryNameController.onSubmit(existingId, NormalMode).url)
+            .withFormUrlEncodedBody(("value", "Updated Name"))
+
+        val result = route(application, request).value
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
+
+        status(result) mustEqual SEE_OTHER
+      }
+    }
+
+    "must not modify other signatories when updating one" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          signatories = Some(
+            Signatories(
+              Seq(
+                Signatory("other-id", Some("Other Person"), jobTitle = Some("CEO")),
+                Signatory(existingId, Some("Old Name"), jobTitle = Some("Director"))
+              )
+            )
+          )
+        )
+
+      val expectedSection =
+        Signatories(
+          Seq(
+            Signatory("other-id", Some("Other Person"), jobTitle = Some("CEO")),
+            Signatory(existingId, Some("Updated Name"), jobTitle = Some("Director"))
+          )
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
+      ).thenReturn(Future.successful(expectedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, SignatoryNameController.onSubmit(existingId, NormalMode).url)
+            .withFormUrlEncodedBody(("value", "Updated Name"))
+
+        route(application, request).value
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
+      }
+    }
+
+    "must add new signatory with default fields when id does not exist" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          signatories = Some(
+            Signatories(Seq.empty)
+          )
+        )
+
+      val expectedSection =
+        Signatories(
+          Seq(Signatory(newId, Some("New Person"), jobTitle = None))
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
+      ).thenReturn(Future.successful(expectedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, SignatoryNameController.onSubmit(newId, NormalMode).url)
+            .withFormUrlEncodedBody(("value", "New Person"))
+
+        route(application, request).value
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
+      }
+    }
   }
 }
