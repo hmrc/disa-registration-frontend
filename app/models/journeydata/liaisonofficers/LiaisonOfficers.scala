@@ -21,6 +21,22 @@ import play.api.libs.json.{Json, OFormat}
 
 case class LiaisonOfficers(liaisonOfficers: Seq[LiaisonOfficer] = Seq.empty[LiaisonOfficer]) extends TaskListSection {
   override def sectionName: String = LiaisonOfficers.sectionName
+
+  def upsertLiaisonOfficer(id: String, fullName: String, max: Int): Option[LiaisonOfficers] = {
+    val exists = liaisonOfficers.exists(_.id == id)
+
+    if (exists)
+      Some(copy(
+          liaisonOfficers = liaisonOfficers.map {
+            case lo if lo.id == id => lo.copy(fullName = Some(fullName))
+            case lo => lo
+          }
+      ))
+    else if (canAddAnother(max)) Some(copy(liaisonOfficers = liaisonOfficers :+ LiaisonOfficer(id, Some(fullName))))
+    else None
+  }
+
+  def canAddAnother(max: Int): Boolean = liaisonOfficers.sizeIs < max
 }
 
 object LiaisonOfficers {
