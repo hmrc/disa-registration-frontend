@@ -35,7 +35,7 @@ import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
-import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, TradingUsingDifferentNamePage, ZReferenceNumberPage}
+import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, TradingNamePage, TradingUsingDifferentNamePage, ZReferenceNumberPage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
 
@@ -69,6 +69,7 @@ class Navigator @Inject() () {
     case RegisteredIsaManagerPage            => ???
     case ZReferenceNumberPage                => ???
     case TradingUsingDifferentNamePage       => tradingUsingDifferentNameNextPage(answers)
+    case TradingNamePage                     => FirmReferenceNumberController.onPageLoad(NormalMode)
     case IsaProductsPage                     => isaProductsNextPage(answers)
     case InnovativeFinancialProductsPage     => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage              => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
@@ -92,6 +93,7 @@ class Navigator @Inject() () {
     case RegisteredIsaManagerPage            => ???
     case ZReferenceNumberPage                => ???
     case TradingUsingDifferentNamePage       => ???
+    case TradingNamePage                     => ???
     case IsaProductsPage                     => IsaProductsCheckYourAnswersController.onPageLoad()
     case InnovativeFinancialProductsPage     => IsaProductsCheckYourAnswersController.onPageLoad()
     case PeerToPeerPlatformPage              => IsaProductsCheckYourAnswersController.onPageLoad()

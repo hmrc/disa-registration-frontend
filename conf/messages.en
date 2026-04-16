@@ -116,7 +116,7 @@ tradingUsingDifferentName.change.hidden = trading using different a name
 tradingName.title = What is your organisation’s trading name?
 tradingName.heading = What is your organisation’s trading name?
 tradingName.checkYourAnswersLabel = tradingName
-tradingName.error.required = Enter the trading name of your organisation
+tradingName.error.required = You must tell us what your organisation’s trading name is
 tradingName.change.hidden = trading name
 
 firmReferenceNumber.title = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
