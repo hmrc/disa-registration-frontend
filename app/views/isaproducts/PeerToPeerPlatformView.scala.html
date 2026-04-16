@@ -47,11 +47,8 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukLabel(HmrcPageHeadingLabel.apply(
-          content = Text(messages("peerToPeerPlatform.heading")),
-          caption = HmrcSectionCaption(messages("sectionTitle.isaProducts")),
-          attributes = Map("for" -> "value")
-        ).withCssClass("govuk-!-margin-bottom-4"))
+        @govukLabel(HmrcPageHeadingLabel.apply(Text(messages("peerToPeerPlatform.heading")),
+            HmrcSectionCaption(messages("sectionTitle.isaProducts")), "govuk-label--l").withCssClass("govuk-!-margin-bottom-4"))
 
         @govukDetails(Details(
           summary = Text(messages("peerToPeerPlatform.details.summary")),
