@@ -63,7 +63,7 @@ class Navigator @Inject() () {
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
     case RegisteredIsaManagerPage            => ???
-    case ZReferenceNumberPage                => ???
+    case ZReferenceNumberPage                => TradingUsingDifferentNameController.onPageLoad(NormalMode)
     case IsaProductsPage                     => isaProductsNextPage(answers)
     case InnovativeFinancialProductsPage     => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage              => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)

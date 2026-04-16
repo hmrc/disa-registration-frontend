@@ -22,6 +22,7 @@ import controllers.isaproducts.routes.*
 import controllers.orgdetails.routes.*
 import controllers.routes.IndexController
 import models.*
+import models.journeydata.OrganisationDetails
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
@@ -34,7 +35,7 @@ import org.scalatest.matchers.should.Matchers.{should, shouldBe}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
-import pages.organisationdetails.RegisteredAddressCorrespondencePage
+import pages.organisationdetails.{RegisteredAddressCorrespondencePage, ZReferenceNumberPage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
 
@@ -142,6 +143,12 @@ class NavigatorSpec extends SpecBase {
   }
 
   "Navigator.normalRoutes" - {
+
+    "route ZReferenceNumberPage to TradingUsingDIfferentNamePage" in {
+      val result: Call = navigator.normalRoutes(ZReferenceNumberPage, OrganisationDetails())
+
+      result shouldBe TradingUsingDifferentNameController.onPageLoad(NormalMode)
+    }
 
     "route IsaProductsPage  to IF products when IF ISA selected" in {
       val answers = answersWithIsaProducts(Seq(InnovativeFinanceIsas))
