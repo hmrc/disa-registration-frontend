@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 @import config.FrontendAppConfig
 @import controllers.isaproducts.routes.PeerToPeerPlatformController
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
 @this(
     layout: templates.Layout,
@@ -27,7 +28,7 @@
     govukInput: GovukInput,
     govukButton: GovukButton,
     govukDetails: GovukDetails,
-    govukLabel: GovukLabel,
+    hmrcPageHeading: HmrcPageHeading,
     hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
     config: FrontendAppConfig
 )
@@ -47,8 +48,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukLabel(HmrcPageHeadingLabel.apply(Text(messages("peerToPeerPlatform.heading")),
-            HmrcSectionCaption(messages("sectionTitle.isaProducts")), "govuk-label--l").withCssClass("govuk-!-margin-bottom-4"))
+        @hmrcPageHeading(PageHeading(
+            text = messages("peerToPeerPlatform.heading"),
+            section = Some(messages("sectionTitle.isaProducts")),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-l")
+        ))
 
         @govukDetails(Details(
           summary = Text(messages("peerToPeerPlatform.details.summary")),
