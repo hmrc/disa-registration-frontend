@@ -18,6 +18,7 @@ package controllers.signatories
 
 import base.SpecBase
 import controllers.signatories.routes.SignatoryNameController
+import controllers.routes.TaskListController
 import forms.SignatoryNameFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.signatories.{Signatories, Signatory}
@@ -466,7 +467,7 @@ class SignatoryNameControllerSpec extends SpecBase {
           .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
       }
     }
-    "must redirect to AddedSignatoryController when no id is provided and max signatories reached" in {
+    "must redirect to TaskListController when no id is provided and max signatories reached" in {
 
       val max = 2
 
@@ -496,8 +497,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual
-          routes.AddedSignatoryController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
     "must allow access when below max signatories and no id is provided" in {

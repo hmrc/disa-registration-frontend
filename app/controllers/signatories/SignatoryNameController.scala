@@ -18,6 +18,7 @@ package controllers.signatories
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import controllers.routes.*
 import forms.SignatoryNameFormProvider
 import handlers.ErrorHandler
 import models.Mode
@@ -63,7 +64,7 @@ class SignatoryNameController @Inject() (
     (identify andThen getData andThen requireData andThen auditContinuation(Signatories.sectionName)) {
       implicit request =>
         if (id.isEmpty && signatoryCount(request) >= appConfig.maxSignatories) {
-          Redirect(routes.AddedSignatoryController.onPageLoad())
+          Redirect(TaskListController.onPageLoad())
         } else {
           val preparedFormAndId = (for {
             id          <- id
