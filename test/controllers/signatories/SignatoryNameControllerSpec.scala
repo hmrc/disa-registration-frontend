@@ -37,11 +37,11 @@ import scala.concurrent.Future
 
 class SignatoryNameControllerSpec extends SpecBase {
 
-  def onwardRoute: Call = Call("GET", "/obligations/enrolment/isa")
-
   private val existingId  = "existing-id-123"
   private val newId       = "new-id-123"
   private val generatedId = "generated-id-123"
+
+  def onwardRoute(id: String): Call = Call("GET", s"/obligations/enrolment/isa/signatory-job-title?id=$id")
 
   lazy val routeUrl: String  = SignatoryNameController.onPageLoad(Some(existingId), NormalMode).url
   lazy val submitUrl: String = SignatoryNameController.onSubmit(existingId, NormalMode).url
@@ -195,7 +195,7 @@ class SignatoryNameControllerSpec extends SpecBase {
           .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute(existingId).url
       }
     }
 
@@ -242,7 +242,7 @@ class SignatoryNameControllerSpec extends SpecBase {
           .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute(newId).url
       }
     }
 
@@ -270,7 +270,7 @@ class SignatoryNameControllerSpec extends SpecBase {
           .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute(existingId).url
       }
     }
 
@@ -336,7 +336,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual s"/obligations/enrolment/isa/check-added-signatory?id=$existingId"
       }
     }
 
@@ -464,6 +464,72 @@ class SignatoryNameControllerSpec extends SpecBase {
 
         verify(mockJourneyAnswersService, atMostOnce)
           .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
+      }
+    }
+    "must redirect to AddedSignatoryController when no id is provided and max signatories reached" in {
+
+      val max = 2
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          signatories = Some(
+            Signatories(
+              Seq(
+                Signatory("id-1", Some("Person One")),
+                Signatory("id-2", Some("Person Two"))
+              )
+            )
+          )
+        )
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .configure("max-signatories" -> max)
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, SignatoryNameController.onPageLoad(None, NormalMode).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual
+          routes.AddedSignatoryController.onPageLoad().url
+      }
+    }
+    "must allow access when below max signatories and no id is provided" in {
+
+      val max = 3
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          signatories = Some(
+            Signatories(
+              Seq(Signatory("id-1", Some("Person One")))
+            )
+          )
+        )
+
+      when(mockUuidGenerator.generate()).thenReturn(generatedId)
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .overrides(bind[UuidGenerator].toInstance(mockUuidGenerator))
+          .configure("max-signatories" -> max)
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, SignatoryNameController.onPageLoad(None, NormalMode).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
       }
     }
   }

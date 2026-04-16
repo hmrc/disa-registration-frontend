@@ -27,6 +27,7 @@ import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.signatories.Signatories
 import models.journeydata.{OrganisationDetails, TaskListSection}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
@@ -72,7 +73,7 @@ class Navigator @Inject() () {
     case FcaArticlesPage                     => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage           => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage => registeredAddressCorrespondenceNextPage(answers)
-    case RemoveSignatoryPage(id)             => IndexController.onPageLoad()
+    case RemoveSignatoryPage(id)             => removeSignatoryNextPage(answers)
     case SignatoryNamePage(id)               => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case _                                   => IndexController.onPageLoad()
@@ -125,5 +126,15 @@ class Navigator @Inject() () {
         OrganisationTelephoneNumberController.onPageLoad(NormalMode)
       case false =>
         IndexController.onPageLoad()
+    }
+
+  private def removeSignatoryNextPage(
+    answers: Signatories
+  ): Call =
+    answers.signatories match {
+      case Seq() =>
+        AddASignatoryController.onPageLoad()
+      case _     =>
+        AddedSignatoryController.onPageLoad()
     }
 }

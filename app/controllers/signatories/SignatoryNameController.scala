@@ -16,11 +16,13 @@
 
 package controllers.signatories
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import forms.SignatoryNameFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.signatories.{Signatories, Signatory}
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.signatories.SignatoryNamePage
 import play.api.Logging
@@ -48,7 +50,8 @@ class SignatoryNameController @Inject() (
   navigator: Navigator,
   uuidGenerator: UuidGenerator,
   val controllerComponents: MessagesControllerComponents,
-  view: SignatoryNameView
+  view: SignatoryNameView,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -59,17 +62,23 @@ class SignatoryNameController @Inject() (
   def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen auditContinuation(Signatories.sectionName)) {
       implicit request =>
+        if (id.isEmpty && signatoryCount(request) >= appConfig.maxSignatories) {
+          Redirect(routes.AddedSignatoryController.onPageLoad())
+        } else {
+          val preparedFormAndId = (for {
+            id          <- id
+            signatories <- request.journeyData.signatories.map(_.signatories)
+            signatory   <- signatories.find(_.id == id)
+            name        <- signatory.fullName
+          } yield (form.fill(name), id))
+            .getOrElse((form, uuidGenerator.generate()))
 
-        val preparedFormAndId = (for {
-          id          <- id
-          signatories <- request.journeyData.signatories.map(_.signatories)
-          signatory   <- signatories.find(_.id == id)
-          name        <- signatory.fullName
-        } yield (form.fill(name), id))
-          .getOrElse((form, uuidGenerator.generate()))
-
-        Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
+          Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
+        }
     }
+
+  private def signatoryCount(request: DataRequest[_]): Int =
+    request.journeyData.signatories.map(_.signatories.size).getOrElse(0)
 
   def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>

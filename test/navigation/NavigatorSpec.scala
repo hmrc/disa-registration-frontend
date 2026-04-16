@@ -19,6 +19,7 @@ package navigation
 import base.SpecBase
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
+import controllers.signatories.routes.*
 import controllers.orgdetails.routes.*
 import controllers.routes.IndexController
 import models.*
@@ -257,19 +258,24 @@ class NavigatorSpec extends SpecBase {
       result shouldBe CoaCheckYourAnswersController.onPageLoad()
     }
 
-    "route RemoveSignatoryPage to Index Controller" in {
+    "route RemoveSignatoryPage to AddedSignatoryController when signatory exists in journeyAnswers" in {
       val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), signatoriesAnswers)
-      result shouldBe IndexController.onPageLoad()
+      result shouldBe AddedSignatoryController.onPageLoad()
     }
 
-    "route SignatoryNamePage to Index Controller" in {
+    "route RemoveSignatoryPage to AddedSignatoryController when a signatory doesn't exists in journeyAnswers" in {
+      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), Signatories(Seq.empty))
+      result shouldBe AddASignatoryController.onPageLoad()
+    }
+
+    "route SignatoryNamePage to SignatoryJobTitleController" in {
       val result: Call = navigator.normalRoutes(SignatoryNamePage(signatoryId), signatoriesAnswers)
-      result shouldBe IndexController.onPageLoad()
+      result shouldBe SignatoryJobTitleController.onPageLoad(id = signatoryId, mode = NormalMode)
     }
 
-    "route SignatoryJobTitlePage to Index Controller" in {
+    "route SignatoryJobTitlePage to SignatoryCheckYourAnswersController" in {
       val result: Call = navigator.normalRoutes(SignatoryJobTitlePage(signatoryId), signatoriesAnswers)
-      result shouldBe IndexController.onPageLoad()
+      result shouldBe SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
     "route unknown page to Index" in {
@@ -327,14 +333,14 @@ class NavigatorSpec extends SpecBase {
         IndexController.onPageLoad()
     }
 
-    "route SignatoryNamePage to Index Controller" in {
+    "route SignatoryNamePage to SignatoryCheckYourAnswersController" in {
       navigator.checkRouteMap(SignatoryNamePage(signatoryId)) shouldBe
-        IndexController.onPageLoad()
+        SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
-    "route SignatoryJobTitlePage to Index Controller" in {
+    "route SignatoryJobTitlePage to SignatoryCheckYourAnswersController" in {
       navigator.checkRouteMap(SignatoryJobTitlePage(signatoryId)) shouldBe
-        IndexController.onPageLoad()
+        SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
     "route unknown page to Index" in {
