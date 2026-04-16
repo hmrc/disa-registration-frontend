@@ -110,7 +110,7 @@ zReferenceNumber.error.tooLong = The Z-reference number you have given is too lo
 tradingUsingDifferentName.title = Does your organisation trade using a different name?
 tradingUsingDifferentName.heading = Does your organisation trade using a different name?
 tradingUsingDifferentName.checkYourAnswersLabel = Does your organisation trade using a different name?
-tradingUsingDifferentName.error.required = Select yes if your organisation trades using a different name
+tradingUsingDifferentName.error.required = You must select either yes or no. For example select yes, if your organisation trades using a different name
 tradingUsingDifferentName.change.hidden = trading using different a name
 
 tradingName.title = What is your organisation’s trading name?
