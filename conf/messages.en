@@ -185,8 +185,11 @@ peerToPeerPlatformNumber.heading = What is the FCA, FRN of {0}?
 peerToPeerPlatformNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 peerToPeerPlatformNumber.error.required = You must tell us your {0} reference number
 peerToPeerPlatformNumber.error.pattern = Enter the {0} reference number in the correct format. It’s usually 6 or 7 numbers
-peerToPeerPlatformNumber.change.hidden = platform FCA
+peerToPeerPlatformNumber.change.hidden = platform FCA FRN
 peerToPeerPlatformNumber.checkYourAnswersLabel = Platform FCA FRN
+
+isaProductsCheckYourAnswers.title = Check your ISA products
+isaProductsCheckYourAnswers.heading = Check your ISA products
 
 ### Signatories
 addASignatory.title = Add a signatory
