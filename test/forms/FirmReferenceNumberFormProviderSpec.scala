@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@ import scala.util.matching.Regex
 
 class FirmReferenceNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey    = "firmReferenceNumber.error.required"
-  val patternKey     = "firmReferenceNumber.error.pattern"
-  val pattern: Regex = """^[0-9]{6,7}$""".r
+  val requiredKey        = "firmReferenceNumber.error.required"
+  val incorrectLengthKey = "firmReferenceNumber.error.incorrectLength"
+  val patternKey         = "firmReferenceNumber.error.pattern"
+  val pattern: Regex     = """^[0-9]+$""".r
 
   val form = new FirmReferenceNumberFormProvider()()
 
@@ -37,6 +38,20 @@ class FirmReferenceNumberFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       numericOfLength(6, 7)
+    )
+
+    behave like fieldWithMinLength(
+      form,
+      fieldName,
+      minLength = 6,
+      lengthError = FormError(fieldName, incorrectLengthKey, Seq(6))
+    )
+
+    behave like fieldWithMaxLength(
+      form,
+      fieldName,
+      maxLength = 7,
+      lengthError = FormError(fieldName, incorrectLengthKey, Seq(7))
     )
 
     behave like fieldWithPattern(

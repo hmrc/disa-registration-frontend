@@ -34,7 +34,7 @@ import org.scalatest.matchers.should.Matchers.{should, shouldBe}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
-import pages.organisationdetails.RegisteredAddressCorrespondencePage
+import pages.organisationdetails.{FirmReferenceNumberPage, RegisteredAddressCorrespondencePage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
 
@@ -218,6 +218,11 @@ class NavigatorSpec extends SpecBase {
       val result: Call =
         navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers.copy(certificatesYesNo = None))
       result shouldBe CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode)
+    }
+
+    "route RegisteredAddressCorrespondencePage to RegisteredAddressCorrespondenceController" in {
+      val result: Call = navigator.normalRoutes(FirmReferenceNumberPage, testOrganisationDetails)
+      result shouldBe RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
     }
 
     "route RegisteredAddressCorrespondencePage to OrganisationTelephoneNumberController if yes submitted" in {

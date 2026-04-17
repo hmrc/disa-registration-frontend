@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/obligations/enrolment/isa/registered-address-correspondence")
 
   val formProvider             = new FirmReferenceNumberFormProvider()
   val form: Form[String]       = formProvider()
@@ -99,7 +99,6 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -143,9 +142,6 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = None)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
           .build()
 
       running(application) {

@@ -26,6 +26,8 @@ class FirmReferenceNumberFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("firmReferenceNumber.error.required")
-        .verifying(regexp("^[0-9]{6,7}$", "firmReferenceNumber.error.pattern"))
+        .verifying(minLength(6, "firmReferenceNumber.error.incorrectLength"))
+        .verifying(maxLength(7, "firmReferenceNumber.error.incorrectLength"))
+        .verifying(regexp("^[0-9]+$", "firmReferenceNumber.error.pattern"))
     )
 }

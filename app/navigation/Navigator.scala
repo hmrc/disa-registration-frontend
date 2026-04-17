@@ -31,7 +31,7 @@ import models.journeydata.{OrganisationDetails, TaskListSection}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
-import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, ZReferenceNumberPage}
+import pages.organisationdetails.{FirmReferenceNumberPage, RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, ZReferenceNumberPage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
 
@@ -75,6 +75,7 @@ class Navigator @Inject() () {
     case RemoveSignatoryPage                 => routes.IndexController.onPageLoad()
     case SignatoryNamePage                   => routes.IndexController.onPageLoad()
     case SignatoryJobTitlePage               => routes.IndexController.onPageLoad()
+    case FirmReferenceNumberPage             => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
     case _                                   => routes.IndexController.onPageLoad()
   }
 
