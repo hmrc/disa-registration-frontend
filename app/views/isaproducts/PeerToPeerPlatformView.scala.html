@@ -50,7 +50,8 @@
         @govukLabel(HmrcPageHeadingLabel.apply(
           content = Text(messages("peerToPeerPlatform.heading")),
           caption = HmrcSectionCaption(messages("sectionTitle.isaProducts")),
-          attributes = Map("for" -> "value")
+          attributes = Map("for" -> "value"),
+          classes = "govuk-label--l"
         ).withCssClass("govuk-!-margin-bottom-4"))
 
         @govukDetails(Details(
