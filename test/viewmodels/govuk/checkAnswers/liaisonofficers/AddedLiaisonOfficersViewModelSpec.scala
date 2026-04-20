@@ -20,8 +20,8 @@ import base.SpecBase
 import config.FrontendAppConfig
 import controllers.liaisonofficers.routes.{LiaisonOfficerNameController, LoCheckYourAnswersController, RemoveLiaisonOfficerController}
 import forms.YesNoAnswerFormProvider
-import models.{CheckMode, NormalMode, YesNoAnswer}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication}
+import models.{NormalMode, YesNoAnswer}
 import org.jsoup.Jsoup
 import play.api.data.Form
 import play.api.test.Helpers.running

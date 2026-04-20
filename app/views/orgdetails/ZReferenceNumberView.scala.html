@@ -50,6 +50,7 @@
         @govukLabel(HmrcPageHeadingLabel.apply(
           content = Text(messages("zReferenceNumber.heading")),
           caption = HmrcSectionCaption(messages("sectionTitle.orgDetails")),
+          classes = "govuk-label--l",
           attributes = Map("for" -> "value")
         ).withCssClass("govuk-!-margin-bottom-4"))
 
@@ -63,7 +64,7 @@
                 field = form("value"),
                 label = Label()
             )
-            .withWidth(Fixed5)
+            .withWidth(Fixed10)
             .withHint(Hint(content = Text(messages("zReferenceNumber.hint"))))
 
         )

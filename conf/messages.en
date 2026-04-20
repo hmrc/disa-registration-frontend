@@ -101,9 +101,11 @@ zReferenceNumber.heading = What is your organisation’s Z-reference number?
 zReferenceNumber.details.summary = Don’t know your Z-reference number?
 zReferenceNumber.details.content = If you’re already registered with HMRC as an ISA manager you can {0} if you have forgotten it or don’t know it.
 zReferenceNumber.details.content.link = check your Z-reference number
-zReferenceNumber.hint = This is usually a Z followed by 4 numbers, for example Z1234
-zReferenceNumber.error.required = You need to tell us what your organisation’s Z reference number is
-zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers
+zReferenceNumber.hint = This is a Z followed by 4 numbers, for example Z1234
+zReferenceNumber.error.required = If you are a registered ISA Manager you must tell us your Z-reference number. This number is a Z followed by 4 numbers
+zReferenceNumber.error.invalid = Z-reference number must only include a Z followed by 4 numbers
+zReferenceNumber.error.tooShort = The Z-reference number you have given is too short. The number is a Z followed by 4 numbers
+zReferenceNumber.error.tooLong = The Z-reference number you have given is too long. The number is a Z followed by 4 numbers
 
 tradingUsingDifferentName.title = Does your organisation trade using a different name?
 tradingUsingDifferentName.heading = Does your organisation trade using a different name?
