@@ -317,7 +317,7 @@ eligibilityToManageIsa.heading = Eligibility to manage ISAs
 eligibilityToManageIsa.p1 = Before you continue, you will need to make sure you have the correct information available to show which permissions your organisation holds.
 eligibilityToManageIsa.p2 = You will need to know:
 eligibilityToManageIsa.bullet1 = the Articles which apply to your organisation - as set out by the FCA
-eligibilityToManageIsa.bullet2 = which kind of financial organisation you operate as
+eligibilityToManageIsa.bullet2 = which type of financial organisation you are
 eligibilityToManageIsa.linkText = Find out more about who can manage ISAs in the Applications for ISA manager status guidance
 
 certificatesOfAuthorityYesNo.title = Certificates of authority which apply to your organisation
