@@ -84,7 +84,7 @@ class LiaisonOfficerPhoneNumberController @Inject() (
                 .map { savedSection =>
                   Redirect(
                     navigator.nextPage(
-                      LiaisonOfficerPhoneNumberPage,
+                      LiaisonOfficerPhoneNumberPage(id),
                       savedSection,
                       mode
                     )

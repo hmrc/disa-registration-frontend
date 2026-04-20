@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.liaisonofficers
+package viewmodels.govuk.checkAnswers.liaisonofficers
 
 import base.SpecBase
 import config.FrontendAppConfig
-import controllers.liaisonofficers.routes.{LiaisonOfficerNameController, RemoveLiaisonOfficerController}
+import controllers.liaisonofficers.routes.{LiaisonOfficerNameController, LoCheckYourAnswersController, RemoveLiaisonOfficerController}
 import forms.YesNoAnswerFormProvider
-import models.YesNoAnswer
+import models.{CheckMode, NormalMode, YesNoAnswer}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication}
-import models.CheckMode
 import org.jsoup.Jsoup
 import play.api.data.Form
 import play.api.test.Helpers.running
+import viewmodels.checkAnswers.liaisonofficers.{AddedLiaisonOfficerSummary, AddedLiaisonOfficersViewModel}
 
 class AddedLiaisonOfficersViewModelSpec extends SpecBase {
 
@@ -105,7 +105,7 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
       }
     }
 
-    "must render change and remove links for each rendered liaison officer" in {
+    "must render correct change and remove links for incomplete and complete liaison officers" in {
 
       running(app) {
         val viewModel = app.injector.instanceOf[AddedLiaisonOfficersViewModel]
@@ -118,9 +118,9 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
         val doc   = Jsoup.parse(html.toString)
         val links = doc.select("a").eachAttr("href")
 
-        links must contain(LiaisonOfficerNameController.onPageLoad(Some(inProgressOfficer.id), CheckMode).url)
+        links must contain(LiaisonOfficerNameController.onPageLoad(Some(inProgressOfficer.id), NormalMode).url)
         links must contain(RemoveLiaisonOfficerController.onPageLoad(inProgressOfficer.id).url)
-        links must contain(LiaisonOfficerNameController.onPageLoad(Some(completeOfficer.id), CheckMode).url)
+        links must contain(LoCheckYourAnswersController.onPageLoad(completeOfficer.id).url)
         links must contain(RemoveLiaisonOfficerController.onPageLoad(completeOfficer.id).url)
       }
     }
