@@ -18,8 +18,8 @@ package viewmodels
 
 import base.SpecBase
 import config.FrontendAppConfig
-import controllers.signatories.routes.{RemoveSignatoryController, SignatoryNameController}
-import models.CheckMode
+import controllers.signatories.routes.{RemoveSignatoryController, SignatoryCheckYourAnswersController, SignatoryNameController}
+import models.NormalMode
 import models.journeydata.signatories.Signatory
 import org.jsoup.Jsoup
 import play.api.data.Form
@@ -143,9 +143,9 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
         val doc   = Jsoup.parse(html.toString)
         val links = doc.select("a").eachAttr("href")
 
-        links must contain(SignatoryNameController.onPageLoad(Some("1"), CheckMode).url)
+        links must contain(SignatoryNameController.onPageLoad(Some("1"), NormalMode).url)
         links must contain(RemoveSignatoryController.onPageLoad("1").url)
-        links must contain(SignatoryNameController.onPageLoad(Some("2"), CheckMode).url)
+        links must contain(SignatoryCheckYourAnswersController.onPageLoad("2").url)
         links must contain(RemoveSignatoryController.onPageLoad("2").url)
       }
     }

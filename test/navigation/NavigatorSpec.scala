@@ -19,6 +19,7 @@ package navigation
 import base.SpecBase
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
+import controllers.signatories.routes.*
 import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
 import controllers.routes.IndexController
@@ -44,7 +45,8 @@ import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
 
-  private val navigator = new Navigator()
+  private val navigator   = new Navigator()
+  private val signatoryId = "testId"
 
   private def answersWithIsaProducts(products: Seq[IsaProduct]): IsaProducts =
     IsaProducts(
@@ -269,19 +271,24 @@ class NavigatorSpec extends SpecBase {
       result shouldBe CoaCheckYourAnswersController.onPageLoad()
     }
 
-    "route RemoveSignatoryPage to Index Controller" in {
-      val result: Call = navigator.normalRoutes(RemoveSignatoryPage, signatoriesAnswers)
-      result shouldBe IndexController.onPageLoad()
+    "route RemoveSignatoryPage to AddedSignatoryController when signatory exists in journeyAnswers" in {
+      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), signatoriesAnswers)
+      result shouldBe AddedSignatoryController.onPageLoad()
     }
 
-    "route SignatoryNamePage to Index Controller" in {
-      val result: Call = navigator.normalRoutes(SignatoryNamePage, signatoriesAnswers)
-      result shouldBe IndexController.onPageLoad()
+    "route RemoveSignatoryPage to AddedSignatoryController when a signatory doesn't exists in journeyAnswers" in {
+      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), Signatories(Seq.empty))
+      result shouldBe AddASignatoryController.onPageLoad()
     }
 
-    "route SignatoryJobTitlePage to Index Controller" in {
-      val result: Call = navigator.normalRoutes(SignatoryJobTitlePage, signatoriesAnswers)
-      result shouldBe IndexController.onPageLoad()
+    "route SignatoryNamePage to SignatoryJobTitleController" in {
+      val result: Call = navigator.normalRoutes(SignatoryNamePage(signatoryId), signatoriesAnswers)
+      result shouldBe SignatoryJobTitleController.onPageLoad(id = signatoryId, mode = NormalMode)
+    }
+
+    "route SignatoryJobTitlePage to SignatoryCheckYourAnswersController" in {
+      val result: Call = navigator.normalRoutes(SignatoryJobTitlePage(signatoryId), signatoriesAnswers)
+      result shouldBe SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
     "route LiaisonOfficerNamePage to LiaisonOfficerEmailController" in {
@@ -371,18 +378,18 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route RemoveSignatoryPage to Index Controller" in {
-      navigator.checkRouteMap(RemoveSignatoryPage) shouldBe
+      navigator.checkRouteMap(RemoveSignatoryPage(signatoryId)) shouldBe
         IndexController.onPageLoad()
     }
 
-    "route SignatoryNamePage to Index Controller" in {
-      navigator.checkRouteMap(SignatoryNamePage) shouldBe
-        IndexController.onPageLoad()
+    "route SignatoryNamePage to SignatoryCheckYourAnswersController" in {
+      navigator.checkRouteMap(SignatoryNamePage(signatoryId)) shouldBe
+        SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
-    "route SignatoryJobTitlePage to Index Controller" in {
-      navigator.checkRouteMap(SignatoryJobTitlePage) shouldBe
-        IndexController.onPageLoad()
+    "route SignatoryJobTitlePage to SignatoryCheckYourAnswersController" in {
+      navigator.checkRouteMap(SignatoryJobTitlePage(signatoryId)) shouldBe
+        SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
     "route LiaisonOfficerNamePage to LO CYA" in {

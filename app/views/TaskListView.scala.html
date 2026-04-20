@@ -26,12 +26,16 @@
 
 @layout(pageTitle = titleNoForm(messages("taskList.title"))) {
 
-  <div>
-    @hmrcPageHeading(PageHeading(
-      text = messages("taskList.heading"),
-      headingClasses = Some("govuk-heading-l")
-    ))
-  </div>
+    <div class="govuk-body">
+        @hmrcPageHeading(PageHeading(
+            text = messages("taskList.heading"),
+            headingClasses = Some("govuk-heading-l")
+        ))
+        <a class="govuk-link govuk-body" href="@controllers.isaproducts.routes.IsaProductsController.onPageLoad(NormalMode).url">
+            ISA Products</a>
+        <br>
+        <a class="govuk-link govuk-body" href="@controllers.signatories.routes.SignatoryNameController.onPageLoad(id = None, mode = NormalMode).url">
+            Signatories</a>
 
-  <a class="govuk-link" href="@controllers.isaproducts.routes.IsaProductsController.onPageLoad(NormalMode).url">ISA Products</a>
+    </div>
 }

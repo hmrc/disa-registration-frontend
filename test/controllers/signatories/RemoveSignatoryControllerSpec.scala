@@ -36,11 +36,12 @@ import scala.concurrent.Future
 
 class RemoveSignatoryControllerSpec extends SpecBase {
 
-  def onwardRoute: Call = Call("GET", "/obligations/enrolment/isa")
-
-  private val existingId   = "existing-id-123"
-  private val otherId      = "other-id-123"
-  private val existingName = "Jane Smith"
+  def onwardRoute(path: String): Call = Call("GET", s"/obligations/enrolment/isa$path")
+  private val addedSignatoriesPath    = "/added-signatories"
+  private val addASignatoryPath       = "/add-a-signatory"
+  private val existingId              = "existing-id-123"
+  private val otherId                 = "other-id-123"
+  private val existingName            = "Jane Smith"
 
   lazy val routeUrl: String  = RemoveSignatoryController.onPageLoad(existingId).url
   lazy val submitUrl: String = RemoveSignatoryController.onSubmit(existingId).url
@@ -184,7 +185,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
           .update(eqTo(expectedSection), any[String], any[String])(any[Writes[Signatories]], any)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute(addedSignatoriesPath).url
       }
     }
 
@@ -220,7 +221,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
           .update(eqTo(existingSection), any[String], any[String])(any[Writes[Signatories]], any)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute(addedSignatoriesPath).url
       }
     }
 
@@ -259,7 +260,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
           .update(eqTo(updatedSection), any[String], any[String])(any[Writes[Signatories]], any)
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual onwardRoute(addASignatoryPath).url
       }
     }
 

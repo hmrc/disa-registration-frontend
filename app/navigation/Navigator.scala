@@ -20,8 +20,8 @@ import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
-import controllers.routes
 import controllers.routes.*
+import controllers.signatories.routes.*
 import models.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
@@ -29,11 +29,12 @@ import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoans
 import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
+import models.journeydata.signatories.Signatories
 import models.journeydata.{OrganisationDetails, TaskListSection}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
-import pages.liaisonofficers.{LiaisonOfficerCommunicationPage, LiaisonOfficerEmailPage, LiaisonOfficerNamePage, LiaisonOfficerPhoneNumberPage, RemoveLiaisonOfficerPage}
+import pages.liaisonofficers.*
 import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, ZReferenceNumberPage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
@@ -80,10 +81,10 @@ class Navigator @Inject() () {
     case LiaisonOfficerPhoneNumberPage(id)   => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
     case LiaisonOfficerCommunicationPage(id) => LoCheckYourAnswersController.onPageLoad(id)
     case RemoveLiaisonOfficerPage            => removeLiaisonOfficerNextPage(answers)
-    case RemoveSignatoryPage                 => routes.IndexController.onPageLoad()
-    case SignatoryNamePage                   => routes.IndexController.onPageLoad()
-    case SignatoryJobTitlePage               => routes.IndexController.onPageLoad()
-    case _                                   => routes.IndexController.onPageLoad()
+    case RemoveSignatoryPage(id)             => removeSignatoryNextPage(answers)
+    case SignatoryNamePage(id)               => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
+    case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case _                                   => IndexController.onPageLoad()
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
@@ -101,19 +102,19 @@ class Navigator @Inject() () {
     case LiaisonOfficerEmailPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
     case LiaisonOfficerPhoneNumberPage(id)   => LoCheckYourAnswersController.onPageLoad(id)
     case LiaisonOfficerCommunicationPage(id) => LoCheckYourAnswersController.onPageLoad(id)
-    case SignatoryNamePage                   => IndexController.onPageLoad()
-    case SignatoryJobTitlePage               => IndexController.onPageLoad()
-    case _                                   => routes.IndexController.onPageLoad()
+    case SignatoryNamePage(id)               => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case _                                   => IndexController.onPageLoad()
   }
 
   private def isaProductsNextPage(answers: IsaProducts): Call =
-    answers.isaProducts.fold(routes.IndexController.onPageLoad()) { isaProducts =>
+    answers.isaProducts.fold(IndexController.onPageLoad()) { isaProducts =>
       if (isaProducts.contains(InnovativeFinanceIsas)) InnovativeFinancialProductsController.onPageLoad(NormalMode)
       else IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
   private def innovativeFinancialProductsNextPage(answers: IsaProducts): Call =
-    answers.innovativeFinancialProducts.fold(routes.IndexController.onPageLoad()) { ifps =>
+    answers.innovativeFinancialProducts.fold(IndexController.onPageLoad()) { ifps =>
       if (ifps.contains(PeertopeerLoansUsingAPlatformWith36hPermissions))
         PeerToPeerPlatformController.onPageLoad(NormalMode)
       else IsaProductsCheckYourAnswersController.onPageLoad()
@@ -132,11 +133,21 @@ class Navigator @Inject() () {
   private def registeredAddressCorrespondenceNextPage(
     answers: OrganisationDetails
   ): Call =
-    answers.registeredAddressCorrespondence.fold(routes.IndexController.onPageLoad()) {
+    answers.registeredAddressCorrespondence.fold(IndexController.onPageLoad()) {
       case true  =>
         OrganisationTelephoneNumberController.onPageLoad(NormalMode)
       case false =>
         IndexController.onPageLoad()
+    }
+
+  private def removeSignatoryNextPage(
+    answers: Signatories
+  ): Call =
+    answers.signatories match {
+      case Seq() =>
+        AddASignatoryController.onPageLoad()
+      case _     =>
+        AddedSignatoryController.onPageLoad()
     }
 
   private def removeLiaisonOfficerNextPage(answers: LiaisonOfficers): Call =
