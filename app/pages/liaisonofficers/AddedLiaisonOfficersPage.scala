@@ -17,6 +17,6 @@
 package pages.liaisonofficers
 
 import models.journeydata.liaisonofficers.LiaisonOfficers
-import pages.IdentifiedPage
+import pages.Page
 
-final case class LiaisonOfficerPhoneNumberPage(id: String) extends IdentifiedPage[LiaisonOfficers]
+case object AddedLiaisonOfficersPage extends Page[LiaisonOfficers]

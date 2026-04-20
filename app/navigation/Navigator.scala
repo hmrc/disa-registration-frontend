@@ -18,20 +18,23 @@ package navigation
 
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
+import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
-import controllers.signatories.routes.*
 import controllers.routes.*
+import controllers.signatories.routes.*
 import models.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
 import models.journeydata.{OrganisationDetails, TaskListSection}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
+import pages.liaisonofficers.*
 import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, ZReferenceNumberPage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
@@ -73,6 +76,11 @@ class Navigator @Inject() () {
     case FcaArticlesPage                     => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage           => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage => registeredAddressCorrespondenceNextPage(answers)
+    case LiaisonOfficerNamePage(id)          => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
+    case LiaisonOfficerEmailPage(id)         => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
+    case LiaisonOfficerPhoneNumberPage(id)   => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
+    case LiaisonOfficerCommunicationPage(id) => LoCheckYourAnswersController.onPageLoad(id)
+    case RemoveLiaisonOfficerPage            => removeLiaisonOfficerNextPage(answers)
     case RemoveSignatoryPage(id)             => removeSignatoryNextPage(answers)
     case SignatoryNamePage(id)               => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
@@ -90,6 +98,10 @@ class Navigator @Inject() () {
     case FcaArticlesPage                     => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage           => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage => IndexController.onPageLoad()
+    case LiaisonOfficerNamePage(id)          => LoCheckYourAnswersController.onPageLoad(id)
+    case LiaisonOfficerEmailPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
+    case LiaisonOfficerPhoneNumberPage(id)   => LoCheckYourAnswersController.onPageLoad(id)
+    case LiaisonOfficerCommunicationPage(id) => LoCheckYourAnswersController.onPageLoad(id)
     case SignatoryNamePage(id)               => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case _                                   => IndexController.onPageLoad()
@@ -136,5 +148,11 @@ class Navigator @Inject() () {
         AddASignatoryController.onPageLoad()
       case _     =>
         AddedSignatoryController.onPageLoad()
+    }
+
+  private def removeLiaisonOfficerNextPage(answers: LiaisonOfficers): Call =
+    answers.liaisonOfficers match {
+      case Nil => AddLiaisonOfficerController.onPageLoad()
+      case _   => AddedLiaisonOfficersController.onPageLoad()
     }
 }

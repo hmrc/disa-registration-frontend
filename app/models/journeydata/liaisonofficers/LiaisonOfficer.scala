@@ -24,7 +24,9 @@ case class LiaisonOfficer(
   phoneNumber: Option[String] = None,
   communication: Set[LiaisonOfficerCommunication] = Set.empty[LiaisonOfficerCommunication],
   email: Option[String] = None
-)
+) {
+  def inProgress: Boolean = List(fullName, phoneNumber, communication, email).exists(_.iterator.isEmpty)
+}
 
 object LiaisonOfficer {
   implicit val format: OFormat[LiaisonOfficer] = Json.format[LiaisonOfficer]

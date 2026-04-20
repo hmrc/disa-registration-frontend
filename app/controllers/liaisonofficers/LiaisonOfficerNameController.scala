@@ -16,11 +16,14 @@
 
 package controllers.liaisonofficers
 
+import config.FrontendAppConfig
+import controllers.routes.TaskListController
 import controllers.actions.*
 import forms.LiaisonOfficerNameFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.liaisonofficers.LiaisonOfficerNamePage
 import play.api.Logging
@@ -47,6 +50,7 @@ class LiaisonOfficerNameController @Inject() (
   formProvider: LiaisonOfficerNameFormProvider,
   navigator: Navigator,
   uuidGenerator: UuidGenerator,
+  appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: LiaisonOfficerNameView
 )(implicit ec: ExecutionContext)
@@ -59,16 +63,12 @@ class LiaisonOfficerNameController @Inject() (
   def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen auditContinuation(LiaisonOfficers.sectionName)) {
       implicit request =>
-
-        val preparedFormAndId = (for {
-          id              <- id
-          liaisonOfficers <- request.journeyData.liaisonOfficers.map(_.liaisonOfficers)
-          liaisonOfficer  <- liaisonOfficers.find(_.id == id)
-          name            <- liaisonOfficer.fullName
-        } yield (form.fill(name), id))
-          .getOrElse((form, uuidGenerator.generate()))
-
-        Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
+        existingOfficer(id) match {
+          case Some(officer) => Ok(view(officer.id, form.fill(officer.fullName.getOrElse("")), mode))
+          case None          =>
+            if (canAddAnother(appConfig)) Ok(view(uuidGenerator.generate(), form, mode))
+            else Redirect(TaskListController.onPageLoad())
+        }
     }
 
   def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -78,33 +78,45 @@ class LiaisonOfficerNameController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode))),
           answer => {
-            val existingSection = request.journeyData.liaisonOfficers
-            val upsertedLO      = LiaisonOfficer(id, Some(answer))
-            val updatedSection  = existingSection match {
-              case Some(existing) =>
-                val existingLOs = existing.liaisonOfficers.filter(_.id != id)
-                existing.copy(liaisonOfficers = existingLOs :+ upsertedLO)
-              case None           => LiaisonOfficers(Seq(upsertedLO))
-            }
+            val updatedSection =
+              request.journeyData.liaisonOfficers
+                .getOrElse(LiaisonOfficers(Nil))
+                .upsertLiaisonOfficer(id, answer, appConfig.maxLiaisonOfficers)
 
-            journeyAnswersService
-              .update(updatedSection, request.groupId, request.credentials.providerId)
-              .map { updatedSection =>
-                Redirect(
-                  navigator.nextPage(
-                    LiaisonOfficerNamePage,
-                    updatedSection,
-                    mode
-                  )
-                )
-              }
-              .recoverWith { case NonFatal(e) =>
-                logger.warn(
-                  s"Failed updating answers for section [${LiaisonOfficers.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-                )
-                errorHandler.internalServerError
-              }
+            updatedSection match {
+              case None                 =>
+                logger.info(s"Addition of liaison officer blocked by limit for groupId [${request.groupId}]")
+                Future.successful(Redirect(TaskListController.onPageLoad()))
+              case Some(updatedSection) =>
+                journeyAnswersService
+                  .update(updatedSection, request.groupId, request.credentials.providerId)
+                  .map { updatedSection =>
+                    Redirect(
+                      navigator.nextPage(
+                        LiaisonOfficerNamePage(id),
+                        updatedSection,
+                        mode
+                      )
+                    )
+                  }
+                  .recoverWith { case NonFatal(e) =>
+                    logger.warn(
+                      s"Failed updating answers for section [${LiaisonOfficers.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                    )
+                    errorHandler.internalServerError
+                  }
+            }
           }
         )
   }
+
+  private def existingOfficer(id: Option[String])(implicit request: DataRequest[_]): Option[LiaisonOfficer] =
+    for {
+      existingId <- id
+      officers   <- request.journeyData.liaisonOfficers.map(_.liaisonOfficers)
+      officer    <- officers.find(_.id == existingId)
+    } yield officer
+
+  private def canAddAnother(appConfig: FrontendAppConfig)(implicit request: DataRequest[_]): Boolean =
+    request.journeyData.liaisonOfficers.forall(_.canAddAnother(appConfig.maxLiaisonOfficers))
 }
