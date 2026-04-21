@@ -39,8 +39,8 @@ import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
-import pages.organisationdetails.{RegisteredAddressCorrespondencePage, TradingUsingDifferentNamePage}
-import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
+import pages.organisationdetails.*
+import pages.signatories.*
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -165,6 +165,11 @@ class NavigatorSpec extends SpecBase {
 
       val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers)
 
+      result shouldBe FirmReferenceNumberController.onPageLoad(NormalMode)
+    }
+
+    "route TradingNamePage to FirmReferenceNumberPage" in {
+      val result: Call = navigator.normalRoutes(TradingNamePage, OrganisationDetails())
       result shouldBe FirmReferenceNumberController.onPageLoad(NormalMode)
     }
 

@@ -30,7 +30,7 @@ import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.TradingNameView
+import views.html.orgdetails.TradingNameView
 
 import scala.concurrent.Future
 
