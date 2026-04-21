@@ -35,7 +35,7 @@ import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
-import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, ZReferenceNumberPage}
+import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, TradingUsingDifferentNamePage, ZReferenceNumberPage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
 
@@ -67,7 +67,8 @@ class Navigator @Inject() () {
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
     case RegisteredIsaManagerPage            => ???
-    case ZReferenceNumberPage                => TradingUsingDifferentNameController.onPageLoad(NormalMode)
+    case ZReferenceNumberPage                => ???
+    case TradingUsingDifferentNamePage       => tradingUsingDifferentNameNextPage(answers)
     case IsaProductsPage                     => isaProductsNextPage(answers)
     case InnovativeFinancialProductsPage     => innovativeFinancialProductsNextPage(answers)
     case PeerToPeerPlatformPage              => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
@@ -90,6 +91,7 @@ class Navigator @Inject() () {
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
     case RegisteredIsaManagerPage            => ???
     case ZReferenceNumberPage                => ???
+    case TradingUsingDifferentNamePage       => ???
     case IsaProductsPage                     => IsaProductsCheckYourAnswersController.onPageLoad()
     case InnovativeFinancialProductsPage     => IsaProductsCheckYourAnswersController.onPageLoad()
     case PeerToPeerPlatformPage              => IsaProductsCheckYourAnswersController.onPageLoad()
@@ -106,6 +108,12 @@ class Navigator @Inject() () {
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case _                                   => IndexController.onPageLoad()
   }
+
+  private def tradingUsingDifferentNameNextPage(answers: OrganisationDetails): Call =
+    answers.tradingUsingDifferentName.fold(TaskListController.onPageLoad()) {
+      case true  => TradingNameController.onPageLoad(NormalMode)
+      case false => FirmReferenceNumberController.onPageLoad(NormalMode)
+    }
 
   private def isaProductsNextPage(answers: IsaProducts): Call =
     answers.isaProducts.fold(IndexController.onPageLoad()) { isaProducts =>

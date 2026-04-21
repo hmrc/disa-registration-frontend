@@ -19,8 +19,8 @@ package navigation
 import base.SpecBase
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
-import controllers.signatories.routes.*
 import controllers.liaisonofficers.routes.*
+import controllers.signatories.routes.*
 import controllers.orgdetails.routes.*
 import controllers.routes.IndexController
 import models.*
@@ -34,12 +34,12 @@ import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.signatories.{Signatories, Signatory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
-import org.scalatest.matchers.should.Matchers.shouldBe
+import org.scalatest.matchers.should.Matchers.{should, shouldBe}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
-import pages.organisationdetails.{RegisteredAddressCorrespondencePage, ZReferenceNumberPage}
+import pages.organisationdetails.{RegisteredAddressCorrespondencePage, TradingUsingDifferentNamePage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
 
@@ -152,10 +152,20 @@ class NavigatorSpec extends SpecBase {
 
   "Navigator.normalRoutes" - {
 
-    "route ZReferenceNumberPage to TradingUsingDIfferentNamePage" in {
-      val result: Call = navigator.normalRoutes(ZReferenceNumberPage, OrganisationDetails())
+    "route TradingUsingDifferentNamePage to TradingNamePage when Yes selected" in {
+      val answers = OrganisationDetails(tradingUsingDifferentName = Some(true))
 
-      result shouldBe TradingUsingDifferentNameController.onPageLoad(NormalMode)
+      val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers)
+
+      result shouldBe TradingNameController.onPageLoad(NormalMode)
+    }
+
+    "route TradingUsingDifferentNamePage to FirmReferenceNumberPage when No selected" in {
+      val answers = OrganisationDetails(tradingUsingDifferentName = Some(false))
+
+      val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers)
+
+      result shouldBe FirmReferenceNumberController.onPageLoad(NormalMode)
     }
 
     "route IsaProductsPage  to IF products when IF ISA selected" in {
