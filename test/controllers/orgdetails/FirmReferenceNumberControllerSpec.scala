@@ -20,12 +20,10 @@ import base.SpecBase
 import forms.FirmReferenceNumberFormProvider
 import models.NormalMode
 import models.journeydata.{JourneyData, OrganisationDetails}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
-import play.api.inject.bind
 import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
