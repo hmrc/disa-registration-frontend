@@ -35,7 +35,7 @@ import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
-import pages.organisationdetails.{RegisteredAddressCorrespondencePage, RegisteredIsaManagerPage, TradingNamePage, TradingUsingDifferentNamePage, ZReferenceNumberPage}
+import pages.organisationdetails.*
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import play.api.mvc.Call
 
@@ -86,6 +86,7 @@ class Navigator @Inject() () {
     case RemoveSignatoryPage(id)             => removeSignatoryNextPage(answers)
     case SignatoryNamePage(id)               => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case FirmReferenceNumberPage             => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
     case _                                   => IndexController.onPageLoad()
   }
 

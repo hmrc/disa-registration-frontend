@@ -20,9 +20,9 @@ import base.SpecBase
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.*
-import controllers.signatories.routes.*
 import controllers.orgdetails.routes.*
 import controllers.routes.IndexController
+import controllers.signatories.routes.*
 import models.*
 import models.journeydata.OrganisationDetails
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
@@ -248,6 +248,11 @@ class NavigatorSpec extends SpecBase {
       val result: Call =
         navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers.copy(certificatesYesNo = None))
       result shouldBe CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode)
+    }
+
+    "route RegisteredAddressCorrespondencePage to RegisteredAddressCorrespondenceController" in {
+      val result: Call = navigator.normalRoutes(FirmReferenceNumberPage, testOrganisationDetails)
+      result shouldBe RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
     }
 
     "route RegisteredAddressCorrespondencePage to OrganisationTelephoneNumberController if yes submitted" in {
