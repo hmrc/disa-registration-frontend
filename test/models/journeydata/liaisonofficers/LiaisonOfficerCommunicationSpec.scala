@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package models
+package models.journeydata.liaisonofficers
 
 import generators.{ModelGenerators, arbitraryLiaisonOfficerCommunication}
-import models.journeydata.liaisonofficers.LiaisonOfficerCommunication
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.OptionValues
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, Json}
 
 class LiaisonOfficerCommunicationSpec

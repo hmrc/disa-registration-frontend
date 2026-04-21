@@ -17,9 +17,6 @@
 package pages.liaisonofficers
 
 import models.journeydata.liaisonofficers.LiaisonOfficers
-import pages.Page
+import pages.IdentifiedPage
 
-case object LiaisonOfficerEmailPage extends Page[LiaisonOfficers] {
-
-  override def toString: String = "liaisonOfficerEmail"
-}
+final case class LiaisonOfficerEmailPage(id: String) extends IdentifiedPage[LiaisonOfficers]

@@ -26,13 +26,13 @@
 
 @(list: SummaryList)(implicit request: Request[_], messages: Messages)
 
-    @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"),Some(messages("sectionTitle.isaProducts")))) {
+    @layout(pageTitle = titleNoForm(messages("isaProductsCheckYourAnswers.title"))) {
         @hmrcPageHeading(PageHeading(
-            text = messages("checkYourAnswers.heading"),
+            text = messages("isaProductsCheckYourAnswers.heading"),
             headingClasses = Some("govuk-heading-l")
         ))
 
-        @formHelper(action = routes.IndexController.onPageLoad(), Symbol("autoComplete") -> "off") {
+        @formHelper(action = routes.TaskListController.onPageLoad(), Symbol("autoComplete") -> "off") {
 
             @govukSummaryList(list)
 

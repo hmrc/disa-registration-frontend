@@ -38,11 +38,15 @@
 
         @govukInput(
             InputViewModel(
-                field = form("value"),
-                label = LabelViewModel(messages("tradingName.heading")).asPageHeading()
+                  field = form("value"),
+                  label = HmrcPageHeadingLabel.apply(
+                    content = Text(messages("tradingName.heading")),
+                    caption = HmrcSectionCaption(messages("sectionTitle.orgDetails")),
+                    classes = "govuk-label--l govuk-!-margin-bottom-4",
+                    attributes = Map("for" -> "value")
+                  )
             )
             .withWidth(Full)
-            .withHeadingAndSectionCaption(Text(messages("tradingName.heading")), Text(messages("sectionTitle.orgDetails")))
         )
 
         @govukButton(

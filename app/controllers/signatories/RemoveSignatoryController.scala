@@ -74,7 +74,9 @@ class RemoveSignatoryController @Inject() (
                   case No  => request.journeyData.signatories
                 }
 
-                updatedSection.fold(Future.successful(Redirect(IndexController.onPageLoad())))(updateAnswersAndRedirect)
+                updatedSection.fold(Future.successful(Redirect(IndexController.onPageLoad())))(section =>
+                  updateAnswersAndRedirect(id, section)
+                )
               }
             )
       )
@@ -88,12 +90,13 @@ class RemoveSignatoryController @Inject() (
       .getOrElse(Future.successful(Redirect(IndexController.onPageLoad())))
 
   private def updateAnswersAndRedirect(
+    id: String,
     updatedSection: Signatories
   )(implicit request: DataRequest[_], executionContext: ExecutionContext) =
     journeyAnswersService
       .update(updatedSection, request.groupId, request.credentials.providerId)
       .map { updatedSection =>
-        Redirect(navigator.nextPage(RemoveSignatoryPage, updatedSection, NormalMode))
+        Redirect(navigator.nextPage(RemoveSignatoryPage(id = id), updatedSection, NormalMode))
       }
       .recoverWith { case NonFatal(e) =>
         logger.warn(

@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-
+@import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
@@ -38,8 +38,8 @@
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("tradingUsingDifferentName.heading")).asPageHeading()
-            ).withHeadingAndSectionCaption(Text(messages("tradingUsingDifferentName.heading")), Text(messages("sectionTitle.orgDetails")))
+                legend = HmrcPageHeadingLegend.apply(Text(messages("tradingUsingDifferentName.heading")), HmrcSectionCaption(messages("sectionTitle.orgDetails")), "govuk-fieldset__legend--l").asPageHeading(Large),
+            )
         )
 
         @govukButton(

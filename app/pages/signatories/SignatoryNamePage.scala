@@ -17,6 +17,6 @@
 package pages.signatories
 
 import models.journeydata.signatories.Signatories
-import pages.Page
+import pages.IdentifiedPage
 
-case object SignatoryNamePage extends Page[Signatories]
+final case class SignatoryNamePage(id: String) extends IdentifiedPage[Signatories]

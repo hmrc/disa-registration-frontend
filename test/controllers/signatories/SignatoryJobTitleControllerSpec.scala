@@ -17,17 +17,15 @@
 package controllers.signatories
 
 import base.SpecBase
-import controllers.signatories.routes.SignatoryJobTitleController
 import controllers.routes.IndexController
+import controllers.signatories.routes.SignatoryJobTitleController
 import forms.SignatoryJobTitleFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.{CheckMode, NormalMode}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
-import play.api.inject.bind
 import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
@@ -38,13 +36,13 @@ import scala.concurrent.Future
 
 class SignatoryJobTitleControllerSpec extends SpecBase {
 
-  def onwardRoute: Call = Call("GET", "/obligations/enrolment/isa")
-
   private val existingId       = "existing-id-123"
   private val otherId          = "other-id-123"
   private val existingName     = "Jane Smith"
   private val existingJobTitle = "Existing Job Title"
   private val newJobTitle      = "New Job Title"
+
+  def onwardRoute: Call = Call("GET", s"/obligations/enrolment/isa/check-added-signatory?id=$existingId")
 
   lazy val routeUrl: String  = SignatoryJobTitleController.onPageLoad(existingId, NormalMode).url
   lazy val submitUrl: String = SignatoryJobTitleController.onSubmit(existingId, NormalMode).url
@@ -418,7 +416,6 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {

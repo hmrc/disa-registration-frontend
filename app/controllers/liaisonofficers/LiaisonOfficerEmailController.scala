@@ -83,7 +83,7 @@ class LiaisonOfficerEmailController @Inject() (
                 .map { savedSection =>
                   Redirect(
                     navigator.nextPage(
-                      LiaisonOfficerEmailPage,
+                      LiaisonOfficerEmailPage(id),
                       savedSection,
                       mode
                     )

@@ -19,14 +19,18 @@ package navigation
 import base.SpecBase
 import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
+import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
 import controllers.routes.IndexController
+import controllers.signatories.routes.*
 import models.*
+import models.journeydata.OrganisationDetails
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.signatories.{Signatories, Signatory}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
@@ -34,13 +38,15 @@ import org.scalatest.matchers.should.Matchers.{should, shouldBe}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
-import pages.organisationdetails.{FirmReferenceNumberPage, RegisteredAddressCorrespondencePage}
-import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
+import pages.liaisonofficers.*
+import pages.organisationdetails.*
+import pages.signatories.*
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
 
-  private val navigator = new Navigator()
+  private val navigator   = new Navigator()
+  private val signatoryId = "testId"
 
   private def answersWithIsaProducts(products: Seq[IsaProduct]): IsaProducts =
     IsaProducts(
@@ -65,6 +71,9 @@ class NavigatorSpec extends SpecBase {
 
   private val signatoriesAnswers: Signatories =
     Signatories(Seq(Signatory(id = testString, fullName = Some(testString), jobTitle = Some(testString))))
+
+  private val liaisonOfficersAnswers: LiaisonOfficers =
+    LiaisonOfficers(Seq(LiaisonOfficer(id = testString, fullName = Some(testString))))
 
   "Navigator.nextPage(PageWithDependents)" - {
 
@@ -142,6 +151,27 @@ class NavigatorSpec extends SpecBase {
   }
 
   "Navigator.normalRoutes" - {
+
+    "route TradingUsingDifferentNamePage to TradingNamePage when Yes selected" in {
+      val answers = OrganisationDetails(tradingUsingDifferentName = Some(true))
+
+      val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers)
+
+      result shouldBe TradingNameController.onPageLoad(NormalMode)
+    }
+
+    "route TradingUsingDifferentNamePage to FirmReferenceNumberPage when No selected" in {
+      val answers = OrganisationDetails(tradingUsingDifferentName = Some(false))
+
+      val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers)
+
+      result shouldBe FirmReferenceNumberController.onPageLoad(NormalMode)
+    }
+
+    "route TradingNamePage to FirmReferenceNumberPage" in {
+      val result: Call = navigator.normalRoutes(TradingNamePage, OrganisationDetails())
+      result shouldBe FirmReferenceNumberController.onPageLoad(NormalMode)
+    }
 
     "route IsaProductsPage  to IF products when IF ISA selected" in {
       val answers = answersWithIsaProducts(Seq(InnovativeFinanceIsas))
@@ -261,19 +291,60 @@ class NavigatorSpec extends SpecBase {
       result shouldBe CoaCheckYourAnswersController.onPageLoad()
     }
 
-    "route RemoveSignatoryPage to Index Controller" in {
-      val result: Call = navigator.normalRoutes(RemoveSignatoryPage, signatoriesAnswers)
-      result shouldBe IndexController.onPageLoad()
+    "route RemoveSignatoryPage to AddedSignatoryController when signatory exists in journeyAnswers" in {
+      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), signatoriesAnswers)
+      result shouldBe AddedSignatoryController.onPageLoad()
     }
 
-    "route SignatoryNamePage to Index Controller" in {
-      val result: Call = navigator.normalRoutes(SignatoryNamePage, signatoriesAnswers)
-      result shouldBe IndexController.onPageLoad()
+    "route RemoveSignatoryPage to AddedSignatoryController when a signatory doesn't exists in journeyAnswers" in {
+      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), Signatories(Seq.empty))
+      result shouldBe AddASignatoryController.onPageLoad()
     }
 
-    "route SignatoryJobTitlePage to Index Controller" in {
-      val result: Call = navigator.normalRoutes(SignatoryJobTitlePage, signatoriesAnswers)
-      result shouldBe IndexController.onPageLoad()
+    "route SignatoryNamePage to SignatoryJobTitleController" in {
+      val result: Call = navigator.normalRoutes(SignatoryNamePage(signatoryId), signatoriesAnswers)
+      result shouldBe SignatoryJobTitleController.onPageLoad(id = signatoryId, mode = NormalMode)
+    }
+
+    "route SignatoryJobTitlePage to SignatoryCheckYourAnswersController" in {
+      val result: Call = navigator.normalRoutes(SignatoryJobTitlePage(signatoryId), signatoriesAnswers)
+      result shouldBe SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
+    }
+
+    "route LiaisonOfficerNamePage to LiaisonOfficerEmailController" in {
+      val result: Call = navigator.normalRoutes(LiaisonOfficerNamePage(testString), liaisonOfficersAnswers)
+
+      result shouldBe LiaisonOfficerEmailController.onPageLoad(testString, NormalMode)
+    }
+
+    "route LiaisonOfficerEmailPage to LiaisonOfficerPhoneNumberController" in {
+      val result: Call = navigator.normalRoutes(LiaisonOfficerEmailPage(testString), liaisonOfficersAnswers)
+
+      result shouldBe LiaisonOfficerPhoneNumberController.onPageLoad(testString, NormalMode)
+    }
+
+    "route LiaisonOfficerPhoneNumberPage to LiaisonOfficerCommunicationController" in {
+      val result: Call = navigator.normalRoutes(LiaisonOfficerPhoneNumberPage(testString), liaisonOfficersAnswers)
+
+      result shouldBe LiaisonOfficerCommunicationController.onPageLoad(testString, NormalMode)
+    }
+
+    "route LiaisonOfficerCommunicationPage to LO CYA" in {
+      val result: Call = navigator.normalRoutes(LiaisonOfficerCommunicationPage(testString), liaisonOfficersAnswers)
+
+      result shouldBe LoCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route RemoveLiaisonOfficerPage to AddLiaisonOfficerController when no liaison officers remain" in {
+      val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, LiaisonOfficers(Nil))
+
+      result shouldBe AddLiaisonOfficerController.onPageLoad()
+    }
+
+    "route RemoveLiaisonOfficerPage to AddedLiaisonOfficersController when liaison officers remain" in {
+      val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, liaisonOfficersAnswers)
+
+      result shouldBe AddedLiaisonOfficersController.onPageLoad()
     }
 
     "route unknown page to Index" in {
@@ -327,18 +398,38 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route RemoveSignatoryPage to Index Controller" in {
-      navigator.checkRouteMap(RemoveSignatoryPage) shouldBe
+      navigator.checkRouteMap(RemoveSignatoryPage(signatoryId)) shouldBe
         IndexController.onPageLoad()
     }
 
-    "route SignatoryNamePage to Index Controller" in {
-      navigator.checkRouteMap(SignatoryNamePage) shouldBe
-        IndexController.onPageLoad()
+    "route SignatoryNamePage to SignatoryCheckYourAnswersController" in {
+      navigator.checkRouteMap(SignatoryNamePage(signatoryId)) shouldBe
+        SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
-    "route SignatoryJobTitlePage to Index Controller" in {
-      navigator.checkRouteMap(SignatoryJobTitlePage) shouldBe
-        IndexController.onPageLoad()
+    "route SignatoryJobTitlePage to SignatoryCheckYourAnswersController" in {
+      navigator.checkRouteMap(SignatoryJobTitlePage(signatoryId)) shouldBe
+        SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
+    }
+
+    "route LiaisonOfficerNamePage to LO CYA" in {
+      navigator.checkRouteMap(LiaisonOfficerNamePage(testString)) shouldBe
+        LoCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route LiaisonOfficerEmailPage to LO CYA" in {
+      navigator.checkRouteMap(LiaisonOfficerEmailPage(testString)) shouldBe
+        LoCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route LiaisonOfficerPhoneNumberPage to LO CYA" in {
+      navigator.checkRouteMap(LiaisonOfficerPhoneNumberPage(testString)) shouldBe
+        LoCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route LiaisonOfficerCommunicationPage to LO CYA" in {
+      navigator.checkRouteMap(LiaisonOfficerCommunicationPage(testString)) shouldBe
+        LoCheckYourAnswersController.onPageLoad(testString)
     }
 
     "route unknown page to Index" in {

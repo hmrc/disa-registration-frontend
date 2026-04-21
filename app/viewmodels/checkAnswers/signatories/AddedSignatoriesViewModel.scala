@@ -17,9 +17,9 @@
 package viewmodels.checkAnswers.signatories
 
 import config.FrontendAppConfig
-import controllers.signatories.routes.{RemoveSignatoryController, SignatoryNameController}
+import controllers.signatories.routes.{RemoveSignatoryController, SignatoryCheckYourAnswersController, SignatoryNameController}
 import models.journeydata.signatories.Signatory
-import models.{CheckMode, YesNoAnswer}
+import models.{NormalMode, YesNoAnswer}
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
@@ -84,9 +84,7 @@ class AddedSignatoriesViewModel @Inject() (
                   )
                 }
                 .getOrElse(HtmlFormat.empty),
-              govukSummaryList(
-                SummaryListViewModel(rows = complete.flatMap(row))
-              )
+              govukSummaryList(SummaryListViewModel(rows = complete.flatMap(signatory => row(signatory))))
             )
           )
         },
@@ -95,7 +93,7 @@ class AddedSignatoriesViewModel @Inject() (
             Seq(
               Html(s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(messages("addedSignatory.inProgress"))}</h2>"""),
               govukSummaryList(
-                SummaryListViewModel(rows = inProgress.flatMap(row))
+                SummaryListViewModel(rows = inProgress.flatMap(signatory => row(signatory, inProgress = true)))
               )
             )
           )
@@ -114,7 +112,16 @@ class AddedSignatoriesViewModel @Inject() (
     )
   }
 
-  private def row(signatory: Signatory)(implicit messages: Messages): Option[SummaryListRow] =
+  private def row(signatory: Signatory, inProgress: Boolean = false)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
+    val changeLink = if (inProgress) {
+      SignatoryNameController
+        .onPageLoad(Some(signatory.id), NormalMode)
+        .url
+    } else {
+      SignatoryCheckYourAnswersController.onPageLoad(signatory.id).url
+    }
     signatory.fullName.map { name =>
       SummaryListRowViewModel(
         key = KeyViewModel(HtmlFormat.escape(name).toString)
@@ -124,9 +131,7 @@ class AddedSignatoriesViewModel @Inject() (
         actions = Seq(
           ActionItemViewModel(
             content = messages("site.change"),
-            href = SignatoryNameController
-              .onPageLoad(Some(signatory.id), CheckMode)
-              .url
+            href = changeLink
           ).withVisuallyHiddenText(
             messages("addedSignatory.summary.action.hidden", name)
           ),
@@ -141,4 +146,5 @@ class AddedSignatoriesViewModel @Inject() (
         )
       )
     }
+  }
 }
