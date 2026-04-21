@@ -17,9 +17,9 @@
 package viewmodels.checkAnswers.liaisonofficers
 
 import config.FrontendAppConfig
-import controllers.liaisonofficers.routes.{LiaisonOfficerNameController, RemoveLiaisonOfficerController}
+import controllers.liaisonofficers.routes.{LiaisonOfficerNameController, LoCheckYourAnswersController, RemoveLiaisonOfficerController}
 import models.journeydata.liaisonofficers.LiaisonOfficer
-import models.{CheckMode, YesNoAnswer}
+import models.{NormalMode, YesNoAnswer}
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
@@ -89,7 +89,11 @@ class AddedLiaisonOfficersViewModel @Inject() (
       ).flatten
     )
 
-  private def row(liaisonOfficer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] =
+  private def row(liaisonOfficer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] = {
+    val changeLink =
+      if (liaisonOfficer.inProgress) LiaisonOfficerNameController.onPageLoad(Some(liaisonOfficer.id), NormalMode).url
+      else LoCheckYourAnswersController.onPageLoad(liaisonOfficer.id).url
+
     liaisonOfficer.fullName.map { answer =>
       SummaryListRowViewModel(
         key = KeyViewModel(HtmlFormat.escape(answer).toString)
@@ -99,7 +103,7 @@ class AddedLiaisonOfficersViewModel @Inject() (
         actions = Seq(
           ActionItemViewModel(
             content = messages("site.change"),
-            href = LiaisonOfficerNameController.onPageLoad(Some(liaisonOfficer.id), CheckMode).url
+            href = changeLink
           ).withVisuallyHiddenText(messages("addedLiaisonOfficers.summary.action.hidden", answer)),
           ActionItemViewModel(
             content = messages("site.remove"),
@@ -108,4 +112,5 @@ class AddedLiaisonOfficersViewModel @Inject() (
         )
       )
     }
+  }
 }

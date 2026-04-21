@@ -51,12 +51,12 @@ final class ZReferenceNumberFormProviderSpec extends FormSpec {
       checkForError(
         form,
         Map(fieldKey -> "Z12"),
-        Seq(FormError(fieldKey, "zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+        Seq(FormError(fieldKey, "zReferenceNumber.error.tooShort", Seq(5)))
       )
       checkForError(
         form,
         Map(fieldKey -> "Z12345"),
-        Seq(FormError(fieldKey, "zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+        Seq(FormError(fieldKey, "zReferenceNumber.error.tooLong", Seq(5)))
       )
     }
 
@@ -64,7 +64,7 @@ final class ZReferenceNumberFormProviderSpec extends FormSpec {
       checkForError(
         form,
         Map(fieldKey -> "A1234"),
-        Seq(FormError(fieldKey, "zReferenceNumber.error.invalid", Seq("^Z[0-9]{4}$")))
+        Seq(FormError(fieldKey, "zReferenceNumber.error.invalid", Seq("^Z[0-9]*$")))
       )
     }
   }

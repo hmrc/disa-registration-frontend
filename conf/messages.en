@@ -101,20 +101,22 @@ zReferenceNumber.heading = What is your organisation’s Z-reference number?
 zReferenceNumber.details.summary = Don’t know your Z-reference number?
 zReferenceNumber.details.content = If you’re already registered with HMRC as an ISA manager you can {0} if you have forgotten it or don’t know it.
 zReferenceNumber.details.content.link = check your Z-reference number
-zReferenceNumber.hint = This is usually a Z followed by 4 numbers, for example Z1234
-zReferenceNumber.error.required = You need to tell us what your organisation’s Z reference number is
-zReferenceNumber.error.invalid = Enter the Z-reference number in the correct format. It’s usually a Z followed by 4 numbers
+zReferenceNumber.hint = This is a Z followed by 4 numbers, for example Z1234
+zReferenceNumber.error.required = If you are a registered ISA Manager you must tell us your Z-reference number. This number is a Z followed by 4 numbers
+zReferenceNumber.error.invalid = Z-reference number must only include a Z followed by 4 numbers
+zReferenceNumber.error.tooShort = The Z-reference number you have given is too short. The number is a Z followed by 4 numbers
+zReferenceNumber.error.tooLong = The Z-reference number you have given is too long. The number is a Z followed by 4 numbers
 
 tradingUsingDifferentName.title = Does your organisation trade using a different name?
 tradingUsingDifferentName.heading = Does your organisation trade using a different name?
 tradingUsingDifferentName.checkYourAnswersLabel = Does your organisation trade using a different name?
-tradingUsingDifferentName.error.required = Select yes if your organisation trades using a different name
+tradingUsingDifferentName.error.required = You must select either yes or no. For example select yes, if your organisation trades using a different name
 tradingUsingDifferentName.change.hidden = trading using different a name
 
 tradingName.title = What is your organisation’s trading name?
 tradingName.heading = What is your organisation’s trading name?
 tradingName.checkYourAnswersLabel = tradingName
-tradingName.error.required = Enter the trading name of your organisation
+tradingName.error.required = You must tell us what your organisation’s trading name is
 tradingName.change.hidden = trading name
 
 firmReferenceNumber.title = Financial Conduct Authority (FCA) Firm Reference Number (FRN)
@@ -123,10 +125,11 @@ firmReferenceNumber.label = What is your organisation’s FCA, FRN?
 firmReferenceNumber.p1 = The FCA, FRN is a unique identification number assigned to each financial organisation and is crucial for verifying the legitimacy and authorisation status of organisations operating in the financial sector.
 firmReferenceNumber.p2 = The number is used to track and manage regulated financial organisations.
 firmReferenceNumber.p3 = The FRN is commonly referred to as the FCA number.
-firmReferenceNumber.p4 = If you’re already registered as an ISA manager with HMRC but have forgotten or can’t find your FCA number,
+firmReferenceNumber.p4 = If you’re already registered as an ISA manager with HMRC but have forgotten or can’t find your FCA number -
 firmReferenceNumber.checkYourAnswersLabel = FCA number
-firmReferenceNumber.error.required = You must tell us your organisation reference number
-firmReferenceNumber.error.pattern = Enter the organisation reference number in the correct format. It’s usually 6 or 7 numbers
+firmReferenceNumber.error.required = You must enter your organisation’s FCA, FRN. This is a 6 or 7 digit number
+firmReferenceNumber.error.pattern = The FCA, FRN must not include letters a to z, hyphens, spaces or apostrophes
+firmReferenceNumber.error.incorrectLength = The FCA, FRN  must be a six or seven digit number
 firmReferenceNumber.change.hidden = FCA number
 firmReferenceNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 firmReferenceNumber.link.text = you can check the ISA managers list to find your number
@@ -185,8 +188,11 @@ peerToPeerPlatformNumber.heading = What is the FCA, FRN of {0}?
 peerToPeerPlatformNumber.hint = The FCA, FRN is usually a 6 or 7 digit number
 peerToPeerPlatformNumber.error.required = You must tell us your {0} reference number
 peerToPeerPlatformNumber.error.pattern = Enter the {0} reference number in the correct format. It’s usually 6 or 7 numbers
-peerToPeerPlatformNumber.change.hidden = platform FCA
+peerToPeerPlatformNumber.change.hidden = platform FCA FRN
 peerToPeerPlatformNumber.checkYourAnswersLabel = Platform FCA FRN
+
+isaProductsCheckYourAnswers.title = Check your ISA products
+isaProductsCheckYourAnswers.heading = Check your ISA products
 
 ### Signatories
 addASignatory.title = Add a signatory

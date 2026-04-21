@@ -18,12 +18,15 @@ package forms
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import play.api.data.validation.Constraint
 
 class ZReferenceNumberFormProvider extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("zReferenceNumber.error.required")
         .transform(_.trim.toUpperCase, identity)
-        .verifying(regexp("^Z[0-9]{4}$", "zReferenceNumber.error.invalid"))
+        .verifying(minLength(5, "zReferenceNumber.error.tooShort"))
+        .verifying(maxLength(5, "zReferenceNumber.error.tooLong"))
+        .verifying(regexp("^Z[0-9]*$", "zReferenceNumber.error.invalid"))
     )
 }

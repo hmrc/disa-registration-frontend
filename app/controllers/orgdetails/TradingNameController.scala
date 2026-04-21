@@ -28,7 +28,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.TradingNameView
+import views.html.orgdetails.TradingNameView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

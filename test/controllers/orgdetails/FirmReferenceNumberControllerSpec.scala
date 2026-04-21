@@ -20,12 +20,10 @@ import base.SpecBase
 import forms.FirmReferenceNumberFormProvider
 import models.NormalMode
 import models.journeydata.{JourneyData, OrganisationDetails}
-import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
-import play.api.inject.bind
 import play.api.libs.json.Writes
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
@@ -36,7 +34,7 @@ import scala.concurrent.Future
 
 class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute: Call = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/obligations/enrolment/isa/registered-address-correspondence")
 
   val formProvider             = new FirmReferenceNumberFormProvider()
   val form: Form[String]       = formProvider()
@@ -99,7 +97,6 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
       running(application) {
@@ -143,9 +140,6 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
       val application =
         applicationBuilder(journeyData = None)
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
           .build()
 
       running(application) {
