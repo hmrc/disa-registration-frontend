@@ -1,0 +1,70 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.InputWidth._
+@import controllers.thirdparties.routes.ThirdPartyOrgDetailsController
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    govukButton: GovukButton,
+    hmrcPageHeading: HmrcPageHeading
+)
+
+@(id: String, form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, messages("thirdPartyOrgDetails.title"), Some(messages("sectionTitle.thirdPartyOrg")))) {
+
+    @formHelper(action = ThirdPartyOrgDetailsController.onSubmit(id, mode)) {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @hmrcPageHeading(PageHeading(
+            text = messages("thirdPartyOrgDetails.heading"),
+            section = Some(messages("sectionTitle.thirdPartyOrg")),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-l")
+        ))
+
+        @govukInput(
+            InputViewModel(
+                field = form("thirdPartyName"),
+                label = Label(content = Text(messages("thirdPartyOrgDetails.nameInputLabel"))),
+            )
+            .withWidth(Full)
+        )
+
+        @govukInput(
+            InputViewModel(
+                    field = form("frn"),
+                    label = Label(content = Text(messages("thirdPartyOrgDetails.frnInputLabel"))),
+            )
+            .withWidth(Full)
+            .withHint(HintViewModel(messages("thirdPartyOrgDetails.frnInputHint")))
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.saveAndContinue"))
+        )
+    }
+}

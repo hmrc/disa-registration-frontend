@@ -86,6 +86,7 @@ sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
 sectionTitle.isaProducts = ISA products
 sectionTitle.certificatesOfAuthority = Certificates of authority
+sectionTitle.thirdPartyOrg = Third party organisations
 sectionTitle.submit = Submit answers
 section.caption.hidden = This section is
 
@@ -386,6 +387,17 @@ fcaArticles.change.hidden = articles selected
 CoaCheckYourAnswers.title = Check your certificates of authority
 CoaCheckYourAnswers.heading = Check your certificates of authority
 
+### Third Party Organisations
+
+thirdPartyOrgDetails.title = Third party organisation details
+thirdPartyOrgDetails.heading = Third party organisation details
+thirdPartyOrgDetails.thirdPartyNameInputLabel = What is the name of the third party organisation?
+thirdPartyOrgDetails.thirdPartyName.error.required = Enter the name of the third party organisation
+thirdPartyOrgDetails.thirdPartyName.error.invalid = The third party name must only include letters a to z, hyphens, spaces and apostrophes
+thirdPartyOrgDetails.frnInputLabel = What is the FCA, FRN of the third party organisation? (optional)
+thirdPartyOrgDetails.frnInputHint = The FRN is usually a 6 or 7 digit number
+thirdPartyOrgDetails.frn.error.invalid = The FCA, FRN must not include letters a to z, hyphens, spaces or apostrophes
+thirdPartyOrgDetails.frn.error.incorrectLength = The FCA, FRN  must be a six or seven digit number
 ### Task List
 taskList.title = Task List
 taskList.heading = Task List
