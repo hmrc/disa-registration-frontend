@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package pages.thirdparties
+package models.journeydata.thirdparty
 
-import models.journeydata.thirdparties.ThirdPartyOrganisations
-import pages.IdentifiedPage
-
-final case class ThirdPartyOrgDetailsPage(id: String) extends IdentifiedPage[ThirdPartyOrganisations]
+case class ThirdPartyOrgDetailsForm(
+  thirdPartyName: String,
+  frn: Option[String]
+)

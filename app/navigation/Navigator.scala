@@ -22,6 +22,7 @@ import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
 import controllers.routes.*
 import controllers.signatories.routes.*
+import controllers.thirdparty.routes.*
 import models.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
@@ -30,6 +31,7 @@ import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
+import models.journeydata.thirdparty.ThirdPartyOrganisations
 import models.journeydata.{OrganisationDetails, TaskListSection}
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
@@ -37,6 +39,7 @@ import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, Peer
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
+import pages.thirdparty.{ProductsManagedByThirdPartyPage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -68,6 +71,7 @@ class Navigator @Inject() () {
   private[navigation] def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
     case RegisteredIsaManagerPage            => ???
     case ZReferenceNumberPage                => ???
+    case FirmReferenceNumberPage             => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
     case TradingUsingDifferentNamePage       => tradingUsingDifferentNameNextPage(answers)
     case TradingNamePage                     => FirmReferenceNumberController.onPageLoad(NormalMode)
     case IsaProductsPage                     => isaProductsNextPage(answers)
@@ -86,8 +90,9 @@ class Navigator @Inject() () {
     case RemoveSignatoryPage(id)             => removeSignatoryNextPage(answers)
     case SignatoryNamePage(id)               => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case FirmReferenceNumberPage             => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
-    case _                                   => IndexController.onPageLoad()
+    case ProductsManagedByThirdPartyPage     => productsManagedByThirdPartNextPage(answers)
+    case ThirdPartyOrgDetailsPage(id)        => IndexController.onPageLoad()
+    case _                                   => throw new NotImplementedError("No route for this page")
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
@@ -109,7 +114,9 @@ class Navigator @Inject() () {
     case LiaisonOfficerCommunicationPage(id) => LoCheckYourAnswersController.onPageLoad(id)
     case SignatoryNamePage(id)               => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case _                                   => IndexController.onPageLoad()
+    case ProductsManagedByThirdPartyPage     => ???
+    case ThirdPartyOrgDetailsPage(id)        => ???
+    case _                                   => throw new NotImplementedError("No route for this page")
   }
 
   private def tradingUsingDifferentNameNextPage(answers: OrganisationDetails): Call =
@@ -165,5 +172,11 @@ class Navigator @Inject() () {
     answers.liaisonOfficers match {
       case Nil => AddLiaisonOfficerController.onPageLoad()
       case _   => AddedLiaisonOfficersController.onPageLoad()
+    }
+
+  private def productsManagedByThirdPartNextPage(answers: ThirdPartyOrganisations): Call =
+    answers.managedByThirdParty match {
+      case Some(YesNoAnswer.Yes) => ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode)
+      case _                     => TaskListController.onPageLoad()
     }
 }

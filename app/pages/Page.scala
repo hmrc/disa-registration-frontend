@@ -32,7 +32,7 @@ trait IdentifiedPage[A <: TaskListSection] extends Page[A] {
 
 trait PageWithoutDependents[A <: TaskListSection] extends ClearablePage[A]
 
-trait PageWithDependents[A <: TaskListSection] extends ClearablePage[A] {
+trait PageWithDependents[A <: TaskListSection] extends Page[A] {
   def pagesToClear(currentAnswers: A): List[ClearablePage[A]]
 
   def resumeNormalMode(currentAnswers: A): Boolean

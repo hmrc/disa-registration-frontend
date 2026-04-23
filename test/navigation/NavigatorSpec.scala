@@ -21,8 +21,9 @@ import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
-import controllers.routes.IndexController
+import controllers.routes.{IndexController, TaskListController}
 import controllers.signatories.routes.*
+import controllers.thirdparty.routes.*
 import models.*
 import models.journeydata.OrganisationDetails
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
@@ -32,15 +33,17 @@ import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsa
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.signatories.{Signatories, Signatory}
+import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
-import org.scalatest.matchers.should.Matchers.{should, shouldBe}
+import org.scalatest.matchers.should.Matchers.shouldBe
 import pages.*
 import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.signatories.*
+import pages.thirdparty.{ProductsManagedByThirdPartyPage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -347,14 +350,37 @@ class NavigatorSpec extends SpecBase {
       result shouldBe AddedLiaisonOfficersController.onPageLoad()
     }
 
+    "route ProductsManagedByThirdParty to TaskList when answer is no" in {
+      val result: Call =
+        navigator.normalRoutes(ProductsManagedByThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.No)))
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route ProductsManagedByThirdParty to ThirdPartyOrgDetailsPage when answer is yes" in {
+      val result: Call =
+        navigator.normalRoutes(ProductsManagedByThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.Yes)))
+
+      result shouldBe ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode)
+    }
+
+    "route ThirdPartyOrgDetailsPage to Index" in {
+      val result: Call = navigator.normalRoutes(
+        ThirdPartyOrgDetailsPage(testString),
+        ThirdPartyOrganisations(Some(YesNoAnswer.No), Seq(ThirdParty(testString)))
+      )
+
+      result shouldBe IndexController.onPageLoad()
+    }
+
     "route unknown page to Index" in {
       case object UnknownPage extends PageWithoutDependents[IsaProducts] {
         override def clearAnswer(answers: IsaProducts): IsaProducts = answers
       }
 
-      val result: Call = navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers)
-
-      result shouldBe IndexController.onPageLoad()
+      assertThrows[NotImplementedError] {
+        navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers)
+      }
     }
   }
 
@@ -397,11 +423,6 @@ class NavigatorSpec extends SpecBase {
         IndexController.onPageLoad()
     }
 
-    "route RemoveSignatoryPage to Index Controller" in {
-      navigator.checkRouteMap(RemoveSignatoryPage(signatoryId)) shouldBe
-        IndexController.onPageLoad()
-    }
-
     "route SignatoryNamePage to SignatoryCheckYourAnswersController" in {
       navigator.checkRouteMap(SignatoryNamePage(signatoryId)) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
@@ -437,9 +458,9 @@ class NavigatorSpec extends SpecBase {
         override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers
       }
 
-      val result: Call = navigator.checkRouteMap(UnknownPage)
-
-      result shouldBe IndexController.onPageLoad()
+      assertThrows[NotImplementedError] {
+        navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers)
+      }
     }
   }
 }

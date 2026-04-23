@@ -16,6 +16,8 @@
 
 package models.journeydata.thirdparties
 
+import models.YesNoAnswer.Yes
+import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import play.api.libs.json.*
 import utils.JsonFormatSpec
 
@@ -23,7 +25,7 @@ class ThirdPartyOrganisationsJsonSpec extends JsonFormatSpec[ThirdPartyOrganisat
 
   override val model: ThirdPartyOrganisations =
     ThirdPartyOrganisations(
-      managedByThirdParty = Some(true),
+      managedByThirdParty = Some(Yes),
       thirdParties = Seq(
         ThirdParty(
           id = "tp-1",
@@ -39,7 +41,7 @@ class ThirdPartyOrganisationsJsonSpec extends JsonFormatSpec[ThirdPartyOrganisat
 
   override val expectedJsonFromWrites: JsValue =
     Json.obj(
-      "managedByThirdParty"    -> true,
+      "managedByThirdParty"    -> "yes",
       "thirdParties"           -> Json.arr(
         Json.obj(
           "id"                      -> "tp-1",

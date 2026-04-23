@@ -14,9 +14,22 @@
  * limitations under the License.
  */
 
-package models.journeydata.thirdparties
+package models.journeydata.thirdparty
 
-case class ThirdPartyOrgDetailsForm(
-  name: String,
-  frn: Option[String]
-)
+import play.api.libs.json.{Json, OFormat}
+
+case class ThirdParty(
+  id: String,
+  thirdPartyName: Option[String] = None,
+  thirdPartyFrn: Option[String] = None,
+  managingIsaReturns: Option[Boolean] = None,
+  usingInvestorFunds: Option[Boolean] = None,
+  investorFundsPercentage: Option[Int] = None
+) {
+  def inProgress: Boolean =
+    List(thirdPartyName, managingIsaReturns, usingInvestorFunds, investorFundsPercentage).exists(_.iterator.isEmpty)
+}
+
+object ThirdParty {
+  implicit val format: OFormat[ThirdParty] = Json.format[ThirdParty]
+}

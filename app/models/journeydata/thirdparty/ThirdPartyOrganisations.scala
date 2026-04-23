@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package models.journeydata.thirdparties
+package models.journeydata.thirdparty
 
+import models.YesNoAnswer
 import models.journeydata.TaskListSection
 import play.api.libs.json.{Json, OFormat}
 
 case class ThirdPartyOrganisations(
-  managedByThirdParty: Option[Boolean],
-  thirdParties: Seq[ThirdParty],
-  connectedOrganisations: Set[String]
+  managedByThirdParty: Option[YesNoAnswer] = None,
+  thirdParties: Seq[ThirdParty] = Nil,
+  connectedOrganisations: Set[String] = Set.empty
 ) extends TaskListSection {
-  override def sectionName: String = ThirdPartyOrganisations.sectionName
+  def sectionName: String = ThirdPartyOrganisations.sectionName
 
   def upsertThirdParty(id: String, name: String, frn: Option[String]): ThirdPartyOrganisations = {
     val exists = thirdParties.exists(_.id == id)
@@ -51,6 +52,6 @@ case class ThirdPartyOrganisations(
 }
 
 object ThirdPartyOrganisations {
-  val sectionName: String                               = "ThirdPartyOrganisations"
+  val sectionName: String                               = "thirdPartyOrganisations"
   implicit val format: OFormat[ThirdPartyOrganisations] = Json.format[ThirdPartyOrganisations]
 }

@@ -17,7 +17,7 @@
 package forms
 
 import forms.mappings.Mappings
-import models.journeydata.thirdparties.ThirdPartyOrgDetailsForm
+import models.journeydata.thirdparty.ThirdPartyOrgDetailsForm
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional}
 
@@ -43,7 +43,7 @@ class ThirdPartyOrgDetailsFormProvider @Inject() extends Mappings {
             .verifying(maxLength(7, "thirdPartyOrgDetails.frn.error.incorrectLength"))
             .verifying(regexp(ThirdPartyOrgDetailsFormProvider.frnRegex, "thirdPartyOrgDetails.frn.error.invalid"))
         )
-      )((name, frn) => ThirdPartyOrgDetailsForm(name, frn))(form => Some((form.name, form.frn)))
+      )((name, frn) => ThirdPartyOrgDetailsForm(name, frn))(form => Some((form.thirdPartyName, form.frn)))
     )
 }
 

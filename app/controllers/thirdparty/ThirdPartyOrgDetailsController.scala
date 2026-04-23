@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package controllers.thirdparties
+package controllers.thirdparty
 
 import controllers.actions.*
 import controllers.routes.*
 import forms.ThirdPartyOrgDetailsFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeydata.thirdparties.{ThirdPartyOrgDetailsForm, ThirdPartyOrganisations}
+import models.journeydata.thirdparty.*
 import navigation.Navigator
-import pages.thirdparties.ThirdPartyOrgDetailsPage
+import pages.thirdparty.ThirdPartyOrgDetailsPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -62,15 +62,10 @@ class ThirdPartyOrgDetailsController @Inject() (
         id           <- id
         thirdParties <- request.journeyData.thirdPartyOrganisations.map(_.thirdParties)
         thirdParty   <- thirdParties.find(_.id == id)
-      } yield {
-        val filledForm = form.fill(
-          ThirdPartyOrgDetailsForm(
-            name = thirdParty.thirdPartyName.getOrElse(""),
-            frn = thirdParty.thirdPartyFrn
-          )
-        )
-        (filledForm, id)
-      }).getOrElse((form, uuidGenerator.generate()))
+        name         <- thirdParty.thirdPartyName
+        frn           = thirdParty.thirdPartyFrn
+      } yield (form.fill(ThirdPartyOrgDetailsForm(name, frn)), id))
+        .getOrElse((form, uuidGenerator.generate()))
 
       Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
     }
@@ -82,13 +77,12 @@ class ThirdPartyOrgDetailsController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode))),
           answer => {
-            val name = answer.name
+            val name = answer.thirdPartyName
             val frn  = answer.frn
             request.journeyData.thirdPartyOrganisations match {
               case Some(existing) =>
                 val updatedSection =
                   existing.upsertThirdParty(id, name, frn)
-
                 journeyAnswersService
                   .update(updatedSection, request.groupId, request.credentials.providerId)
                   .map { updated =>

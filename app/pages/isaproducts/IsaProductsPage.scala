@@ -19,7 +19,7 @@ package pages.isaproducts
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import pages.{ClearablePage, PageWithDependents}
 
-case object IsaProductsPage extends PageWithDependents[IsaProducts] {
+case object IsaProductsPage extends PageWithDependents[IsaProducts] with ClearablePage[IsaProducts] {
   override def toString: String = "isaProducts"
 
   override def clearAnswer(answers: IsaProducts): IsaProducts = answers.copy(isaProducts = None)

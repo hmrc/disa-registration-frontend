@@ -15,7 +15,7 @@
  *@
 
 @import viewmodels.InputWidth._
-@import controllers.thirdparties.routes.ThirdPartyOrgDetailsController
+@import controllers.thirdparty.routes.ThirdPartyOrgDetailsController
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
@@ -31,7 +31,7 @@
 
 @(id: String, form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("thirdPartyOrgDetails.title"), Some(messages("sectionTitle.thirdPartyOrg")))) {
+@layout(pageTitle = title(form, messages("thirdPartyOrgDetails.title"), Some(messages("sectionTitle.thirdParty")))) {
 
     @formHelper(action = ThirdPartyOrgDetailsController.onSubmit(id, mode)) {
 
@@ -41,7 +41,7 @@
 
         @hmrcPageHeading(PageHeading(
             text = messages("thirdPartyOrgDetails.heading"),
-            section = Some(messages("sectionTitle.thirdPartyOrg")),
+            section = Some(messages("sectionTitle.thirdParty")),
             headingClasses = Some("govuk-heading-l"),
             captionClasses = Some("govuk-caption-l")
         ))

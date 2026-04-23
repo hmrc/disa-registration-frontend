@@ -17,7 +17,7 @@
 package models.journeydata.thirdparty
 
 import base.SpecBase
-import models.journeydata.thirdparties.{ThirdParty, ThirdPartyOrganisations}
+import models.YesNoAnswer.Yes
 
 class ThirdPartyOrganisationsSpec extends SpecBase {
 
@@ -160,7 +160,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
 
         val existing =
           ThirdPartyOrganisations(
-            managedByThirdParty = Some(true),
+            managedByThirdParty = Some(Yes),
             thirdParties = Seq(
               ThirdParty(
                 id = "existing-id",
@@ -177,7 +177,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
         val result =
           existing.upsertThirdParty("existing-id", "Updated Name", Some("654321"))
 
-        result.managedByThirdParty mustBe Some(true)
+        result.managedByThirdParty mustBe Some(Yes)
         result.connectedOrganisations mustBe Set("org-1", "org-2")
 
         result.thirdParties.head mustBe ThirdParty(
