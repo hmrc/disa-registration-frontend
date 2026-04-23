@@ -164,6 +164,13 @@ POST       /added-signatories                            controllers.signatories
 GET        /remove-signatory                             controllers.signatories.RemoveSignatoryController.onPageLoad(id: String)
 POST       /remove-signatory                             controllers.signatories.RemoveSignatoryController.onSubmit(id: String)
 
+## Third Party Organisations
+
+GET        /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad(mode: Mode = NormalMode)
+POST       /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit(mode: Mode = NormalMode)
+GET        /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit(mode: Mode = CheckMode)
+
 ## Declare & Submit
 
 ### Declaration
