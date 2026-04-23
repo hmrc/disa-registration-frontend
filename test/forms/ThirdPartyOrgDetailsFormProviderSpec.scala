@@ -28,7 +28,7 @@ class ThirdPartyOrgDetailsFormProviderSpec extends StringFieldBehaviours {
   val nameRequiredKey = "thirdPartyOrgDetails.thirdPartyName.error.required"
   val nameInvalidKey  = "thirdPartyOrgDetails.thirdPartyName.error.invalid"
 
-  val frnLengthKey = "thirdPartyOrgDetails.frn.error.incorrectLength"
+  val frnLengthKey  = "thirdPartyOrgDetails.frn.error.incorrectLength"
   val frnPatternKey = "thirdPartyOrgDetails.frn.error.invalid"
 
   val nameField = "thirdPartyName"
@@ -74,7 +74,7 @@ class ThirdPartyOrgDetailsFormProviderSpec extends StringFieldBehaviours {
       requiredError = FormError(nameField, nameRequiredKey)
     )
   }
-  
+
   ".frn" - {
 
     behave like fieldThatBindsValidData(

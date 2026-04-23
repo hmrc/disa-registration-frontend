@@ -17,6 +17,6 @@
 package models.journeydata.thirdparties
 
 case class ThirdPartyOrgDetailsForm(
-                                     name: String,
-                                     frn: Option[String]
-                                   )
+  name: String,
+  frn: Option[String]
+)

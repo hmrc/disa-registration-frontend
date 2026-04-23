@@ -26,7 +26,8 @@ case class ThirdParty(
   usingInvestorFunds: Option[Boolean] = None,
   investorFundsPercentage: Option[Int] = None
 ) {
-  def inProgress: Boolean = List(thirdPartyName, managingIsaReturns, usingInvestorFunds, investorFundsPercentage).exists(_.iterator.isEmpty)
+  def inProgress: Boolean =
+    List(thirdPartyName, managingIsaReturns, usingInvestorFunds, investorFundsPercentage).exists(_.iterator.isEmpty)
 }
 
 object ThirdParty {

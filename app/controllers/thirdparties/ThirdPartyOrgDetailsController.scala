@@ -37,78 +37,80 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class ThirdPartyOrgDetailsController @Inject()(
-                                                override val messagesApi: MessagesApi,
-                                                identify: IdentifierAction,
-                                                getData: DataRetrievalAction,
-                                                requireData: DataRequiredAction,
-                                                journeyAnswersService: JourneyAnswersService,
-                                                errorHandler: ErrorHandler,
-                                                formProvider: ThirdPartyOrgDetailsFormProvider,
-                                                navigator: Navigator,
-                                                uuidGenerator: UuidGenerator,
-                                                val controllerComponents: MessagesControllerComponents,
-                                                view: SignatoryNameView)(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class ThirdPartyOrgDetailsController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler,
+  formProvider: ThirdPartyOrgDetailsFormProvider,
+  navigator: Navigator,
+  uuidGenerator: UuidGenerator,
+  val controllerComponents: MessagesControllerComponents,
+  view: SignatoryNameView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   val form: Form[ThirdPartyOrgDetailsForm] = formProvider()
 
   def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData) {
-      implicit request =>
-        val preparedFormAndId = (for {
-          id <- id
-          thirdParties <- request.journeyData.thirdPartyOrganisations.map(_.thirdParties)
-          thirdParty <- thirdParties.find(_.id == id)
-        } yield {
-          val filledForm = form.fill(
-            ThirdPartyOrgDetailsForm(
-              name = thirdParty.thirdPartyName.getOrElse(""),
-              frn = thirdParty.thirdPartyFrn
-            )
+    (identify andThen getData andThen requireData) { implicit request =>
+      val preparedFormAndId = (for {
+        id           <- id
+        thirdParties <- request.journeyData.thirdPartyOrganisations.map(_.thirdParties)
+        thirdParty   <- thirdParties.find(_.id == id)
+      } yield {
+        val filledForm = form.fill(
+          ThirdPartyOrgDetailsForm(
+            name = thirdParty.thirdPartyName.getOrElse(""),
+            frn = thirdParty.thirdPartyFrn
           )
-          (filledForm, id)
-        }).getOrElse((form, uuidGenerator.generate()))
+        )
+        (filledForm, id)
+      }).getOrElse((form, uuidGenerator.generate()))
 
-        Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
+      Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
     }
 
   def onSubmit(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(id, formWithErrors, mode))),
-        answer => {
-          val name = answer.name
-          val frn = answer.frn
-          request.journeyData.thirdPartyOrganisations match {
-            case Some(existing) =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode))),
+          answer => {
+            val name = answer.name
+            val frn  = answer.frn
+            request.journeyData.thirdPartyOrganisations match {
+              case Some(existing) =>
+                val updatedSection =
+                  existing.upsertThirdParty(id, name, frn)
 
-              val updatedSection =
-                existing.upsertThirdParty(id, name, frn)
-
-              journeyAnswersService
-                .update(updatedSection, request.groupId, request.credentials.providerId)
-                .map { updated =>
-                  Redirect(
-                    navigator.nextPage(
-                      ThirdPartyOrgDetailsPage(id),
-                      updated,
-                      mode
+                journeyAnswersService
+                  .update(updatedSection, request.groupId, request.credentials.providerId)
+                  .map { updated =>
+                    Redirect(
+                      navigator.nextPage(
+                        ThirdPartyOrgDetailsPage(id),
+                        updated,
+                        mode
+                      )
                     )
-                  )
-                }
-                .recoverWith { case NonFatal(e) =>
-                  logger.warn(s"Failed updating answers for section [${ThirdPartyOrganisations.sectionName}] for groupId [${request.groupId}] with error: [$e]")
-                  errorHandler.internalServerError
-                }
+                  }
+                  .recoverWith { case NonFatal(e) =>
+                    logger.warn(
+                      s"Failed updating answers for section [${ThirdPartyOrganisations.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                    )
+                    errorHandler.internalServerError
+                  }
 
-            case None =>
-              Future.successful(Redirect(TaskListController.onPageLoad()))
+              case None =>
+                Future.successful(Redirect(TaskListController.onPageLoad()))
+            }
           }
-        }
-      )
+        )
     }
 }

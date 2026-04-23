@@ -37,8 +37,8 @@ import scala.concurrent.Future
 
 class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
-  private val existingId = "existing-id-123"
-  private val newId = "new-id-123"
+  private val existingId  = "existing-id-123"
+  private val newId       = "new-id-123"
   private val generatedId = "generated-id-123"
 
   lazy val formProvider: ThirdPartyOrgDetailsFormProvider =
@@ -131,13 +131,13 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, NormalMode).url)
           .withFormUrlEncodedBody(
             "thirdPartyName" -> "",
-            "frn" -> "abc"
+            "frn"            -> "abc"
           )
 
       val boundForm = form.bind(
         Map(
           "thirdPartyName" -> "",
-          "frn" -> "abc"
+          "frn"            -> "abc"
         )
       )
 
@@ -180,7 +180,10 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
       )
 
     when(
-      mockJourneyAnswersService.update(eqTo(expected), any[String], any[String])(any[Writes[ThirdPartyOrganisations]], any)
+      mockJourneyAnswersService.update(eqTo(expected), any[String], any[String])(
+        any[Writes[ThirdPartyOrganisations]],
+        any
+      )
     ).thenReturn(Future.successful(expected))
 
     val application =
@@ -191,7 +194,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, NormalMode).url)
           .withFormUrlEncodedBody(
             "thirdPartyName" -> "Updated Name",
-            "frn" -> "654321"
+            "frn"            -> "654321"
           )
 
       val result = route(application, request).value
@@ -225,7 +228,10 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
       )
 
     when(
-      mockJourneyAnswersService.update(eqTo(expected), any[String], any[String])(any[Writes[ThirdPartyOrganisations]], any)
+      mockJourneyAnswersService.update(eqTo(expected), any[String], any[String])(
+        any[Writes[ThirdPartyOrganisations]],
+        any
+      )
     ).thenReturn(Future.successful(expected))
 
     val application =
@@ -236,7 +242,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(newId, NormalMode).url)
           .withFormUrlEncodedBody(
             "thirdPartyName" -> "New Name",
-            "frn" -> "123456"
+            "frn"            -> "123456"
           )
 
       val result = route(application, request).value
@@ -248,7 +254,6 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
       redirectLocation(result).value mustEqual onwardRoute(newId).url
     }
   }
-
 
   "must return Internal Server Error when JourneyAnswersService.update fails" in {
 
@@ -275,7 +280,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, NormalMode).url)
           .withFormUrlEncodedBody(
             "thirdPartyName" -> testString,
-            "frn" -> "123456"
+            "frn"            -> "123456"
           )
 
       val result = route(application, request).value
@@ -321,7 +326,10 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
       )
 
     when(
-      mockJourneyAnswersService.update(eqTo(expected), any[String], any[String])(any[Writes[ThirdPartyOrganisations]], any)
+      mockJourneyAnswersService.update(eqTo(expected), any[String], any[String])(
+        any[Writes[ThirdPartyOrganisations]],
+        any
+      )
     ).thenReturn(Future.successful(expected))
 
     val application =
@@ -332,7 +340,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, CheckMode).url)
           .withFormUrlEncodedBody(
             "thirdPartyName" -> "Name",
-            "frn" -> ""
+            "frn"            -> ""
           )
 
       val result = route(application, request).value

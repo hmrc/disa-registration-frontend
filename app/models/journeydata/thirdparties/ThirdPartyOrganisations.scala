@@ -19,7 +19,11 @@ package models.journeydata.thirdparties
 import models.journeydata.TaskListSection
 import play.api.libs.json.{Json, OFormat}
 
-case class ThirdPartyOrganisations(managedByThirdParty: Option[Boolean], thirdParties: Seq[ThirdParty], connectedOrganisations: Set[String]) extends TaskListSection {
+case class ThirdPartyOrganisations(
+  managedByThirdParty: Option[Boolean],
+  thirdParties: Seq[ThirdParty],
+  connectedOrganisations: Set[String]
+) extends TaskListSection {
   override def sectionName: String = ThirdPartyOrganisations.sectionName
 
   def upsertThirdParty(id: String, name: String, frn: Option[String]): ThirdPartyOrganisations = {
@@ -33,7 +37,7 @@ case class ThirdPartyOrganisations(managedByThirdParty: Option[Boolean], thirdPa
               thirdPartyName = Some(name),
               thirdPartyFrn = frn
             )
-          case tp => tp
+          case tp                => tp
         }
       else
         thirdParties :+ ThirdParty(
@@ -47,6 +51,6 @@ case class ThirdPartyOrganisations(managedByThirdParty: Option[Boolean], thirdPa
 }
 
 object ThirdPartyOrganisations {
-  val sectionName: String                   = "ThirdPartyOrganisations"
+  val sectionName: String                               = "ThirdPartyOrganisations"
   implicit val format: OFormat[ThirdPartyOrganisations] = Json.format[ThirdPartyOrganisations]
 }

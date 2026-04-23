@@ -30,24 +30,24 @@ class ThirdPartyOrgDetailsFormProvider @Inject() extends Mappings {
       mapping(
         "thirdPartyName" -> text("thirdPartyOrgDetails.thirdPartyName.error.required")
           .transform(_.trim, identity)
-          .verifying(regexp(ThirdPartyOrgDetailsFormProvider.thirdPartyNameRegex, "thirdPartyOrgDetails.thirdPartyName.error.invalid")),
-
-        "frn" -> optional(
+          .verifying(
+            regexp(
+              ThirdPartyOrgDetailsFormProvider.thirdPartyNameRegex,
+              "thirdPartyOrgDetails.thirdPartyName.error.invalid"
+            )
+          ),
+        "frn"            -> optional(
           text()
             .transform(_.trim, identity)
             .verifying(minLength(6, "thirdPartyOrgDetails.frn.error.incorrectLength"))
             .verifying(maxLength(7, "thirdPartyOrgDetails.frn.error.incorrectLength"))
             .verifying(regexp(ThirdPartyOrgDetailsFormProvider.frnRegex, "thirdPartyOrgDetails.frn.error.invalid"))
         )
-      )(
-        (name, frn) => ThirdPartyOrgDetailsForm(name, frn)
-      )(
-        form => Some((form.name, form.frn))
-      )
+      )((name, frn) => ThirdPartyOrgDetailsForm(name, frn))(form => Some((form.name, form.frn)))
     )
 }
 
 object ThirdPartyOrgDetailsFormProvider {
   private[forms] val thirdPartyNameRegex = "^[\\p{L}'’ -]+$"
-  private[forms] val frnRegex = "^[0-9]+$"
+  private[forms] val frnRegex            = "^[0-9]+$"
 }

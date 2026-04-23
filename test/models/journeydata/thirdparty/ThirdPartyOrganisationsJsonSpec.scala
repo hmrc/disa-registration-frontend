@@ -39,14 +39,14 @@ class ThirdPartyOrganisationsJsonSpec extends JsonFormatSpec[ThirdPartyOrganisat
 
   override val expectedJsonFromWrites: JsValue =
     Json.obj(
-      "managedByThirdParty" -> true,
-      "thirdParties" -> Json.arr(
+      "managedByThirdParty"    -> true,
+      "thirdParties"           -> Json.arr(
         Json.obj(
-          "id" -> "tp-1",
-          "thirdPartyName" -> "Test Org",
-          "thirdPartyFrn" -> "123456",
-          "managingIsaReturns" -> true,
-          "usingInvestorFunds" -> false,
+          "id"                      -> "tp-1",
+          "thirdPartyName"          -> "Test Org",
+          "thirdPartyFrn"           -> "123456",
+          "managingIsaReturns"      -> true,
+          "usingInvestorFunds"      -> false,
           "investorFundsPercentage" -> 10
         )
       ),
