@@ -89,7 +89,7 @@ class Navigator @Inject() () {
     case RemoveSignatoryPage(id)             => removeSignatoryNextPage(answers)
     case SignatoryNamePage(id)               => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case ProductsManagedByThirdPartyPage => productsManagedByThirdPartNextPage(answers)
+    case ProductsManagedByThirdPartyPage     => productsManagedByThirdPartNextPage(answers)
     case _                                   => throw new NotImplementedError("No route for this page")
   }
 
@@ -112,7 +112,7 @@ class Navigator @Inject() () {
     case LiaisonOfficerCommunicationPage(id) => LoCheckYourAnswersController.onPageLoad(id)
     case SignatoryNamePage(id)               => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case ProductsManagedByThirdPartyPage => ???
+    case ProductsManagedByThirdPartyPage     => ???
     case _                                   => throw new NotImplementedError("No route for this page")
   }
 
@@ -174,6 +174,6 @@ class Navigator @Inject() () {
   private def productsManagedByThirdPartNextPage(answers: ThirdPartyOrganisations): Call =
     answers.managedByThirdParty match {
       case Some(YesNoAnswer.Yes) => ???
-      case _ => TaskListController.onPageLoad()
+      case _                     => TaskListController.onPageLoad()
     }
 }

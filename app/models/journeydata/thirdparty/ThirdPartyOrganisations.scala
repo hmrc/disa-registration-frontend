@@ -20,11 +20,15 @@ import models.YesNoAnswer
 import models.journeydata.TaskListSection
 import play.api.libs.json.{Json, OFormat}
 
-case class ThirdPartyOrganisations(managedByThirdParty: Option[YesNoAnswer] = None, thirdParties: Seq[ThirdParty] = Nil, connectedOrganisations: Set[String] = Set.empty) extends TaskListSection {
+case class ThirdPartyOrganisations(
+  managedByThirdParty: Option[YesNoAnswer] = None,
+  thirdParties: Seq[ThirdParty] = Nil,
+  connectedOrganisations: Set[String] = Set.empty
+) extends TaskListSection {
   def sectionName: String = ThirdPartyOrganisations.sectionName
 }
 
 object ThirdPartyOrganisations {
-  val sectionName: String                   = "thirdPartyOrganisations"
+  val sectionName: String                               = "thirdPartyOrganisations"
   implicit val format: OFormat[ThirdPartyOrganisations] = Json.format[ThirdPartyOrganisations]
 }

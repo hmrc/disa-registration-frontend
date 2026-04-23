@@ -16,6 +16,7 @@
 
 package models.journeydata
 
+import models.YesNoAnswer
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Yes
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
@@ -23,6 +24,7 @@ import models.journeydata.certificatesofauthority.FinancialOrganisation.Bank
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.ByEmail
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
+import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
 
@@ -71,8 +73,13 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       liaisonOfficers =
         Some(LiaisonOfficers(Seq(LiaisonOfficer(testString, Some(testString), Some(testString), Set(ByEmail))))),
       signatories = None,
-      outsourcedAdministration = Some(OutsourcedAdministration(Some("O1"), Some("O2"))),
-      feesCommissionsAndIncentives = Some(FeesCommissionsAndIncentives(Some("F1"), Some("F2")))
+      thirdPartyOrganisations = Some(
+        ThirdPartyOrganisations(
+          Some(YesNoAnswer.Yes),
+          Seq(ThirdParty(testString, Some(testString), Some(true), Some(true), Some(1))),
+          Set.empty
+        )
+      )
     )
 
   override val expectedJsonFromWrites: JsValue = Json.parse(s"""
@@ -117,13 +124,10 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       "liaisonOfficers": {
         "liaisonOfficers":[{"id":"test","fullName":"test","phoneNumber":"test","communication":["byEmail"]}]
       },
-      "outsourcedAdministration": {
-        "dataItem": "O1",
-        "dataItem2": "O2"
-      },
-      "feesCommissionsAndIncentives": {
-        "dataItem": "F1",
-        "dataItem2": "F2"
+      "thirdPartyOrganisations":{
+        "managedByThirdParty":"yes",
+        "thirdParties":[{"id":"test","thirdPartyName":"test","managingIsaReturns":true,"usingInvestorFunds":true,"investorFundsPercentage":1}],
+        "connectedOrganisations":[]
       }
     }
   """)
@@ -172,13 +176,10 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
     "liaisonOfficers": {
       "liaisonOfficers":[{"id":"test","fullName":"test","phoneNumber":"test","communication":["byEmail"]}]
     },
-    "outsourcedAdministration": {
-      "dataItem": "O1",
-      "dataItem2": "O2"
-    },
-    "feesCommissionsAndIncentives": {
-      "dataItem": "F1",
-      "dataItem2": "F2"
+    "thirdPartyOrganisations":{
+        "managedByThirdParty":"yes",
+        "thirdParties":[{"id":"test","thirdPartyName":"test","managingIsaReturns":true,"usingInvestorFunds":true,"investorFundsPercentage":1}],
+        "connectedOrganisations":[]
     },
     "lastUpdated": "2025-10-21T10:00:00Z"
   }

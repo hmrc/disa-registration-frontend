@@ -19,13 +19,14 @@ package models.journeydata.thirdparty
 import play.api.libs.json.{Json, OFormat}
 
 case class ThirdParty(
-                       id: String,
-                       thirdPartyName: Option[String] = None,
-                       managingIsaReturns: Option[Boolean] = None,
-                       usingInvestorFunds: Option[Boolean] = None,
-                       investorFundsPercentage: Option[Int] = None
-                     ) {
-  def inProgress: Boolean = List(thirdPartyName, managingIsaReturns, usingInvestorFunds, investorFundsPercentage).exists(_.iterator.isEmpty)
+  id: String,
+  thirdPartyName: Option[String] = None,
+  managingIsaReturns: Option[Boolean] = None,
+  usingInvestorFunds: Option[Boolean] = None,
+  investorFundsPercentage: Option[Int] = None
+) {
+  def inProgress: Boolean =
+    List(thirdPartyName, managingIsaReturns, usingInvestorFunds, investorFundsPercentage).exists(_.iterator.isEmpty)
 }
 
 object ThirdParty {

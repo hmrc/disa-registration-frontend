@@ -40,14 +40,14 @@ object JourneyData {
 
   val auditWrites: OWrites[JourneyData] = OWrites[JourneyData] { jd =>
     Json.obj(
-      "groupId"                      -> jd.groupId,
-      "groupName"                    -> jd.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
-      "internalRegistrationId"       -> jd.enrolmentId,
-      "organisationDetails"          -> jd.organisationDetails,
-      "isaProducts"                  -> jd.isaProducts,
-      "certificatesOfAuthority"      -> jd.certificatesOfAuthority,
-      "liaisonOfficers"              -> jd.liaisonOfficers,
-      "signatories"                  -> jd.signatories,
+      "groupId"                 -> jd.groupId,
+      "groupName"               -> jd.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
+      "internalRegistrationId"  -> jd.enrolmentId,
+      "organisationDetails"     -> jd.organisationDetails,
+      "isaProducts"             -> jd.isaProducts,
+      "certificatesOfAuthority" -> jd.certificatesOfAuthority,
+      "liaisonOfficers"         -> jd.liaisonOfficers,
+      "signatories"             -> jd.signatories,
       "thirdPartyOrganisations" -> jd.thirdPartyOrganisations
     )
   }

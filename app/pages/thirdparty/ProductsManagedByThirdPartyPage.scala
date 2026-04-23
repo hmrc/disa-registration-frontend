@@ -22,16 +22,13 @@ import pages.{ClearablePage, PageWithDependents}
 
 case object ProductsManagedByThirdPartyPage extends PageWithDependents[ThirdPartyOrganisations] {
 
-  def pagesToClear(currentAnswers: ThirdPartyOrganisations): List[ClearablePage[ThirdPartyOrganisations]] = ???
+  // TODO Add pages as section is complete
+  def pagesToClear(currentAnswers: ThirdPartyOrganisations): List[ClearablePage[ThirdPartyOrganisations]] = List.empty
 
   def resumeNormalMode(currentAnswers: ThirdPartyOrganisations): Boolean = {
     val yesAnswerWithNoDetails = currentAnswers.managedByThirdParty.contains(Yes) && currentAnswers.thirdParties.isEmpty
-    val noOrMissingAnswer = currentAnswers.managedByThirdParty.fold(true)(_ == No)
+    val noOrMissingAnswer      = currentAnswers.managedByThirdParty.fold(true)(_ == No)
 
     yesAnswerWithNoDetails || noOrMissingAnswer
   }
-
-  def clearAnswer(answers: ThirdPartyOrganisations): ThirdPartyOrganisations =
-    if(answers.managedByThirdParty.contains(No)) ThirdPartyOrganisations(managedByThirdParty = Some(No))
-    else answers
 }

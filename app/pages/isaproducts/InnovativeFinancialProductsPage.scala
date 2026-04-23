@@ -19,7 +19,7 @@ package pages.isaproducts
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import pages.{ClearablePage, PageWithDependents}
 
-case object InnovativeFinancialProductsPage extends PageWithDependents[IsaProducts] {
+case object InnovativeFinancialProductsPage extends PageWithDependents[IsaProducts] with ClearablePage[IsaProducts] {
 
   override def toString: String = "innovativeFinancialProducts"
 

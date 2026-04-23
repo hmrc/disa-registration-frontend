@@ -35,46 +35,47 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class ProductsManagedByThirdPartyController @Inject()(
-                                                       override val messagesApi: MessagesApi,
-                                                       navigator: Navigator,
-                                                       identify: IdentifierAction,
-                                                       getData: DataRetrievalAction,
-                                                       requireData: DataRequiredAction,
-                                                       formProvider: YesNoAnswerFormProvider,
-                                                       errorHandler: ErrorHandler,
-                                                       journeyAnswersService: JourneyAnswersService,
-                                                       val controllerComponents: MessagesControllerComponents,
-                                                       view: ProductsManagedByThirdPartyView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+class ProductsManagedByThirdPartyController @Inject() (
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: YesNoAnswerFormProvider,
+  errorHandler: ErrorHandler,
+  journeyAnswersService: JourneyAnswersService,
+  val controllerComponents: MessagesControllerComponents,
+  view: ProductsManagedByThirdPartyView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   val form = formProvider("productsManagedByThirdParty.error.required")
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
 
-      val preparedForm = request.journeyData.thirdPartyOrganisations.flatMap(_.managedByThirdParty) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+    val preparedForm = request.journeyData.thirdPartyOrganisations.flatMap(_.managedByThirdParty) match {
+      case None        => form
+      case Some(value) => form.fill(value)
+    }
 
-      Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
-
-        answer => {
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          answer => {
             val existingSection = request.journeyData.thirdPartyOrganisations
             val updatedSection  =
               existingSection match {
                 case Some(existing) =>
                   clearStalePages(ProductsManagedByThirdPartyPage, existing.copy(managedByThirdParty = Some(answer)))
-                case _           => ThirdPartyOrganisations(managedByThirdParty = Some(answer))
+                case _              => ThirdPartyOrganisations(managedByThirdParty = Some(answer))
               }
 
             journeyAnswersService
@@ -96,6 +97,6 @@ class ProductsManagedByThirdPartyController @Inject()(
                 errorHandler.internalServerError
               }
           }
-      )
+        )
   }
 }
