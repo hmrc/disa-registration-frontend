@@ -86,6 +86,7 @@ sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
 sectionTitle.isaProducts = ISA products
 sectionTitle.certificatesOfAuthority = Certificates of authority
+sectionTitle.thirdParty = Third party organisations
 sectionTitle.submit = Submit answers
 section.caption.hidden = This section is
 
@@ -315,6 +316,14 @@ addedLiaisonOfficers.inProgress = In progress
 addedLiaisonOfficers.legend = Do you want to add another liaison officer?
 addedLiaisonOfficers.error.required = Select yes if you’d like to add another liaison officer
 addedLiaisonOfficers.summary.action.hidden = {0} details
+
+### Third Party Organisations
+
+productsManagedByThirdParty.title = Are any of your ISA products managed by third party organisations?
+productsManagedByThirdParty.heading = Are any of your ISA products managed by third party organisations?
+productsManagedByThirdParty.error.required = Select yes if any of your ISA products are managed by a third party organisation
+productsManagedByThirdParty.checkYourAnswersLabel = Are any of your ISA products managed by third party organisations?
+productsManagedByThirdParty.change.hidden = ProductsManagedByThirdParty
 
 ### Certificates of Authority
 

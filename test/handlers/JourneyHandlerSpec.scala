@@ -19,8 +19,8 @@ package handlers
 import base.SpecBase
 import models.journeydata.TaskListSection
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.matchers.should.Matchers.{should, shouldBe}
-import pages.PageWithDependents
+import org.scalatest.matchers.should.Matchers.shouldBe
+import pages.{ClearablePage, PageWithDependents}
 
 class JourneyHandlerSpec extends SpecBase {
 
@@ -44,8 +44,8 @@ class JourneyHandlerSpec extends SpecBase {
 
     "apply clearAnswer for each page returned by pagesToClear" in {
       val changedPage = mock[PageWithDependents[TestSection]]
-      val page1       = mock[PageWithDependents[TestSection]]
-      val page2       = mock[PageWithDependents[TestSection]]
+      val page1       = mock[ClearablePage[TestSection]]
+      val page2       = mock[ClearablePage[TestSection]]
 
       val updated = TestSection("after")
 
@@ -68,7 +68,7 @@ class JourneyHandlerSpec extends SpecBase {
 
     "work with a single page to clear" in {
       val changedPage = mock[PageWithDependents[TestSection]]
-      val page1       = mock[PageWithDependents[TestSection]]
+      val page1       = mock[ClearablePage[TestSection]]
 
       val updated = TestSection("after")
 

@@ -20,6 +20,7 @@ import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
+import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.libs.json.{Format, Json, OWrites}
 
 case class JourneyData(
@@ -31,8 +32,7 @@ case class JourneyData(
   certificatesOfAuthority: Option[CertificatesOfAuthority] = None,
   liaisonOfficers: Option[LiaisonOfficers] = None,
   signatories: Option[Signatories] = None,
-  outsourcedAdministration: Option[OutsourcedAdministration] = None,
-  feesCommissionsAndIncentives: Option[FeesCommissionsAndIncentives] = None
+  thirdPartyOrganisations: Option[ThirdPartyOrganisations] = None
 )
 
 object JourneyData {
@@ -40,16 +40,15 @@ object JourneyData {
 
   val auditWrites: OWrites[JourneyData] = OWrites[JourneyData] { jd =>
     Json.obj(
-      "groupId"                      -> jd.groupId,
-      "groupName"                    -> jd.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
-      "internalRegistrationId"       -> jd.enrolmentId,
-      "organisationDetails"          -> jd.organisationDetails,
-      "isaProducts"                  -> jd.isaProducts,
-      "certificatesOfAuthority"      -> jd.certificatesOfAuthority,
-      "liaisonOfficers"              -> jd.liaisonOfficers,
-      "signatories"                  -> jd.signatories,
-      "outsourcedAdministration"     -> jd.outsourcedAdministration,
-      "feesCommissionsAndIncentives" -> jd.feesCommissionsAndIncentives
+      "groupId"                 -> jd.groupId,
+      "groupName"               -> jd.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
+      "internalRegistrationId"  -> jd.enrolmentId,
+      "organisationDetails"     -> jd.organisationDetails,
+      "isaProducts"             -> jd.isaProducts,
+      "certificatesOfAuthority" -> jd.certificatesOfAuthority,
+      "liaisonOfficers"         -> jd.liaisonOfficers,
+      "signatories"             -> jd.signatories,
+      "thirdPartyOrganisations" -> jd.thirdPartyOrganisations
     )
   }
 }

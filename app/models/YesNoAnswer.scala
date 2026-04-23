@@ -24,8 +24,8 @@ sealed trait YesNoAnswer
 
 object YesNoAnswer extends Enumerable.Implicits {
 
-  case object Yes extends WithName("site.yes") with YesNoAnswer
-  case object No extends WithName("site.no") with YesNoAnswer
+  case object Yes extends WithName("yes") with YesNoAnswer
+  case object No extends WithName("no") with YesNoAnswer
 
   val values: Seq[YesNoAnswer] = Seq(
     Yes,
@@ -34,7 +34,7 @@ object YesNoAnswer extends Enumerable.Implicits {
 
   def options(implicit messages: Messages): Seq[RadioItem] = values.zipWithIndex.map { case (value, index) =>
     RadioItem(
-      content = Text(messages(s"${value.toString}")),
+      content = Text(messages(s"site.${value.toString}")),
       value = Some(value.toString),
       id = Some(s"value_$index")
     )
