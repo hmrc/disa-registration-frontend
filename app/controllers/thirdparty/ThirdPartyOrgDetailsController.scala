@@ -31,7 +31,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.UuidGenerator
-import views.html.signatories.SignatoryNameView
+import views.html.thirdparty.ThirdPartyOrgDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,7 +48,7 @@ class ThirdPartyOrgDetailsController @Inject() (
   navigator: Navigator,
   uuidGenerator: UuidGenerator,
   val controllerComponents: MessagesControllerComponents,
-  view: SignatoryNameView
+  view: ThirdPartyOrgDetailsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport

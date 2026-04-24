@@ -32,7 +32,7 @@ import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import utils.UuidGenerator
-import views.html.signatories.SignatoryNameView
+import views.html.thirdparty.ThirdPartyOrgDetailsView
 
 import scala.concurrent.Future
 
@@ -67,7 +67,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SignatoryNameView]
+        val view = application.injector.instanceOf[ThirdPartyOrgDetailsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(generatedId, form, NormalMode)(
@@ -103,7 +103,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SignatoryNameView]
+        val view = application.injector.instanceOf[ThirdPartyOrgDetailsView]
 
         val filledForm =
           form.fill(
@@ -146,7 +146,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SignatoryNameView]
+        val view = application.injector.instanceOf[ThirdPartyOrgDetailsView]
 
         status(result) mustEqual BAD_REQUEST
         contentAsString(result) mustEqual view(existingId, boundForm, NormalMode)(
@@ -308,7 +308,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SignatoryNameView]
+        val view = application.injector.instanceOf[ThirdPartyOrgDetailsView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(generatedId, form, CheckMode)(

@@ -49,7 +49,7 @@
         @govukInput(
             InputViewModel(
                 field = form("thirdPartyName"),
-                label = Label(content = Text(messages("thirdPartyOrgDetails.nameInputLabel"))),
+                label = Label(content = Text(messages("thirdPartyOrgDetails.thirdPartyNameInputLabel")), classes = "govuk-label--m"),
             )
             .withWidth(Full)
         )
@@ -57,7 +57,7 @@
         @govukInput(
             InputViewModel(
                     field = form("frn"),
-                    label = Label(content = Text(messages("thirdPartyOrgDetails.frnInputLabel"))),
+                    label = Label(content = Text(messages("thirdPartyOrgDetails.frnInputLabel")), classes = "govuk-label--m"),
             )
             .withWidth(Full)
             .withHint(HintViewModel(messages("thirdPartyOrgDetails.frnInputHint")))
