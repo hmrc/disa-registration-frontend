@@ -184,7 +184,7 @@ class Navigator @Inject() () {
 
   private def returnsManagedByThirdPartNextPage(answers: ThirdPartyOrganisations): Call =
     answers.managedByThirdParty match {
-      case Some(YesNoAnswer.Yes) => ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode)
+      case Some(YesNoAnswer.Yes) => TaskListController.onPageLoad()
       case _                     => TaskListController.onPageLoad()
     }
 }

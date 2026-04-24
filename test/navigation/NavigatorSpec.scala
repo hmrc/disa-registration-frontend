@@ -43,7 +43,7 @@ import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, Peer
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.signatories.*
-import pages.thirdparty.{ProductsManagedByThirdPartyPage, ThirdPartyOrgDetailsPage}
+import pages.thirdparty.{ProductsManagedByThirdPartyPage, ReturnsManagedByThirdPartyPage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -364,13 +364,31 @@ class NavigatorSpec extends SpecBase {
       result shouldBe ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode)
     }
 
-    "route ThirdPartyOrgDetailsPage to Index" in {
+    "route ThirdPartyOrgDetailsPage to ReturnsManagedByThirdParty" in {
       val result: Call = navigator.normalRoutes(
         ThirdPartyOrgDetailsPage(testString),
         ThirdPartyOrganisations(Some(YesNoAnswer.No), Seq(ThirdParty(testString)))
       )
 
       result shouldBe ReturnsManagedByThirdPartyController.onPageLoad(testString, NormalMode)
+    }
+
+    "route ReturnsManagedByThirdPartyPage to TaskList when 'yes' is submitted" in {
+      val result: Call = navigator.normalRoutes(
+        ReturnsManagedByThirdPartyPage(testString),
+        ThirdPartyOrganisations(Some(YesNoAnswer.No), Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes))))
+      )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route ReturnsManagedByThirdPartyPage to TaskList when 'no' is submitted" in {
+      val result: Call = navigator.normalRoutes(
+        ReturnsManagedByThirdPartyPage(testString),
+        ThirdPartyOrganisations(Some(YesNoAnswer.No), Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.No))))
+      )
+
+      result shouldBe TaskListController.onPageLoad()
     }
 
     "route unknown page to Index" in {
