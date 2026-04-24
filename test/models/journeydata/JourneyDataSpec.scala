@@ -83,7 +83,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
               Some(testString),
               Some(YesNoAnswer.Yes),
               Some(YesNoAnswer.Yes),
-              Some(1)
+              Some("1")
             )
           ),
           Set.empty
@@ -135,7 +135,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       },
       "thirdPartyOrganisations":{
         "managedByThirdParty":"yes",
-        "thirdParties":[{"id":"test","thirdPartyName":"test","thirdPartyFrn":"test","managingIsaReturns":"yes","usingInvestorFunds":"yes","investorFundsPercentage":1}],
+        "thirdParties":[{"id":"test","thirdPartyName":"test","thirdPartyFrn":"test","managingIsaReturns":"yes","usingInvestorFunds":"yes","investorFundsPercentage":"1"}],
         "connectedOrganisations":[]
       }
     }
@@ -187,7 +187,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
     },
     "thirdPartyOrganisations":{
         "managedByThirdParty":"yes",
-        "thirdParties":[{"id":"test","thirdPartyName":"test","thirdPartyFrn":"test","managingIsaReturns":"yes","usingInvestorFunds":"yes","investorFundsPercentage":1}],
+        "thirdParties":[{"id":"test","thirdPartyName":"test","thirdPartyFrn":"test","managingIsaReturns":"yes","usingInvestorFunds":"yes","investorFundsPercentage":"1"}],
         "connectedOrganisations":[]
     },
     "lastUpdated": "2025-10-21T10:00:00Z"

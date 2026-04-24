@@ -34,7 +34,7 @@ class ThirdPartyOrganisationsJsonSpec extends JsonFormatSpec[ThirdPartyOrganisat
           thirdPartyFrn = Some("123456"),
           managingIsaReturns = Some(YesNoAnswer.Yes),
           usingInvestorFunds = Some(YesNoAnswer.Yes),
-          investorFundsPercentage = Some(10)
+          investorFundsPercentage = Some("10")
         )
       ),
       connectedOrganisations = Set("org-1", "org-2")
@@ -50,7 +50,7 @@ class ThirdPartyOrganisationsJsonSpec extends JsonFormatSpec[ThirdPartyOrganisat
           "thirdPartyFrn"           -> "123456",
           "managingIsaReturns"      -> s"${YesNoAnswer.Yes}",
           "usingInvestorFunds"      -> s"${YesNoAnswer.Yes}",
-          "investorFundsPercentage" -> 10
+          "investorFundsPercentage" -> "10"
         )
       ),
       "connectedOrganisations" -> Json.arr("org-1", "org-2")
