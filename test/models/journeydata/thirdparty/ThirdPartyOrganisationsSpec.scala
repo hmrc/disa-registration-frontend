@@ -17,6 +17,7 @@
 package models.journeydata.thirdparty
 
 import base.SpecBase
+import models.YesNoAnswer
 import models.YesNoAnswer.Yes
 
 class ThirdPartyOrganisationsSpec extends SpecBase {
@@ -166,7 +167,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
                 id = "existing-id",
                 thirdPartyName = Some("Old Name"),
                 thirdPartyFrn = Some("123456"),
-                managingIsaReturns = Some(true),
+                managingIsaReturns = Some(YesNoAnswer.Yes),
                 usingInvestorFunds = Some(false),
                 investorFundsPercentage = Some(10)
               )
@@ -184,7 +185,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
           id = "existing-id",
           thirdPartyName = Some("Updated Name"),
           thirdPartyFrn = Some("654321"),
-          managingIsaReturns = Some(true),
+          managingIsaReturns = Some(YesNoAnswer.Yes),
           usingInvestorFunds = Some(false),
           investorFundsPercentage = Some(10)
         )

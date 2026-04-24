@@ -16,6 +16,7 @@
 
 package models.journeydata.thirdparties
 
+import models.YesNoAnswer
 import models.YesNoAnswer.Yes
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import play.api.libs.json.*
@@ -31,7 +32,7 @@ class ThirdPartyOrganisationsJsonSpec extends JsonFormatSpec[ThirdPartyOrganisat
           id = "tp-1",
           thirdPartyName = Some("Test Org"),
           thirdPartyFrn = Some("123456"),
-          managingIsaReturns = Some(true),
+          managingIsaReturns = Some(YesNoAnswer.Yes),
           usingInvestorFunds = Some(false),
           investorFundsPercentage = Some(10)
         )
@@ -47,7 +48,7 @@ class ThirdPartyOrganisationsJsonSpec extends JsonFormatSpec[ThirdPartyOrganisat
           "id"                      -> "tp-1",
           "thirdPartyName"          -> "Test Org",
           "thirdPartyFrn"           -> "123456",
-          "managingIsaReturns"      -> true,
+          "managingIsaReturns"      -> s"${YesNoAnswer.Yes}",
           "usingInvestorFunds"      -> false,
           "investorFundsPercentage" -> 10
         )
