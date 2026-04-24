@@ -43,7 +43,7 @@ import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, Peer
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.signatories.*
-import pages.thirdparty.{ProductsManagedByThirdPartyPage, ReturnsManagedByThirdPartyPage, ThirdPartyOrgDetailsPage}
+import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, ReturnsManagedByThirdPartyPage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -373,19 +373,49 @@ class NavigatorSpec extends SpecBase {
       result shouldBe ReturnsManagedByThirdPartyController.onPageLoad(testString, NormalMode)
     }
 
-    "route ReturnsManagedByThirdPartyPage to TaskList when 'yes' is submitted" in {
+    "route ReturnsManagedByThirdPartyPage to InvestorFundsUsedByThirdPartyController when 'yes' is submitted" in {
       val result: Call = navigator.normalRoutes(
         ReturnsManagedByThirdPartyPage(testString),
-        ThirdPartyOrganisations(Some(YesNoAnswer.No), Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes))))
+        ThirdPartyOrganisations(
+          Some(YesNoAnswer.No),
+          Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes)))
+        )
       )
 
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe InvestorFundsUsedByThirdPartyController.onPageLoad(testString, NormalMode)
     }
 
     "route ReturnsManagedByThirdPartyPage to TaskList when 'no' is submitted" in {
       val result: Call = navigator.normalRoutes(
         ReturnsManagedByThirdPartyPage(testString),
-        ThirdPartyOrganisations(Some(YesNoAnswer.No), Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.No))))
+        ThirdPartyOrganisations(
+          Some(YesNoAnswer.No),
+          Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.No)))
+        )
+      )
+
+      result shouldBe InvestorFundsUsedByThirdPartyController.onPageLoad(id = testString, mode = NormalMode)
+    }
+
+    "route InvestorFundsUsedByThirdPartyPage to TaskList when 'yes' is submitted" in {
+      val result: Call = navigator.normalRoutes(
+        InvestorFundsUsedByThirdPartyPage(testString),
+        ThirdPartyOrganisations(
+          Some(YesNoAnswer.No),
+          Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.Yes)))
+        )
+      )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route InvestorFundsUsedByThirdPartyPage to TaskList when 'no' is submitted" in {
+      val result: Call = navigator.normalRoutes(
+        InvestorFundsUsedByThirdPartyPage(testString),
+        ThirdPartyOrganisations(
+          Some(YesNoAnswer.No),
+          Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.No)))
+        )
       )
 
       result shouldBe TaskListController.onPageLoad()

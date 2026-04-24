@@ -18,7 +18,6 @@ package controllers.thirdparty
 
 import base.SpecBase
 import controllers.routes.IndexController
-import controllers.thirdparty.routes._
 import forms.YesNoAnswerFormProvider
 import models.YesNoAnswer
 import models.journeydata.JourneyData
@@ -31,11 +30,11 @@ import play.api.libs.json.Writes
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.thirdparty.ReturnsManagedByThirdPartyView
+import views.html.thirdparty.InvestorFundsUsedByThirdPartyView
 
 import scala.concurrent.Future
 
-class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
+class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
 
   private val existingId = "existing-id"
   private val otherId    = "other-id"
@@ -43,16 +42,19 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
   private val yesAnswer  = YesNoAnswer.Yes
   private val noAnswer   = YesNoAnswer.No
 
-  val formProvider            = new YesNoAnswerFormProvider()
-  val form: Form[YesNoAnswer] = formProvider("returnsManagedByThirdParty.error.required")
+  val formProvider: YesNoAnswerFormProvider = new YesNoAnswerFormProvider()
+  val form: Form[YesNoAnswer]               = formProvider("investorFundsUsedByThirdParty.error.required")
+
+  def onwardRoute =
+    routes.InvestorFundsUsedByThirdPartyController.onPageLoad(existingId, NormalMode)
 
   lazy val routeUrl: String =
-    routes.ReturnsManagedByThirdPartyController.onPageLoad(existingId, NormalMode).url
+    routes.InvestorFundsUsedByThirdPartyController.onPageLoad(existingId, NormalMode).url
 
   lazy val submitUrl: String =
-    routes.ReturnsManagedByThirdPartyController.onSubmit(existingId, NormalMode).url
+    routes.InvestorFundsUsedByThirdPartyController.onSubmit(existingId, NormalMode).url
 
-  "ReturnsManagedByThirdPartyController" - {
+  "InvestorFundsUsedByThirdPartyController" - {
 
     "GET" - {
 
@@ -60,8 +62,8 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
 
         val journeyData =
           JourneyData(
-            groupId = testGroupId,
-            enrolmentId = testString,
+            testGroupId,
+            testString,
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -77,7 +79,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
           val request = FakeRequest(GET, routeUrl)
 
           val result = route(application, request).value
-          val view   = application.injector.instanceOf[ReturnsManagedByThirdPartyView]
+          val view   = application.injector.instanceOf[InvestorFundsUsedByThirdPartyView]
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(existingId, name, form, NormalMode)(
@@ -98,7 +100,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
                 None,
                 Seq(
                   ThirdParty(otherId, Some("Other")),
-                  ThirdParty(existingId, Some(name), managingIsaReturns = Some(yesAnswer))
+                  ThirdParty(existingId, Some(name), usingInvestorFunds = Some(yesAnswer))
                 ),
                 Set.empty
               )
@@ -111,7 +113,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
           val request = FakeRequest(GET, routeUrl)
 
           val result = route(application, request).value
-          val view   = application.injector.instanceOf[ReturnsManagedByThirdPartyView]
+          val view   = application.injector.instanceOf[InvestorFundsUsedByThirdPartyView]
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(existingId, name, form.fill(yesAnswer), NormalMode)(
@@ -185,7 +187,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
 
           val boundForm = form.bind(Map("value" -> ""))
 
-          val view = application.injector.instanceOf[ReturnsManagedByThirdPartyView]
+          val view = application.injector.instanceOf[InvestorFundsUsedByThirdPartyView]
 
           val result = route(application, request).value
 
@@ -235,7 +237,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
             None,
             Seq(
               ThirdParty(otherId, Some("Other")),
-              ThirdParty(existingId, Some(name), managingIsaReturns = Some(yesAnswer))
+              ThirdParty(existingId, Some(name), usingInvestorFunds = Some(yesAnswer))
             ),
             Set.empty
           )
@@ -258,25 +260,6 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
             .update(eqTo(expected), any(), any())(any[Writes[ThirdPartyOrganisations]], any)
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual InvestorFundsUsedByThirdPartyController
-            .onPageLoad(existingId, NormalMode)
-            .url
-        }
-      }
-
-      "must redirect to Index when section missing" in {
-
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-
-        running(application) {
-          val request =
-            FakeRequest(POST, submitUrl)
-              .withFormUrlEncodedBody(("value", yesAnswer.toString))
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual IndexController.onPageLoad().url
         }
       }
 
@@ -325,7 +308,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
-                Seq(ThirdParty(existingId, Some(name), managingIsaReturns = Some(noAnswer))),
+                Seq(ThirdParty(existingId, Some(name), usingInvestorFunds = Some(noAnswer))),
                 Set.empty
               )
             )
@@ -335,10 +318,10 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(GET, routes.ReturnsManagedByThirdPartyController.onPageLoad(existingId, CheckMode).url)
+            FakeRequest(GET, routes.InvestorFundsUsedByThirdPartyController.onPageLoad(existingId, CheckMode).url)
 
           val result = route(application, request).value
-          val view   = application.injector.instanceOf[ReturnsManagedByThirdPartyView]
+          val view   = application.injector.instanceOf[InvestorFundsUsedByThirdPartyView]
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(existingId, name, form.fill(noAnswer), CheckMode)(

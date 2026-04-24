@@ -340,6 +340,12 @@ returnsManagedByThirdParty.error.required = Select yes if the third party organi
 returnsManagedByThirdParty.checkYourAnswersLabel = Are your ISA returns and reporting managed by third party organisations?
 returnsManagedByThirdParty.change.hidden = returnsManagedByThirdParty
 
+investorFundsUsedByThirdParty.title = Will any investor funds be used to pay fees, commissions, or incentives for managing or marketing ISA products to {0}?
+investorFundsUsedByThirdParty.heading = Will any investor funds be used to pay fees, commissions, or incentives for managing or marketing ISA products to {0}?
+investorFundsUsedByThirdParty.error.required = Select yes if the third party organisation will receive any investor funds to pay fees, commissions or incentives for managing or marketing ISAs products
+investorFundsUsedByThirdParty.checkYourAnswersLabel = Will investor funds be used for payments to {0}
+investorFundsUsedByThirdParty.change.hidden = Will investor funds be used for payments to third party
+
 ### Certificates of Authority
 
 eligibilityToManageIsa.title = Eligibility to manage ISAs

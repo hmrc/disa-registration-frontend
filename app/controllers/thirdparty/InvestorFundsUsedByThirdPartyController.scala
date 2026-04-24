@@ -24,19 +24,19 @@ import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.requests.DataRequest
 import models.{Mode, YesNoAnswer}
 import navigation.Navigator
-import pages.thirdparty.ReturnsManagedByThirdPartyPage
+import pages.thirdparty.InvestorFundsUsedByThirdPartyPage
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.thirdparty.ReturnsManagedByThirdPartyView
+import views.html.thirdparty.InvestorFundsUsedByThirdPartyView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class ReturnsManagedByThirdPartyController @Inject() (
+class InvestorFundsUsedByThirdPartyController @Inject() (
   override val messagesApi: MessagesApi,
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
@@ -46,12 +46,12 @@ class ReturnsManagedByThirdPartyController @Inject() (
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: ReturnsManagedByThirdPartyView
+  view: InvestorFundsUsedByThirdPartyView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider("returnsManagedByThirdParty.error.required")
+  val form = formProvider("investorFundsUsedByThirdParty.error.required")
 
   def onPageLoad(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -83,7 +83,7 @@ class ReturnsManagedByThirdPartyController @Inject() (
                 .map { savedSection =>
                   Redirect(
                     navigator.nextPage(
-                      ReturnsManagedByThirdPartyPage(id),
+                      InvestorFundsUsedByThirdPartyPage(id),
                       savedSection,
                       mode
                     )
@@ -108,8 +108,8 @@ class ReturnsManagedByThirdPartyController @Inject() (
     findThirdParty(id).flatMap { thirdParty =>
       for {
         name              <- thirdParty.thirdPartyName
-        managingIsaReturns = thirdParty.managingIsaReturns
-      } yield (thirdParty, name, managingIsaReturns)
+        usingInvestorFunds = thirdParty.usingInvestorFunds
+      } yield (thirdParty, name, usingInvestorFunds)
     }
 
   private def updatedSectionWithAnswer(id: String, answer: YesNoAnswer)(implicit
@@ -118,7 +118,7 @@ class ReturnsManagedByThirdPartyController @Inject() (
     request.journeyData.thirdPartyOrganisations.flatMap { section =>
       val (matching, others) = section.thirdParties.partition(_.id == id)
       matching.headOption.map { thirdParty =>
-        section.copy(thirdParties = others :+ thirdParty.copy(managingIsaReturns = Some(answer)))
+        section.copy(thirdParties = others :+ thirdParty.copy(usingInvestorFunds = Some(answer)))
       }
     }
 }
