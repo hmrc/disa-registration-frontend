@@ -370,7 +370,7 @@ class NavigatorSpec extends SpecBase {
         ThirdPartyOrganisations(Some(YesNoAnswer.No), Seq(ThirdParty(testString)))
       )
 
-      result shouldBe IndexController.onPageLoad()
+      result shouldBe ReturnsManagedByThirdPartyController.onPageLoad(testString, NormalMode)
     }
 
     "route unknown page to Index" in {
