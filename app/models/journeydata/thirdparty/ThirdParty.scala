@@ -16,13 +16,14 @@
 
 package models.journeydata.thirdparty
 
+import models.YesNoAnswer
 import play.api.libs.json.{Json, OFormat}
 
 case class ThirdParty(
   id: String,
   thirdPartyName: Option[String] = None,
   thirdPartyFrn: Option[String] = None,
-  managingIsaReturns: Option[Boolean] = None,
+  managingIsaReturns: Option[YesNoAnswer] = None,
   usingInvestorFunds: Option[Boolean] = None,
   investorFundsPercentage: Option[Int] = None
 ) {

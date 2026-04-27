@@ -175,6 +175,12 @@ GET        /third-party-details                          controllers.thirdparty.
 POST       /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = NormalMode)
 GET        /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
 POST       /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = CheckMode)
+
+GET        /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = NormalMode)
+POST       /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = NormalMode)
+GET        /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode)
+POST       /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode)
+
 ## Declare & Submit
 
 ### Declaration
