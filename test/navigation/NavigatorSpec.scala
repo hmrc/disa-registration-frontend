@@ -385,7 +385,7 @@ class NavigatorSpec extends SpecBase {
       result shouldBe InvestorFundsUsedByThirdPartyController.onPageLoad(testString, NormalMode)
     }
 
-    "route ReturnsManagedByThirdPartyPage to TaskList when 'no' is submitted" in {
+    "route ReturnsManagedByThirdPartyPage to InvestorFundsUsedByThirdPartyController when 'no' is submitted" in {
       val result: Call = navigator.normalRoutes(
         ReturnsManagedByThirdPartyPage(testString),
         ThirdPartyOrganisations(
