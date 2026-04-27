@@ -26,6 +26,29 @@ case class ThirdPartyOrganisations(
   connectedOrganisations: Set[String] = Set.empty
 ) extends TaskListSection {
   def sectionName: String = ThirdPartyOrganisations.sectionName
+
+  def upsertThirdParty(id: String, name: String, frn: Option[String]): ThirdPartyOrganisations = {
+    val exists = thirdParties.exists(_.id == id)
+
+    val updated =
+      if (exists)
+        thirdParties.map {
+          case tp if tp.id == id =>
+            tp.copy(
+              thirdPartyName = Some(name),
+              thirdPartyFrn = frn
+            )
+          case tp                => tp
+        }
+      else
+        thirdParties :+ ThirdParty(
+          id = id,
+          thirdPartyName = Some(name),
+          thirdPartyFrn = frn
+        )
+
+    copy(thirdParties = updated)
+  }
 }
 
 object ThirdPartyOrganisations {

@@ -32,6 +32,8 @@ case class JourneyData(
   certificatesOfAuthority: Option[CertificatesOfAuthority] = None,
   liaisonOfficers: Option[LiaisonOfficers] = None,
   signatories: Option[Signatories] = None,
+  outsourcedAdministration: Option[OutsourcedAdministration] = None,
+  feesCommissionsAndIncentives: Option[FeesCommissionsAndIncentives] = None,
   thirdPartyOrganisations: Option[ThirdPartyOrganisations] = None
 )
 
@@ -40,15 +42,17 @@ object JourneyData {
 
   val auditWrites: OWrites[JourneyData] = OWrites[JourneyData] { jd =>
     Json.obj(
-      "groupId"                 -> jd.groupId,
-      "groupName"               -> jd.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
-      "internalRegistrationId"  -> jd.enrolmentId,
-      "organisationDetails"     -> jd.organisationDetails,
-      "isaProducts"             -> jd.isaProducts,
-      "certificatesOfAuthority" -> jd.certificatesOfAuthority,
-      "liaisonOfficers"         -> jd.liaisonOfficers,
-      "signatories"             -> jd.signatories,
-      "thirdPartyOrganisations" -> jd.thirdPartyOrganisations
+      "groupId"                      -> jd.groupId,
+      "groupName"                    -> jd.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
+      "internalRegistrationId"       -> jd.enrolmentId,
+      "organisationDetails"          -> jd.organisationDetails,
+      "isaProducts"                  -> jd.isaProducts,
+      "certificatesOfAuthority"      -> jd.certificatesOfAuthority,
+      "liaisonOfficers"              -> jd.liaisonOfficers,
+      "signatories"                  -> jd.signatories,
+      "outsourcedAdministration"     -> jd.outsourcedAdministration,
+      "feesCommissionsAndIncentives" -> jd.feesCommissionsAndIncentives,
+      "thirdPartyOrganisations"      -> jd.thirdPartyOrganisations
     )
   }
 }

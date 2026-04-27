@@ -22,6 +22,7 @@ import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
 import controllers.routes.*
 import controllers.signatories.routes.*
+import controllers.thirdparty.routes.*
 import models.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
@@ -38,7 +39,7 @@ import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, Peer
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
-import pages.thirdparty.ProductsManagedByThirdPartyPage
+import pages.thirdparty.{ProductsManagedByThirdPartyPage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -90,6 +91,7 @@ class Navigator @Inject() () {
     case SignatoryNamePage(id)               => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case ProductsManagedByThirdPartyPage     => productsManagedByThirdPartNextPage(answers)
+    case ThirdPartyOrgDetailsPage(id)        => IndexController.onPageLoad()
     case _                                   => throw new NotImplementedError("No route for this page")
   }
 
@@ -113,6 +115,7 @@ class Navigator @Inject() () {
     case SignatoryNamePage(id)               => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case ProductsManagedByThirdPartyPage     => ???
+    case ThirdPartyOrgDetailsPage(id)        => ???
     case _                                   => throw new NotImplementedError("No route for this page")
   }
 
@@ -173,7 +176,7 @@ class Navigator @Inject() () {
 
   private def productsManagedByThirdPartNextPage(answers: ThirdPartyOrganisations): Call =
     answers.managedByThirdParty match {
-      case Some(YesNoAnswer.Yes) => ???
+      case Some(YesNoAnswer.Yes) => ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode)
       case _                     => TaskListController.onPageLoad()
     }
 }

@@ -90,7 +90,6 @@ sectionTitle.thirdParty = Third party organisations
 sectionTitle.submit = Submit answers
 section.caption.hidden = This section is
 
-
 ### Organisation Details
 
 registeredIsaManager.title = Is your organisation registered to manage ISAs with HMRC?
@@ -325,6 +324,16 @@ productsManagedByThirdParty.error.required = Select yes if any of your ISA produ
 productsManagedByThirdParty.checkYourAnswersLabel = Are any of your ISA products managed by third party organisations?
 productsManagedByThirdParty.change.hidden = ProductsManagedByThirdParty
 
+thirdPartyOrgDetails.title = Third party organisation details
+thirdPartyOrgDetails.heading = Third party organisation details
+thirdPartyOrgDetails.thirdPartyNameInputLabel = What is the name of the third party organisation?
+thirdPartyOrgDetails.thirdPartyName.error.required = Enter the name of the third party organisation
+thirdPartyOrgDetails.thirdPartyName.error.invalid = The third party name must only include letters a to z, hyphens, spaces and apostrophes
+thirdPartyOrgDetails.frnInputLabel = What is the FCA, FRN of the third party organisation? (optional)
+thirdPartyOrgDetails.frnInputHint = The FRN is usually a 6 or 7 digit number
+thirdPartyOrgDetails.frn.error.invalid = The FCA, FRN must not include letters a to z, hyphens, spaces or apostrophes
+thirdPartyOrgDetails.frn.error.incorrectLength = The FCA, FRN  must be a six or seven digit number
+
 ### Certificates of Authority
 
 eligibilityToManageIsa.title = Eligibility to manage ISAs
@@ -394,6 +403,7 @@ fcaArticles.change.hidden = articles selected
 
 CoaCheckYourAnswers.title = Check your certificates of authority
 CoaCheckYourAnswers.heading = Check your certificates of authority
+
 
 ### Task List
 taskList.title = Task List
