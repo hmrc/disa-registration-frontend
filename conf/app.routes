@@ -187,6 +187,9 @@ POST       /investor-funds-used-by-third-party           controllers.thirdparty.
 GET        /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode)
 POST       /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode)
 
+GET        /remove-third-party-organisation              controllers.thirdparty.RemoveThirdPartyController.onPageLoad(id: String)
+POST       /remove-third-party-organisation              controllers.thirdparty.RemoveThirdPartyController.onSubmit(id: String)
+
 ## Declare & Submit
 
 ### Declaration

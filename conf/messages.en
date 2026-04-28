@@ -346,6 +346,10 @@ investorFundsUsedByThirdParty.error.required = Select yes if the third party org
 investorFundsUsedByThirdParty.checkYourAnswersLabel = Will investor funds be used for payments to {0}
 investorFundsUsedByThirdParty.change.hidden = Will investor funds be used for payments to third party
 
+removeThirdParty.title = Are you sure you want to remove {0} as a third-party organisation?
+removeThirdParty.heading = Are you sure you want to remove {0} as a third-party organisation?
+removeThirdParty.error.required = Select yes if you want to remove this third-party organisation
+
 ### Certificates of Authority
 
 eligibilityToManageIsa.title = Eligibility to manage ISAs
