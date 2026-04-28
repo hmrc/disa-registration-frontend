@@ -38,7 +38,7 @@ class ThirdPartyInvestorFundsPercentageFormProviderSpec extends StringFieldBehav
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      Gen.oneOf("1", "50", "99")
+      Gen.oneOf("0", "1", "50", "99", "100")
     )
 
     behave like mandatoryField(
@@ -59,7 +59,7 @@ class ThirdPartyInvestorFundsPercentageFormProviderSpec extends StringFieldBehav
 
     "must not bind values below 0 or above 100" in {
 
-      val invalidValues = Seq("-10", "101", "999", "0", "100")
+      val invalidValues = Seq("-10", "101", "999")
 
       invalidValues.foreach { value =>
         val result = form.bind(Map(fieldName -> value))
