@@ -69,31 +69,33 @@ class Navigator @Inject() () {
 
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
-    case RegisteredIsaManagerPage            => ???
-    case ZReferenceNumberPage                => ???
-    case FirmReferenceNumberPage             => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
-    case TradingUsingDifferentNamePage       => tradingUsingDifferentNameNextPage(answers)
-    case TradingNamePage                     => FirmReferenceNumberController.onPageLoad(NormalMode)
-    case IsaProductsPage                     => isaProductsNextPage(answers)
-    case InnovativeFinancialProductsPage     => innovativeFinancialProductsNextPage(answers)
-    case PeerToPeerPlatformPage              => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
-    case PeerToPeerPlatformNumberPage        => IsaProductsCheckYourAnswersController.onPageLoad()
-    case CertificatesOfAuthorityYesNoPage    => certificatesOfAuthorityYesNoNextPage(answers)
-    case FcaArticlesPage                     => CoaCheckYourAnswersController.onPageLoad()
-    case FinancialOrganisationPage           => CoaCheckYourAnswersController.onPageLoad()
-    case RegisteredAddressCorrespondencePage => registeredAddressCorrespondenceNextPage(answers)
-    case LiaisonOfficerNamePage(id)          => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
-    case LiaisonOfficerEmailPage(id)         => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
-    case LiaisonOfficerPhoneNumberPage(id)   => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
-    case LiaisonOfficerCommunicationPage(id) => LoCheckYourAnswersController.onPageLoad(id)
-    case RemoveLiaisonOfficerPage            => removeLiaisonOfficerNextPage(answers)
-    case RemoveSignatoryPage(id)             => removeSignatoryNextPage(answers)
-    case SignatoryNamePage(id)               => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
-    case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case ProductsManagedByThirdPartyPage     => productsManagedByThirdPartNextPage(answers)
-    case ThirdPartyOrgDetailsPage(id)        => ReturnsManagedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
-    case ReturnsManagedByThirdPartyPage(id)  => returnsManagedByThirdPartNextPage(answers)
-    case _                                   => throw new NotImplementedError("No route for this page")
+    case RegisteredIsaManagerPage              => ???
+    case ZReferenceNumberPage                  => ???
+    case FirmReferenceNumberPage               => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
+    case TradingUsingDifferentNamePage         => tradingUsingDifferentNameNextPage(answers)
+    case TradingNamePage                       => FirmReferenceNumberController.onPageLoad(NormalMode)
+    case IsaProductsPage                       => isaProductsNextPage(answers)
+    case InnovativeFinancialProductsPage       => innovativeFinancialProductsNextPage(answers)
+    case PeerToPeerPlatformPage                => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
+    case PeerToPeerPlatformNumberPage          => IsaProductsCheckYourAnswersController.onPageLoad()
+    case CertificatesOfAuthorityYesNoPage      => certificatesOfAuthorityYesNoNextPage(answers)
+    case FcaArticlesPage                       => CoaCheckYourAnswersController.onPageLoad()
+    case FinancialOrganisationPage             => CoaCheckYourAnswersController.onPageLoad()
+    case RegisteredAddressCorrespondencePage   => registeredAddressCorrespondenceNextPage(answers)
+    case LiaisonOfficerNamePage(id)            => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
+    case LiaisonOfficerEmailPage(id)           => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
+    case LiaisonOfficerPhoneNumberPage(id)     => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
+    case LiaisonOfficerCommunicationPage(id)   => LoCheckYourAnswersController.onPageLoad(id)
+    case RemoveLiaisonOfficerPage              => removeLiaisonOfficerNextPage(answers)
+    case RemoveSignatoryPage(id)               => removeSignatoryNextPage(answers)
+    case SignatoryNamePage(id)                 => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
+    case SignatoryJobTitlePage(id)             => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case ProductsManagedByThirdPartyPage       => productsManagedByThirdPartNextPage(answers)
+    case ThirdPartyOrgDetailsPage(id)          => ReturnsManagedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
+    case ReturnsManagedByThirdPartyPage(id)    =>
+      InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
+    case InvestorFundsUsedByThirdPartyPage(id) => investorFundsUsedByThirdPartyNextPage(answers, id)
+    case _                                     => throw new NotImplementedError("No route for this page")
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
@@ -182,9 +184,18 @@ class Navigator @Inject() () {
       case _                     => TaskListController.onPageLoad()
     }
 
-  private def returnsManagedByThirdPartNextPage(answers: ThirdPartyOrganisations): Call =
-    answers.managedByThirdParty match {
-      case Some(YesNoAnswer.Yes) => TaskListController.onPageLoad()
-      case _                     => TaskListController.onPageLoad()
+  private def investorFundsUsedByThirdPartyNextPage(
+    answers: ThirdPartyOrganisations,
+    id: String
+  ): Call =
+    answers.thirdParties
+      .find(_.id == id)
+      .flatMap(_.usingInvestorFunds) match {
+      case Some(YesNoAnswer.Yes) =>
+        TaskListController.onPageLoad()
+      case Some(YesNoAnswer.No)  =>
+        TaskListController.onPageLoad()
+      case _                     =>
+        TaskListController.onPageLoad()
     }
 }
