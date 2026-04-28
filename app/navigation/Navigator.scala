@@ -69,30 +69,30 @@ class Navigator @Inject() () {
 
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
-    case RegisteredIsaManagerPage              => ???
-    case ZReferenceNumberPage                  => ???
-    case FirmReferenceNumberPage               => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
-    case TradingUsingDifferentNamePage         => tradingUsingDifferentNameNextPage(answers)
-    case TradingNamePage                       => FirmReferenceNumberController.onPageLoad(NormalMode)
-    case IsaProductsPage                       => isaProductsNextPage(answers)
-    case InnovativeFinancialProductsPage       => innovativeFinancialProductsNextPage(answers)
-    case PeerToPeerPlatformPage                => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
-    case PeerToPeerPlatformNumberPage          => IsaProductsCheckYourAnswersController.onPageLoad()
-    case CertificatesOfAuthorityYesNoPage      => certificatesOfAuthorityYesNoNextPage(answers)
-    case FcaArticlesPage                       => CoaCheckYourAnswersController.onPageLoad()
-    case FinancialOrganisationPage             => CoaCheckYourAnswersController.onPageLoad()
-    case RegisteredAddressCorrespondencePage   => registeredAddressCorrespondenceNextPage(answers)
-    case LiaisonOfficerNamePage(id)            => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
-    case LiaisonOfficerEmailPage(id)           => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
-    case LiaisonOfficerPhoneNumberPage(id)     => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
-    case LiaisonOfficerCommunicationPage(id)   => LoCheckYourAnswersController.onPageLoad(id)
-    case RemoveLiaisonOfficerPage              => removeLiaisonOfficerNextPage(answers)
-    case RemoveSignatoryPage(id)               => removeSignatoryNextPage(answers)
-    case SignatoryNamePage(id)                 => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
-    case SignatoryJobTitlePage(id)             => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case ProductsManagedByThirdPartyPage       => productsManagedByThirdPartNextPage(answers)
-    case ThirdPartyOrgDetailsPage(id)          => ReturnsManagedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
-    case ReturnsManagedByThirdPartyPage(id)    =>
+    case RegisteredIsaManagerPage                  => ???
+    case ZReferenceNumberPage                      => ???
+    case FirmReferenceNumberPage                   => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
+    case TradingUsingDifferentNamePage             => tradingUsingDifferentNameNextPage(answers)
+    case TradingNamePage                           => FirmReferenceNumberController.onPageLoad(NormalMode)
+    case IsaProductsPage                           => isaProductsNextPage(answers)
+    case InnovativeFinancialProductsPage           => innovativeFinancialProductsNextPage(answers)
+    case PeerToPeerPlatformPage                    => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
+    case PeerToPeerPlatformNumberPage              => IsaProductsCheckYourAnswersController.onPageLoad()
+    case CertificatesOfAuthorityYesNoPage          => certificatesOfAuthorityYesNoNextPage(answers)
+    case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
+    case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
+    case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
+    case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
+    case LiaisonOfficerEmailPage(id)               => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
+    case LiaisonOfficerPhoneNumberPage(id)         => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
+    case LiaisonOfficerCommunicationPage(id)       => LoCheckYourAnswersController.onPageLoad(id)
+    case RemoveLiaisonOfficerPage                  => removeLiaisonOfficerNextPage(answers)
+    case RemoveSignatoryPage(id)                   => removeSignatoryNextPage(answers)
+    case SignatoryNamePage(id)                     => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
+    case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case ProductsManagedByThirdPartyPage           => productsManagedByThirdPartNextPage(answers)
+    case ThirdPartyOrgDetailsPage(id)              => ReturnsManagedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
+    case ReturnsManagedByThirdPartyPage(id)        =>
       InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
     case InvestorFundsUsedByThirdPartyPage(id) => investorFundsUsedByThirdPartyNextPage(answers, id)
     case RemoveThirdPartyPage                  => removeThirdPartyNextPage(answers)
@@ -100,28 +100,30 @@ class Navigator @Inject() () {
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
-    case RegisteredIsaManagerPage            => ???
-    case ZReferenceNumberPage                => ???
-    case TradingUsingDifferentNamePage       => ???
-    case TradingNamePage                     => ???
-    case IsaProductsPage                     => IsaProductsCheckYourAnswersController.onPageLoad()
-    case InnovativeFinancialProductsPage     => IsaProductsCheckYourAnswersController.onPageLoad()
-    case PeerToPeerPlatformPage              => IsaProductsCheckYourAnswersController.onPageLoad()
-    case PeerToPeerPlatformNumberPage        => IsaProductsCheckYourAnswersController.onPageLoad()
-    case CertificatesOfAuthorityYesNoPage    => CoaCheckYourAnswersController.onPageLoad()
-    case FcaArticlesPage                     => CoaCheckYourAnswersController.onPageLoad()
-    case FinancialOrganisationPage           => CoaCheckYourAnswersController.onPageLoad()
-    case RegisteredAddressCorrespondencePage => IndexController.onPageLoad()
-    case LiaisonOfficerNamePage(id)          => LoCheckYourAnswersController.onPageLoad(id)
-    case LiaisonOfficerEmailPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
-    case LiaisonOfficerPhoneNumberPage(id)   => LoCheckYourAnswersController.onPageLoad(id)
-    case LiaisonOfficerCommunicationPage(id) => LoCheckYourAnswersController.onPageLoad(id)
-    case SignatoryNamePage(id)               => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case SignatoryJobTitlePage(id)           => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case ProductsManagedByThirdPartyPage     => ???
-    case ThirdPartyOrgDetailsPage(id)        => ???
-    case ReturnsManagedByThirdPartyPage(id)  => ???
-    case _                                   => throw new NotImplementedError("No route for this page")
+    case RegisteredIsaManagerPage                  => ???
+    case ZReferenceNumberPage                      => ???
+    case TradingUsingDifferentNamePage             => ???
+    case TradingNamePage                           => ???
+    case IsaProductsPage                           => IsaProductsCheckYourAnswersController.onPageLoad()
+    case InnovativeFinancialProductsPage           => IsaProductsCheckYourAnswersController.onPageLoad()
+    case PeerToPeerPlatformPage                    => IsaProductsCheckYourAnswersController.onPageLoad()
+    case PeerToPeerPlatformNumberPage              => IsaProductsCheckYourAnswersController.onPageLoad()
+    case CertificatesOfAuthorityYesNoPage          => CoaCheckYourAnswersController.onPageLoad()
+    case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
+    case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
+    case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
+    case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
+    case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
+    case LiaisonOfficerPhoneNumberPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
+    case LiaisonOfficerCommunicationPage(id)       => LoCheckYourAnswersController.onPageLoad(id)
+    case SignatoryNamePage(id)                     => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+    case ProductsManagedByThirdPartyPage           => ???
+    case ThirdPartyOrgDetailsPage(id)              => ???
+    case ReturnsManagedByThirdPartyPage(id)        => ???
+    case InvestorFundsUsedByThirdPartyPage(id)     => ???
+    case ThirdPartyInvestorFundsPercentagePage(id) => ???
+    case _                                         => throw new NotImplementedError("No route for this page")
   }
 
   private def tradingUsingDifferentNameNextPage(answers: OrganisationDetails): Call =
@@ -193,7 +195,7 @@ class Navigator @Inject() () {
       .find(_.id == id)
       .flatMap(_.usingInvestorFunds) match {
       case Some(YesNoAnswer.Yes) =>
-        TaskListController.onPageLoad()
+        ThirdPartyInvestorFundsPercentageController.onPageLoad(id = id, mode = NormalMode)
       case Some(YesNoAnswer.No)  =>
         TaskListController.onPageLoad()
       case _                     =>

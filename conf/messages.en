@@ -12,6 +12,7 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 site.confirmAndSave = Confirm and save
+site.percentage = %
 
 date.day = Day
 date.month = Month
@@ -344,7 +345,15 @@ investorFundsUsedByThirdParty.title = Will any investor funds be used to pay fee
 investorFundsUsedByThirdParty.heading = Will any investor funds be used to pay fees, commissions, or incentives for managing or marketing ISA products to {0}?
 investorFundsUsedByThirdParty.error.required = Select yes if the third party organisation will receive any investor funds to pay fees, commissions or incentives for managing or marketing ISAs products
 investorFundsUsedByThirdParty.checkYourAnswersLabel = Will investor funds be used for payments to {0}
-investorFundsUsedByThirdParty.change.hidden = Will investor funds be used for payments to third party
+investorFundsUsedByThirdParty.change.hidden = will investor funds be used for payments to third party
+
+thirdPartyInvestorFundsPercentage.title = What percentage of investor funds will be paid to {0} as commissions or incentives?
+thirdPartyInvestorFundsPercentage.heading = What percentage of investor funds will be paid to {0} as commissions or incentives?
+thirdPartyInvestorFundsPercentage.hint = Add a number which shows the percentage
+thirdPartyInvestorFundsPercentage.error.required = Add a number to show the percentage of investor funds that will be paid to the third party organisation as commissions or incentives
+thirdPartyInvestorFundsPercentage.error.invalid = The percentage must be a number between 0 and 100
+thirdPartyInvestorFundsPercentage.checkYourAnswersLabel = Percentage of investor funds used for commissions or incentives?
+thirdPartyInvestorFundsPercentage.change.hidden = percentage of investor funds used for commissions or incentives
 
 removeThirdParty.title = Are you sure you want to remove {0} as a third-party organisation?
 removeThirdParty.heading = Are you sure you want to remove {0} as a third-party organisation?
