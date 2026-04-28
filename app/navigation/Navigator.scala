@@ -94,9 +94,10 @@ class Navigator @Inject() () {
     case ThirdPartyOrgDetailsPage(id)              => ReturnsManagedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
     case ReturnsManagedByThirdPartyPage(id)        =>
       InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
-    case InvestorFundsUsedByThirdPartyPage(id) => investorFundsUsedByThirdPartyNextPage(answers, id)
-    case RemoveThirdPartyPage                  => removeThirdPartyNextPage(answers)
-    case _                                     => throw new NotImplementedError("No route for this page")
+    case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id)
+    case ThirdPartyInvestorFundsPercentagePage(id) => TaskListController.onPageLoad()
+    case RemoveThirdPartyPage                      => removeThirdPartyNextPage(answers)
+    case _                                         => throw new NotImplementedError("No route for this page")
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {

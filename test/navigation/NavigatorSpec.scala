@@ -43,7 +43,7 @@ import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, Peer
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.signatories.*
-import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, ReturnsManagedByThirdPartyPage, RemoveThirdPartyPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyOrgDetailsPage}
+import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, RemoveThirdPartyPage, ReturnsManagedByThirdPartyPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -431,7 +431,7 @@ class NavigatorSpec extends SpecBase {
       )
       result shouldBe TaskListController.onPageLoad()
     }
-    
+
     "route RemoveThirdPartyPage to TaskList when third parties exist in answers" in {
       val result: Call = navigator.normalRoutes(
         RemoveThirdPartyPage,
