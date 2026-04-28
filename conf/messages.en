@@ -361,27 +361,27 @@ thirdPartyInvestorFundsPercentage.change.hidden = percentage of investor funds u
 thirdPartyCya.title = Check added third-party organisation
 thirdPartyCya.heading = Check added third-party organisation
 
-thirdPartyOrgDetails.title = Third party organisation details
-thirdPartyOrgDetails.heading = Third party organisation details
-thirdPartyOrgDetails.thirdPartyNameInputLabel = What is the name of the third party organisation?
-thirdPartyOrgDetails.thirdPartyName.error.required = Enter the name of the third party organisation
-thirdPartyOrgDetails.thirdPartyName.error.invalid = The third party name must only include letters a to z, hyphens, spaces and apostrophes
-thirdPartyOrgDetails.frnInputLabel = What is the FCA, FRN of the third party organisation? (optional)
+thirdPartyOrgDetails.title = Third-party organisation details
+thirdPartyOrgDetails.heading = Third-party organisation details
+thirdPartyOrgDetails.thirdPartyNameInputLabel = What is the name of the third-party organisation?
+thirdPartyOrgDetails.thirdPartyName.error.required = Enter the name of the third-party organisation
+thirdPartyOrgDetails.thirdPartyName.error.invalid = The third-party name must only include letters a to z, hyphens, spaces and apostrophes
+thirdPartyOrgDetails.frnInputLabel = What is the FCA, FRN of the third-party organisation? (optional)
 thirdPartyOrgDetails.frnInputHint = The FRN is usually a 6 or 7 digit number
 thirdPartyOrgDetails.frn.error.invalid = The FCA, FRN must not include letters a to z, hyphens, spaces or apostrophes
 thirdPartyOrgDetails.frn.error.incorrectLength = The FCA, FRN  must be a six or seven digit number
 
 returnsManagedByThirdParty.title = Will {0} manage your ISA returns and reporting?
 returnsManagedByThirdParty.heading = Will {0} manage your ISA returns and reporting?
-returnsManagedByThirdParty.error.required = Select yes if the third party organisation will manage your ISA returns and reporting
-returnsManagedByThirdParty.checkYourAnswersLabel = Are your ISA returns and reporting managed by third party organisations?
+returnsManagedByThirdParty.error.required = Select yes if the third-party organisation will manage your ISA returns and reporting
+returnsManagedByThirdParty.checkYourAnswersLabel = Are your ISA returns and reporting managed by third-party organisations?
 returnsManagedByThirdParty.change.hidden = returnsManagedByThirdParty
 
 investorFundsUsedByThirdParty.title = Will any investor funds be used to pay fees, commissions, or incentives for managing or marketing ISA products to {0}?
 investorFundsUsedByThirdParty.heading = Will any investor funds be used to pay fees, commissions, or incentives for managing or marketing ISA products to {0}?
-investorFundsUsedByThirdParty.error.required = Select yes if the third party organisation will receive any investor funds to pay fees, commissions or incentives for managing or marketing ISAs products
+investorFundsUsedByThirdParty.error.required = Select yes if the third-party organisation will receive any investor funds to pay fees, commissions or incentives for managing or marketing ISAs products
 investorFundsUsedByThirdParty.checkYourAnswersLabel = Will investor funds be used for payments to {0}
-investorFundsUsedByThirdParty.change.hidden = Will investor funds be used for payments to third party
+investorFundsUsedByThirdParty.change.hidden = Will investor funds be used for payments to third-party
 
 ### Certificates of Authority
 
