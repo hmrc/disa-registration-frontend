@@ -193,52 +193,6 @@ POST       /change-percentage-of-investor-funds-used     controllers.thirdparty.
 
 GET        /check-added-third-party                      controllers.thirdparty.ThirdPartyCheckYourAnswersController.onPageLoad(id: String)
 
-GET        /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
-POST       /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
-POST       /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = CheckMode)
-
-GET        /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode)
-
-GET        /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
-POST       /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
-POST       /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = CheckMode)
-
-GET        /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode)
-
-
-GET        /investor-funds-used-by-third-party           controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /investor-funds-used-by-third-party           controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode)
-
-GET        /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
-POST       /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
-POST       /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = CheckMode)
-
-GET        /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode)
-
-GET        /investor-funds-used-by-third-party           controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /investor-funds-used-by-third-party           controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode)
-
-GET        /percentage-of-investor-funds-used            controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /percentage-of-investor-funds-used            controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-percentage-of-investor-funds-used     controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-percentage-of-investor-funds-used     controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onSubmit(id: String, mode: Mode = CheckMode)
-
 ## Declare & Submit
 
 ### Declaration
