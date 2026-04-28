@@ -26,7 +26,7 @@ class ThirdPartyInvestorFundsPercentageFormProvider extends Mappings {
       "value" -> text("thirdPartyInvestorFundsPercentage.error.required")
         .verifying(
           "thirdPartyInvestorFundsPercentage.error.invalid",
-          value => value.toIntOption.exists(n => n > 0 && n < 100)
+          value => value.toIntOption.exists(n => n >= 0 && n <= 100)
         )
     )
 }
