@@ -17,7 +17,8 @@
 package controllers.thirdparty
 
 import base.SpecBase
-import controllers.routes.{IndexController, TaskListController}
+import controllers.thirdparty.routes._
+import controllers.routes._
 import forms.YesNoAnswerFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
@@ -309,7 +310,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
             .update(eqTo(expected), any(), any())(any[Writes[ThirdPartyOrganisations]], any)
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+          redirectLocation(result).value mustEqual ThirdPartyCheckYourAnswersController.onPageLoad(existingId).url
         }
       }
 

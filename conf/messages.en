@@ -87,7 +87,7 @@ sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
 sectionTitle.isaProducts = ISA products
 sectionTitle.certificatesOfAuthority = Certificates of authority
-sectionTitle.thirdParty = Third party organisations
+sectionTitle.thirdParty = Third-party organisations
 sectionTitle.submit = Submit answers
 section.caption.hidden = This section is
 
@@ -319,41 +319,47 @@ addedLiaisonOfficers.summary.action.hidden = {0} details
 
 ### Third Party Organisations
 
-productsManagedByThirdParty.title = Are any of your ISA products managed by third party organisations?
-productsManagedByThirdParty.heading = Are any of your ISA products managed by third party organisations?
-productsManagedByThirdParty.error.required = Select yes if any of your ISA products are managed by a third party organisation
-productsManagedByThirdParty.checkYourAnswersLabel = Are any of your ISA products managed by third party organisations?
-productsManagedByThirdParty.change.hidden = ProductsManagedByThirdParty
+productsManagedByThirdParty.title = Are any of your ISA products managed by third-party organisations?
+productsManagedByThirdParty.heading = Are any of your ISA products managed by third-party organisations?
+productsManagedByThirdParty.error.required = Select yes if any of your ISA products are managed by a third-party organisation
+productsManagedByThirdParty.checkYourAnswersLabel = Outsourcing ISA management or administration
+productsManagedByThirdParty.change.hidden = outsourcing ISA management
 
-thirdPartyOrgDetails.title = Third party organisation details
-thirdPartyOrgDetails.heading = Third party organisation details
-thirdPartyOrgDetails.thirdPartyNameInputLabel = What is the name of the third party organisation?
-thirdPartyOrgDetails.thirdPartyName.error.required = Enter the name of the third party organisation
-thirdPartyOrgDetails.thirdPartyName.error.invalid = The third party name must only include letters a to z, hyphens, spaces and apostrophes
-thirdPartyOrgDetails.frnInputLabel = What is the FCA, FRN of the third party organisation? (optional)
+thirdPartyOrgDetails.title = Third-party organisation details
+thirdPartyOrgDetails.heading = Third-party organisation details
+thirdPartyOrgDetails.thirdPartyNameInputLabel = What is the name of the third-party organisation?
+thirdPartyOrgDetails.thirdPartyName.error.required = Enter the name of the third-party organisation
+thirdPartyOrgDetails.thirdPartyName.error.invalid = The third-party name must only include letters a to z, hyphens, spaces and apostrophes
+thirdPartyOrgDetails.frnInputLabel = What is the FCA, FRN of the third-party organisation? (optional)
 thirdPartyOrgDetails.frnInputHint = The FRN is usually a 6 or 7 digit number
 thirdPartyOrgDetails.frn.error.invalid = The FCA, FRN must not include letters a to z, hyphens, spaces or apostrophes
 thirdPartyOrgDetails.frn.error.incorrectLength = The FCA, FRN  must be a six or seven digit number
+thirdPartyOrgDetails.checkYourAnswersLabel = Third-party {0} details
+thirdPartyOrgDetails.change.hidden = third-party {0} details
 
 returnsManagedByThirdParty.title = Will {0} manage your ISA returns and reporting?
 returnsManagedByThirdParty.heading = Will {0} manage your ISA returns and reporting?
-returnsManagedByThirdParty.error.required = Select yes if the third party organisation will manage your ISA returns and reporting
-returnsManagedByThirdParty.checkYourAnswersLabel = Are your ISA returns and reporting managed by third party organisations?
-returnsManagedByThirdParty.change.hidden = returnsManagedByThirdParty
+returnsManagedByThirdParty.error.required = Select yes if the third-party organisation will manage your ISA returns and reporting
+returnsManagedByThirdParty.checkYourAnswersLabel = Will {0} manage your ISA monthly reporting?
+returnsManagedByThirdParty.change.hidden = will this third-party manage monthly ISA reporting
 
 investorFundsUsedByThirdParty.title = Will any investor funds be used to pay fees, commissions, or incentives for managing or marketing ISA products to {0}?
 investorFundsUsedByThirdParty.heading = Will any investor funds be used to pay fees, commissions, or incentives for managing or marketing ISA products to {0}?
-investorFundsUsedByThirdParty.error.required = Select yes if the third party organisation will receive any investor funds to pay fees, commissions or incentives for managing or marketing ISAs products
-investorFundsUsedByThirdParty.checkYourAnswersLabel = Will investor funds be used for payments to {0}
-investorFundsUsedByThirdParty.change.hidden = will investor funds be used for payments to third party
+investorFundsUsedByThirdParty.error.required = Select yes if the third-party organisation will receive any investor funds to pay fees, commissions or incentives for managing or marketing ISAs products
+investorFundsUsedByThirdParty.checkYourAnswersLabel = Will investor funds be used for payments to {0}?
+investorFundsUsedByThirdParty.checkYourAnswersValue = {0}%
+investorFundsUsedByThirdParty.change.hidden = will investor funds be used for payments to third-party
 
 thirdPartyInvestorFundsPercentage.title = What percentage of investor funds will be paid to {0} as commissions or incentives?
 thirdPartyInvestorFundsPercentage.heading = What percentage of investor funds will be paid to {0} as commissions or incentives?
-thirdPartyInvestorFundsPercentage.hint = Add a number which shows the percentage
-thirdPartyInvestorFundsPercentage.error.required = Add a number to show the percentage of investor funds that will be paid to the third party organisation as commissions or incentives
-thirdPartyInvestorFundsPercentage.error.invalid = The percentage must be a number between 0 and 100
+thirdPartyInvestorFundsPercentage.hint = Add a whole number that shows the percentage
+thirdPartyInvestorFundsPercentage.error.required = Add a whole number to show the percentage of investor funds that will be paid to the third-party organisation as commissions or incentives
+thirdPartyInvestorFundsPercentage.error.invalid = The percentage must be a number between 0 and 100 and should be a whole number
 thirdPartyInvestorFundsPercentage.checkYourAnswersLabel = Percentage of investor funds used for commissions or incentives?
 thirdPartyInvestorFundsPercentage.change.hidden = percentage of investor funds used for commissions or incentives
+
+thirdPartyCya.title = Check added third-party organisation
+thirdPartyCya.heading = Check added third-party organisation
 
 ### Certificates of Authority
 
