@@ -355,6 +355,10 @@ thirdPartyInvestorFundsPercentage.error.invalid = The percentage must be a numbe
 thirdPartyInvestorFundsPercentage.checkYourAnswersLabel = Percentage of investor funds used for commissions or incentives?
 thirdPartyInvestorFundsPercentage.change.hidden = percentage of investor funds used for commissions or incentives
 
+removeThirdParty.title = Are you sure you want to remove {0} as a third-party organisation?
+removeThirdParty.heading = Are you sure you want to remove {0} as a third-party organisation?
+removeThirdParty.error.required = Select yes if you want to remove this third-party organisation
+
 ### Certificates of Authority
 
 eligibilityToManageIsa.title = Eligibility to manage ISAs
