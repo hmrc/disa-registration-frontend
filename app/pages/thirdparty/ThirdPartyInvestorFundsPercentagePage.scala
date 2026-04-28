@@ -17,6 +17,20 @@
 package pages.thirdparty
 
 import models.journeydata.thirdparty.ThirdPartyOrganisations
-import pages.IdentifiedPage
+import pages.{ClearablePage, IdentifiedPage}
 
-final case class ThirdPartyInvestorFundsPercentagePage(id: String) extends IdentifiedPage[ThirdPartyOrganisations]
+final case class ThirdPartyInvestorFundsPercentagePage(id: String)
+    extends IdentifiedPage[ThirdPartyOrganisations]
+    with ClearablePage[ThirdPartyOrganisations] {
+  override def clearAnswer(
+    answers: ThirdPartyOrganisations
+  ): ThirdPartyOrganisations =
+    answers.copy(
+      thirdParties = answers.thirdParties.map {
+        case tp if tp.id == id =>
+          tp.copy(investorFundsPercentage = None)
+        case tp                =>
+          tp
+      }
+    )
+}

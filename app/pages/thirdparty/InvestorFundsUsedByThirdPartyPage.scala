@@ -16,7 +16,22 @@
 
 package pages.thirdparty
 
+import models.YesNoAnswer
 import models.journeydata.thirdparty.ThirdPartyOrganisations
-import pages.IdentifiedPage
+import pages.{ClearablePage, PageWithDependents}
 
-final case class InvestorFundsUsedByThirdPartyPage(id: String) extends IdentifiedPage[ThirdPartyOrganisations]
+case class InvestorFundsUsedByThirdPartyPage(id: String) extends PageWithDependents[ThirdPartyOrganisations] {
+  override def pagesToClear(
+    currentAnswers: ThirdPartyOrganisations
+  ): List[ClearablePage[ThirdPartyOrganisations]] =
+    currentAnswers.thirdParties.collect {
+      case tp if tp.id == id && tp.usingInvestorFunds.contains(YesNoAnswer.No) =>
+        ThirdPartyInvestorFundsPercentagePage(id)
+    }.toList
+
+  override def resumeNormalMode(currentAnswers: ThirdPartyOrganisations): Boolean =
+    currentAnswers.thirdParties.exists { tp =>
+      tp.id == id &&
+      (tp.usingInvestorFunds.contains(YesNoAnswer.Yes) && tp.investorFundsPercentage.isEmpty)
+    }
+}
