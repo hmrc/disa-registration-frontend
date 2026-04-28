@@ -43,7 +43,7 @@ import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, Peer
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.signatories.*
-import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, ReturnsManagedByThirdPartyPage, ThirdPartyOrgDetailsPage}
+import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, ReturnsManagedByThirdPartyPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -385,7 +385,7 @@ class NavigatorSpec extends SpecBase {
       result shouldBe InvestorFundsUsedByThirdPartyController.onPageLoad(testString, NormalMode)
     }
 
-    "route ReturnsManagedByThirdPartyPage to InvestorFundsUsedByThirdPartyController when 'no' is submitted" in {
+    "route ReturnsManagedByThirdPartyPage to TaskList when 'no' is submitted" in {
       val result: Call = navigator.normalRoutes(
         ReturnsManagedByThirdPartyPage(testString),
         ThirdPartyOrganisations(
@@ -406,7 +406,7 @@ class NavigatorSpec extends SpecBase {
         )
       )
 
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe ThirdPartyInvestorFundsPercentageController.onPageLoad(id = testString, mode = NormalMode)
     }
 
     "route InvestorFundsUsedByThirdPartyPage to TaskList when 'no' is submitted" in {
@@ -418,6 +418,17 @@ class NavigatorSpec extends SpecBase {
         )
       )
 
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to TaskList" in {
+      val result: Call = navigator.normalRoutes(
+        ThirdPartyInvestorFundsPercentagePage(testString),
+        ThirdPartyOrganisations(
+          Some(YesNoAnswer.No),
+          Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.No), Some("20")))
+        )
+      )
       result shouldBe TaskListController.onPageLoad()
     }
 

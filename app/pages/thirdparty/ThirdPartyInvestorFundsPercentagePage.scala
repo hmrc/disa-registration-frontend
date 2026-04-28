@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 
-package models.journeydata.thirdparty
+package pages.thirdparty
 
-import models.YesNoAnswer
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.thirdparty.ThirdPartyOrganisations
+import pages.IdentifiedPage
 
-case class ThirdParty(
-  id: String,
-  thirdPartyName: Option[String] = None,
-  thirdPartyFrn: Option[String] = None,
-  managingIsaReturns: Option[YesNoAnswer] = None,
-  usingInvestorFunds: Option[YesNoAnswer] = None,
-  investorFundsPercentage: Option[String] = None
-) {
-  def inProgress: Boolean =
-    List(thirdPartyName, managingIsaReturns, usingInvestorFunds).exists(_.iterator.isEmpty)
-}
-
-object ThirdParty {
-  implicit val format: OFormat[ThirdParty] = Json.format[ThirdParty]
-}
+final case class ThirdPartyInvestorFundsPercentagePage(id: String) extends IdentifiedPage[ThirdPartyOrganisations]

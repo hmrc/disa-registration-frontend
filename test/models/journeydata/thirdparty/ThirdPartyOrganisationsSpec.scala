@@ -169,7 +169,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
                 thirdPartyFrn = Some("123456"),
                 managingIsaReturns = Some(YesNoAnswer.Yes),
                 usingInvestorFunds = Some(YesNoAnswer.Yes),
-                investorFundsPercentage = Some(10)
+                investorFundsPercentage = Some("10")
               )
             ),
             connectedOrganisations = Set("org-1", "org-2")
@@ -187,7 +187,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
           thirdPartyFrn = Some("654321"),
           managingIsaReturns = Some(YesNoAnswer.Yes),
           usingInvestorFunds = Some(YesNoAnswer.Yes),
-          investorFundsPercentage = Some(10)
+          investorFundsPercentage = Some("10")
         )
       }
     }
