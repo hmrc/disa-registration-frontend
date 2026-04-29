@@ -16,8 +16,6 @@
 
 package controllers
 
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.verify
 import org.mongodb.scala.*
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.FakeRequest

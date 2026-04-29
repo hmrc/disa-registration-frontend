@@ -17,6 +17,7 @@
 package models.grs
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.play.bootstrap.binders.OnlyRelative
 
 case class GrsCreateJourneyRequest(
   continueUrl: String,
@@ -26,7 +27,11 @@ case class GrsCreateJourneyRequest(
   regime: String,
   accessibilityUrl: String,
   labels: Option[Labels]
-)
+) {
+  require(OnlyRelative.applies(continueUrl), "continueUrl must be relative")
+  require(OnlyRelative.applies(signOutUrl), "signOutUrl must be relative")
+  require(OnlyRelative.applies(accessibilityUrl), "accessibilityUrl must be relative")
+}
 
 object GrsCreateJourneyRequest {
   implicit val format: OFormat[GrsCreateJourneyRequest] = Json.format[GrsCreateJourneyRequest]
