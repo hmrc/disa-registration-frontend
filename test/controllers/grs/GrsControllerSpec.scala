@@ -120,7 +120,7 @@ class GrsControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Start when business verification fails but UTR is missing" in {
+      "must show error page when business verification fails but UTR is missing" in {
 
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
@@ -136,15 +136,15 @@ class GrsControllerSpec extends SpecBase {
         running(application) {
           val result = route(application, fakeRequest).value
 
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
+          status(result) shouldBe INTERNAL_SERVER_ERROR
+          verify(mockErrorHandler).internalServerError(any)
 
           verify(mockBvLockoutService, Mockito.never())
             .lockout(any[String], any[String])
         }
       }
 
-      "must redirect to Start when no business registration/verification data present" in {
+      "must show error page when no business registration/verification data present" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse(
           businessRegistrationStatus = FailedStatus,
@@ -177,12 +177,12 @@ class GrsControllerSpec extends SpecBase {
         running(application) {
           val result = route(application, fakeRequest).value
 
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
+          status(result) shouldBe INTERNAL_SERVER_ERROR
+          verify(mockErrorHandler).internalServerError(any)
         }
       }
 
-      "must redirect to Start when business registration fails" in {
+      "must show error page when business registration fails" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
         val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
 
@@ -212,8 +212,8 @@ class GrsControllerSpec extends SpecBase {
         running(application) {
           val result = route(application, fakeRequest).value
 
-          status(result)                 shouldBe SEE_OTHER
-          redirectLocation(result).value shouldBe controllers.routes.StartController.onPageLoad().url
+          status(result) shouldBe INTERNAL_SERVER_ERROR
+          verify(mockErrorHandler).internalServerError(any)
         }
       }
 
