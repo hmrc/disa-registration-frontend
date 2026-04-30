@@ -96,6 +96,7 @@ class Navigator @Inject() () {
       InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
     case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id)
     case ThirdPartyInvestorFundsPercentagePage(id) => ThirdPartyCheckYourAnswersController.onPageLoad(id)
+    case RemoveThirdPartyPage                      => removeThirdPartyNextPage(answers)
     case _                                         => throw new NotImplementedError("No route for this page")
   }
 
@@ -199,5 +200,11 @@ class Navigator @Inject() () {
         ThirdPartyCheckYourAnswersController.onPageLoad(id = id)
       case _                     =>
         TaskListController.onPageLoad()
+    }
+
+  private def removeThirdPartyNextPage(answers: ThirdPartyOrganisations): Call =
+    answers.thirdParties match {
+      case Nil => ProductsManagedByThirdPartyController.onPageLoad()
+      case _   => TaskListController.onPageLoad()
     }
 }

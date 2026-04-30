@@ -43,7 +43,7 @@ import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, Peer
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.signatories.*
-import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, ReturnsManagedByThirdPartyPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyOrgDetailsPage}
+import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, RemoveThirdPartyPage, ReturnsManagedByThirdPartyPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -442,6 +442,25 @@ class NavigatorSpec extends SpecBase {
         )
       )
       result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(id = testString)
+    }
+
+    "route RemoveThirdPartyPage to TaskList when third parties exist in answers" in {
+      val result: Call = navigator.normalRoutes(
+        RemoveThirdPartyPage,
+        ThirdPartyOrganisations(
+          Some(YesNoAnswer.Yes),
+          Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.No)))
+        )
+      )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route RemoveThirdPartyPage to ProductsManagedByThirdPartyPage when no third parties exist in answers" in {
+      val result: Call =
+        navigator.normalRoutes(RemoveThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.Yes), Seq.empty))
+
+      result shouldBe ProductsManagedByThirdPartyController.onPageLoad()
     }
 
     "route unknown page to Index" in {

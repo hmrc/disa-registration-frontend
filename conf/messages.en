@@ -361,6 +361,10 @@ thirdPartyInvestorFundsPercentage.change.hidden = percentage of investor funds u
 thirdPartyCya.title = Check added third-party organisation
 thirdPartyCya.heading = Check added third-party organisation
 
+removeThirdParty.title = Are you sure you want to remove {0} as a third-party organisation?
+removeThirdParty.heading = Are you sure you want to remove {0} as a third-party organisation?
+removeThirdParty.error.required = Select yes if you want to remove this third-party organisation
+
 ### Certificates of Authority
 
 eligibilityToManageIsa.title = Eligibility to manage ISAs
