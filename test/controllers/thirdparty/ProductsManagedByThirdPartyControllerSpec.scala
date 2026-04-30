@@ -19,10 +19,10 @@ package controllers.thirdparty
 import base.SpecBase
 import controllers.thirdparty.routes.ProductsManagedByThirdPartyController
 import forms.YesNoAnswerFormProvider
+import models.YesNoAnswer
 import models.YesNoAnswer.*
 import models.journeydata.JourneyData
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
-import models.{CheckMode, NormalMode, YesNoAnswer}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
@@ -40,8 +40,8 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val routeUrl: String  = ProductsManagedByThirdPartyController.onPageLoad(NormalMode).url
-  lazy val submitUrl: String = ProductsManagedByThirdPartyController.onSubmit(NormalMode).url
+  lazy val routeUrl: String  = ProductsManagedByThirdPartyController.onPageLoad().url
+  lazy val submitUrl: String = ProductsManagedByThirdPartyController.onSubmit().url
 
   val formProvider: YesNoAnswerFormProvider = new YesNoAnswerFormProvider()
   val form: Form[YesNoAnswer]               = formProvider("productsManagedByThirdParty.error.required")
@@ -60,7 +60,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
       }
     }
 
@@ -87,7 +87,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Yes), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(Yes))(request, messages(application)).toString
       }
     }
 
@@ -114,7 +114,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(No), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(No))(request, messages(application)).toString
       }
     }
 
@@ -134,7 +134,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
       }
     }
 
@@ -284,74 +284,6 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         await(route(application, request).value)
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
-      }
-    }
-
-    "must render view with CheckMode on a GET" in {
-
-      val journeyData =
-        JourneyData(
-          groupId = testGroupId,
-          enrolmentId = testString,
-          thirdPartyOrganisations = Some(
-            ThirdPartyOrganisations(
-              managedByThirdParty = Some(Yes)
-            )
-          )
-        )
-
-      val application = applicationBuilder(journeyData = Some(journeyData)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, ProductsManagedByThirdPartyController.onPageLoad(CheckMode).url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Yes), CheckMode)(request, messages(application)).toString
-      }
-    }
-
-    "must submit with CheckMode and redirect" in {
-
-      val existingSection =
-        ThirdPartyOrganisations(
-          managedByThirdParty = Some(No)
-        )
-
-      val journeyData =
-        JourneyData(
-          groupId = testGroupId,
-          enrolmentId = testString,
-          thirdPartyOrganisations = Some(existingSection)
-        )
-
-      val expectedSection =
-        ThirdPartyOrganisations(
-          managedByThirdParty = Some(Yes)
-        )
-
-      when(
-        mockJourneyAnswersService
-          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[ThirdPartyOrganisations]], any)
-      ).thenReturn(Future.successful(expectedSection))
-
-      val application =
-        applicationBuilder(journeyData = Some(journeyData))
-          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, ProductsManagedByThirdPartyController.onSubmit(CheckMode).url)
-            .withFormUrlEncodedBody("value" -> "yes")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 
