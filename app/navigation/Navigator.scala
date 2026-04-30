@@ -95,7 +95,7 @@ class Navigator @Inject() () {
     case ReturnsManagedByThirdPartyPage(id)        =>
       InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
     case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id)
-    case ThirdPartyInvestorFundsPercentagePage(id) => TaskListController.onPageLoad()
+    case ThirdPartyInvestorFundsPercentagePage(id) => ThirdPartyCheckYourAnswersController.onPageLoad(id)
     case RemoveThirdPartyPage                      => removeThirdPartyNextPage(answers)
     case _                                         => throw new NotImplementedError("No route for this page")
   }
@@ -119,11 +119,10 @@ class Navigator @Inject() () {
     case LiaisonOfficerCommunicationPage(id)       => LoCheckYourAnswersController.onPageLoad(id)
     case SignatoryNamePage(id)                     => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case ProductsManagedByThirdPartyPage           => ???
-    case ThirdPartyOrgDetailsPage(id)              => ???
-    case ReturnsManagedByThirdPartyPage(id)        => ???
-    case InvestorFundsUsedByThirdPartyPage(id)     => ???
-    case ThirdPartyInvestorFundsPercentagePage(id) => ???
+    case ThirdPartyOrgDetailsPage(id)              => ThirdPartyCheckYourAnswersController.onPageLoad(id)
+    case ReturnsManagedByThirdPartyPage(id)        => ThirdPartyCheckYourAnswersController.onPageLoad(id)
+    case InvestorFundsUsedByThirdPartyPage(id)     => ThirdPartyCheckYourAnswersController.onPageLoad(id)
+    case ThirdPartyInvestorFundsPercentagePage(id) => ThirdPartyCheckYourAnswersController.onPageLoad(id)
     case _                                         => throw new NotImplementedError("No route for this page")
   }
 
@@ -198,7 +197,7 @@ class Navigator @Inject() () {
       case Some(YesNoAnswer.Yes) =>
         ThirdPartyInvestorFundsPercentageController.onPageLoad(id = id, mode = NormalMode)
       case Some(YesNoAnswer.No)  =>
-        TaskListController.onPageLoad()
+        ThirdPartyCheckYourAnswersController.onPageLoad(id = id)
       case _                     =>
         TaskListController.onPageLoad()
     }

@@ -20,11 +20,13 @@ import controllers.actions.*
 import controllers.routes.*
 import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
+import handlers.JourneyHandler.clearStalePages
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.requests.DataRequest
 import models.{Mode, YesNoAnswer}
 import navigation.Navigator
 import pages.thirdparty.InvestorFundsUsedByThirdPartyPage
+import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -51,7 +53,7 @@ class InvestorFundsUsedByThirdPartyController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider("investorFundsUsedByThirdParty.error.required")
+  val form: Form[YesNoAnswer] = formProvider("investorFundsUsedByThirdParty.error.required")
 
   def onPageLoad(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -78,12 +80,21 @@ class InvestorFundsUsedByThirdPartyController @Inject() (
             updatedSectionWithAnswer(id, answer).fold {
               Future.successful(Redirect(IndexController.onPageLoad()))
             } { updatedSection =>
+              val existingSection = request.journeyData.thirdPartyOrganisations
+              val cleanedSection  =
+                existingSection match {
+                  case Some(_) =>
+                    clearStalePages(InvestorFundsUsedByThirdPartyPage(id), updatedSection)
+                  case None    =>
+                    updatedSection
+                }
               journeyAnswersService
-                .update(updatedSection, request.groupId, request.credentials.providerId)
+                .update(cleanedSection, request.groupId, request.credentials.providerId)
                 .map { savedSection =>
                   Redirect(
                     navigator.nextPage(
                       InvestorFundsUsedByThirdPartyPage(id),
+                      existingSection,
                       savedSection,
                       mode
                     )
