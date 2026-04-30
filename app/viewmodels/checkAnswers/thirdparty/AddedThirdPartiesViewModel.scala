@@ -17,7 +17,6 @@
 package viewmodels.checkAnswers.thirdparty
 
 import config.FrontendAppConfig
-import controllers.routes.*
 import controllers.thirdparty.routes.*
 import models.journeydata.thirdparty.ThirdParty
 import models.{NormalMode, YesNoAnswer}
@@ -140,7 +139,7 @@ class AddedThirdPartiesViewModel @Inject() (
           ),
           ActionItemViewModel(
             content = messages("site.remove"),
-            href = TaskListController.onPageLoad().url
+            href = RemoveThirdPartyController.onPageLoad(id = thirdParty.id).url
           ).withVisuallyHiddenText(
             messages("addedThirdParties.summary.action.hidden", name)
           )
