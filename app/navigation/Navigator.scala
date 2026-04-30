@@ -96,6 +96,7 @@ class Navigator @Inject() () {
       InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
     case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id)
     case ThirdPartyInvestorFundsPercentagePage(id) => TaskListController.onPageLoad()
+    case ThirdPartyConnectedOrganisationsPage      => TaskListController.onPageLoad()
     case _                                         => throw new NotImplementedError("No route for this page")
   }
 
@@ -123,6 +124,7 @@ class Navigator @Inject() () {
     case ReturnsManagedByThirdPartyPage(id)        => ???
     case InvestorFundsUsedByThirdPartyPage(id)     => ???
     case ThirdPartyInvestorFundsPercentagePage(id) => ???
+    case ThirdPartyConnectedOrganisationsPage      => ???
     case _                                         => throw new NotImplementedError("No route for this page")
   }
 

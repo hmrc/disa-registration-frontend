@@ -355,6 +355,17 @@ thirdPartyInvestorFundsPercentage.error.invalid = The percentage must be a numbe
 thirdPartyInvestorFundsPercentage.checkYourAnswersLabel = Percentage of investor funds used for commissions or incentives?
 thirdPartyInvestorFundsPercentage.change.hidden = percentage of investor funds used for commissions or incentives
 
+thirdPartyConnectedOrganisations.title = Connected organisations
+thirdPartyConnectedOrganisations.heading = Connected organisations
+thirdPartyConnectedOrganisations.p1 = Organisations are ‘connected’ where:
+thirdPartyConnectedOrganisations.li1 = one has control of the other
+thirdPartyConnectedOrganisations.li2 = both are under the control of the same person or persons
+thirdPartyConnectedOrganisations.p2 = In the case of a limited liability partnership, that control is where the other organisation possesses, or has the rights to get a share or more than half the assets or more than half the income of the limited liability partnership.
+thirdPartyConnectedOrganisations.h2 = Which of these organisations are connected?
+thirdPartyConnectedOrganisations.hint = Select all that apply
+thirdPartyConnectedOrganisations.noneSelected = None are connected
+thirdPartyConnectedOrganisations.checkBoxDivider = or
+
 ### Certificates of Authority
 
 eligibilityToManageIsa.title = Eligibility to manage ISAs
