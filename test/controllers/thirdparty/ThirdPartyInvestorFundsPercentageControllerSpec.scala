@@ -18,6 +18,7 @@ package controllers.thirdparty
 
 import base.SpecBase
 import controllers.routes.IndexController
+import controllers.thirdparty.routes._
 import forms.ThirdPartyInvestorFundsPercentageFormProvider
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.{CheckMode, NormalMode}
@@ -42,13 +43,13 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
   val form: Form[String] = formProvider()
 
   lazy val routeUrl: String =
-    routes.ThirdPartyInvestorFundsPercentageController.onPageLoad(existingId, NormalMode).url
+    ThirdPartyInvestorFundsPercentageController.onPageLoad(existingId, NormalMode).url
 
   lazy val submitUrl: String =
-    routes.ThirdPartyInvestorFundsPercentageController.onSubmit(existingId, NormalMode).url
+    ThirdPartyInvestorFundsPercentageController.onSubmit(existingId, NormalMode).url
 
   def onwardRoute: String =
-    controllers.routes.TaskListController.onPageLoad().url
+    ThirdPartyCheckYourAnswersController.onPageLoad(existingId).url
 
   "ThirdPartyInvestorFundsPercentageController" - {
 

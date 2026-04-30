@@ -409,7 +409,7 @@ class NavigatorSpec extends SpecBase {
       result shouldBe ThirdPartyInvestorFundsPercentageController.onPageLoad(id = testString, mode = NormalMode)
     }
 
-    "route InvestorFundsUsedByThirdPartyPage to TaskList when 'no' is submitted" in {
+    "route InvestorFundsUsedByThirdPartyPage to ThirdPartyCheckYourAnswersController when 'no' is submitted" in {
       val result: Call = navigator.normalRoutes(
         InvestorFundsUsedByThirdPartyPage(testString),
         ThirdPartyOrganisations(
@@ -418,10 +418,22 @@ class NavigatorSpec extends SpecBase {
         )
       )
 
+      result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(id = testString)
+    }
+
+    "route InvestorFundsUsedByThirdPartyPage to TaskList when no answer is present" in {
+      val result: Call = navigator.normalRoutes(
+        InvestorFundsUsedByThirdPartyPage(testString),
+        ThirdPartyOrganisations(
+          Some(YesNoAnswer.Yes),
+          Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), None))
+        )
+      )
+
       result shouldBe TaskListController.onPageLoad()
     }
 
-    "route ThirdPartyInvestorFundsPercentagePage to TaskList" in {
+    "route ThirdPartyInvestorFundsPercentagePage to ThirdPartyCheckYourAnswersController" in {
       val result: Call = navigator.normalRoutes(
         ThirdPartyInvestorFundsPercentagePage(testString),
         ThirdPartyOrganisations(
@@ -429,7 +441,7 @@ class NavigatorSpec extends SpecBase {
           Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.No), Some("20")))
         )
       )
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(id = testString)
     }
 
     "route unknown page to Index" in {
@@ -510,6 +522,26 @@ class NavigatorSpec extends SpecBase {
     "route LiaisonOfficerCommunicationPage to LO CYA" in {
       navigator.checkRouteMap(LiaisonOfficerCommunicationPage(testString)) shouldBe
         LoCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route ThirdPartyOrgDetailsPage to Third Party CYA" in {
+      navigator.checkRouteMap(ThirdPartyOrgDetailsPage(testString)) shouldBe
+        ThirdPartyCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route ReturnsManagedByThirdPartyPage to Third Party CYA" in {
+      navigator.checkRouteMap(ReturnsManagedByThirdPartyPage(testString)) shouldBe
+        ThirdPartyCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route InvestorFundsUsedByThirdPartyPage to Third Party CYA" in {
+      navigator.checkRouteMap(InvestorFundsUsedByThirdPartyPage(testString)) shouldBe
+        ThirdPartyCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to Third Party CYA" in {
+      navigator.checkRouteMap(ThirdPartyInvestorFundsPercentagePage(testString)) shouldBe
+        ThirdPartyCheckYourAnswersController.onPageLoad(testString)
     }
 
     "route unknown page to Index" in {
