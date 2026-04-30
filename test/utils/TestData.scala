@@ -84,6 +84,7 @@ trait TestData extends Generators {
     businessVerificationPassed = Some(true),
     ctUtr = Some("1234567890"),
     registeredAddress = Some(testRegisteredAddress),
-    companyName = Some(testString)
+    companyName = Some(testString),
+    businessPartnerId = Some(testString)
   )
 }
