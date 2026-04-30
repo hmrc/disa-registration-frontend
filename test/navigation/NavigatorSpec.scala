@@ -460,7 +460,7 @@ class NavigatorSpec extends SpecBase {
       val result: Call =
         navigator.normalRoutes(RemoveThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.Yes), Seq.empty))
 
-      result shouldBe ProductsManagedByThirdPartyController.onPageLoad(NormalMode)
+      result shouldBe ProductsManagedByThirdPartyController.onPageLoad()
     }
 
     "route unknown page to Index" in {
