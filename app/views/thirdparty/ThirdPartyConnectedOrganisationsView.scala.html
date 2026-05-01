@@ -15,7 +15,7 @@
  *@
 
 @import viewmodels.ThirdPartyCheckboxItems
-@import controllers.thirdparty.routes.ThirdPartyOrgDetailsController
+@import controllers.thirdparty.routes.ThirdPartyConnectedOrganisationsController
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import models.journeydata.thirdparty.ThirdParty
@@ -33,7 +33,7 @@
 
 @layout(pageTitle = title(form, messages("thirdPartyConnectedOrganisations.title"), Some(messages("sectionTitle.thirdParty")))) {
 
-    @formHelper(action = ThirdPartyOrgDetailsController.onSubmit(mode)) {
+    @formHelper(action = ThirdPartyConnectedOrganisationsController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

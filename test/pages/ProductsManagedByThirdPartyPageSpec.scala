@@ -19,41 +19,56 @@ package pages
 import base.SpecBase
 import models.YesNoAnswer.{No, Yes}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
-import org.scalatest.matchers.should.Matchers.shouldBe
+import org.scalatest.matchers.should.Matchers.{should, shouldBe}
 import pages.thirdparty.ProductsManagedByThirdPartyPage
 
 class ProductsManagedByThirdPartyPageSpec extends SpecBase {
 
   "ProductsManagedByThirdPartyPage" - {
 
-    "resumeNormalMode should be true when answered Yes and there are no third party details yet" in {
+    "resumeNormalMode should be true when answer is Yes and no third party details exist" in {
       ProductsManagedByThirdPartyPage.resumeNormalMode(withYesWithoutExistingDependentAnswer) shouldBe true
     }
 
-    "resumeNormalMode should be false when answered Yes and third party details already exist" in {
+    "resumeNormalMode should be false when answer is Yes and third party details exist" in {
       ProductsManagedByThirdPartyPage.resumeNormalMode(withYesAndExistingDependentAnswer) shouldBe false
     }
 
-    "resumeNormalMode should be true when answered No" in {
+    "resumeNormalMode should be true when answer is No (regardless of data existence)" in {
       ProductsManagedByThirdPartyPage.resumeNormalMode(withNoWithoutExistingDependentAnswer) shouldBe true
       ProductsManagedByThirdPartyPage.resumeNormalMode(withNoAndExistingDependentAnswer)     shouldBe true
     }
 
-    "resumeNormalMode should be true when the answer is missing" in {
+    "resumeNormalMode should be true when answer is missing" in {
       ProductsManagedByThirdPartyPage.resumeNormalMode(empty) shouldBe true
     }
 
-    "pagesToClear should return dependent pages when the answer is No and stale third party details exist" in {
+    "pagesToClear should clear third party details when answer is No and data exists" in {
       val pages = ProductsManagedByThirdPartyPage.pagesToClear(withNoAndExistingDependentAnswer)
-//TODO update as pages are added
-      pages shouldBe List()
+
+      pages should have size 1
+
+      val result = pages.foldLeft(withNoAndExistingDependentAnswer) { case (acc, page) =>
+        page.clearAnswer(acc)
+      }
+
+      result.thirdParties shouldBe Nil
     }
 
-    "pagesToClear should return Nil when there are no stale dependent answers" in {
-      ProductsManagedByThirdPartyPage.pagesToClear(withYesAndExistingDependentAnswer)     shouldBe Nil
+    "pagesToClear should return Nil when answer is No but no third party details exist" in {
+      ProductsManagedByThirdPartyPage.pagesToClear(withNoWithoutExistingDependentAnswer) shouldBe Nil
+    }
+
+    "pagesToClear should return Nil when answer is Yes and third party details exist" in {
+      ProductsManagedByThirdPartyPage.pagesToClear(withYesAndExistingDependentAnswer) shouldBe Nil
+    }
+
+    "pagesToClear should return Nil when answer is Yes and no third party details exist" in {
       ProductsManagedByThirdPartyPage.pagesToClear(withYesWithoutExistingDependentAnswer) shouldBe Nil
-      ProductsManagedByThirdPartyPage.pagesToClear(withNoWithoutExistingDependentAnswer)  shouldBe Nil
-      ProductsManagedByThirdPartyPage.pagesToClear(empty)                                 shouldBe Nil
+    }
+
+    "pagesToClear should return Nil when answer is missing" in {
+      ProductsManagedByThirdPartyPage.pagesToClear(empty) shouldBe Nil
     }
   }
 
@@ -69,9 +84,7 @@ class ProductsManagedByThirdPartyPageSpec extends SpecBase {
   private def withYesAndExistingDependentAnswer: ThirdPartyOrganisations =
     empty.copy(
       managedByThirdParty = Some(Yes),
-      thirdParties = Seq(
-        ThirdParty(testString)
-      )
+      thirdParties = Seq(ThirdParty(testString))
     )
 
   private def withNoWithoutExistingDependentAnswer: ThirdPartyOrganisations =
@@ -80,8 +93,6 @@ class ProductsManagedByThirdPartyPageSpec extends SpecBase {
   private def withNoAndExistingDependentAnswer: ThirdPartyOrganisations =
     empty.copy(
       managedByThirdParty = Some(No),
-      thirdParties = Seq(
-        ThirdParty(testString)
-      )
+      thirdParties = Seq(ThirdParty(testString))
     )
 }

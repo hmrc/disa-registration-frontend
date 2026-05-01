@@ -35,19 +35,19 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class ThirdPartyConnectedOrganisationsController @Inject()(
-                                                            override val messagesApi: MessagesApi,
-                                                            identify: IdentifierAction,
-                                                            getData: DataRetrievalAction,
-                                                            requireData: DataRequiredAction,
-                                                            journeyAnswersService: JourneyAnswersService,
-                                                            errorHandler: ErrorHandler,
-                                                            formProvider: ThirdPartyConnectedOrganisationsFormProvider,
-                                                            navigator: Navigator,
-                                                            val controllerComponents: MessagesControllerComponents,
-                                                            view: ThirdPartyConnectedOrganisationsView
-                                                          )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class ThirdPartyConnectedOrganisationsController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler,
+  formProvider: ThirdPartyConnectedOrganisationsFormProvider,
+  navigator: Navigator,
+  val controllerComponents: MessagesControllerComponents,
+  view: ThirdPartyConnectedOrganisationsView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport
     with Logging {
 
@@ -57,9 +57,9 @@ class ThirdPartyConnectedOrganisationsController @Inject()(
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      val section = request.journeyData.thirdPartyOrganisations
+      val section      = request.journeyData.thirdPartyOrganisations
       val thirdParties = section.map(_.thirdParties).getOrElse(Nil)
-      val selected = section.map(_.connectedOrganisations.toSet).getOrElse(Set.empty)
+      val selected     = section.map(_.connectedOrganisations.toSet).getOrElse(Set.empty)
       val preparedForm = if (selected.isEmpty) form else form.fill(selected)
 
       Ok(view(thirdParties, preparedForm, mode))
@@ -68,7 +68,7 @@ class ThirdPartyConnectedOrganisationsController @Inject()(
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
 
-      val sectionOpt = request.journeyData.thirdPartyOrganisations
+      val sectionOpt   = request.journeyData.thirdPartyOrganisations
       val thirdParties = sectionOpt.map(_.thirdParties).getOrElse(Nil)
 
       form
@@ -84,7 +84,7 @@ class ThirdPartyConnectedOrganisationsController @Inject()(
                 val updatedConnected =
                   if (values.contains(NoneValue)) Set.empty[String]
                   else values
-                  
+
                 val updatedSection =
                   section.copy(
                     connectedOrganisations = updatedConnected

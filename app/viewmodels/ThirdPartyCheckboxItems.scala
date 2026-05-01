@@ -25,8 +25,9 @@ object ThirdPartyCheckboxItems {
 
   val NoneValue = "none"
 
-  def items(thirdParties: Seq[ThirdParty],
-             selected: Seq[String] = Seq.empty)(implicit messages: Messages): Seq[CheckboxItem] = {
+  def items(thirdParties: Seq[ThirdParty], selected: Seq[String] = Seq.empty)(implicit
+    messages: Messages
+  ): Seq[CheckboxItem] = {
 
     val partyItems =
       thirdParties.flatMap { tp =>

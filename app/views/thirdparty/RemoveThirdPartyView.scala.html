@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import controllers.liaisonofficers.routes.RemoveLiaisonOfficerController
+@import controllers.thirdparty.routes.RemoveThirdPartyController
 @import viewmodels.LegendSize.Large
 
 @this(
@@ -27,9 +27,9 @@
 
 @(id: String, name: String, form: Form[_])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("removeLiaisonOfficer.title", name), Some(messages("sectionTitle.liaisonOfficers")))) {
+@layout(pageTitle = title(form, messages("removeThirdParty.title", name), Some(messages("sectionTitle.thirdParty")))) {
 
-    @formHelper(action = RemoveLiaisonOfficerController.onSubmit(id), Symbol("autoComplete") -> "off") {
+    @formHelper(action = RemoveThirdPartyController.onSubmit(id), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
@@ -38,7 +38,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = HmrcPageHeadingLegend.apply(Text(messages("removeLiaisonOfficer.heading", name)), HmrcSectionCaption(messages("sectionTitle.liaisonOfficers")), "govuk-fieldset__legend--l").asPageHeading(Large),
+                legend = HmrcPageHeadingLegend.apply(Text(messages("removeThirdParty.heading", name)), HmrcSectionCaption(messages("sectionTitle.thirdParty")), "govuk-fieldset__legend--l").asPageHeading(Large),
                 items  = YesNoAnswer.options
             ).inline()
         )
