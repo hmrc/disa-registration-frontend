@@ -18,6 +18,7 @@ package controllers.thirdparty
 
 import base.SpecBase
 import controllers.thirdparty.routes.ThirdPartyOrgDetailsController
+import controllers.routes._
 import forms.ThirdPartyOrgDetailsFormProvider
 import models.YesNoAnswer.Yes
 import models.journeydata.JourneyData
@@ -118,6 +119,42 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to TaskListController when no id is provided and max third-parties reached" in {
+
+      val max = 2
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          thirdPartyOrganisations = Some(
+            ThirdPartyOrganisations(
+              managedByThirdParty = None,
+              thirdParties = Seq(
+                ThirdParty(existingId, Some("Old Name"), thirdPartyFrn = Some("123456")),
+                ThirdParty(newId, Some("Old Name"), thirdPartyFrn = Some("123457"))
+              ),
+              connectedOrganisations = Set.empty
+            )
+          )
+        )
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .configure("max-third-parties" -> max)
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
   }

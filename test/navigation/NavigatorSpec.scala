@@ -453,7 +453,7 @@ class NavigatorSpec extends SpecBase {
         )
       )
 
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe AddedThirdPartiesController.onPageLoad()
     }
 
     "route RemoveThirdPartyPage to ProductsManagedByThirdPartyPage when no third parties exist in answers" in {

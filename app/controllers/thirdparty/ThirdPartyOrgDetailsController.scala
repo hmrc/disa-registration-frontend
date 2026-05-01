@@ -16,12 +16,14 @@
 
 package controllers.thirdparty
 
+import config.FrontendAppConfig
 import controllers.actions.*
 import controllers.routes.*
 import forms.ThirdPartyOrgDetailsFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.thirdparty.*
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.thirdparty.ThirdPartyOrgDetailsPage
 import play.api.Logging
@@ -48,7 +50,8 @@ class ThirdPartyOrgDetailsController @Inject() (
   navigator: Navigator,
   uuidGenerator: UuidGenerator,
   val controllerComponents: MessagesControllerComponents,
-  view: ThirdPartyOrgDetailsView
+  view: ThirdPartyOrgDetailsView,
+  appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -58,17 +61,24 @@ class ThirdPartyOrgDetailsController @Inject() (
 
   def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      val preparedFormAndId = (for {
-        id           <- id
-        thirdParties <- request.journeyData.thirdPartyOrganisations.map(_.thirdParties)
-        thirdParty   <- thirdParties.find(_.id == id)
-        name         <- thirdParty.thirdPartyName
-        frn           = thirdParty.thirdPartyFrn
-      } yield (form.fill(ThirdPartyOrgDetailsForm(name, frn)), id))
-        .getOrElse((form, uuidGenerator.generate()))
+      if (id.isEmpty && thirdPartyCount(request) >= appConfig.maxThirdParties) {
+        Redirect(TaskListController.onPageLoad())
+      } else {
+        val preparedFormAndId = (for {
+          id           <- id
+          thirdParties <- request.journeyData.thirdPartyOrganisations.map(_.thirdParties)
+          thirdParty   <- thirdParties.find(_.id == id)
+          name         <- thirdParty.thirdPartyName
+          frn           = thirdParty.thirdPartyFrn
+        } yield (form.fill(ThirdPartyOrgDetailsForm(name, frn)), id))
+          .getOrElse((form, uuidGenerator.generate()))
 
-      Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
+        Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
+      }
     }
+
+  private def thirdPartyCount(request: DataRequest[_]): Int =
+    request.journeyData.thirdPartyOrganisations.map(_.thirdParties.size).getOrElse(0)
 
   def onSubmit(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

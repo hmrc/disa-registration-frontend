@@ -361,6 +361,17 @@ thirdPartyInvestorFundsPercentage.change.hidden = percentage of investor funds u
 thirdPartyCya.title = Check added third-party organisation
 thirdPartyCya.heading = Check added third-party organisation
 
+addedThirdParties.title = You have added a third-party organisation
+addedThirdParties.heading = You have added a third-party organisation
+addedThirdParties.title.plural = You have added {0} third-party organisations
+addedThirdParties.heading.plural = You have added {0} third-party organisations
+addedThirdParties.p = Use this to add organisations who you will outsource your ISA returns to. You can add up to 10 third-party organisations.
+addedThirdParties.addAnother = Do you want to add another organisation?
+addedThirdParties.error.required = Select yes if you’d like to add another third-party organisation
+addedThirdParties.complete = Complete
+addedThirdParties.inProgress = In progress
+addedThirdParties.summary.action.hidden = {0} details
+
 thirdPartyConnectedOrganisations.title = Connected organisations
 thirdPartyConnectedOrganisations.heading = Connected organisations
 thirdPartyConnectedOrganisations.p1 = Organisations are ‘connected’ where:

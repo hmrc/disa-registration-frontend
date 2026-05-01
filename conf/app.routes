@@ -193,6 +193,9 @@ POST       /change-percentage-of-investor-funds-used     controllers.thirdparty.
 
 GET        /check-added-third-party                      controllers.thirdparty.ThirdPartyCheckYourAnswersController.onPageLoad(id: String)
 
+GET        /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onPageLoad()
+POST       /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onSubmit()
+
 GET        /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = NormalMode)
 POST       /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onSubmit(mode: Mode = NormalMode)
 GET        /change-connected-third-parties               controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = CheckMode)

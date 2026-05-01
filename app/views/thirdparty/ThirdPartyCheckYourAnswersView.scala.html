@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.pageheading.PageHeading
-@import controllers.routes.TaskListController
+@import controllers.thirdparty.routes._
 
 @this(
   layout: templates.Layout,
@@ -35,7 +35,7 @@
     headingClasses = Some("govuk-heading-l"),
   ))
 
-  @formHelper(action = TaskListController.onPageLoad(), Symbol("autoComplete") -> "off") {
+  @formHelper(action = AddedThirdPartiesController.onPageLoad(), Symbol("autoComplete") -> "off") {
 
     @govukSummaryList(list)
 
