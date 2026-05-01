@@ -66,7 +66,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -100,7 +100,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name), managingIsaReturns = Some(yesAnswer))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -128,7 +128,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
             testGroupId,
             testString,
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Seq.empty)
             )
           )
 
@@ -149,7 +149,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
             testGroupId,
             testString,
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Seq.empty)
             )
           )
 
@@ -173,7 +173,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
             testGroupId,
             testString,
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, Some(name))), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, Some(name))), Seq.empty)
             )
           )
 
@@ -225,7 +225,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -237,7 +237,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
               ThirdParty(otherId, Some("Other")),
               ThirdParty(existingId, Some(name), managingIsaReturns = Some(yesAnswer))
             ),
-            Set.empty
+            Seq.empty
           )
 
         when(
@@ -290,7 +290,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -326,7 +326,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name), managingIsaReturns = Some(noAnswer))),
-                Set.empty
+                Seq.empty
               )
             )
           )

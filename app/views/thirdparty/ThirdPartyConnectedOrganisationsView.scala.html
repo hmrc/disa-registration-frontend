@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import models.journeydata.thirdparty.ThirdParty
+@import models.journeydata.thirdparty._
 
 
 @this(
@@ -29,7 +30,7 @@
     govukButton: GovukButton,
     hmrcPageHeading: HmrcPageHeading)
 
-@(thirdParties: Seq[ThirdParty], form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(thirdParties: Seq[ThirdParty], form: Form[Seq[String]], mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("thirdPartyConnectedOrganisations.title"), Some(messages("sectionTitle.thirdParty")))) {
 
@@ -59,10 +60,14 @@
         @govukCheckboxes(
             CheckboxesViewModel(
                 form   = form,
-                name   = "value",
+                name   = "value[]",
                 hint   = Some(Hint(content = Text(messages("thirdPartyConnectedOrganisations.hint")))),
-                legend = LegendViewModel(messages("thirdPartyConnectedOrganisations.h2")).withCssClass("govuk-fieldset__legend--m"),
-                items = ThirdPartyCheckboxItems.items(thirdParties)
+                legend = LegendViewModel(messages("thirdPartyConnectedOrganisations.h2"))
+                .withCssClass("govuk-fieldset__legend--m"),
+                items  = ThirdPartyCheckboxItems.items(
+                    thirdParties,
+                    form.value.getOrElse(Seq.empty)
+                )
             )
         )
 

@@ -23,7 +23,7 @@ import play.api.libs.json.{Json, OFormat}
 case class ThirdPartyOrganisations(
   managedByThirdParty: Option[YesNoAnswer] = None,
   thirdParties: Seq[ThirdParty] = Nil,
-  connectedOrganisations: Set[String] = Set.empty
+  connectedOrganisations: Seq[String] = Nil
 ) extends TaskListSection {
   def sectionName: String = ThirdPartyOrganisations.sectionName
 

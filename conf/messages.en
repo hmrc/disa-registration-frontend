@@ -382,6 +382,7 @@ thirdPartyConnectedOrganisations.h2 = Which of these organisations are connected
 thirdPartyConnectedOrganisations.hint = Select all that apply
 thirdPartyConnectedOrganisations.noneSelected = None are connected
 thirdPartyConnectedOrganisations.checkBoxDivider = or
+thirdPartyConnectedOrganisations.error.required = Select an option. If any of the organisations are connected select how many. If none of them are connected, select ‘None are connected’
 
 removeThirdParty.title = Are you sure you want to remove {0} as a third-party organisation?
 removeThirdParty.heading = Are you sure you want to remove {0} as a third-party organisation?

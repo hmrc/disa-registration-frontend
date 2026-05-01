@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package forms
+package models.journeydata.thirdparty
 
-import play.api.data.Form
-import play.api.data.Forms.{nonEmptyText, seq}
+sealed trait ConnectedThirdPartySelection
 
-import javax.inject.Inject
+case class SelectedParty(id: String) extends ConnectedThirdPartySelection
 
-class ThirdPartyConnectedOrganisationsFormProvider @Inject {
+case object NoneSelected extends ConnectedThirdPartySelection
 
-  // TODO: Waiting on confirmation from UCD but we require two error message
-  // 1. if only selected one org
-  // 2. if JS is disabled and user selects none&orgs
-  def apply(): Form[Seq[String]] =
-    Form(
-      "value" ->
-        seq(nonEmptyText)
-          .verifying(
-            "thirdPartyConnectedOrganisations.error.required",
-            _.nonEmpty
-          )
-    )
+object ConnectedThirdPartySelection {
+  
+  val noneAreConnectedFormValue = "none-are-connected"
+
+  def fromForm(values: Seq[String]): Seq[ConnectedThirdPartySelection] =
+    if (values.contains(noneAreConnectedFormValue))
+      Seq(NoneSelected)
+    else
+      values.map(SelectedParty.apply)
 }
+

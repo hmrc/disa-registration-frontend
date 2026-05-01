@@ -42,7 +42,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
         ThirdPartyOrganisations(
           managedByThirdParty = Some(Yes),
           thirdParties = thirdParties,
-          connectedOrganisations = Set.empty
+          connectedOrganisations = Seq.empty
         )
       )
     )
@@ -98,10 +98,10 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to ThirdPartiesCheckYourAnswerController when YES and at max" in {
+    "must redirect to ThirdPartyConnectedOrganisationsController when Save and Continue and at max third parties" in {
 
       val maxList =
-        (1 to mockAppConfig.maxThirdParties)
+        (1 to 10)
           .map(i => ThirdParty(i.toString, Some(s"Org $i")))
 
       val application =
@@ -110,12 +110,12 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody("value" -> YesNoAnswer.Yes.toString)
+            .withFormUrlEncodedBody("value" -> "")
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+        redirectLocation(result).value mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode).url
       }
     }
 
@@ -190,7 +190,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to task list when NO selected and more than one third party exists" in {
+    "must redirect to 'Connected Third Parties' page when NO selected and more than one third party exists" in {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData(Seq(tp1, tp2)))).build()
@@ -203,7 +203,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+        redirectLocation(result).value mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode).url
       }
     }
 

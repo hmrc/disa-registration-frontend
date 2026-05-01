@@ -90,7 +90,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
               thirdParties = Seq(
                 ThirdParty(existingId, Some("Old Name"), thirdPartyFrn = Some("123456"))
               ),
-              connectedOrganisations = Set.empty
+              connectedOrganisations = Seq.empty
             )
           )
         )
@@ -137,7 +137,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
                 ThirdParty(existingId, Some("Old Name"), thirdPartyFrn = Some("123456")),
                 ThirdParty(newId, Some("Old Name"), thirdPartyFrn = Some("123457"))
               ),
-              connectedOrganisations = Set.empty
+              connectedOrganisations = Seq.empty
             )
           )
         )
@@ -204,7 +204,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
               Seq(
                 ThirdParty(existingId, Some("Old Name"), thirdPartyFrn = Some("123456"))
               ),
-              Set.empty
+              Seq.empty
             )
           )
         )
@@ -215,7 +215,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
           Seq(
             ThirdParty(existingId, Some("Updated Name"), thirdPartyFrn = Some("654321"))
           ),
-          Set.empty
+          Seq.empty
         )
 
       when(
@@ -253,7 +253,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
           groupId = testGroupId,
           enrolmentId = testString,
           thirdPartyOrganisations = Some(
-            ThirdPartyOrganisations(None, Seq.empty, Set.empty)
+            ThirdPartyOrganisations(None, Seq.empty, Seq.empty)
           )
         )
 
@@ -263,7 +263,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
           Seq(
             ThirdParty(newId, Some("New Name"), thirdPartyFrn = Some("123456"))
           ),
-          Set.empty
+          Seq.empty
         )
 
       when(
@@ -305,7 +305,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
             ThirdPartyOrganisations(
               None,
               Seq(ThirdParty(existingId, Some("Existing"))),
-              Set.empty
+              Seq.empty
             )
           )
         )
@@ -361,7 +361,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         ThirdPartyOrganisations(
           None,
           Seq(ThirdParty(existingId, Some("Name"), thirdPartyFrn = None)),
-          Set.empty
+          Seq.empty
         )
 
       when(

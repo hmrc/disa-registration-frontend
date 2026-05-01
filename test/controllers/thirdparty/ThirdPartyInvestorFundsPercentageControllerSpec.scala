@@ -63,7 +63,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -95,7 +95,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name), investorFundsPercentage = Some("50"))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -123,7 +123,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
         val journeyData =
           testJourneyData.copy(
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Seq.empty)
             )
           )
 
@@ -142,7 +142,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
         val journeyData =
           testJourneyData.copy(
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Seq.empty)
             )
           )
 
@@ -167,7 +167,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -221,7 +221,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -233,7 +233,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
               ThirdParty(otherId, Some("Other")),
               ThirdParty(existingId, Some(name), investorFundsPercentage = Some("50"))
             ),
-            Set.empty
+            Seq.empty
           )
 
         when(
@@ -267,7 +267,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -302,7 +302,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name), investorFundsPercentage = Some("50"))),
-                Set.empty
+                Seq.empty
               )
             )
           )

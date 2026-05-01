@@ -22,6 +22,7 @@ import forms.ThirdPartyConnectedOrganisationsFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.thirdparty.*
+import models.journeydata.thirdparty.ConnectedThirdPartySelection.noneAreConnectedFormValue
 import navigation.Navigator
 import play.api.Logging
 import play.api.data.Form
@@ -51,60 +52,51 @@ class ThirdPartyConnectedOrganisationsController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form: Form[Set[String]] = formProvider()
-
-  private val NoneValue = "none"
+  private val form: Form[Seq[String]] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      val section      = request.journeyData.thirdPartyOrganisations
-      val thirdParties = section.map(_.thirdParties).getOrElse(Nil)
-      val selected     = section.map(_.connectedOrganisations.toSet).getOrElse(Set.empty)
-      val preparedForm = if (selected.isEmpty) form else form.fill(selected)
-
-      Ok(view(thirdParties, preparedForm, mode))
+      request.journeyData.thirdPartyOrganisations.fold {
+        Redirect(TaskListController.onPageLoad())
+      } { section =>
+        Ok(view(section.thirdParties, form.fill(section.connectedOrganisations), mode))
+      }
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-
-      val sectionOpt   = request.journeyData.thirdPartyOrganisations
-      val thirdParties = sectionOpt.map(_.thirdParties).getOrElse(Nil)
-
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful(
-              BadRequest(view(thirdParties, formWithErrors, mode))
-            ),
-          values =>
-            sectionOpt match {
-              case Some(section) =>
-                val updatedConnected =
-                  if (values.contains(NoneValue)) Set.empty[String]
-                  else values
-
-                val updatedSection =
-                  section.copy(
-                    connectedOrganisations = updatedConnected
+      request.journeyData.thirdPartyOrganisations.fold {
+        Future.successful(Redirect(TaskListController.onPageLoad()))
+      } { section =>
+        val thirdParties = section.thirdParties
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(view(thirdParties, formWithErrors, mode))
+              ),
+            values => {
+              val updatedSection =
+                section.copy(
+                  connectedOrganisations = if (values.contains(noneAreConnectedFormValue)) Nil else values
+                )
+              journeyAnswersService
+                .update(
+                  updatedSection,
+                  request.groupId,
+                  request.credentials.providerId
+                )
+                .map(_ => Redirect(TaskListController.onPageLoad()))
+                .recoverWith { case NonFatal(e) =>
+                  logger.warn(
+                    s"Failed updating answers for section [${ThirdPartyOrganisations.sectionName}] " +
+                      s"for groupId [${request.groupId}] with error: [$e]"
                   )
-
-                journeyAnswersService
-                  .update(updatedSection, request.groupId, request.credentials.providerId)
-                  .map { _ =>
-                    Redirect(TaskListController.onPageLoad())
-                  }
-                  .recoverWith { case NonFatal(e) =>
-                    logger.warn(
-                      s"Failed updating answers for section [${ThirdPartyOrganisations.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-                    )
-                    errorHandler.internalServerError
-                  }
-
-              case None =>
-                Future.successful(Redirect(IndexController.onPageLoad()))
+                  errorHandler.internalServerError
+                }
             }
-        )
+          )
+      }
     }
 }

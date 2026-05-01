@@ -16,44 +16,52 @@
 
 package viewmodels
 
-import models.journeydata.thirdparty.ThirdParty
+import models.journeydata.thirdparty.*
+import models.journeydata.thirdparty.ConnectedThirdPartySelection.noneAreConnectedFormValue
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
 object ThirdPartyCheckboxItems {
 
-  val NoneValue = "none"
+  def items(
+    thirdParties: Seq[ThirdParty],
+    selected: Seq[String]
+  )(implicit messages: Messages): Seq[CheckboxItem] = {
 
-  def items(thirdParties: Seq[ThirdParty], selected: Seq[String] = Seq.empty)(implicit
-    messages: Messages
-  ): Seq[CheckboxItem] = {
+    val selections = ConnectedThirdPartySelection.fromForm(selected)
 
-    val partyItems =
+    val partyItems: Seq[CheckboxItem] =
       thirdParties.flatMap { tp =>
         tp.thirdPartyName.map { name =>
           CheckboxItem(
-            value = tp.id,
             content = Text(name),
-            checked = selected.contains(tp.id)
+            id = Some(s"value-${tp.id}"),
+            name = Some(s"value[]"),
+            value = name,
+            checked = selections.contains(SelectedParty(tp.id))
           )
         }
       }
 
-    val divider =
+    val divider: Seq[CheckboxItem] =
       Seq(
         CheckboxItem(
-          divider = Some(messages("thirdPartyConnectedOrganisations.checkBoxDivider"))
+          divider = Some(
+            messages("thirdPartyConnectedOrganisations.checkBoxDivider")
+          )
         )
       )
 
-    val noneItem =
+    val noneItem: Seq[CheckboxItem] =
       Seq(
         CheckboxItem(
-          value = NoneValue,
           content = Text(messages("thirdPartyConnectedOrganisations.noneSelected")),
+          id = Some("value-none"),
+          name = Some("value[]"),
+          value = noneAreConnectedFormValue,
           behaviour = Some(ExclusiveCheckbox),
-          checked = selected.contains(NoneValue)
+          checked = selections.contains(NoneSelected)
         )
       )
 
