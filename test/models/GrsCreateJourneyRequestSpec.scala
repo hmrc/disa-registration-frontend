@@ -22,7 +22,7 @@ import utils.JsonFormatSpec
 class GrsCreateJourneyRequestSpec extends JsonFormatSpec[GrsCreateJourneyRequest] {
 
   val testJourneyRequest: GrsCreateJourneyRequest = GrsCreateJourneyRequest(
-    continueUrl = "http://localhost/continue",
+    continueUrl = "/continue",
     businessVerificationCheck = true,
     deskProServiceId = "deskProId",
     signOutUrl = "/some/url",
@@ -35,7 +35,7 @@ class GrsCreateJourneyRequestSpec extends JsonFormatSpec[GrsCreateJourneyRequest
 
   override val expectedJsonFromWrites: JsValue = Json.parse("""
     {
-      "continueUrl": "http://localhost/continue",
+      "continueUrl": "/continue",
       "businessVerificationCheck": true,
       "deskProServiceId": "deskProId",
       "signOutUrl": "/some/url",

@@ -17,7 +17,8 @@
 package controllers
 
 import controllers.actions.*
-import models.grs.{BvFail, BvPass, GRSResponse, RegisteredStatus}
+import handlers.ErrorHandler
+import models.grs.*
 import models.journeydata.BusinessVerification
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -26,7 +27,7 @@ import services.{BusinessVerificationLockoutService, GrsService, JourneyAnswersS
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class GrsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -34,6 +35,7 @@ class GrsController @Inject() (
   getData: DataRetrievalAction,
   journeyAnswersService: JourneyAnswersService,
   grsService: GrsService,
+  errorHandler: ErrorHandler,
   businessVerificationLockoutService: BusinessVerificationLockoutService,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
@@ -53,7 +55,7 @@ class GrsController @Inject() (
 
         (verificationPassed, registrationPassed) match {
 
-          case (Some(BvPass), true) =>
+          case (Some(BvPass), true) | (Some(CtEnrolled), true) =>
             journeyAnswersService
               .update(businessVerification, request.groupId, request.credentials.providerId)
               .map { _ =>
@@ -71,14 +73,13 @@ class GrsController @Inject() (
 
               case None =>
                 logger.warn(s"[BV] Missing UTR on failed verification for groupId=${request.groupId}")
-                Future.successful(
-                  Redirect(routes.StartController.onPageLoad())
-                )
+                errorHandler.internalServerError
             }
           case _                                                                 =>
-            Future.successful(
-              Redirect(routes.StartController.onPageLoad())
-            )
+            val bvStatus = grsResponse.businessVerificationStatus.map(status => s" BV Status: [$status]")
+            logger
+              .warn(s"Failure from GRS/BV. Registration status: [${grsResponse.businessRegistrationStatus}]$bvStatus")
+            errorHandler.internalServerError
         }
       }
     }

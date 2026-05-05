@@ -137,7 +137,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       isLockedOut shouldBe true
     }
 
-    "redirect to Start when verification FAILS but UTR is missing (no lockout)" in {
+    "show error page when verification FAILS but UTR is missing (no lockout)" in {
 
       val journeyData =
         s"""{ "groupId": "$testGroupId" }"""
@@ -155,9 +155,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
           .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
       ).get
 
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe
-        Some(routes.StartController.onPageLoad().url)
+      status(result) shouldBe INTERNAL_SERVER_ERROR
 
       isLockedOut shouldBe false
     }
@@ -180,9 +178,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
           .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
       ).get
 
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe
-        Some(routes.StartController.onPageLoad().url)
+      status(result) shouldBe INTERNAL_SERVER_ERROR
 
       isLockedOut shouldBe false
     }
@@ -205,9 +201,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
           .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
       ).get
 
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe
-        Some(routes.StartController.onPageLoad().url)
+      status(result) shouldBe INTERNAL_SERVER_ERROR
 
       isLockedOut shouldBe false
     }
@@ -230,9 +224,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
           .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
       ).get
 
-      status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe
-        Some(routes.StartController.onPageLoad().url)
+      status(result) shouldBe INTERNAL_SERVER_ERROR
 
       isLockedOut shouldBe false
     }

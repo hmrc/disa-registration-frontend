@@ -72,9 +72,9 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
   def grsRetrieveResultUrl(journeyId: String): String =
     s"$incorporatedEntityIdentificationHost/incorporated-entity-identification/api/journey/$journeyId"
 
-  lazy val grsCallback: String = s"$host/obligations/enrolment/isa/incorporated-identity-callback"
+  lazy val grsCallback: String = "/obligations/enrolment/isa/incorporated-identity-callback"
 
-  lazy val accessibilityStatementUrl = s"/accessibility-statement/disa-registration-frontend"
+  lazy val accessibilityStatementUrl = "/accessibility-statement/disa-registration-frontend"
 
   lazy val maxLiaisonOfficers: Int = getInt("maxLiaisonOfficers")
   lazy val maxSignatories: Int     = getInt("max-signatories")
