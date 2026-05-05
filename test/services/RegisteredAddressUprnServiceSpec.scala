@@ -57,7 +57,8 @@ class RegisteredAddressUprnServiceSpec extends SpecBase {
       businessRegistrationPassed = Some(true),
       ctUtr = Some("123"),
       registeredAddress = address,
-      companyName = Some("Company name")
+      companyName = Some("Company name"),
+      businessPartnerId = Some(testString)
     )
 
   "RegisteredAddressUprnService" - {
