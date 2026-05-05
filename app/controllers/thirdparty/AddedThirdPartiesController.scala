@@ -60,7 +60,6 @@ class AddedThirdPartiesController @Inject() (
       Redirect(TaskListController.onPageLoad())
     } { case (inProgress, complete) =>
       val count = inProgress.size + complete.size
-
       if (count == appConfig.maxThirdParties) {
         Redirect(ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode))
       } else {

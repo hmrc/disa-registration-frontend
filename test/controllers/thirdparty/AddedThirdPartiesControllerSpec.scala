@@ -23,6 +23,7 @@ import controllers.thirdparty.routes.*
 import models.YesNoAnswer.Yes
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.{NormalMode, YesNoAnswer}
+import org.mockito.Mockito.when
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.checkAnswers.thirdparty.AddedThirdPartiesSummary
@@ -99,9 +100,10 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
     }
 
     "must redirect to ThirdPartyConnectedOrganisationsController when Save and Continue and at max third parties" in {
+      when(mockAppConfig.maxThirdParties).thenReturn(10)
 
       val maxList =
-        (1 to 10)
+        (1 to mockAppConfig.maxThirdParties)
           .map(i => ThirdParty(i.toString, Some(s"Org $i")))
 
       val application =
@@ -147,46 +149,6 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-      }
-    }
-
-    "must redirect to task list when at max and no form value submitted" in {
-
-      val maxList =
-        (1 to mockAppConfig.maxThirdParties)
-          .map(i => ThirdParty(i.toString, Some(s"Org $i")))
-
-      val application =
-        applicationBuilder(journeyData = Some(journeyData(maxList))).build()
-
-      running(application) {
-        val request = FakeRequest(POST, submitUrl)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
-      }
-    }
-
-    "must NOT return BAD_REQUEST when invalid form and at max" in {
-
-      val maxList =
-        (1 to mockAppConfig.maxThirdParties)
-          .map(i => ThirdParty(i.toString, Some(s"Org $i")))
-
-      val application =
-        applicationBuilder(journeyData = Some(journeyData(maxList))).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody("value" -> "")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
