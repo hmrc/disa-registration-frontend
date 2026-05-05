@@ -61,7 +61,7 @@ class ThirdPartyOrgDetailsController @Inject() (
 
   def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      if (id.isEmpty && thirdPartyCount(request) >= appConfig.maxThirdParties) {
+      if (cannotAddAnotherThirdParty(id, request)) {
         Redirect(TaskListController.onPageLoad())
       } else {
         val preparedFormAndId = (for {
@@ -76,9 +76,6 @@ class ThirdPartyOrgDetailsController @Inject() (
         Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
       }
     }
-
-  private def thirdPartyCount(request: DataRequest[_]): Int =
-    request.journeyData.thirdPartyOrganisations.map(_.thirdParties.size).getOrElse(0)
 
   def onSubmit(id: String, mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
@@ -117,4 +114,13 @@ class ThirdPartyOrgDetailsController @Inject() (
           }
         )
     }
+
+  private def thirdPartyCount(request: DataRequest[_]): Int =
+    request.journeyData.thirdPartyOrganisations.map(_.thirdParties.size).getOrElse(0)
+
+  private def cannotAddAnotherThirdParty(
+    id: Option[String],
+    request: DataRequest[_]
+  ): Boolean =
+    id.isEmpty && thirdPartyCount(request) >= appConfig.maxThirdParties
 }
