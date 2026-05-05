@@ -205,6 +205,6 @@ class Navigator @Inject() () {
   private def removeThirdPartyNextPage(answers: ThirdPartyOrganisations): Call =
     answers.thirdParties match {
       case Nil => ProductsManagedByThirdPartyController.onPageLoad()
-      case _   => TaskListController.onPageLoad()
+      case _   => AddedThirdPartiesController.onPageLoad()
     }
 }
