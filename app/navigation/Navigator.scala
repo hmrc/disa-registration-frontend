@@ -97,6 +97,7 @@ class Navigator @Inject() () {
     case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id)
     case ThirdPartyInvestorFundsPercentagePage(id) => ThirdPartyCheckYourAnswersController.onPageLoad(id)
     case RemoveThirdPartyPage                      => removeThirdPartyNextPage(answers)
+    case ConnectedThirdPariesPage                  => ThirdPartiesCheckYourAnswersController.onPageLoad()
     case _                                         => throw new NotImplementedError("No route for this page")
   }
 
@@ -123,6 +124,7 @@ class Navigator @Inject() () {
     case ReturnsManagedByThirdPartyPage(id)        => ThirdPartyCheckYourAnswersController.onPageLoad(id)
     case InvestorFundsUsedByThirdPartyPage(id)     => ThirdPartyCheckYourAnswersController.onPageLoad(id)
     case ThirdPartyInvestorFundsPercentagePage(id) => ThirdPartyCheckYourAnswersController.onPageLoad(id)
+    case ConnectedThirdPariesPage                  => ThirdPartiesCheckYourAnswersController.onPageLoad()
     case _                                         => throw new NotImplementedError("No route for this page")
   }
 
@@ -204,7 +206,7 @@ class Navigator @Inject() () {
 
   private def removeThirdPartyNextPage(answers: ThirdPartyOrganisations): Call =
     answers.thirdParties match {
-      case Nil => ProductsManagedByThirdPartyController.onPageLoad()
+      case Nil => ProductsManagedByThirdPartyController.onPageLoad(NormalMode)
       case _   => AddedThirdPartiesController.onPageLoad()
     }
 }

@@ -323,7 +323,7 @@ productsManagedByThirdParty.title = Are any of your ISA products managed by thir
 productsManagedByThirdParty.heading = Are any of your ISA products managed by third-party organisations?
 productsManagedByThirdParty.error.required = Select yes if any of your ISA products are managed by a third-party organisation
 productsManagedByThirdParty.checkYourAnswersLabel = Outsourcing ISA management or administration
-productsManagedByThirdParty.change.hidden = outsourcing ISA management
+productsManagedByThirdParty.change.hidden = whether you are using a third-party organisation
 
 thirdPartyOrgDetails.title = Third-party organisation details
 thirdPartyOrgDetails.heading = Third-party organisation details
@@ -375,6 +375,13 @@ addedThirdParties.summary.action.hidden = {0} details
 removeThirdParty.title = Are you sure you want to remove {0} as a third-party organisation?
 removeThirdParty.heading = Are you sure you want to remove {0} as a third-party organisation?
 removeThirdParty.error.required = Select yes if you want to remove this third-party organisation
+
+thirdPartiesCheckYourAnswers.title.plural = Check added third-party organisations
+thirdPartiesCheckYourAnswers.title = Check added third-party organisation
+thirdPartiesCheckYourAnswers.heading.plural = Check added third-party organisations
+thirdPartiesCheckYourAnswers.heading = Check added third-party organisation
+thirdPartiesCheckYourAnswers.sub.heading = Third-party {0}
+thirdPartiesCheckYourAnswers.addAnother.label = Add or remove third party
 
 ### Certificates of Authority
 

@@ -166,10 +166,10 @@ POST       /remove-signatory                             controllers.signatories
 
 ## Third Party Organisations
 
-GET        /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad()
-POST       /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit()
-GET        /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad()
-POST       /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit()
+GET        /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad(mode: Mode = NormalMode)
+POST       /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit(mode: Mode = NormalMode)
+GET        /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit(mode: Mode = CheckMode)
 
 GET        /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
 POST       /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = NormalMode)
@@ -198,6 +198,8 @@ POST       /added-third-parties                          controllers.thirdparty.
 
 GET        /remove-third-party-organisation              controllers.thirdparty.RemoveThirdPartyController.onPageLoad(id: String)
 POST       /remove-third-party-organisation              controllers.thirdparty.RemoveThirdPartyController.onSubmit(id: String)
+
+GET        /check-added-third-parties                    controllers.thirdparty.ThirdPartiesCheckYourAnswersController.onPageLoad()
 
 ## Declare & Submit
 
