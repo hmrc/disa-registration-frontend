@@ -196,6 +196,11 @@ GET        /check-added-third-party                      controllers.thirdparty.
 GET        /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onPageLoad()
 POST       /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onSubmit()
 
+GET        /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = NormalMode)
+POST       /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-connected-third-parties               controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-connected-third-parties               controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onSubmit(mode: Mode = CheckMode)
+
 GET        /remove-third-party-organisation              controllers.thirdparty.RemoveThirdPartyController.onPageLoad(id: String)
 POST       /remove-third-party-organisation              controllers.thirdparty.RemoveThirdPartyController.onSubmit(id: String)
 

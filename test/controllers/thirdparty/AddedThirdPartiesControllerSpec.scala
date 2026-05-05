@@ -23,6 +23,7 @@ import controllers.thirdparty.routes.*
 import models.YesNoAnswer.Yes
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.{NormalMode, YesNoAnswer}
+import org.mockito.Mockito.when
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.checkAnswers.thirdparty.AddedThirdPartiesSummary
@@ -42,7 +43,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
         ThirdPartyOrganisations(
           managedByThirdParty = Some(Yes),
           thirdParties = thirdParties,
-          connectedOrganisations = Set.empty
+          connectedOrganisations = Seq.empty
         )
       )
     )
@@ -98,7 +99,8 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to ThirdPartiesCheckYourAnswerController when YES and at max" in {
+    "must redirect to ThirdPartyConnectedOrganisationsController when Save and Continue and at max third parties" in {
+      when(mockAppConfig.maxThirdParties).thenReturn(10)
 
       val maxList =
         (1 to mockAppConfig.maxThirdParties)
@@ -110,12 +112,12 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody("value" -> YesNoAnswer.Yes.toString)
+            .withFormUrlEncodedBody("value" -> "")
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+        redirectLocation(result).value mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode).url
       }
     }
 
@@ -150,47 +152,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to task list when at max and no form value submitted" in {
-
-      val maxList =
-        (1 to mockAppConfig.maxThirdParties)
-          .map(i => ThirdParty(i.toString, Some(s"Org $i")))
-
-      val application =
-        applicationBuilder(journeyData = Some(journeyData(maxList))).build()
-
-      running(application) {
-        val request = FakeRequest(POST, submitUrl)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
-      }
-    }
-
-    "must NOT return BAD_REQUEST when invalid form and at max" in {
-
-      val maxList =
-        (1 to mockAppConfig.maxThirdParties)
-          .map(i => ThirdParty(i.toString, Some(s"Org $i")))
-
-      val application =
-        applicationBuilder(journeyData = Some(journeyData(maxList))).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, submitUrl)
-            .withFormUrlEncodedBody("value" -> "")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
-      }
-    }
-
-    "must redirect to task list when NO selected and more than one third party exists" in {
+    "must redirect to 'Connected Third Parties' page when NO selected and more than one third party exists" in {
 
       val application =
         applicationBuilder(journeyData = Some(journeyData(Seq(tp1, tp2)))).build()
@@ -203,7 +165,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+        redirectLocation(result).value mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode).url
       }
     }
 

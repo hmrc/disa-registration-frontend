@@ -37,7 +37,7 @@ class ThirdPartyOrganisationsJsonSpec extends JsonFormatSpec[ThirdPartyOrganisat
           investorFundsPercentage = Some("10")
         )
       ),
-      connectedOrganisations = Set("org-1", "org-2")
+      connectedOrganisations = Seq("org-1", "org-2")
     )
 
   override val expectedJsonFromWrites: JsValue =

@@ -38,7 +38,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
                 thirdPartyFrn = Some("123456")
               )
             ),
-            connectedOrganisations = Set.empty
+            connectedOrganisations = Seq.empty
           )
 
         val result =
@@ -53,7 +53,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
               thirdPartyFrn = Some("654321")
             )
           ),
-          connectedOrganisations = Set.empty
+          connectedOrganisations = Seq.empty
         )
       }
 
@@ -74,7 +74,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
                 thirdPartyFrn = Some("123456")
               )
             ),
-            connectedOrganisations = Set.empty
+            connectedOrganisations = Seq.empty
           )
 
         val result =
@@ -94,7 +94,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
               thirdPartyFrn = Some("654321")
             )
           ),
-          connectedOrganisations = Set.empty
+          connectedOrganisations = Seq.empty
         )
       }
 
@@ -109,7 +109,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
                 thirdPartyName = Some("Other Org")
               )
             ),
-            connectedOrganisations = Set.empty
+            connectedOrganisations = Seq.empty
           )
 
         val result =
@@ -128,7 +128,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
               thirdPartyFrn = Some("222222")
             )
           ),
-          connectedOrganisations = Set.empty
+          connectedOrganisations = Seq.empty
         )
       }
 
@@ -138,7 +138,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
           ThirdPartyOrganisations(
             managedByThirdParty = None,
             thirdParties = Seq.empty,
-            connectedOrganisations = Set.empty
+            connectedOrganisations = Seq.empty
           )
 
         val result =
@@ -153,7 +153,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
               thirdPartyFrn = None
             )
           ),
-          connectedOrganisations = Set.empty
+          connectedOrganisations = Seq.empty
         )
       }
 
@@ -172,14 +172,14 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
                 investorFundsPercentage = Some("10")
               )
             ),
-            connectedOrganisations = Set("org-1", "org-2")
+            connectedOrganisations = Seq("org-1", "org-2")
           )
 
         val result =
           existing.upsertThirdParty("existing-id", "Updated Name", Some("654321"))
 
         result.managedByThirdParty mustBe Some(Yes)
-        result.connectedOrganisations mustBe Set("org-1", "org-2")
+        result.connectedOrganisations mustBe Seq("org-1", "org-2")
 
         result.thirdParties.head mustBe ThirdParty(
           id = "existing-id",
@@ -191,6 +191,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
         )
       }
     }
+
     ".sectionName" - {
 
       "must return the correct section name" in {
@@ -199,7 +200,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
           ThirdPartyOrganisations(
             managedByThirdParty = None,
             thirdParties = Seq.empty,
-            connectedOrganisations = Set.empty
+            connectedOrganisations = Seq.empty
           )
 
         model.sectionName mustBe ThirdPartyOrganisations.sectionName

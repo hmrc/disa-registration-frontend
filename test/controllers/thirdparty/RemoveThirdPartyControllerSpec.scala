@@ -57,7 +57,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         ThirdPartyOrganisations(
           managedByThirdParty = None,
           thirdParties = thirdParties,
-          connectedOrganisations = Set.empty
+          connectedOrganisations = Seq.empty
         )
       )
     )
@@ -155,7 +155,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         ThirdPartyOrganisations(
           None,
           Seq(otherThirdParty),
-          Set.empty
+          Seq.empty
         )
 
       when(
@@ -183,7 +183,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
     "must not remove and still update when No is submitted" in {
 
       val existingSection =
-        ThirdPartyOrganisations(None, Seq(existingThirdParty, otherThirdParty), Set.empty)
+        ThirdPartyOrganisations(None, Seq(existingThirdParty, otherThirdParty), Seq.empty)
 
       val journeyData =
         testJourneyData.copy(thirdPartyOrganisations = Some(existingSection))
@@ -249,7 +249,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
       val journeyData = withThirdParties(Seq(existingThirdParty))
 
       val updated =
-        ThirdPartyOrganisations(None, Seq.empty, Set.empty)
+        ThirdPartyOrganisations(None, Seq.empty, Seq.empty)
 
       when(
         mockJourneyAnswersService

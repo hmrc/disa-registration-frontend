@@ -86,7 +86,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
               Some("1")
             )
           ),
-          Set.empty
+          Seq.empty
         )
       )
     )

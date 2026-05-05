@@ -68,7 +68,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -102,7 +102,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name), usingInvestorFunds = Some(yesAnswer))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -130,7 +130,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
             testGroupId,
             testString,
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Seq.empty)
             )
           )
 
@@ -151,7 +151,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
             testGroupId,
             testString,
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Seq.empty)
             )
           )
 
@@ -175,7 +175,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
             testGroupId,
             testString,
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, Some(name))), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, Some(name))), Seq.empty)
             )
           )
 
@@ -227,7 +227,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -239,7 +239,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdParty(otherId, Some("Other")),
               ThirdParty(existingId, Some(name), usingInvestorFunds = Some(yesAnswer))
             ),
-            Set.empty
+            Seq.empty
           )
 
         when(
@@ -277,7 +277,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -289,7 +289,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdParty(otherId, Some("Other")),
               ThirdParty(existingId, Some(name), usingInvestorFunds = Some(noAnswer))
             ),
-            Set.empty
+            Seq.empty
           )
 
         when(
@@ -324,7 +324,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -360,7 +360,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name), usingInvestorFunds = Some(noAnswer))),
-                Set.empty
+                Seq.empty
               )
             )
           )
