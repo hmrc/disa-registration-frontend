@@ -39,7 +39,7 @@ class ThirdPartyConnectedOrganisationsControllerSpec extends SpecBase {
   private val submitUrl = ThirdPartyConnectedOrganisationsController.onSubmit(NormalMode).url
 
   val formProvider: ThirdPartyConnectedOrganisationsFormProvider = new ThirdPartyConnectedOrganisationsFormProvider()
-  val form: Form[Seq[String]] = formProvider()
+  val form: Form[Seq[String]]                                    = formProvider()
 
   private val tp1 = ThirdParty("1", Some("Org 1"))
   private val tp2 = ThirdParty("2", Some("Org 2"))

@@ -23,7 +23,7 @@ case class SelectedParty(id: String) extends ConnectedThirdPartySelection
 case object NoneSelected extends ConnectedThirdPartySelection
 
 object ConnectedThirdPartySelection {
-  
+
   val noneAreConnectedFormValue = "none-are-connected"
 
   def fromForm(values: Seq[String]): Seq[ConnectedThirdPartySelection] =
@@ -32,4 +32,3 @@ object ConnectedThirdPartySelection {
     else
       values.map(SelectedParty.apply)
 }
-
