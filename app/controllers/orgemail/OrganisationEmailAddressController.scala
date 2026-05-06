@@ -22,6 +22,7 @@ import forms.OrganisationEmailAddressFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.journeydata.OrganisationEmail
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.orgemail.OrganisationEmailAddressPage
 import play.api.Logging
@@ -73,32 +74,49 @@ class OrganisationEmailAddressController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           email =>
-            emailVerificationConnector
-              .sendCode(email)
-              .flatMap { _ =>
-                val updatedSection = OrganisationEmail(
-                  organisationEmail = Some(email),
-                  verified = Some(false)
+            if (submittedEmailIsAlreadyVerified(email)) {
+              Future.successful(
+                Redirect(
+                  navigator.nextPage(
+                    OrganisationEmailAddressPage,
+                    request.journeyData.organisationEmail.get,
+                    mode
+                  )
                 )
+              )
+            } else {
+              emailVerificationConnector
+                .sendCode(email)
+                .flatMap { _ =>
+                  val updatedSection = OrganisationEmail(
+                    organisationEmail = Some(email),
+                    verified = Some(false)
+                  )
 
-                journeyAnswersService
-                  .update(updatedSection, request.groupId, request.credentials.providerId)
-                  .map { savedSection =>
-                    Redirect(
-                      navigator.nextPage(
-                        OrganisationEmailAddressPage,
-                        savedSection,
-                        mode
+                  journeyAnswersService
+                    .update(updatedSection, request.groupId, request.credentials.providerId)
+                    .map { savedSection =>
+                      Redirect(
+                        navigator.nextPage(
+                          OrganisationEmailAddressPage,
+                          savedSection,
+                          mode
+                        )
                       )
-                    )
-                  }
-              }
-              .recoverWith { case NonFatal(e) =>
-                logger.warn(
-                  s"Failed submitting organisation email address for groupId [${request.groupId}] with error: [$e]"
-                )
-                errorHandler.internalServerError
-              }
+                    }
+                }
+                .recoverWith { case NonFatal(e) =>
+                  logger.warn(
+                    s"Failed submitting organisation email address for groupId [${request.groupId}] with error: [$e]"
+                  )
+                  errorHandler.internalServerError
+                }
+            }
         )
+    }
+
+  private def submittedEmailIsAlreadyVerified(email: String)(implicit request: DataRequest[_]): Boolean =
+    request.journeyData.organisationEmail.exists { section =>
+      section.organisationEmail.contains(email) && section.verified.contains(true)
     }
 }

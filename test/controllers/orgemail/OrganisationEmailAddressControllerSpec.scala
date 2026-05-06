@@ -24,7 +24,7 @@ import models.journeydata.{JourneyData, OrganisationEmail}
 import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{atMostOnce, verify, when}
+import org.mockito.Mockito.{atMostOnce, never, verify, when}
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
@@ -124,6 +124,93 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must not send verification code or update answers when submitted email is unchanged and already verified" in {
+
+      val existingSection =
+        OrganisationEmail(
+          organisationEmail = Some(oldEmail),
+          verified = Some(true)
+        )
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          organisationEmail = Some(existingSection)
+        )
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody(("value", oldEmail))
+
+        val result = route(application, request).value
+
+        verify(mockEmailVerificationConnector, never)
+          .sendCode(any[String])(any[HeaderCarrier])
+
+        verify(mockJourneyAnswersService, never)
+          .update(any[OrganisationEmail], any[String], any[String])(any[Writes[OrganisationEmail]], any)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must send verification code and update answers when submitted email is unchanged but not verified" in {
+
+      val existingSection =
+        OrganisationEmail(
+          organisationEmail = Some(oldEmail),
+          verified = Some(false)
+        )
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          organisationEmail = Some(existingSection)
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(existingSection), any[String], any[String])(any[Writes[OrganisationEmail]], any)
+      ).thenReturn(Future.successful(existingSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody(("value", oldEmail))
+
+        val result = route(application, request).value
+
+        verify(mockEmailVerificationConnector, atMostOnce())
+          .sendCode(any[String])(any[HeaderCarrier])
+
+        verify(mockJourneyAnswersService, atMostOnce())
+          .update(any[OrganisationEmail], any[String], any[String])(any[Writes[OrganisationEmail]], any)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 
