@@ -64,6 +64,12 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
           orgTelephoneNumber = None
         )
       ),
+      organisationEmail = Some(
+        OrganisationEmail(
+          Some("example@example.com"),
+          Some(true)
+        )
+      ),
       certificatesOfAuthority = Some(
         CertificatesOfAuthority(
           certificatesYesNo = Some(Yes),
@@ -115,6 +121,10 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "tradingUsingDifferentName": true,
         "tradingName": "test",
         "fcaNumber": "test"
+      },
+      "organisationEmail": {
+        "organisationEmail": "example@example.com",
+        "verified": true
       },
       "isaProducts": {
         "isaProducts": [
@@ -168,6 +178,10 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       "tradingUsingDifferentName": true,
       "tradingName": "test",
       "fcaNumber": "test"
+    },
+    "organisationEmail": {
+      "organisationEmail": "example@example.com",
+      "verified": true
     },
     "isaProducts": {
       "isaProducts": [

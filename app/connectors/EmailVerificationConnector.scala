@@ -18,12 +18,13 @@ package connectors
 
 import config.FrontendAppConfig
 import models.emailverification.{SendEmailVerificationCodeRequest, VerifyEmailCodeRequest}
+import play.api.Logging
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,10 +32,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class EmailVerificationConnector @Inject() (
   httpClient: HttpClientV2,
   appConfig: FrontendAppConfig
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def sendCode(email: String)(implicit hc: HeaderCarrier): Future[Unit] = {
-    val url = s"${appConfig.emailVerificationBaseUrl}/v2/send-code"
+    val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/v2/send-code"
 
     httpClient
       .post(url"$url")
@@ -46,12 +48,14 @@ class EmailVerificationConnector @Inject() (
             ()
 
           case status =>
+            val msg = upstreamErrorMessage(
+              endpoint = "POST /v2/send-code",
+              status = response.status,
+              body = response.body
+            )
+            logger.error(msg)
             throw UpstreamErrorResponse(
-              message = upstreamErrorMessage(
-                endpoint = "POST /v2/send-code",
-                status = response.status,
-                body = response.body
-              ),
+              message = msg,
               statusCode = response.status,
               reportAs = INTERNAL_SERVER_ERROR
             )
@@ -60,7 +64,7 @@ class EmailVerificationConnector @Inject() (
   }
 
   def verifyCode(email: String, code: String)(implicit hc: HeaderCarrier): Future[Unit] = {
-    val url = s"${appConfig.emailVerificationBaseUrl}/v2/verify-code"
+    val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/v2/verify-code"
 
     httpClient
       .post(url"$url")
@@ -72,9 +76,15 @@ class EmailVerificationConnector @Inject() (
             ()
 
           case status =>
+            val msg = upstreamErrorMessage(
+              endpoint = "POST /v2/verify-code",
+              status = response.status,
+              body = response.body
+            )
+            logger.error(msg)
             throw UpstreamErrorResponse(
-              message = s"Email verification verify-code failed with status [$status]",
-              statusCode = status,
+              message = msg,
+              statusCode = response.status,
               reportAs = INTERNAL_SERVER_ERROR
             )
         }
