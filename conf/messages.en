@@ -83,6 +83,7 @@ page.signOut.answers.not.saved.heading = We have signed you out
 ## Section Titles
 
 sectionTitle.orgDetails = Organisation details
+sectionTitle.organisationEmail = Organisation email
 sectionTitle.signatories = Signatories
 sectionTitle.liaisonOfficers = Liaison officers
 sectionTitle.isaProducts = ISA products
@@ -148,6 +149,16 @@ organisationTelephoneNumber.change.hidden = organisation telephone number
 registeredAddressCorrespondence.title = Do you want us to use the registered address to send you letters?
 registeredAddressCorrespondence.heading = Do you want us to use the registered address to send you letters?
 registeredAddressCorrespondence.error.required = Select yes if you want HMRC to use the address given for correspondence
+
+### Organisation Email
+
+organisationEmailAddress.title = What is the email address of your organisation?
+organisationEmailAddress.heading = What is the email address of your organisation?
+organisationEmailAddress.hint = This email will be used to notify you of any messages within your Business Tax Account (BTA) that need your attention
+organisationEmailAddress.checkYourAnswersLabel = Organisation email
+organisationEmailAddress.error.required = Enter the email address of your organisation. Use a name, @ symbol and a domain name, like yourname@example.com
+organisationEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
+organisationEmailAddress.change.hidden = organisation email
 
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?

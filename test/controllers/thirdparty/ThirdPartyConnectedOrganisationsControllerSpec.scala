@@ -28,7 +28,6 @@ import org.mockito.Mockito.when
 import play.api.data.Form
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.http.HeaderCarrier
 import views.html.thirdparty.ThirdPartyConnectedOrganisationsView
 
 import scala.concurrent.Future

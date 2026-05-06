@@ -38,6 +38,7 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
+import pages.orgemail.OrganisationEmailAddressPage
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import pages.thirdparty.*
 import play.api.mvc.Call
@@ -82,6 +83,7 @@ class Navigator @Inject() () {
     case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
+    case OrganisationEmailAddressPage              => TaskListController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
     case LiaisonOfficerEmailPage(id)               => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
     case LiaisonOfficerPhoneNumberPage(id)         => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)

@@ -43,8 +43,9 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
   val isaManagerGuidanceUrl: String = getString("urls.isaManagerGuidance")
   val ggSignInUrl: String           = s"$loginUrl?continue=${URLEncoder.encode(loginContinueUrl, "UTF-8")}"
 
-  lazy val disaRegistrationBaseUrl: String = baseUrl("disa-registration")
-  lazy val addressLookupBaseUrl: String    = baseUrl("address-lookup")
+  lazy val disaRegistrationBaseUrl: String  = baseUrl("disa-registration")
+  lazy val addressLookupBaseUrl: String     = baseUrl("address-lookup")
+  lazy val emailVerificationBaseUrl: String = baseUrl("email-verification")
 
   private lazy val exitSurveyBaseUrl: String = baseUrl("feedback-frontend")
 
