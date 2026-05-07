@@ -18,6 +18,7 @@ package connectors
 
 import base.SpecBase
 import config.FrontendAppConfig
+import models.emailverification.VerifyEmailCodeResult.{InvalidCode, Verified}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -150,7 +151,7 @@ class EmailVerificationConnectorSpec extends SpecBase {
           .verifyCode("test@example.com", "123456")
           .futureValue
 
-        result shouldBe ()
+        result shouldBe Verified
       }
 
       "must include request body" in new TestSetup {
@@ -165,27 +166,18 @@ class EmailVerificationConnectorSpec extends SpecBase {
         verify(mockRequestBuilder).withBody(any())(any(), any(), any())
       }
 
-      "must fail with UpstreamErrorResponse when downstream returns BAD_REQUEST" in new TestSetup {
+      "must return InvalidCode when downstream returns BAD_REQUEST" in new TestSetup {
 
         val upstreamBody = """{"code":"CODE_NOT_VALID"}"""
 
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, upstreamBody)))
 
-        val thrown = connector
+        val result = connector
           .verifyCode("test@example.com", "123456")
-          .failed
           .futureValue
 
-        thrown mustBe a[UpstreamErrorResponse]
-
-        val upstreamError = thrown.asInstanceOf[UpstreamErrorResponse]
-
-        upstreamError.statusCode mustEqual BAD_REQUEST
-        upstreamError.reportAs mustEqual INTERNAL_SERVER_ERROR
-        upstreamError.getMessage must include("Email verification call [POST /v2/verify-code] failed")
-        upstreamError.getMessage must include(s"upstream status [$BAD_REQUEST]")
-        upstreamError.getMessage must include(upstreamBody)
+        result mustBe InvalidCode
       }
 
       "must fail with UpstreamErrorResponse when downstream returns SERVICE_UNAVAILABLE" in new TestSetup {

@@ -31,6 +31,12 @@
 
 @(form: Form[_], mode: Mode, email: String)(implicit request: Request[_], messages: Messages)
 
+@changeEmailLink = @{
+  HtmlFormat.raw(
+    s"""<a class="govuk-link govuk-body" href="${OrganisationEmailAddressController.onPageLoad(mode).url}">${messages("emailVerificationCode.p2.link")}</a>"""
+  )
+}
+
 @layout(pageTitle = title(form, messages("emailVerificationCode.title"), Some(messages("sectionTitle.organisationEmail")))) {
 
     @formHelper(action = EmailVerificationCodeController.onSubmit()) {
@@ -47,22 +53,7 @@
         ))
 
         <p class="govuk-body">@HtmlFormat.raw(messages("emailVerificationCode.p1", email))</p>
-        <p class="govuk-body">@messages("emailVerificationCode.p2")</p>
-
-        <div class="govuk-button-group">
-            @govukButton(
-              Button(
-                preventDoubleClick = Some(true),
-                classes = "govuk-button--secondary",
-                attributes = Map(
-                  "formaction" -> controllers.orgemail.routes.EmailVerificationCodeController.requestNewCode().url,
-                  "formmethod" -> "post"
-                ),
-                content = Text(messages("emailVerificationCode.link1"))
-              )
-            )
-          <a class="govuk-link govuk-body" href="@OrganisationEmailAddressController.onPageLoad(mode).url">@messages("emailVerificationCode.link2")</a>
-        </div>
+        <p class="govuk-body">@HtmlFormat.raw(messages("emailVerificationCode.p2", changeEmailLink))</p>
 
         @govukInput(
             InputViewModel(
@@ -73,8 +64,21 @@
             .withWidth(Fixed10)
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.saveAndContinue"))
-        )
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(messages("site.saveAndContinue"))
+            )
+            @govukButton(
+              Button(
+                preventDoubleClick = Some(true),
+                classes = "govuk-button--secondary",
+                attributes = Map(
+                  "formaction" -> controllers.orgemail.routes.EmailVerificationCodeController.requestNewCode().url,
+                  "formmethod" -> "post"
+                ),
+                content = Text(messages("emailVerificationCode.link"))
+              )
+            )
+        </div>
     }
 }
