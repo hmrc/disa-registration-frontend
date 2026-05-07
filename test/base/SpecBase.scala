@@ -17,7 +17,7 @@
 package base
 
 import config.FrontendAppConfig
-import connectors.{AddressLookupConnector, DisaRegistrationConnector}
+import connectors.{AddressLookupConnector, DisaRegistrationConnector, EmailVerificationConnector}
 import controllers.actions.*
 import handlers.ErrorHandler
 import models.journeydata.JourneyData
@@ -88,6 +88,7 @@ trait SpecBase
   protected val mockRegisteredAddressUprnService: RegisteredAddressUprnService = mock[RegisteredAddressUprnService]
   protected val mockBvLockoutService: BusinessVerificationLockoutService       = mock[BusinessVerificationLockoutService]
   protected val mockUuidGenerator: UuidGenerator                               = mock[UuidGenerator]
+  protected val mockEmailVerificationConnector: EmailVerificationConnector     = mock[EmailVerificationConnector]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -107,7 +108,8 @@ trait SpecBase
       mockRegisteredAddressUprnService,
       mockUuidGenerator,
       mockBvLockoutService,
-      mockBvLockoutRepository
+      mockBvLockoutRepository,
+      mockEmailVerificationConnector
     )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))

@@ -62,8 +62,10 @@ trait BaseIntegrationSpec
       "microservice.services.disa-registration.port" -> wiremockPort.toString,
       "microservice.services.incorporated-entity-identification-frontend.host" -> wiremockHost,
       "microservice.services.incorporated-entity-identification-frontend.port" -> wiremockPort.toString,
+      "microservice.services.address-lookup.host" -> wiremockHost,
       "microservice.services.address-lookup.port" -> wiremockPort.toString,
-      "microservice.services.address-lookup.port" -> wiremockPort.toString
+      "microservice.services.email-verification.host" -> wiremockHost,
+      "microservice.services.email-verification.port" -> wiremockPort.toString,
     )
 
   override def beforeAll(): Unit = {

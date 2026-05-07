@@ -69,6 +69,13 @@ POST       /organisation-telephone-number                controllers.orgdetails.
 GET        /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = CheckMode)
 
+## Organisation Email
+
+GET        /organisation-email-address                   controllers.orgemail.OrganisationEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /organisation-email-address                   controllers.orgemail.OrganisationEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /change-organisation-email-address            controllers.orgemail.OrganisationEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-organisation-email-address            controllers.orgemail.OrganisationEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
 ## ISA Products
 GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
 POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
