@@ -28,8 +28,8 @@ class ThirdPartyCheckboxItemsSpec extends SpecBase {
 
   implicit lazy val msgs: Messages = stubMessages()
 
-  private val tp1 = ThirdParty(id = "id-1", thirdPartyName = Some("Org One"))
-  private val tp2 = ThirdParty(id = "id-2", thirdPartyName = Some("Org Two"))
+  private val tp1      = ThirdParty(id = "id-1", thirdPartyName = Some("Org One"))
+  private val tp2      = ThirdParty(id = "id-2", thirdPartyName = Some("Org Two"))
   private val tpNoName = ThirdParty(id = "id-3", thirdPartyName = None)
 
   "ThirdPartyCheckboxItems.items" - {
@@ -38,7 +38,7 @@ class ThirdPartyCheckboxItemsSpec extends SpecBase {
       val items =
         ThirdPartyCheckboxItems.items(
           thirdParties = Seq(tp1, tp2),
-          selected     = Nil
+          selected = Nil
         )
 
       items.map(_.content) must contain allOf (
@@ -51,10 +51,10 @@ class ThirdPartyCheckboxItemsSpec extends SpecBase {
       val items =
         ThirdPartyCheckboxItems.items(
           thirdParties = Seq(tp1, tpNoName),
-          selected     = Nil
+          selected = Nil
         )
 
-      items.map(_.content) must contain (Text("Org One"))
+      items.map(_.content) must contain(Text("Org One"))
       items.map(_.content) must not contain Text("")
     }
 
@@ -62,7 +62,7 @@ class ThirdPartyCheckboxItemsSpec extends SpecBase {
       val items =
         ThirdPartyCheckboxItems.items(
           thirdParties = Seq(tp1, tp2),
-          selected     = Seq("id-2")
+          selected = Seq("id-2")
         )
 
       val checkedItems =
@@ -75,7 +75,7 @@ class ThirdPartyCheckboxItemsSpec extends SpecBase {
       val items =
         ThirdPartyCheckboxItems.items(
           thirdParties = Seq(tp1),
-          selected     = Nil
+          selected = Nil
         )
 
       items.exists(_.divider.isDefined) mustBe true
@@ -85,7 +85,7 @@ class ThirdPartyCheckboxItemsSpec extends SpecBase {
       val items =
         ThirdPartyCheckboxItems.items(
           thirdParties = Seq(tp1),
-          selected     = Nil
+          selected = Nil
         )
 
       val noneItem =
@@ -101,7 +101,7 @@ class ThirdPartyCheckboxItemsSpec extends SpecBase {
       val items =
         ThirdPartyCheckboxItems.items(
           thirdParties = Seq(tp1, tp2),
-          selected     = Seq(noneAreConnectedFormValue)
+          selected = Seq(noneAreConnectedFormValue)
         )
 
       val noneItem =
@@ -114,7 +114,7 @@ class ThirdPartyCheckboxItemsSpec extends SpecBase {
       val items =
         ThirdPartyCheckboxItems.items(
           thirdParties = Seq(tp1, tp2),
-          selected     = Seq("id-1", noneAreConnectedFormValue)
+          selected = Seq("id-1", noneAreConnectedFormValue)
         )
 
       val checkedItems =
