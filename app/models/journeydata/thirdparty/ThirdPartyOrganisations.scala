@@ -73,15 +73,21 @@ case class ThirdPartyOrganisations(
     val updatedThirdParties =
       thirdParties.filterNot(_.id == id)
 
-    val updatedConnectedOrgs =
+    val connectedAfterNameRemoval =
       removedThirdPartyOpt
         .flatMap(_.thirdPartyName)
-        .map(name => connectedOrganisations.filterNot(_ == name))
+        .map { name =>
+          connectedOrganisations.filterNot(_ == name)
+        }
         .getOrElse(connectedOrganisations)
+
+    val finalConnectedOrgs =
+      if (updatedThirdParties.size == 1) Nil
+      else connectedAfterNameRemoval
 
     copy(
       thirdParties = updatedThirdParties,
-      connectedOrganisations = updatedConnectedOrgs
+      connectedOrganisations = finalConnectedOrgs
     )
   }
 }

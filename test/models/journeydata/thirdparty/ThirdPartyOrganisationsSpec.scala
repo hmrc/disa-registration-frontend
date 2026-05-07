@@ -207,13 +207,9 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
       }
     }
 
-    /*
-     * removeThirdParty
-     */
-
     "removeThirdParty" - {
 
-      "must remove a third party and its name from connectedOrganisations when name exists" in {
+      "must remove a third party and clear connectedOrganisations when only one third party remains" in {
 
         val model =
           ThirdPartyOrganisations(
@@ -239,11 +235,10 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
             thirdPartyName = Some("Org B")
           )
         )
-
-        result.connectedOrganisations mustBe Seq("Org B", "Org C")
+        result.connectedOrganisations mustBe Seq.empty
       }
 
-      "must remove only the third party when it has no name (no connected org update)" in {
+      "must remove the third party and clear connectedOrganisations when only one remains, even if removed party has no name" in {
 
         val model =
           ThirdPartyOrganisations(
@@ -270,7 +265,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
           )
         )
 
-        result.connectedOrganisations mustBe Seq("Org B")
+        result.connectedOrganisations mustBe Seq.empty
       }
 
       "must do nothing when third party id does not exist" in {
@@ -284,7 +279,7 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
                 thirdPartyName = Some("Org A")
               )
             ),
-            connectedOrganisations = Seq("Org A")
+            connectedOrganisations = Seq.empty
           )
 
         val result = model.removeThirdParty("missing-id")
@@ -304,6 +299,36 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
         val result = model.removeThirdParty("anything")
 
         result mustBe model
+      }
+
+      "must clear connectedOrganisations when removing a third party leaves only one remaining" in {
+
+        val model =
+          ThirdPartyOrganisations(
+            managedByThirdParty = None,
+            thirdParties = Seq(
+              ThirdParty(
+                id = "tp-1",
+                thirdPartyName = Some("Org A")
+              ),
+              ThirdParty(
+                id = "tp-2",
+                thirdPartyName = Some("Org B")
+              )
+            ),
+            connectedOrganisations = Seq("Org A", "Org B")
+          )
+
+        val result = model.removeThirdParty("tp-1")
+
+        result.thirdParties mustBe Seq(
+          ThirdParty(
+            id = "tp-2",
+            thirdPartyName = Some("Org B")
+          )
+        )
+
+        result.connectedOrganisations mustBe Seq.empty
       }
     }
   }
