@@ -17,26 +17,23 @@
 package controllers.thirdparty
 
 import controllers.actions.*
-import models.journeydata.thirdparty.ThirdParty
-import models.requests.DataRequest
+import models.NormalMode
+import controllers.routes.*
+import controllers.thirdparty.routes.*
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.thirdparty
-import viewmodels.checkAnswers.thirdparty.*
-import viewmodels.govuk.summarylist.*
-import views.html.thirdparty.{ThirdPartiesCheckYourAnswersView, ThirdPartyCheckYourAnswersView}
+import views.html.thirdparty.ThirdPartiesCheckYourAnswersView
 
 import javax.inject.Inject
 
-class ThirdPartiesCheckYourAnswersController @Inject()(
+class ThirdPartiesCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  viewModel: ThirdPartiesCheckYourAnswersViewModel,
   view: ThirdPartiesCheckYourAnswersView
 ) extends FrontendBaseController
     with I18nSupport
@@ -45,11 +42,12 @@ class ThirdPartiesCheckYourAnswersController @Inject()(
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.journeyData.thirdPartyOrganisations match {
-        case Some(section) if section.thirdParties.exists(!_.inProgress) =>
-          Ok(view(viewModel(section)))
-
-        case _ =>
-          Redirect(controllers.routes.TaskListController.onPageLoad())
+        case Some(section) if section.canAccessCheckYourAnswers =>
+          Ok(view(section))
+        case Some(section) if section.hasSingleCompleted        =>
+          Redirect(AddedThirdPartiesController.onPageLoad(NormalMode, None))
+        case _                                                  =>
+          Redirect(TaskListController.onPageLoad())
       }
     }
 }

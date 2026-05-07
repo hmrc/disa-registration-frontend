@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.thirdparty
+package viewmodels.checkAnswers.thirdparty.finalcya
 
-import controllers.thirdparty.routes.{ProductsManagedByThirdPartyController, ReturnsManagedByThirdPartyController}
+import controllers.thirdparty.routes.InvestorFundsUsedByThirdPartyController
 import models.CheckMode
-import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
+import models.ReturnTo.FinalCya
+import models.journeydata.thirdparty.ThirdParty
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -26,12 +27,14 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListR
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object AddAnotherThirdPartySummary {
+object InvestorFundsUsedByThirdPartySummary {
 
-  def row(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit messages: Messages): SummaryListRow = {
-    val answer = if(thirdPartyOrganisations.thirdParties.size > 1) "yes" else "no"
-    SummaryListRowViewModel(
-      key = Key(Text(messages("thirdPartiesCheckYourAnswers.addAnother.label"))),
+  def row(thirdParty: ThirdParty)(implicit messages: Messages): Option[SummaryListRow] =
+    for {
+      name   <- thirdParty.thirdPartyName
+      answer <- thirdParty.usingInvestorFunds
+    } yield SummaryListRowViewModel(
+      key = Key(Text(messages("investorFundsUsedByThirdParty.checkYourAnswersLabel", name))),
       value = ValueViewModel(
         HtmlContent(
           HtmlFormat.escape(messages(s"site.$answer"))
@@ -40,10 +43,10 @@ object AddAnotherThirdPartySummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          ProductsManagedByThirdPartyController.onPageLoad(CheckMode).url
+          InvestorFundsUsedByThirdPartyController.onPageLoad(thirdParty.id, CheckMode, Some(FinalCya)).url
         )
-          .withVisuallyHiddenText(messages("productsManagedByThirdParty.change.hidden"))
+          .withVisuallyHiddenText(messages("investorFundsUsedByThirdParty.change.hidden", name))
       )
     )
-  }
+
 }

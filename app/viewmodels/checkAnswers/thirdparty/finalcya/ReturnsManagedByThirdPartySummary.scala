@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.thirdparty
+package viewmodels.checkAnswers.thirdparty.finalcya
 
-import controllers.thirdparty.routes.ReturnsManagedByThirdPartyController
+import controllers.thirdparty.routes.*
 import models.CheckMode
+import models.ReturnTo.FinalCya
 import models.journeydata.thirdparty.ThirdParty
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -42,7 +43,7 @@ object ReturnsManagedByThirdPartySummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          ReturnsManagedByThirdPartyController.onPageLoad(thirdParty.id, CheckMode).url
+          ThirdPartyManagingReturnsController.onPageLoad(thirdParty.id, CheckMode, Some(FinalCya)).url
         )
           .withVisuallyHiddenText(messages("returnsManagedByThirdParty.change.hidden"))
       )

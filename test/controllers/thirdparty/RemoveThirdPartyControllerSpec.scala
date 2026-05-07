@@ -17,12 +17,12 @@
 package controllers.thirdparty
 
 import base.SpecBase
-import controllers.routes.IndexController
+import controllers.routes.TaskListController
 import controllers.thirdparty.routes.RemoveThirdPartyController
 import forms.YesNoAnswerFormProvider
-import models.YesNoAnswer
 import models.YesNoAnswer.{No, Yes}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
+import models.{NormalMode, YesNoAnswer}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
@@ -57,7 +57,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         ThirdPartyOrganisations(
           managedByThirdParty = None,
           thirdParties = thirdParties,
-          connectedOrganisations = Set.empty
+          connectedOrganisations = Seq.empty
         )
       )
     )
@@ -83,7 +83,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Index when third party does not exist" in {
+    "must redirect to Tasklist when third party does not exist" in {
 
       val application =
         applicationBuilder(journeyData = Some(withThirdParties(Seq(otherThirdParty)))).build()
@@ -92,11 +92,11 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         val result = route(application, FakeRequest(GET, routeUrl)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
-    "must redirect to Index when name is missing" in {
+    "must redirect to Tasklist when name is missing" in {
 
       val tpWithoutName = ThirdParty(existingId, None)
 
@@ -107,11 +107,11 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         val result = route(application, FakeRequest(GET, routeUrl)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
-    "must redirect to Index when section is missing" in {
+    "must redirect to Tasklist when section is missing" in {
 
       val application =
         applicationBuilder(journeyData = Some(testJourneyData)).build()
@@ -120,7 +120,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         val result = route(application, FakeRequest(GET, routeUrl)).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
@@ -155,7 +155,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         ThirdPartyOrganisations(
           None,
           Seq(otherThirdParty),
-          Set.empty
+          Seq.empty
         )
 
       when(
@@ -177,13 +177,14 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
           .update(eqTo(expected), any(), any())(any[Writes[ThirdPartyOrganisations]], any)
 
         status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustEqual Some(routes.AddedThirdPartiesController.onPageLoad(NormalMode, None).url)
       }
     }
 
     "must not remove and still update when No is submitted" in {
 
       val existingSection =
-        ThirdPartyOrganisations(None, Seq(existingThirdParty, otherThirdParty), Set.empty)
+        ThirdPartyOrganisations(None, Seq(existingThirdParty, otherThirdParty), Seq.empty)
 
       val journeyData =
         testJourneyData.copy(thirdPartyOrganisations = Some(existingSection))
@@ -210,7 +211,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Index when third party not found on POST" in {
+    "must redirect to Tasklist when third party not found on POST" in {
 
       val application =
         applicationBuilder(journeyData = Some(withThirdParties(Seq(otherThirdParty)))).build()
@@ -223,11 +224,11 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
-    "must redirect to Index when section missing on POST" in {
+    "must redirect to Tasklist when section missing on POST" in {
 
       val application =
         applicationBuilder(journeyData = Some(testJourneyData)).build()
@@ -240,7 +241,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
@@ -249,7 +250,7 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
       val journeyData = withThirdParties(Seq(existingThirdParty))
 
       val updated =
-        ThirdPartyOrganisations(None, Seq.empty, Set.empty)
+        ThirdPartyOrganisations(None, Seq.empty, Seq.empty)
 
       when(
         mockJourneyAnswersService

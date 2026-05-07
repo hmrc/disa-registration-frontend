@@ -14,9 +14,25 @@
  * limitations under the License.
  */
 
-package pages.thirdparty
+package forms
 
-import models.journeydata.thirdparty.ThirdPartyOrganisations
-import pages.Page
+import play.api.data.Form
+import play.api.data.Forms.{nonEmptyText, seq}
 
-case object ConnectedThirdPariesPage extends Page[ThirdPartyOrganisations]
+import javax.inject.Inject
+
+class ThirdPartyConnectedOrganisationsFormProvider @Inject {
+
+  // TODO: Waiting on confirmation from UCD but we require two error message
+  // 1. if only selected one org
+  // 2. if JS is disabled and user selects none&orgs
+  def apply(): Form[Seq[String]] =
+    Form(
+      "value" ->
+        seq(nonEmptyText)
+          .verifying(
+            "thirdPartyConnectedOrganisations.error.required",
+            _.nonEmpty
+          )
+    )
+}

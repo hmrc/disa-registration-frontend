@@ -72,7 +72,7 @@ class FirmReferenceNumberController @Inject() (
           journeyAnswersService
             .update(updatedSection, request.groupId, request.credentials.providerId)
             .map { updatedSection =>
-              Redirect(navigator.nextPage(FirmReferenceNumberPage, updatedSection, mode))
+              Redirect(navigator.nextPage(FirmReferenceNumberPage, updatedSection, mode, None))
             }
             .recoverWith { case NonFatal(e) =>
               logger.warn(

@@ -74,7 +74,7 @@ class ZReferenceNumberController @Inject() (
           journeyAnswersService
             .update(updatedSection, request.groupId, request.credentials.providerId)
             .map { updatedSection =>
-              Redirect(navigator.nextPage(ZReferenceNumberPage, updatedSection, mode))
+              Redirect(navigator.nextPage(ZReferenceNumberPage, updatedSection, mode, None))
             }
             .recoverWith { case NonFatal(e) =>
               logger.warn(

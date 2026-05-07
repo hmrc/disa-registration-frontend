@@ -25,7 +25,8 @@ case class Session(
   userId: String,
   auditContinuationEventSent: Boolean,
   updatesInThisSession: Boolean,
-  lastSeen: Instant
+  lastSeen: Instant,
+  navigationContext: Option[NavigationContext] = None
 )
 
 object Session {

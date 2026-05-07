@@ -42,9 +42,9 @@ object InvestorFundsUsedByThirdPartySummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          InvestorFundsUsedByThirdPartyController.onPageLoad(thirdParty.id, CheckMode).url
+          InvestorFundsUsedByThirdPartyController.onPageLoad(thirdParty.id, CheckMode, None).url
         )
-          .withVisuallyHiddenText(messages("investorFundsUsedByThirdParty.change.hidden"))
+          .withVisuallyHiddenText(messages("investorFundsUsedByThirdParty.change.hidden", name))
       )
     )
 

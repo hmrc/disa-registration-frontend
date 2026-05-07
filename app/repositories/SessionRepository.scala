@@ -17,7 +17,7 @@
 package repositories
 
 import config.FrontendAppConfig
-import models.session.Session
+import models.session.*
 import org.bson.conversions.Bson
 import org.mongodb.scala.model.*
 import uk.gov.hmrc.mongo.MongoComponent
@@ -102,6 +102,41 @@ class SessionRepository @Inject() (
       .updateOne(
         filter = byId(userId),
         update = Updates.set("lastSeen", Instant.now(clock))
+      )
+      .toFuture()
+      .map(_ => ())
+
+  def setReturnToFinalCya(userId: String, value: Boolean): Future[Unit] =
+    collection
+      .updateOne(
+        filter = byId(userId),
+        update = Updates.combine(
+          Updates.set("navigationContext.returnToFinalCya", value),
+          Updates.set("lastSeen", now),
+          Updates.setOnInsert("userId", userId),
+          Updates.setOnInsert("auditContinuationEventSent", false),
+          Updates.setOnInsert("updatesInThisSession", false)
+        ),
+        options = new UpdateOptions().upsert(true)
+      )
+      .toFuture()
+      .map(_ => ())
+
+  def getReturnToFinalCya(userId: String): Future[Boolean] =
+    collection
+      .find(byId(userId))
+      .first()
+      .toFutureOption()
+      .map(
+        _.flatMap(_.navigationContext.map(_.returnToFinalCya))
+          .getOrElse(false)
+      )
+
+  def clearReturnToFinalCya(userId: String): Future[Unit] =
+    collection
+      .updateOne(
+        filter = byId(userId),
+        update = Updates.unset("navigationContext")
       )
       .toFuture()
       .map(_ => ())

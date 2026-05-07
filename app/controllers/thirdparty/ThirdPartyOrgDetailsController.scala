@@ -21,7 +21,7 @@ import controllers.actions.*
 import controllers.routes.*
 import forms.ThirdPartyOrgDetailsFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.thirdparty.*
 import models.requests.DataRequest
 import navigation.Navigator
@@ -59,9 +59,9 @@ class ThirdPartyOrgDetailsController @Inject() (
 
   val form: Form[ThirdPartyOrgDetailsForm] = formProvider()
 
-  def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] =
+  def onPageLoad(id: Option[String], mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      if (id.isEmpty && thirdPartyCount(request) >= appConfig.maxThirdParties) {
+      if (cannotAddAnotherThirdParty(id, request)) {
         Redirect(TaskListController.onPageLoad())
       } else {
         val preparedFormAndId = (for {
@@ -73,19 +73,16 @@ class ThirdPartyOrgDetailsController @Inject() (
         } yield (form.fill(ThirdPartyOrgDetailsForm(name, frn)), id))
           .getOrElse((form, uuidGenerator.generate()))
 
-        Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
+        Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode, returnTo))
       }
     }
 
-  private def thirdPartyCount(request: DataRequest[_]): Int =
-    request.journeyData.thirdPartyOrganisations.map(_.thirdParties.size).getOrElse(0)
-
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] =
+  def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode, returnTo))),
           answer => {
             val name = answer.thirdPartyName
             val frn  = answer.frn
@@ -100,7 +97,8 @@ class ThirdPartyOrgDetailsController @Inject() (
                       navigator.nextPage(
                         ThirdPartyOrgDetailsPage(id),
                         updated,
-                        mode
+                        mode,
+                        returnTo
                       )
                     )
                   }
@@ -117,4 +115,13 @@ class ThirdPartyOrgDetailsController @Inject() (
           }
         )
     }
+
+  private def thirdPartyCount(request: DataRequest[_]): Int =
+    request.journeyData.thirdPartyOrganisations.map(_.thirdParties.size).getOrElse(0)
+
+  private def cannotAddAnotherThirdParty(
+    id: Option[String],
+    request: DataRequest[_]
+  ): Boolean =
+    id.isEmpty && thirdPartyCount(request) >= appConfig.maxThirdParties
 }

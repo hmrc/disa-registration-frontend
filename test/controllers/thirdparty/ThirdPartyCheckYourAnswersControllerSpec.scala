@@ -79,7 +79,7 @@ class ThirdPartyCheckYourAnswersControllerSpec extends SpecBase {
         val expectedRows =
           Seq(
             ThirdPartyOrgDetailsSummary.row(thirdParty, 2),
-            ReturnsManagedByThirdPartySummary.row(thirdParty),
+            ThirdPartyManagingReturnsSummary.row(thirdParty),
             InvestorFundsUsedByThirdPartySummary.row(thirdParty),
             ThirdPartyInvestorFundsPercentageSummary.row(thirdParty)
           ).flatten

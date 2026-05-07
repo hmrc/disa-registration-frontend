@@ -46,13 +46,13 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
   val form: Form[YesNoAnswer]               = formProvider("investorFundsUsedByThirdParty.error.required")
 
   def onwardRoute(id: String) =
-    routes.ThirdPartyInvestorFundsPercentageController.onPageLoad(id, NormalMode)
+    routes.ThirdPartyInvestorFundsPercentageController.onPageLoad(id, NormalMode, None)
 
   lazy val routeUrl: String =
-    routes.InvestorFundsUsedByThirdPartyController.onPageLoad(existingId, NormalMode).url
+    routes.InvestorFundsUsedByThirdPartyController.onPageLoad(existingId, NormalMode, None).url
 
   lazy val submitUrl: String =
-    routes.InvestorFundsUsedByThirdPartyController.onSubmit(existingId, NormalMode).url
+    routes.InvestorFundsUsedByThirdPartyController.onSubmit(existingId, NormalMode, None).url
 
   "InvestorFundsUsedByThirdPartyController" - {
 
@@ -68,7 +68,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -82,7 +82,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           val view   = application.injector.instanceOf[InvestorFundsUsedByThirdPartyView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(existingId, name, form, NormalMode)(
+          contentAsString(result) mustEqual view(existingId, name, form, NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -102,7 +102,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name), usingInvestorFunds = Some(yesAnswer))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -116,7 +116,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           val view   = application.injector.instanceOf[InvestorFundsUsedByThirdPartyView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(existingId, name, form.fill(yesAnswer), NormalMode)(
+          contentAsString(result) mustEqual view(existingId, name, form.fill(yesAnswer), NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -130,7 +130,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
             testGroupId,
             testString,
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Seq.empty)
             )
           )
 
@@ -151,7 +151,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
             testGroupId,
             testString,
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Seq.empty)
             )
           )
 
@@ -175,7 +175,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
             testGroupId,
             testString,
             thirdPartyOrganisations = Some(
-              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, Some(name))), Set.empty)
+              ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, Some(name))), Seq.empty)
             )
           )
 
@@ -192,7 +192,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(existingId, name, boundForm, NormalMode)(
+          contentAsString(result) mustEqual view(existingId, name, boundForm, NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -227,7 +227,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -239,7 +239,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdParty(otherId, Some("Other")),
               ThirdParty(existingId, Some(name), usingInvestorFunds = Some(yesAnswer))
             ),
-            Set.empty
+            Seq.empty
           )
 
         when(
@@ -277,7 +277,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
                   ThirdParty(otherId, Some("Other")),
                   ThirdParty(existingId, Some(name))
                 ),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -289,7 +289,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdParty(otherId, Some("Other")),
               ThirdParty(existingId, Some(name), usingInvestorFunds = Some(noAnswer))
             ),
-            Set.empty
+            Seq.empty
           )
 
         when(
@@ -324,7 +324,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -360,7 +360,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
               ThirdPartyOrganisations(
                 None,
                 Seq(ThirdParty(existingId, Some(name), usingInvestorFunds = Some(noAnswer))),
-                Set.empty
+                Seq.empty
               )
             )
           )
@@ -369,13 +369,13 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(GET, routes.InvestorFundsUsedByThirdPartyController.onPageLoad(existingId, CheckMode).url)
+            FakeRequest(GET, routes.InvestorFundsUsedByThirdPartyController.onPageLoad(existingId, CheckMode, None).url)
 
           val result = route(application, request).value
           val view   = application.injector.instanceOf[InvestorFundsUsedByThirdPartyView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(existingId, name, form.fill(noAnswer), CheckMode)(
+          contentAsString(result) mustEqual view(existingId, name, form.fill(noAnswer), CheckMode, None)(
             request,
             messages(application)
           ).toString

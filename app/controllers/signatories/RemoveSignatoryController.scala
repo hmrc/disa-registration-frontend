@@ -96,7 +96,7 @@ class RemoveSignatoryController @Inject() (
     journeyAnswersService
       .update(updatedSection, request.groupId, request.credentials.providerId)
       .map { updatedSection =>
-        Redirect(navigator.nextPage(RemoveSignatoryPage(id = id), updatedSection, NormalMode))
+        Redirect(navigator.nextPage(RemoveSignatoryPage(id = id), updatedSection, NormalMode, None))
       }
       .recoverWith { case NonFatal(e) =>
         logger.warn(

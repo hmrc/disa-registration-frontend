@@ -17,7 +17,8 @@
 package controllers.thirdparty
 
 import controllers.actions.*
-import controllers.routes.IndexController
+import controllers.routes.*
+import controllers.thirdparty.routes.*
 import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
 import models.YesNoAnswer.{No, Yes}
@@ -60,6 +61,7 @@ class RemoveThirdPartyController @Inject() (
       providingName(id, name => Future.successful(Ok(view(id, name, form))))
   }
 
+  // TODO: if a user removes and then users back, where should they be redirected too.
   def onSubmit(id: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       providingName(
@@ -74,10 +76,9 @@ class RemoveThirdPartyController @Inject() (
                   case Yes => updatedSectionWithThirdPartyRemoved(id)
                   case No  => request.journeyData.thirdPartyOrganisations
                 }
-
-                updatedSection.fold(Future.successful(Redirect(IndexController.onPageLoad())))(section =>
-                  updateAnswersAndRedirect(section)
-                )
+                updatedSection.fold(
+                  Future.successful(Redirect(AddedThirdPartiesController.onPageLoad(NormalMode, None)))
+                )(section => updateAnswersAndRedirect(section))
               }
             )
       )
@@ -88,7 +89,7 @@ class RemoveThirdPartyController @Inject() (
       thirdParty <- findThirdParty(id)
       name       <- thirdParty.thirdPartyName
     } yield block(name))
-      .getOrElse(Future.successful(Redirect(IndexController.onPageLoad())))
+      .getOrElse(Future.successful(Redirect(TaskListController.onPageLoad())))
 
   private def updateAnswersAndRedirect(
     updatedSection: ThirdPartyOrganisations
@@ -96,7 +97,7 @@ class RemoveThirdPartyController @Inject() (
     journeyAnswersService
       .update(updatedSection, request.groupId, request.credentials.providerId)
       .map { updatedSection =>
-        Redirect(navigator.nextPage(RemoveThirdPartyPage, updatedSection, NormalMode))
+        Redirect(navigator.nextPage(RemoveThirdPartyPage, updatedSection, NormalMode, None))
       }
       .recoverWith { case NonFatal(e) =>
         logger.warn(
@@ -111,9 +112,5 @@ class RemoveThirdPartyController @Inject() (
   private def updatedSectionWithThirdPartyRemoved(
     id: String
   )(implicit request: DataRequest[_]): Option[ThirdPartyOrganisations] =
-    request.journeyData.thirdPartyOrganisations.map(thirdParties =>
-      thirdParties.copy(
-        thirdParties = thirdParties.thirdParties.filterNot(_.id == id)
-      )
-    )
+    request.journeyData.thirdPartyOrganisations.map(_.removeThirdParty(id))
 }

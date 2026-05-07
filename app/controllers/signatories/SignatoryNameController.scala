@@ -116,7 +116,8 @@ class SignatoryNameController @Inject() (
                   navigator.nextPage(
                     SignatoryNamePage(id),
                     updatedSection,
-                    mode
+                    mode,
+                    None
                   )
                 )
               }

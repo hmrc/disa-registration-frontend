@@ -35,7 +35,7 @@
     headingClasses = Some("govuk-heading-l"),
   ))
 
-  @formHelper(action = AddedThirdPartiesController.onPageLoad(), Symbol("autoComplete") -> "off") {
+  @formHelper(action = ThirdPartyCheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
 
     @govukSummaryList(list)
 

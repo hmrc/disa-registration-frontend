@@ -51,7 +51,7 @@ object ThirdPartyOrgDetailsSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            ThirdPartyOrgDetailsController.onPageLoad(Some(thirdParty.id), CheckMode).url
+            ThirdPartyOrgDetailsController.onPageLoad(Some(thirdParty.id), CheckMode, None).url
           ).withVisuallyHiddenText(messages("thirdPartyOrgDetails.change.hidden", index))
         )
       )

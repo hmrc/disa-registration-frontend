@@ -14,48 +14,47 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.thirdparty
+package viewmodels.checkAnswers.thirdparty.finalcya
 
-import controllers.thirdparty.routes.ThirdPartyInvestorFundsPercentageController
+import controllers.thirdparty.routes.*
 import models.CheckMode
-import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
+import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow, Value}
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ConnectedOrganisationsSummary {
+object ThirdPartyConnectedOrganisationsControllerSummary {
 
   def row(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit messages: Messages): Option[SummaryListRow] = {
 
     val connectedOrgs = thirdPartyOrganisations.connectedOrganisations
 
-    val displayValue =
+    val displayValue: Value =
       if (connectedOrgs.nonEmpty) {
-        HtmlContent(
-          HtmlFormat.fill(
-            connectedOrgs.flatMap { org =>
-              Seq(
-                HtmlFormat.escape(org),
-                HtmlFormat.raw("<br>")
-              )
-            }
+        ValueViewModel(
+          HtmlContent(
+            Html(
+              connectedOrgs
+                .map(answer => HtmlFormat.escape(answer).body)
+                .mkString(",<br>")
+            )
           )
         )
       } else {
-        ValueViewModel(messages("site.no"))
+        ValueViewModel(Text(messages("site.no")))
       }
 
     Some(
       SummaryListRowViewModel(
-        key = Key(Text(messages("connectedOrganisations.checkYourAnswersLabel"))),
+        key = Key(Text(messages("thirdPartyConnectedOrganisations.checkYourAnswersLabel"))),
         value = displayValue,
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            controllers.thirdparty.routes.ThirdPartyConnectedOrganisationsController
+            ThirdPartyConnectedOrganisationsController
               .onPageLoad(CheckMode)
               .url
           ).withVisuallyHiddenText(

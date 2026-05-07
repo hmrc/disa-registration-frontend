@@ -17,6 +17,6 @@
 package pages.thirdparty
 
 import models.journeydata.thirdparty.ThirdPartyOrganisations
-import pages.IdentifiedPage
+import pages.Page
 
-final case class ReturnsManagedByThirdPartyPage(id: String) extends IdentifiedPage[ThirdPartyOrganisations]
+case object AddedThirdPartiesPage extends Page[ThirdPartyOrganisations]

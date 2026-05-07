@@ -42,7 +42,7 @@ object ThirdPartyInvestorFundsPercentageSummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          ThirdPartyInvestorFundsPercentageController.onPageLoad(thirdParty.id, CheckMode).url
+          ThirdPartyInvestorFundsPercentageController.onPageLoad(thirdParty.id, CheckMode, None).url
         )
           .withVisuallyHiddenText(messages("thirdPartyInvestorFundsPercentage.change.hidden"))
       )

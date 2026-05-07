@@ -23,7 +23,7 @@ import play.api.libs.json.{Json, OFormat}
 case class ThirdPartyOrganisations(
   managedByThirdParty: Option[YesNoAnswer] = None,
   thirdParties: Seq[ThirdParty] = Nil,
-  connectedOrganisations: Set[String] = Set.empty
+  connectedOrganisations: Seq[String] = Nil
 ) extends TaskListSection {
   def sectionName: String = ThirdPartyOrganisations.sectionName
 
@@ -48,6 +48,41 @@ case class ThirdPartyOrganisations(
         )
 
     copy(thirdParties = updated)
+  }
+
+  def completedThirdParties: Seq[ThirdParty] =
+    thirdParties.filterNot(_.inProgress)
+
+  def completedCount: Int =
+    completedThirdParties.size
+
+  def hasMultipleCompleted: Boolean =
+    completedCount > 1
+
+  def hasSingleCompleted: Boolean =
+    completedCount == 1
+
+  def canAccessCheckYourAnswers: Boolean =
+    hasMultipleCompleted
+
+  def removeThirdParty(id: String): ThirdPartyOrganisations = {
+
+    val removedThirdPartyOpt =
+      thirdParties.find(_.id == id)
+
+    val updatedThirdParties =
+      thirdParties.filterNot(_.id == id)
+
+    val updatedConnectedOrgs =
+      removedThirdPartyOpt
+        .flatMap(_.thirdPartyName)
+        .map(name => connectedOrganisations.filterNot(_ == name))
+        .getOrElse(connectedOrganisations)
+
+    copy(
+      thirdParties = updatedThirdParties,
+      connectedOrganisations = updatedConnectedOrgs
+    )
   }
 }
 

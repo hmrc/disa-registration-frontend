@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.thirdparty
+package viewmodels.checkAnswers.thirdparty.finalcya
 
-import controllers.thirdparty.routes.{ProductsManagedByThirdPartyController, ReturnsManagedByThirdPartyController}
+import controllers.thirdparty.routes.AddedThirdPartiesController
 import models.CheckMode
-import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
+import models.ReturnTo.FinalCya
+import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -26,22 +27,20 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListR
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ProductsManagedByThirdPartySummary {
+object AddAnotherThirdPartySummary {
 
-  def row(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit messages: Messages): Option[SummaryListRow] =
-    for {
-      answer <- thirdPartyOrganisations.managedByThirdParty
-    } yield SummaryListRowViewModel(
-      key = Key(Text(messages("productsManagedByThirdParty.checkYourAnswersLabel"))),
+  def row(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit messages: Messages): SummaryListRow =
+    SummaryListRowViewModel(
+      key = Key(Text(messages("thirdPartiesCheckYourAnswers.addAnother.label"))),
       value = ValueViewModel(
         HtmlContent(
-          HtmlFormat.escape(messages(s"site.$answer"))
+          HtmlFormat.escape(messages("site.no"))
         )
       ),
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          ProductsManagedByThirdPartyController.onPageLoad(CheckMode).url
+          AddedThirdPartiesController.onPageLoad(CheckMode, Some(FinalCya)).url
         )
           .withVisuallyHiddenText(messages("productsManagedByThirdParty.change.hidden"))
       )

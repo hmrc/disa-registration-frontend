@@ -24,6 +24,7 @@ import controllers.routes.*
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
+import models.ReturnTo.FinalCya
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
@@ -47,28 +48,43 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class Navigator @Inject() () {
 
-  def nextPage[A <: TaskListSection](page: PageWithDependents[A], existing: Option[A], updated: A, mode: Mode): Call = {
+  def nextPage[A <: TaskListSection](
+    page: PageWithDependents[A],
+    existing: Option[A],
+    updated: A,
+    mode: Mode,
+    returnTo: Option[ReturnTo]
+  ): Call = {
     val onwardMode: Mode =
       existing.fold(NormalMode)(existing => if (page.resumeNormalMode(updated)) NormalMode else mode)
 
     onwardMode match {
       case NormalMode =>
-        normalRoutes(page, updated)
+        normalRoutes(page, updated, returnTo)
       case CheckMode  =>
-        checkRouteMap(page)
+        checkRouteMap(page, returnTo)
     }
   }
 
-  def nextPage[A <: TaskListSection](page: Page[A], updated: A, mode: Mode): Call =
+  def nextPage[A <: TaskListSection](
+    page: Page[A],
+    updated: A,
+    mode: Mode,
+    returnTo: Option[ReturnTo]
+  ): Call =
     mode match {
       case NormalMode =>
-        normalRoutes(page, updated)
+        normalRoutes(page, updated, returnTo)
       case CheckMode  =>
-        checkRouteMap(page)
+        checkRouteMap(page, returnTo)
     }
 
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
-  private[navigation] def normalRoutes[A <: TaskListSection](page: Page[A], answers: A): Call = page match {
+  private[navigation] def normalRoutes[A <: TaskListSection](
+    page: Page[A],
+    answers: A,
+    returnTo: Option[ReturnTo]
+  ): Call = page match {
     case RegisteredIsaManagerPage                  => ???
     case ZReferenceNumberPage                      => ???
     case FirmReferenceNumberPage                   => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
@@ -91,42 +107,45 @@ class Navigator @Inject() () {
     case SignatoryNamePage(id)                     => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
     case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
     case ProductsManagedByThirdPartyPage           => productsManagedByThirdPartNextPage(answers)
-    case ThirdPartyOrgDetailsPage(id)              => ReturnsManagedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
-    case ReturnsManagedByThirdPartyPage(id)        =>
-      InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode)
-    case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id)
-    case ThirdPartyInvestorFundsPercentagePage(id) => ThirdPartyCheckYourAnswersController.onPageLoad(id)
+    case ThirdPartyOrgDetailsPage(id)              =>
+      ThirdPartyManagingReturnsController.onPageLoad(id = id, mode = NormalMode, None)
+    case ThirdPartyManagingReturnsPage(id)         =>
+      InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode, None)
+    case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id, returnTo)
+    case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckRoute(id, returnTo)
     case RemoveThirdPartyPage                      => removeThirdPartyNextPage(answers)
-    case ConnectedThirdPariesPage                  => ThirdPartiesCheckYourAnswersController.onPageLoad()
+    case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
     case _                                         => throw new NotImplementedError("No route for this page")
   }
 
-  private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A]): Call = page match {
-    case RegisteredIsaManagerPage                  => ???
-    case ZReferenceNumberPage                      => ???
-    case TradingUsingDifferentNamePage             => ???
-    case TradingNamePage                           => ???
-    case IsaProductsPage                           => IsaProductsCheckYourAnswersController.onPageLoad()
-    case InnovativeFinancialProductsPage           => IsaProductsCheckYourAnswersController.onPageLoad()
-    case PeerToPeerPlatformPage                    => IsaProductsCheckYourAnswersController.onPageLoad()
-    case PeerToPeerPlatformNumberPage              => IsaProductsCheckYourAnswersController.onPageLoad()
-    case CertificatesOfAuthorityYesNoPage          => CoaCheckYourAnswersController.onPageLoad()
-    case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
-    case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
-    case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
-    case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
-    case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
-    case LiaisonOfficerPhoneNumberPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
-    case LiaisonOfficerCommunicationPage(id)       => LoCheckYourAnswersController.onPageLoad(id)
-    case SignatoryNamePage(id)                     => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case ThirdPartyOrgDetailsPage(id)              => ThirdPartyCheckYourAnswersController.onPageLoad(id)
-    case ReturnsManagedByThirdPartyPage(id)        => ThirdPartyCheckYourAnswersController.onPageLoad(id)
-    case InvestorFundsUsedByThirdPartyPage(id)     => ThirdPartyCheckYourAnswersController.onPageLoad(id)
-    case ThirdPartyInvestorFundsPercentagePage(id) => ThirdPartyCheckYourAnswersController.onPageLoad(id)
-    case ConnectedThirdPariesPage                  => ThirdPartiesCheckYourAnswersController.onPageLoad()
-    case _                                         => throw new NotImplementedError("No route for this page")
-  }
+  private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A], returnTo: Option[ReturnTo]): Call =
+    page match {
+      case RegisteredIsaManagerPage                  => ???
+      case ZReferenceNumberPage                      => ???
+      case TradingUsingDifferentNamePage             => ???
+      case TradingNamePage                           => ???
+      case IsaProductsPage                           => IsaProductsCheckYourAnswersController.onPageLoad()
+      case InnovativeFinancialProductsPage           => IsaProductsCheckYourAnswersController.onPageLoad()
+      case PeerToPeerPlatformPage                    => IsaProductsCheckYourAnswersController.onPageLoad()
+      case PeerToPeerPlatformNumberPage              => IsaProductsCheckYourAnswersController.onPageLoad()
+      case CertificatesOfAuthorityYesNoPage          => CoaCheckYourAnswersController.onPageLoad()
+      case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
+      case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
+      case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
+      case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
+      case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
+      case LiaisonOfficerPhoneNumberPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
+      case LiaisonOfficerCommunicationPage(id)       => LoCheckYourAnswersController.onPageLoad(id)
+      case SignatoryNamePage(id)                     => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+      case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
+      case ProductsManagedByThirdPartyPage           => ThirdPartiesCheckYourAnswersController.onPageLoad()
+      case ThirdPartyOrgDetailsPage(id)              => thirdPartyCheckRoute(id, returnTo)
+      case ThirdPartyManagingReturnsPage(id)         => thirdPartyCheckRoute(id, returnTo)
+      case InvestorFundsUsedByThirdPartyPage(id)     => thirdPartyCheckRoute(id, returnTo)
+      case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckRoute(id, returnTo)
+      case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
+      case _                                         => throw new NotImplementedError("No route for this page")
+    }
 
   private def tradingUsingDifferentNameNextPage(answers: OrganisationDetails): Call =
     answers.tradingUsingDifferentName.fold(TaskListController.onPageLoad()) {
@@ -171,10 +190,8 @@ class Navigator @Inject() () {
     answers: Signatories
   ): Call =
     answers.signatories match {
-      case Seq() =>
-        AddASignatoryController.onPageLoad()
-      case _     =>
-        AddedSignatoryController.onPageLoad()
+      case Seq() => AddASignatoryController.onPageLoad()
+      case _     => AddedSignatoryController.onPageLoad()
     }
 
   private def removeLiaisonOfficerNextPage(answers: LiaisonOfficers): Call =
@@ -185,19 +202,20 @@ class Navigator @Inject() () {
 
   private def productsManagedByThirdPartNextPage(answers: ThirdPartyOrganisations): Call =
     answers.managedByThirdParty match {
-      case Some(YesNoAnswer.Yes) => ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode)
+      case Some(YesNoAnswer.Yes) => ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode, None)
       case _                     => TaskListController.onPageLoad()
     }
 
   private def investorFundsUsedByThirdPartyNextPage(
     answers: ThirdPartyOrganisations,
-    id: String
+    id: String,
+    returnTo: Option[ReturnTo]
   ): Call =
     answers.thirdParties
       .find(_.id == id)
       .flatMap(_.usingInvestorFunds) match {
       case Some(YesNoAnswer.Yes) =>
-        ThirdPartyInvestorFundsPercentageController.onPageLoad(id = id, mode = NormalMode)
+        ThirdPartyInvestorFundsPercentageController.onPageLoad(id = id, mode = NormalMode, returnTo)
       case Some(YesNoAnswer.No)  =>
         ThirdPartyCheckYourAnswersController.onPageLoad(id = id)
       case _                     =>
@@ -207,6 +225,18 @@ class Navigator @Inject() () {
   private def removeThirdPartyNextPage(answers: ThirdPartyOrganisations): Call =
     answers.thirdParties match {
       case Nil => ProductsManagedByThirdPartyController.onPageLoad(NormalMode)
-      case _   => AddedThirdPartiesController.onPageLoad()
+      case _   => AddedThirdPartiesController.onPageLoad(NormalMode, None)
     }
+
+  private def thirdPartyCheckRoute(
+    id: String,
+    returnTo: Option[ReturnTo]
+  ): Call =
+    returnTo match {
+      case Some(FinalCya) =>
+        ThirdPartiesCheckYourAnswersController.onPageLoad()
+      case _              =>
+        ThirdPartyCheckYourAnswersController.onPageLoad(id)
+    }
+
 }
