@@ -105,39 +105,4 @@ class SessionRepository @Inject() (
       )
       .toFuture()
       .map(_ => ())
-
-  def setReturnToFinalCya(userId: String, value: Boolean): Future[Unit] =
-    collection
-      .updateOne(
-        filter = byId(userId),
-        update = Updates.combine(
-          Updates.set("navigationContext.returnToFinalCya", value),
-          Updates.set("lastSeen", now),
-          Updates.setOnInsert("userId", userId),
-          Updates.setOnInsert("auditContinuationEventSent", false),
-          Updates.setOnInsert("updatesInThisSession", false)
-        ),
-        options = new UpdateOptions().upsert(true)
-      )
-      .toFuture()
-      .map(_ => ())
-
-  def getReturnToFinalCya(userId: String): Future[Boolean] =
-    collection
-      .find(byId(userId))
-      .first()
-      .toFutureOption()
-      .map(
-        _.flatMap(_.navigationContext.map(_.returnToFinalCya))
-          .getOrElse(false)
-      )
-
-  def clearReturnToFinalCya(userId: String): Future[Unit] =
-    collection
-      .updateOne(
-        filter = byId(userId),
-        update = Updates.unset("navigationContext")
-      )
-      .toFuture()
-      .map(_ => ())
 }

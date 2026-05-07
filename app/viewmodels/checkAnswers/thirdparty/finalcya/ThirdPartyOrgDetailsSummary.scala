@@ -17,9 +17,8 @@
 package viewmodels.checkAnswers.thirdparty.finalcya
 
 import controllers.thirdparty.routes.*
-import models.CheckMode
-import models.ReturnTo.FinalCya
 import models.journeydata.thirdparty.ThirdParty
+import models.{CheckMode, ReturnTo}
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -29,7 +28,9 @@ import viewmodels.implicits.*
 
 object ThirdPartyOrgDetailsSummary {
 
-  def row(thirdParty: ThirdParty, index: Int)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(thirdParty: ThirdParty, index: Int, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     thirdParty.thirdPartyName.map { name =>
 
       val content =
@@ -53,7 +54,7 @@ object ThirdPartyOrgDetailsSummary {
           ActionItemViewModel(
             "site.change",
             ThirdPartyOrgDetailsController
-              .onPageLoad(Some(thirdParty.id), CheckMode, Some(FinalCya))
+              .onPageLoad(Some(thirdParty.id), CheckMode, returnTo)
               .url
           ).withVisuallyHiddenText(messages("thirdPartyOrgDetails.change.hidden", index))
         )

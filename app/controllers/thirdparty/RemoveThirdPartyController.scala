@@ -18,7 +18,6 @@ package controllers.thirdparty
 
 import controllers.actions.*
 import controllers.routes.*
-import controllers.thirdparty.routes.*
 import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
 import models.YesNoAnswer.{No, Yes}
@@ -61,7 +60,6 @@ class RemoveThirdPartyController @Inject() (
       providingName(id, name => Future.successful(Ok(view(id, name, form))))
   }
 
-  // TODO: if a user removes and then users back, where should they be redirected too.
   def onSubmit(id: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       providingName(
@@ -77,7 +75,7 @@ class RemoveThirdPartyController @Inject() (
                   case No  => request.journeyData.thirdPartyOrganisations
                 }
                 updatedSection.fold(
-                  Future.successful(Redirect(AddedThirdPartiesController.onPageLoad(NormalMode, None)))
+                  Future.successful(Redirect(TaskListController.onPageLoad()))
                 )(section => updateAnswersAndRedirect(section))
               }
             )

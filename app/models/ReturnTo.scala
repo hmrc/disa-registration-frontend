@@ -28,12 +28,12 @@ object ReturnTo {
     new QueryStringBindable[ReturnTo] {
 
       override def bind(
-                         key: String,
-                         params: Map[String, Seq[String]]
-                       ): Option[Either[String, ReturnTo]] =
+        key: String,
+        params: Map[String, Seq[String]]
+      ): Option[Either[String, ReturnTo]] =
         params.get(key).flatMap(_.headOption).map {
           case "FinalCya" => Right(FinalCya)
-          case other       => Left(s"Unknown returnTo value: $other")
+          case other      => Left(s"Unknown returnTo value: $other")
         }
 
       override def unbind(key: String, value: ReturnTo): String =
@@ -42,4 +42,3 @@ object ReturnTo {
         }
     }
 }
-

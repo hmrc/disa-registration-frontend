@@ -17,23 +17,21 @@
 package controllers.thirdparty
 
 import controllers.actions.*
+import controllers.thirdparty.routes.*
+import models.NormalMode
 import models.journeydata.thirdparty.ThirdParty
 import models.requests.DataRequest
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.thirdparty
 import viewmodels.checkAnswers.thirdparty.*
+import viewmodels.checkAnswers.thirdparty.finalcya._
 import viewmodels.govuk.summarylist.*
 import views.html.thirdparty.ThirdPartyCheckYourAnswersView
-import controllers.routes.*
-import controllers.thirdparty.routes.*
-import models.NormalMode
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class ThirdPartyCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
@@ -41,32 +39,18 @@ class ThirdPartyCheckYourAnswersController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ThirdPartyCheckYourAnswersView,
-  sessionRepository: SessionRepository
-)(implicit executionContext: ExecutionContext)
-    extends FrontendBaseController
+  view: ThirdPartyCheckYourAnswersView
+) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad(id: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
-      val userId = request.credentials.providerId
-      sessionRepository.getReturnToFinalCya(userId).flatMap {
-        case true =>
-          sessionRepository
-            .clearReturnToFinalCya(userId)
-            .map(_ => Redirect(ThirdPartiesCheckYourAnswersController.onPageLoad()))
-
-        case false =>
-          Future.successful {
-            findThirdParty(id) match {
-              case Some(thirdParty) if !thirdParty.inProgress =>
-                Ok(view(SummaryListViewModel(buildSummaryRows(id))))
-
-              case _ =>
-                Redirect(TaskListController.onPageLoad())
-            }
-          }
+    (identify andThen getData andThen requireData) { implicit request =>
+      findThirdParty(id) match {
+        case Some(thirdParty) if !thirdParty.inProgress =>
+          Ok(view(SummaryListViewModel(buildSummaryRows(id))))
+        case _                                          =>
+          Redirect(controllers.routes.TaskListController.onPageLoad())
       }
     }
 

@@ -16,6 +16,7 @@
 
 package viewmodels.checkAnswers.thirdparty.finalcya
 
+import models.ReturnTo.FinalCya
 import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
@@ -69,10 +70,10 @@ class ThirdPartiesCheckYourAnswersViewModel @Inject() (
     messages: Messages
   ): Seq[SummaryListRow] =
     Seq(
-      ThirdPartyOrgDetailsSummary.row(tp, index),
-      ReturnsManagedByThirdPartySummary.row(tp),
-      InvestorFundsUsedByThirdPartySummary.row(tp),
-      ThirdPartyInvestorFundsPercentageSummary.row(tp)
+      ThirdPartyOrgDetailsSummary.row(tp, index, Some(FinalCya)),
+      ThirdPartyManagingReturnsSummary.row(tp, Some(FinalCya)),
+      InvestorFundsUsedByThirdPartySummary.row(tp, Some(FinalCya)),
+      ThirdPartyInvestorFundsPercentageSummary.row(tp, Some(FinalCya))
     ).flatten
 
   private def buildGlobalSections(section: ThirdPartyOrganisations)(implicit messages: Messages): Seq[Html] =

@@ -17,9 +17,8 @@
 package viewmodels.checkAnswers.thirdparty.finalcya
 
 import controllers.thirdparty.routes.ThirdPartyInvestorFundsPercentageController
-import models.CheckMode
-import models.ReturnTo.FinalCya
 import models.journeydata.thirdparty.ThirdParty
+import models.{CheckMode, ReturnTo}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -29,7 +28,9 @@ import viewmodels.implicits.*
 
 object ThirdPartyInvestorFundsPercentageSummary {
 
-  def row(thirdParty: ThirdParty)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(thirdParty: ThirdParty, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     for {
       name   <- thirdParty.thirdPartyName
       answer <- thirdParty.investorFundsPercentage
@@ -43,7 +44,7 @@ object ThirdPartyInvestorFundsPercentageSummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          ThirdPartyInvestorFundsPercentageController.onPageLoad(thirdParty.id, CheckMode, Some(FinalCya)).url
+          ThirdPartyInvestorFundsPercentageController.onPageLoad(thirdParty.id, CheckMode, returnTo).url
         )
           .withVisuallyHiddenText(messages("thirdPartyInvestorFundsPercentage.change.hidden"))
       )

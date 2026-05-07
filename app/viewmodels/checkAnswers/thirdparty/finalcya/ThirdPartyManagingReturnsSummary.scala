@@ -17,9 +17,8 @@
 package viewmodels.checkAnswers.thirdparty.finalcya
 
 import controllers.thirdparty.routes.*
-import models.CheckMode
-import models.ReturnTo.FinalCya
 import models.journeydata.thirdparty.ThirdParty
+import models.{CheckMode, ReturnTo}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -27,9 +26,11 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListR
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ReturnsManagedByThirdPartySummary {
+object ThirdPartyManagingReturnsSummary {
 
-  def row(thirdParty: ThirdParty)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(thirdParty: ThirdParty, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     for {
       name   <- thirdParty.thirdPartyName
       answer <- thirdParty.managingIsaReturns
@@ -43,7 +44,7 @@ object ReturnsManagedByThirdPartySummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          ThirdPartyManagingReturnsController.onPageLoad(thirdParty.id, CheckMode, Some(FinalCya)).url
+          ThirdPartyManagingReturnsController.onPageLoad(thirdParty.id, CheckMode, returnTo).url
         )
           .withVisuallyHiddenText(messages("returnsManagedByThirdParty.change.hidden"))
       )

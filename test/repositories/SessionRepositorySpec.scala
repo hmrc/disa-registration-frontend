@@ -17,7 +17,7 @@
 package repositories
 
 import base.SpecBase
-import models.session.{NavigationContext, Session}
+import models.session.Session
 import org.mongodb.scala.ObservableFuture
 import org.mongodb.scala.model.Filters
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
@@ -163,83 +163,6 @@ class SessionRepositorySpec extends SpecBase {
 
       val count = await(repository.collection.countDocuments(Filters.eq("userId", testCredentials.providerId)).head())
       count mustBe 0L
-    }
-  }
-
-  "setReturnToFinalCya" - {
-
-    "must set navigationContext.returnToFinalCya to true and update lastSeen when session exists" in {
-
-      val session = buildSession(testCredentials.providerId)
-      await(repository.collection.insertOne(session).toFuture())
-
-      await(repository.setReturnToFinalCya(testCredentials.providerId, value = true))
-
-      val stored =
-        await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
-
-      stored.navigationContext.value.returnToFinalCya mustBe true
-      stored.lastSeen mustBe fixedNow
-    }
-
-    "must upsert a new session when none exists" in {
-
-      await(repository.setReturnToFinalCya(testCredentials.providerId, value = false))
-
-      val stored =
-        await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
-
-      stored.userId mustBe testCredentials.providerId
-      stored.navigationContext.value.returnToFinalCya mustBe false
-    }
-  }
-
-  "getReturnToFinalCya" - {
-
-    "must return true when value exists in navigationContext" in {
-
-      val session =
-        buildSession(testCredentials.providerId).copy(
-          navigationContext = Some(NavigationContext(returnToFinalCya = true))
-        )
-
-      await(repository.collection.insertOne(session).toFuture())
-
-      val result =
-        await(repository.getReturnToFinalCya(testCredentials.providerId))
-
-      result mustBe true
-    }
-
-    "must return false when navigationContext is missing" in {
-
-      val session = buildSession(testCredentials.providerId)
-      await(repository.collection.insertOne(session).toFuture())
-
-      val result =
-        await(repository.getReturnToFinalCya(testCredentials.providerId))
-
-      result mustBe false
-    }
-  }
-
-  "clearReturnToFinalCya" - {
-
-    "must remove navigationContext from session" in {
-
-      val session =
-        buildSession(testCredentials.providerId).copy(
-          navigationContext = Some(NavigationContext(returnToFinalCya = true))
-        )
-
-      await(repository.collection.insertOne(session).toFuture())
-
-      await(repository.clearReturnToFinalCya(testCredentials.providerId))
-
-      val stored =
-        await(repository.collection.find(Filters.eq("userId", testCredentials.providerId)).head())
-
-      stored.navigationContext mustBe None
     }
   }
 }
