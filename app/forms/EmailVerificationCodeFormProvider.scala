@@ -21,15 +21,15 @@ import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
 
-class OrganisationEmailAddressFormProvider @Inject() extends Mappings {
-
-  private val emailRegex =
-    """^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"""
+class EmailVerificationCodeFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("organisationEmailAddress.error.required")
-        .transform(_.trim, identity: String => String)
-        .verifying(regexp(emailRegex, "organisationEmailAddress.error.format"))
+      "value" -> text("emailVerificationCode.error.required")
+        .transform(_.trim.toUpperCase, identity: String => String)
+        .verifying(maxLength(100, "emailVerificationCode.error.length"))
+        .verifying(alphaOnly("emailVerificationCode.error.format"))
+        .verifying(minLength(6, "emailVerificationCode.error.tooShort"))
+        .verifying(maxLength(6, "emailVerificationCode.error.tooLong"))
     )
 }

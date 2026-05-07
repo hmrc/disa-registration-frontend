@@ -23,6 +23,12 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 
 trait Constraints {
 
+  protected def alphaOnly[A](errorKey: String): Constraint[String] =
+    Constraint { input =>
+      if (input.forall(_.isLetter)) Valid
+      else Invalid(errorKey)
+    }
+
   protected def firstError[A](constraints: Constraint[A]*): Constraint[A] =
     Constraint { input =>
       constraints

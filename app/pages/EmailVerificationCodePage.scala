@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import javax.inject.Inject
+import models.journeydata.OrganisationEmail
 
-import forms.mappings.Mappings
-import play.api.data.Form
-
-class OrganisationEmailAddressFormProvider @Inject() extends Mappings {
-
-  private val emailRegex =
-    """^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"""
-
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("organisationEmailAddress.error.required")
-        .transform(_.trim, identity: String => String)
-        .verifying(regexp(emailRegex, "organisationEmailAddress.error.format"))
-    )
-}
+case object EmailVerificationCodePage extends Page[OrganisationEmail]

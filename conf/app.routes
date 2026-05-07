@@ -76,6 +76,9 @@ POST       /organisation-email-address                   controllers.orgemail.Or
 GET        /change-organisation-email-address            controllers.orgemail.OrganisationEmailAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-organisation-email-address            controllers.orgemail.OrganisationEmailAddressController.onSubmit(mode: Mode = CheckMode)
 
+GET        /email-verification-code                        controllers.orgemail.EmailVerificationCodeController.onPageLoad(mode: Mode = NormalMode)
+POST       /email-verification-code                        controllers.orgemail.EmailVerificationCodeController.onSubmit(mode: Mode = NormalMode)
+POST       /request-new-code                            controllers.orgemail.EmailVerificationCodeController.requestNewCode()
 ## ISA Products
 GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
 POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
