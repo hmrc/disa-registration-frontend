@@ -69,6 +69,13 @@ POST       /organisation-telephone-number                controllers.orgdetails.
 GET        /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = CheckMode)
 
+## Organisation Email
+
+GET        /organisation-email-address                   controllers.orgemail.OrganisationEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /organisation-email-address                   controllers.orgemail.OrganisationEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /change-organisation-email-address            controllers.orgemail.OrganisationEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-organisation-email-address            controllers.orgemail.OrganisationEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
 ## ISA Products
 GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
 POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)
@@ -192,12 +199,16 @@ GET        /change-percentage-of-investor-funds-used     controllers.thirdparty.
 POST       /change-percentage-of-investor-funds-used     controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onSubmit(id: String, mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
 GET        /check-added-third-party                      controllers.thirdparty.ThirdPartyCheckYourAnswersController.onPageLoad(id: String)
-POST       /check-added-third-party                      controllers.thirdparty.ThirdPartyCheckYourAnswersController.onSubmit()
 
 GET        /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
 POST       /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onSubmit(mode: Mode = NormalMode)
 GET        /change-added-third-parties                   controllers.thirdparty.AddedThirdPartiesController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 POST       /change-added-third-parties                   controllers.thirdparty.AddedThirdPartiesController.onSubmit(mode: Mode = CheckMode)
+
+GET        /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = NormalMode)
+POST       /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-connected-third-parties               controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-connected-third-parties               controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = NormalMode)
 POST       /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onSubmit(mode: Mode = NormalMode)

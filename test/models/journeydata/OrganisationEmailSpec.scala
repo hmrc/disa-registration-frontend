@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,18 @@
 
 package models.journeydata
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, JsValue, Json}
+import utils.JsonFormatSpec
 
-case class BusinessVerification(
-  businessRegistrationPassed: Option[Boolean],
-  businessVerificationPassed: Option[Boolean],
-  ctUtr: Option[String],
-  registeredAddress: Option[RegisteredAddress],
-  companyName: Option[String],
-  businessPartnerId: Option[String]
-) extends TaskListSection {
-  override def sectionName: String = "businessVerification"
-}
+class OrganisationEmailSpec extends JsonFormatSpec[OrganisationEmail] {
 
-object BusinessVerification {
-  implicit val format: OFormat[BusinessVerification] = Json.format[BusinessVerification]
+  def model: OrganisationEmail = OrganisationEmail(Some("example@example.com"), Some(true))
+
+  def expectedJsonFromWrites: JsValue =
+    Json.parse("""{
+      |     "organisationEmail": "example@example.com",
+      |     "verified": true
+    }""".stripMargin)
+
+  implicit def format: Format[OrganisationEmail] = OrganisationEmail.format
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package models.emailverification
 
 import play.api.libs.json.{Json, OFormat}
 
-case class BusinessVerification(
-  businessRegistrationPassed: Option[Boolean],
-  businessVerificationPassed: Option[Boolean],
-  ctUtr: Option[String],
-  registeredAddress: Option[RegisteredAddress],
-  companyName: Option[String],
-  businessPartnerId: Option[String]
-) extends TaskListSection {
-  override def sectionName: String = "businessVerification"
+case class SendEmailVerificationCodeRequest(email: String)
+
+object SendEmailVerificationCodeRequest {
+  implicit val format: OFormat[SendEmailVerificationCodeRequest] =
+    Json.format[SendEmailVerificationCodeRequest]
 }
 
-object BusinessVerification {
-  implicit val format: OFormat[BusinessVerification] = Json.format[BusinessVerification]
+case class VerifyEmailCodeRequest(email: String, code: String)
+
+object VerifyEmailCodeRequest {
+  implicit val format: OFormat[VerifyEmailCodeRequest] =
+    Json.format[VerifyEmailCodeRequest]
 }

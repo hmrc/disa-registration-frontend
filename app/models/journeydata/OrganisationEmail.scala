@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,13 @@ package models.journeydata
 
 import play.api.libs.json.{Json, OFormat}
 
-case class BusinessVerification(
-  businessRegistrationPassed: Option[Boolean],
-  businessVerificationPassed: Option[Boolean],
-  ctUtr: Option[String],
-  registeredAddress: Option[RegisteredAddress],
-  companyName: Option[String],
-  businessPartnerId: Option[String]
-) extends TaskListSection {
-  override def sectionName: String = "businessVerification"
+case class OrganisationEmail(organisationEmail: Option[String] = None, verified: Option[Boolean] = None)
+    extends TaskListSection {
+  def sectionName: String = OrganisationEmail.sectionName
 }
 
-object BusinessVerification {
-  implicit val format: OFormat[BusinessVerification] = Json.format[BusinessVerification]
+object OrganisationEmail {
+  val sectionName = "organisationEmail"
+
+  implicit val format: OFormat[OrganisationEmail] = Json.format[OrganisationEmail]
 }

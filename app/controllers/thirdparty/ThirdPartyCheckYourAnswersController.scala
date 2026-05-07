@@ -17,8 +17,6 @@
 package controllers.thirdparty
 
 import controllers.actions.*
-import controllers.thirdparty.routes.*
-import models.NormalMode
 import models.journeydata.thirdparty.ThirdParty
 import models.requests.DataRequest
 import play.api.Logging
@@ -27,7 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.thirdparty
 import viewmodels.checkAnswers.thirdparty.*
-import viewmodels.checkAnswers.thirdparty.finalcya._
+import viewmodels.checkAnswers.thirdparty.finalcya.*
 import viewmodels.govuk.summarylist.*
 import views.html.thirdparty.ThirdPartyCheckYourAnswersView
 
@@ -69,9 +67,4 @@ class ThirdPartyCheckYourAnswersController @Inject() (
 
   private def findThirdParty(id: String)(implicit request: DataRequest[_]): Option[ThirdParty] =
     request.journeyData.thirdPartyOrganisations.flatMap(_.thirdParties.find(_.id == id))
-
-  def onSubmit(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Redirect(AddedThirdPartiesController.onPageLoad(NormalMode, None))
-    }
 }
