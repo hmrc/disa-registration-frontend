@@ -34,7 +34,7 @@
 
 @layout(pageTitle = title(form, messages("AddAnotherAddress.title"), Some(messages("sectionTitle.orgDetails")))) {
 
-    @formHelper(action = AddAnotherAddressController.onSubmit(id, mode)) {
+    @formHelper(action = AddAnotherAddressController.onSubmit(mode)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

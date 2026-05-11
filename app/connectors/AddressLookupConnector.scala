@@ -17,6 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
+import models.addresslookup.LookupAddress
 import models.requests.AddressLookupRequest
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -27,20 +28,33 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddressLookupConnector @Inject() (
-  httpClient: HttpClientV2,
-  appConfig: FrontendAppConfig
-)(implicit ec: ExecutionContext) {
+                                         httpClient: HttpClientV2,
+                                         appConfig: FrontendAppConfig
+                                       )(implicit ec: ExecutionContext) {
 
-  def searchAddress(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[JsValue] = {
-    val url         = s"${appConfig.addressLookupBaseUrl}/lookup"
+  def searchAddress(postcode: String, filter: Option[String])
+                   (implicit hc: HeaderCarrier): Future[Seq[LookupAddress]] = {
+
+    val url = s"${appConfig.addressLookupBaseUrl}/lookup"
+
     val requestBody = AddressLookupRequest(
       postcode = postcode,
-      filter = filter
+      filter   = filter
     )
 
     httpClient
       .post(url"$url")
       .withBody(Json.toJson(requestBody))
       .execute[JsValue]
+      .map(parse)
   }
+
+  private def parse(json: JsValue): Seq[LookupAddress] =
+    (json \ "addresses").asOpt[Seq[JsValue]].getOrElse(Seq.empty).map { addr =>
+      LookupAddress(
+        lines = (addr \ "address").asOpt[Seq[String]].getOrElse(Seq.empty),
+        postcode = (addr \ "postcode").as[String],
+        uprn = (addr \ "uprn").asOpt[Long].map(_.toString)
+      )
+    }
 }

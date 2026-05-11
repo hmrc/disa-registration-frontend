@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package models.journeydata.orgdetails
+package pages.organisationdetails
 
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.OrganisationDetails
+import pages.PageWithoutDependents
 
-case class AddAnotherAddressForm(
-  postcode: String,
-  filter: Option[String]
-)
+case object AddAnotherAddressPage extends PageWithoutDependents[OrganisationDetails] {
 
-object AddAnotherAddressForm {
-  implicit val format: OFormat[AddAnotherAddressForm] = Json.format[AddAnotherAddressForm]
+  override def toString: String = "addAnotherAddress"
+
+  override def clearAnswer(answers: OrganisationDetails): OrganisationDetails = answers.copy(addAnotherAddress = None)
 }

@@ -166,7 +166,7 @@ class Navigator @Inject() () {
       case true  =>
         OrganisationTelephoneNumberController.onPageLoad(NormalMode)
       case false =>
-        IndexController.onPageLoad()
+        AddAnotherAddressController.onPageLoad(NormalMode)
     }
 
   private def removeSignatoryNextPage(

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package models.journeydata.orgdetails
+package models.addresslookup
 
 import play.api.libs.json.{Json, OFormat}
 
-case class AddAnotherAddressForm(
-  postcode: String,
-  filter: Option[String]
-)
+case class LookupAddress(
+                          lines: Seq[String],
+                          postcode: String,
+                          uprn: Option[String]
+                        )
 
-object AddAnotherAddressForm {
-  implicit val format: OFormat[AddAnotherAddressForm] = Json.format[AddAnotherAddressForm]
+object LookupAddress {
+  implicit val writes: OFormat[LookupAddress] = Json.format[LookupAddress]
 }

@@ -26,50 +26,36 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 import config.Constants.defaultUprn
+import models.addresslookup.LookupAddress
 
 class AddressLookupService @Inject() (
   connector: AddressLookupConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def getUprn(address: RegisteredAddress)(implicit hc: HeaderCarrier): Future[Option[String]] = {
+  def lookup(postcode: String, filter: Option[String])
+            (implicit hc: HeaderCarrier): Future[Seq[LookupAddress]] = {
 
-    // TODO: Further discussion to be had around what happens if GRS/BV doesn't return all expected address fields
-    val postcode = address.postCode.getOrElse {
-      val message = s"Postcode is required for address lookup but was missing. Address: $address"
-      logger.error(message)
-      throw new IllegalArgumentException(message)
-    }
-
-    val filter = address.addressLine1
-
-    connector
-      .searchAddress(postcode, filter)
-      .map { json =>
-        extractUprn(json) match {
-          case Some(uprn) =>
-            logger.info(s"UPRN found for postcode: $postcode")
-            Some(uprn)
-
-          case None =>
-            logger.warn(
-              s"No UPRN found in lookup response, using default. Postcode: $postcode, filter: $filter"
-            )
-            Some(defaultUprn)
-        }
-      }
+    connector.searchAddress(postcode, filter)
       .recover { case NonFatal(e) =>
-        logger.warn(
-          s"Address lookup failed for postcode: $postcode, filter: $filter",
-          e
-        )
-        None
+        logger.warn(s"Address lookup failed for $postcode", e)
+        Seq.empty
       }
   }
 
-  private def extractUprn(json: JsValue): Option[String] =
-    json
-      .asOpt[Seq[JsValue]]
-      .flatMap(_.headOption)
-      .flatMap(addr => (addr \ "uprn").asOpt[Long].map(_.toString))
+  def getUprn(address: LookupAddress)
+             (implicit hc: HeaderCarrier): Future[Option[String]] = {
+
+    address.uprn match {
+
+      case some @ Some(_) =>
+        Future.successful(some)
+
+      case None =>
+        logger.warn(
+          s"No UPRN returned for selected address, defaulting. Postcode=${address.postcode}"
+        )
+        Future.successful(Some(config.Constants.defaultUprn))
+    }
+  }
 }

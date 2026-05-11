@@ -26,6 +26,7 @@ import models.journeydata.orgdetails.AddAnotherAddressForm
 import models.journeydata.thirdparty.*
 import models.requests.DataRequest
 import navigation.Navigator
+import pages.organisationdetails.AddAnotherAddressPage
 import pages.thirdparty.ThirdPartyOrgDetailsPage
 import play.api.Logging
 import play.api.data.Form
@@ -68,42 +69,57 @@ class AddAnotherAddressController @Inject()(
           .flatMap(_.addAnotherAddress)
           .map(form.fill)
           .getOrElse(form)
-      Ok(view(uuidGenerator.generate(), preparedForm, mode))
+      Ok(view(preparedForm, mode))
     }
 
   def onSubmit(mode: Mode): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request => {
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode))),
+
           answer => {
-            val postcode = answer.postcode
-            val filter  = answer.filter
-            request.journeyData.organisationDetails match {
-              case Some(existing) =>
-                val updatedSection =
-                  existing.upsertThirdParty(postcode, filter)
+
+            val updatedOrgDetails =
+              request.journeyData.organisationDetails
+                .map { existing =>
+                  existing.copy(
+                    addAnotherAddress = Some(answer)
+                  )
+                }
+
+            updatedOrgDetails match {
+
+              case Some(updatedSection) =>
                 journeyAnswersService
-                  .update(updatedSection, request.groupId, request.credentials.providerId)
-                  .map { updated =>
+                  .update(
+                    updatedSection,
+                    request.groupId,
+                    request.credentials.providerId
+                  )
+                  .map { updatedJourneyData =>
                     Redirect(
                       navigator.nextPage(
-                        ThirdPartyOrgDetailsPage(id),
-                        updated,
+                        AddAnotherAddressPage,
+                        updatedJourneyData,
                         mode
                       )
                     )
                   }
                   .recoverWith { case NonFatal(e) =>
                     logger.warn(
-                      s"Failed updating answers for section [${ThirdPartyOrganisations.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                      s"Failed updating answers for OrganisationDetails addAnotherAddress " +
+                        s"[groupId=${request.groupId}] error: ${e.getMessage}"
                     )
                     errorHandler.internalServerError
                   }
 
               case None =>
-                Future.successful(Redirect(TaskListController.onPageLoad()))
+                Future.successful(
+                  Redirect(TaskListController.onPageLoad())
+                )
             }
           }
         )
