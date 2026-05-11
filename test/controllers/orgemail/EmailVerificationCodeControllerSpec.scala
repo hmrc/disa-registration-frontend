@@ -20,9 +20,9 @@ import base.SpecBase
 import connectors.EmailVerificationConnector
 import controllers.orgemail.routes.{EmailVerificationCodeController, OrganisationEmailAddressController}
 import forms.EmailVerificationCodeFormProvider
+import models.NormalMode
 import models.emailverification.VerifyEmailCodeResult
 import models.journeydata.{JourneyData, OrganisationEmail}
-import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, never, verify, when}

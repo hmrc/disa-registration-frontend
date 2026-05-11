@@ -95,7 +95,8 @@ class EmailVerificationCodeController @Inject() (
                             navigator.nextPage(
                               EmailVerificationCodePage,
                               savedSection,
-                              mode
+                              mode,
+                              None
                             )
                           )
                         }
