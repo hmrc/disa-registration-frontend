@@ -63,7 +63,11 @@ class AddressLookupConnectorSpec extends SpecBase {
             |    "address": {
             |      "lines": ["1 Test Street", "Test Area"],
             |      "town": "Testtown",
-            |      "postcode": "BB00 0BB"
+            |      "postcode": "BB00 0BB",
+            |      "country": {
+            |        "code": "GB",
+            |        "name": "United Kingdom"
+            |      }
             |    }
             |  }
             |]
@@ -75,7 +79,8 @@ class AddressLookupConnectorSpec extends SpecBase {
             addressLine2 = Some("Test Area"),
             addressLine3 = Some("Testtown"),
             postCode = Some("BB00 0BB"),
-            uprn = Some("123")
+            uprn = Some("123"),
+            country = Some("United Kingdom")
           )
         )
 
@@ -96,7 +101,11 @@ class AddressLookupConnectorSpec extends SpecBase {
             |    "uprn": 200,
             |    "address": {
             |      "lines": ["Test Street"],
-            |      "postcode": "BB00 0BB"
+            |      "postcode": "BB00 0BB",
+            |      "country": {
+            |        "code": "GB",
+            |        "name": "United Kingdom"
+            |      }
             |    }
             |  }
             |]

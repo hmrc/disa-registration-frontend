@@ -42,7 +42,11 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
           |    "address": {
           |      "lines": ["1 Test Street", "Test Area"],
           |      "town": "Test Town",
-          |      "postcode": "BB00 0BB"
+          |      "postcode": "BB00 0BB",
+          |      "country": {
+          |        "code": "GB",
+          |        "name": "United Kingdom"
+          |      }
           |    }
           |  }
           |]
@@ -58,7 +62,8 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
           addressLine2 = Some("Test Area"),
           addressLine3 = Some("Test Town"),
           postCode = Some("BB00 0BB"),
-          uprn = Some("123456789")
+          uprn = Some("123456789"),
+          country = Some("United Kingdom")
         )
       )
     }
@@ -80,7 +85,11 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
           |    "uprn": 200000698110,
           |    "address": {
           |      "lines": ["Test Street"],
-          |      "postcode": "BB00 0BB"
+          |      "postcode": "BB00 0BB",
+          |      "country": {
+          |        "code": "GB",
+          |        "name": "United Kingdom"
+          |      }
           |    }
           |  }
           |]

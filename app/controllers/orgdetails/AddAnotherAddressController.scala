@@ -99,7 +99,7 @@ class AddAnotherAddressController @Inject() (
                         )
                     BadRequest(view(formWithError, mode))
                   } else {
-                    Redirect(navigator.nextPage(AddAnotherAddressPage, updatedSection, mode))
+                    Redirect(navigator.nextPage(AddAnotherAddressPage, updatedSection, mode, None))
                   }
                 }
                 .recoverWith { case NonFatal(e) =>

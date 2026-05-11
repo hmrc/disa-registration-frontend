@@ -313,7 +313,8 @@ class NavigatorSpec extends SpecBase {
                 )
               )
             )
-          )
+          ),
+          returnTo = None
         )
       result shouldBe TaskListController.onPageLoad()
     }
@@ -341,7 +342,8 @@ class NavigatorSpec extends SpecBase {
                 )
               )
             )
-          )
+          ),
+          returnTo = None
         )
       result shouldBe TaskListController.onPageLoad()
     }

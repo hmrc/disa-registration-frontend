@@ -52,8 +52,11 @@ class AddressLookupConnector @Inject() (
 
   private def parse(json: JsValue): Seq[LookupAddress] =
     json.asOpt[Seq[JsValue]].getOrElse(Seq.empty).map { addr =>
-      val address = addr \ "address"
-      val lines   =
+
+      val address =
+        (addr \ "address").as[JsValue]
+
+      val lines =
         (address \ "lines").asOpt[Seq[String]].getOrElse(Seq.empty)
 
       LookupAddress(
@@ -61,7 +64,8 @@ class AddressLookupConnector @Inject() (
         addressLine2 = lines.lift(1),
         addressLine3 = (address \ "town").asOpt[String],
         postCode = (address \ "postcode").asOpt[String],
-        uprn = (addr \ "uprn").asOpt[Long].map(_.toString)
+        uprn = (addr \ "uprn").asOpt[Long].map(_.toString),
+        country = (address \ "country" \ "name").asOpt[String]
       )
     }
 }

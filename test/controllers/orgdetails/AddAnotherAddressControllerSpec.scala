@@ -17,34 +17,28 @@
 package controllers.orgdetails
 
 import base.SpecBase
-import config.FrontendAppConfig
-import controllers.routes.*
 import forms.AddAnotherAddressFormProvider
-import models.Mode
+import models.{Mode, NormalMode}
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.{JourneyData, OrganisationDetails}
-import models.requests.DataRequest
-import models.{CheckMode, NormalMode}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
 import play.api.inject.bind
+import play.api.libs.json.Writes
+import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import services.{AddressLookupService, JourneyAnswersService}
 import views.html.orgdetails.AddAnotherAddressView
-import handlers.ErrorHandler
-import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import play.api.libs.json.Writes
-import play.api.mvc.Results.InternalServerError
 
 import scala.concurrent.Future
 
 class AddAnotherAddressControllerSpec extends SpecBase {
 
-  private val formProvider = new AddAnotherAddressFormProvider()
+  private val formProvider                  = new AddAnotherAddressFormProvider()
   private val form: Form[AddAnotherAddress] = formProvider()
 
   private val mode: Mode = NormalMode
@@ -153,7 +147,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       ).thenReturn(Future.successful(journeyDetails))
 
       val navigator = mock[Navigator]
-      when(navigator.nextPage(any(), any(), any())).thenReturn(onwardRoute)
+      when(navigator.nextPage(any(), any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
@@ -183,8 +177,8 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       when(mockAddressLookupService.lookup(any[String], any())(any()))
         .thenReturn(Future.successful(Seq.empty))
 
-      when(mockJourneyAnswersService.update(any(), any[String], any[String])(
-        any(), any)).thenReturn(Future.successful(journeyDetails))
+      when(mockJourneyAnswersService.update(any(), any[String], any[String])(any(), any))
+        .thenReturn(Future.successful(journeyDetails))
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
@@ -209,9 +203,8 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       when(mockAddressLookupService.lookup(any[String], any())(any()))
         .thenReturn(Future.successful(Seq(mock[models.addresslookup.LookupAddress])))
 
-      when(mockJourneyAnswersService.update(any(), any[String], any[String])(
-        any[Writes[OrganisationDetails]],
-        any)).thenReturn(Future.failed(new Exception("DB failure")))
+      when(mockJourneyAnswersService.update(any(), any[String], any[String])(any[Writes[OrganisationDetails]], any))
+        .thenReturn(Future.failed(new Exception("DB failure")))
 
       when(mockErrorHandler.internalServerError(any[RequestHeader]))
         .thenReturn(Future.successful(InternalServerError))
@@ -262,9 +255,8 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         )(any[Writes[OrganisationDetails]], any())
       ).thenReturn(Future.successful(expectedSection))
 
-
       val navigator = mock[Navigator]
-      when(navigator.nextPage(any(), any(), any()))
+      when(navigator.nextPage(any(), any(), any(), any()))
         .thenReturn(Call("GET", "/next-page"))
 
       val application =
@@ -278,7 +270,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
           FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode).url)
             .withFormUrlEncodedBody(
               "postcode" -> "AA1 1AA",
-              "filter" -> "Test"
+              "filter"   -> "Test"
             )
 
         val result = route(application, request).value

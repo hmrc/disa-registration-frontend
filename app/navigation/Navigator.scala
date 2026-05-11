@@ -249,7 +249,7 @@ class Navigator @Inject() () {
         TaskListController.onPageLoad()
     }
   }
-  
+
   private def thirdPartyCheckRoute(
     id: String,
     returnTo: Option[ReturnTo]

@@ -32,6 +32,7 @@ class AddressLookupService @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
+  // TODO: Further discussion to be had around what happens if GRS/BV doesn't return all expected address fields
   def getUprn(address: RegisteredAddress)(implicit hc: HeaderCarrier): Future[Option[String]] = {
 
     val postcode = address.postCode.getOrElse {

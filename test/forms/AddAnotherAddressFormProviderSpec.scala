@@ -38,7 +38,7 @@ class AddAnotherAddressFormProviderSpec extends StringFieldBehaviours {
       )
 
       result.value.value.postcode shouldBe "SW1A 1AA"
-      result.value.value.filter shouldBe Some("Test")
+      result.value.value.filter   shouldBe Some("Test")
     }
 
     "must fail when postcode is missing" in {
