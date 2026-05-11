@@ -306,13 +306,17 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route OrganisationEmailAddressPage to OrganisationEmailVerificationCodePage" in {
-      val result: Call = navigator.normalRoutes(OrganisationEmailAddressPage, OrganisationEmail(Some(testString)))
+      val result: Call = navigator.normalRoutes(OrganisationEmailAddressPage, OrganisationEmail(Some(testString)), None)
       result shouldBe EmailVerificationCodeController.onPageLoad()
     }
 
     "route OrganisationEmailVerificationCodePage to OrganisationEmail CYA" in {
       val result: Call =
-        navigator.normalRoutes(OrganisationEmailVerificationCodePage, OrganisationEmail(Some(testString), Some(true)))
+        navigator.normalRoutes(
+          OrganisationEmailVerificationCodePage,
+          OrganisationEmail(Some(testString), Some(true)),
+          None
+        )
       result shouldBe OrganisationEmailCyaController.onPageLoad()
     }
 
@@ -554,7 +558,7 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route OrganisationEmailAddressPage to Org email CYA" in {
-      navigator.checkRouteMap(OrganisationEmailAddressPage) shouldBe
+      navigator.checkRouteMap(OrganisationEmailAddressPage, None) shouldBe
         OrganisationEmailCyaController.onPageLoad()
     }
 

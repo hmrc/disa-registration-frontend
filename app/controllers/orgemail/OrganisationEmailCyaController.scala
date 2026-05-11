@@ -24,8 +24,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.*
-import viewmodels.govuk.summarylist.*
-import views.html.isaproducts.IsaProductsCheckYourAnswersView
+import viewmodels.govuk.all.SummaryListViewModel
+import views.html.orgemail.OrganisationEmailCyaView
 
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ class OrganisationEmailCyaController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: IsaProductsCheckYourAnswersView
+  view: OrganisationEmailCyaView
 ) extends FrontendBaseController
     with I18nSupport {
 

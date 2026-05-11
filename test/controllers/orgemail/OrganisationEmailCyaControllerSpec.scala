@@ -24,7 +24,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.checkAnswers.OrganisationEmailSummary
 import viewmodels.govuk.summarylist.SummaryListViewModel
-import views.html.isaproducts.IsaProductsCheckYourAnswersView
+import views.html.orgemail.OrganisationEmailCyaView
 
 class OrganisationEmailCyaControllerSpec extends SpecBase {
 
@@ -58,7 +58,7 @@ class OrganisationEmailCyaControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[IsaProductsCheckYourAnswersView]
+        val view = application.injector.instanceOf[OrganisationEmailCyaView]
 
         val expectedRows =
           Seq(OrganisationEmailSummary.row(email))
