@@ -136,6 +136,7 @@ class Navigator @Inject() () {
       case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
       case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
       case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
+      case OrganisationEmailAddressPage              => OrganisationEmailCyaController.onPageLoad()
       case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerPhoneNumberPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
