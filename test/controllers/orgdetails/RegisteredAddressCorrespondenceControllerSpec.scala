@@ -17,7 +17,8 @@
 package controllers.orgdetails
 
 import base.SpecBase
-import controllers.*
+import controllers.orgdetails.routes.*
+import controllers.routes.*
 import forms.RegisteredAddressCorrespondenceFormProvider
 import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails, RegisteredAddress}
 import models.{CheckMode, NormalMode}
@@ -40,7 +41,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
   val form: Form[Boolean] = formProvider()
 
   lazy val registeredAddressCorrespondenceRoute: String =
-    orgdetails.routes.RegisteredAddressCorrespondenceController.onPageLoad(NormalMode).url
+    RegisteredAddressCorrespondenceController.onPageLoad(NormalMode).url
 
   "RegisteredAddressCorrespondenceController onPageLoad" - {
 
@@ -83,7 +84,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.StartController.onPageLoad().url
+        redirectLocation(result).value mustEqual StartController.onPageLoad().url
       }
     }
 
@@ -153,7 +154,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual orgdetails.routes.OrganisationTelephoneNumberController
+        redirectLocation(result).value mustEqual OrganisationTelephoneNumberController
           .onPageLoad(NormalMode)
           .url
       }
@@ -189,11 +190,11 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual AddAnotherAddressController.onPageLoad(NormalMode).url
       }
     }
 
-    "must return to check your answers if stays no answer has changed on submission" in {
+    "must return to check your answers if no answer has changed on submission" in {
 
       val initialJourneyData = JourneyData(
         groupId = testGroupId,
@@ -218,13 +219,13 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request =
-          FakeRequest(POST, orgdetails.routes.RegisteredAddressCorrespondenceController.onPageLoad(CheckMode).url)
+          FakeRequest(POST, RegisteredAddressCorrespondenceController.onPageLoad(CheckMode).url)
             .withFormUrlEncodedBody("value" -> "false")
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
       }
     }
 
@@ -273,7 +274,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.StartController.onPageLoad().url
+        redirectLocation(result).value mustEqual StartController.onPageLoad().url
       }
     }
 

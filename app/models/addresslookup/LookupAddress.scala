@@ -19,10 +19,12 @@ package models.addresslookup
 import play.api.libs.json.{Json, OFormat}
 
 case class LookupAddress(
-                          lines: Seq[String],
-                          postcode: String,
-                          uprn: Option[String]
-                        )
+  addressLine1: Option[String] = None,
+  addressLine2: Option[String] = None,
+  addressLine3: Option[String] = None,
+  postCode: Option[String] = None,
+  uprn: Option[String] = None
+)
 
 object LookupAddress {
   implicit val writes: OFormat[LookupAddress] = Json.format[LookupAddress]

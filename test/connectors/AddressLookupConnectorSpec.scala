@@ -18,11 +18,11 @@ package connectors
 
 import base.SpecBase
 import config.FrontendAppConfig
+import models.addresslookup.LookupAddress
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.inject
-import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -53,42 +53,47 @@ class AddressLookupConnectorSpec extends SpecBase {
 
     "searchAddress" - {
 
-      "must return JsValue on successful call" in new TestSetup {
+      "must return parsed LookupAddress sequence on success" in new TestSetup {
 
-        val jsonResponse: JsValue = Json.parse(
+        val jsonResponse =
           """
             |[
             |  {
-            |    "id": "GB690091234501",
-            |    "uprn": 690091234501,
+            |    "uprn": 123,
             |    "address": {
-            |      "lines": ["1 Test Street"],
+            |      "lines": ["1 Test Street", "Test Area"],
             |      "town": "Testtown",
-            |      "postcode": "AA00 0AA"
+            |      "postcode": "BB00 0BB"
             |    }
             |  }
             |]
             |""".stripMargin
+
+        val expected = Seq(
+          LookupAddress(
+            addressLine1 = Some("1 Test Street"),
+            addressLine2 = Some("Test Area"),
+            addressLine3 = Some("Testtown"),
+            postCode = Some("BB00 0BB"),
+            uprn = Some("123")
+          )
         )
 
-        when(mockRequestBuilder.execute[JsValue](any(), any()))
-          .thenReturn(Future.successful(jsonResponse))
+        when(mockRequestBuilder.execute[play.api.libs.json.JsValue](any(), any()))
+          .thenReturn(Future.successful(play.api.libs.json.Json.parse(jsonResponse)))
 
-        val result = connector
-          .searchAddress("BB00 0BB", Some("Test"))
-          .futureValue
+        val result = connector.searchAddress("BB00 0BB", Some("Test")).futureValue
 
-        result shouldBe jsonResponse
+        result shouldBe expected
       }
 
       "must include request body with postcode and filter" in new TestSetup {
 
-        val response: JsValue = Json.parse(
+        val response =
           """
             |[
             |  {
-            |    "id": "GB200000698110",
-            |    "uprn": 200000698110,
+            |    "uprn": 200,
             |    "address": {
             |      "lines": ["Test Street"],
             |      "postcode": "BB00 0BB"
@@ -96,52 +101,38 @@ class AddressLookupConnectorSpec extends SpecBase {
             |  }
             |]
             |""".stripMargin
-        )
 
-        when(mockRequestBuilder.execute[JsValue](any(), any()))
-          .thenReturn(Future.successful(response))
+        when(mockRequestBuilder.execute[play.api.libs.json.JsValue](any(), any()))
+          .thenReturn(Future.successful(play.api.libs.json.Json.parse(response)))
 
-        connector
-          .searchAddress("BB00 0BB", Some("Test"))
-          .futureValue
+        connector.searchAddress("BB00 0BB", Some("Test")).futureValue
 
         verify(mockRequestBuilder).withBody(any())(any, any, any)
       }
 
       "must propagate UpstreamErrorResponse when downstream fails" in new TestSetup {
 
-        val upstreamErrorResponse: UpstreamErrorResponse =
-          UpstreamErrorResponse(
-            message = "Service unavailable",
-            statusCode = 503,
-            reportAs = 503,
-            headers = Map.empty
-          )
+        val upstreamErrorResponse =
+          UpstreamErrorResponse("Service unavailable", 503, 503, Map.empty)
 
-        when(mockRequestBuilder.execute[JsValue](any(), any()))
+        when(mockRequestBuilder.execute[play.api.libs.json.JsValue](any(), any()))
           .thenReturn(Future.failed(upstreamErrorResponse))
 
-        val thrown = connector
-          .searchAddress("BB00 0BB", None)
-          .failed
-          .futureValue
+        val thrown = connector.searchAddress("BB00 0BB", None).failed.futureValue
 
         thrown shouldBe upstreamErrorResponse
       }
 
-      "must propagate Throwable when an unexpected error occurs" in new TestSetup {
+      "must propagate Throwable when unexpected error occurs" in new TestSetup {
 
-        val runtimeException = new RuntimeException("Connection timeout")
+        val exception = new RuntimeException("Connection timeout")
 
-        when(mockRequestBuilder.execute[JsValue](any(), any()))
-          .thenReturn(Future.failed(runtimeException))
+        when(mockRequestBuilder.execute[play.api.libs.json.JsValue](any(), any()))
+          .thenReturn(Future.failed(exception))
 
-        val thrown = connector
-          .searchAddress("BB00 0BB", None)
-          .failed
-          .futureValue
+        val thrown = connector.searchAddress("BB00 0BB", None).failed.futureValue
 
-        thrown shouldBe runtimeException
+        thrown shouldBe exception
       }
     }
   }

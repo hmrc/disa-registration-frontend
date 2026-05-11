@@ -16,51 +16,44 @@
 
 package controllers.orgdetails
 
-import config.FrontendAppConfig
 import controllers.actions.*
-import controllers.routes.*
-import forms.{AddAnotherAddressFormProvider, ThirdPartyOrgDetailsFormProvider}
+import forms.AddAnotherAddressFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeydata.orgdetails.AddAnotherAddressForm
-import models.journeydata.thirdparty.*
-import models.requests.DataRequest
+import models.journeydata.OrganisationDetails
+import models.journeydata.orgdetails.AddAnotherAddress
 import navigation.Navigator
 import pages.organisationdetails.AddAnotherAddressPage
-import pages.thirdparty.ThirdPartyOrgDetailsPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.JourneyAnswersService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.{AddressLookupService, JourneyAnswersService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.UuidGenerator
 import views.html.orgdetails.AddAnotherAddressView
-import views.html.thirdparty.ThirdPartyOrgDetailsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class AddAnotherAddressController @Inject()(
+class AddAnotherAddressController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   journeyAnswersService: JourneyAnswersService,
+  addressLookupService: AddressLookupService,
   errorHandler: ErrorHandler,
   formProvider: AddAnotherAddressFormProvider,
   navigator: Navigator,
-  uuidGenerator: UuidGenerator,
   val controllerComponents: MessagesControllerComponents,
-  view: AddAnotherAddressView,
-  appConfig: FrontendAppConfig
+  view: AddAnotherAddressView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  val form: Form[AddAnotherAddressForm] = formProvider()
+  private val form: Form[AddAnotherAddress] = formProvider()
 
   def onPageLoad(mode: Mode): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
@@ -69,6 +62,7 @@ class AddAnotherAddressController @Inject()(
           .flatMap(_.addAnotherAddress)
           .map(form.fill)
           .getOrElse(form)
+
       Ok(view(preparedForm, mode))
     }
 
@@ -77,51 +71,45 @@ class AddAnotherAddressController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, mode))),
-
-          answer => {
-
-            val updatedOrgDetails =
-              request.journeyData.organisationDetails
-                .map { existing =>
-                  existing.copy(
-                    addAnotherAddress = Some(answer)
-                  )
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          answer =>
+            addressLookupService.lookup(answer.postcode, answer.filter).flatMap { results =>
+              val enrichedAnswer = answer.copy(addresses = results)
+              val updatedSection =
+                request.journeyData.organisationDetails match {
+                  case Some(existing) =>
+                    existing.copy(addAnotherAddress = Some(enrichedAnswer))
+                  case None           =>
+                    OrganisationDetails(addAnotherAddress = Some(enrichedAnswer))
                 }
-
-            updatedOrgDetails match {
-
-              case Some(updatedSection) =>
-                journeyAnswersService
-                  .update(
-                    updatedSection,
-                    request.groupId,
-                    request.credentials.providerId
-                  )
-                  .map { updatedJourneyData =>
-                    Redirect(
-                      navigator.nextPage(
-                        AddAnotherAddressPage,
-                        updatedJourneyData,
-                        mode
-                      )
-                    )
-                  }
-                  .recoverWith { case NonFatal(e) =>
-                    logger.warn(
-                      s"Failed updating answers for OrganisationDetails addAnotherAddress " +
-                        s"[groupId=${request.groupId}] error: ${e.getMessage}"
-                    )
-                    errorHandler.internalServerError
-                  }
-
-              case None =>
-                Future.successful(
-                  Redirect(TaskListController.onPageLoad())
+              journeyAnswersService
+                .update(
+                  updatedSection,
+                  request.groupId,
+                  request.credentials.providerId
                 )
+                .map { updatedSection =>
+                  if (results.isEmpty) {
+                    val formWithError =
+                      form
+                        .fill(enrichedAnswer)
+                        .withError(
+                          "postcode",
+                          "AddAnotherAddress.postcode.error.not.found"
+                        )
+                    BadRequest(view(formWithError, mode))
+                  } else {
+                    Redirect(navigator.nextPage(AddAnotherAddressPage, updatedSection, mode))
+                  }
+                }
+                .recoverWith { case NonFatal(e) =>
+                  logger.warn(
+                    s"Failed updating answers for section [${updatedSection.sectionName}] " +
+                      s"for groupId [${request.groupId}] with error: [$e]"
+                  )
+                  errorHandler.internalServerError
+                }
             }
-          }
         )
     }
 }

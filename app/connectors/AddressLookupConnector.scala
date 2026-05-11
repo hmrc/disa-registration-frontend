@@ -28,18 +28,19 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class AddressLookupConnector @Inject() (
-                                         httpClient: HttpClientV2,
-                                         appConfig: FrontendAppConfig
-                                       )(implicit ec: ExecutionContext) {
+  httpClient: HttpClientV2,
+  appConfig: FrontendAppConfig
+)(implicit ec: ExecutionContext) {
 
-  def searchAddress(postcode: String, filter: Option[String])
-                   (implicit hc: HeaderCarrier): Future[Seq[LookupAddress]] = {
+  def searchAddress(postcode: String, filter: Option[String])(implicit
+    hc: HeaderCarrier
+  ): Future[Seq[LookupAddress]] = {
 
-    val url = s"${appConfig.addressLookupBaseUrl}/lookup"
+    val url = s"${appConfig.addressLookupBaseUrl}/address-lookup/lookup"
 
     val requestBody = AddressLookupRequest(
       postcode = postcode,
-      filter   = filter
+      filter = filter
     )
 
     httpClient
@@ -50,10 +51,16 @@ class AddressLookupConnector @Inject() (
   }
 
   private def parse(json: JsValue): Seq[LookupAddress] =
-    (json \ "addresses").asOpt[Seq[JsValue]].getOrElse(Seq.empty).map { addr =>
+    json.asOpt[Seq[JsValue]].getOrElse(Seq.empty).map { addr =>
+      val address = addr \ "address"
+      val lines   =
+        (address \ "lines").asOpt[Seq[String]].getOrElse(Seq.empty)
+
       LookupAddress(
-        lines = (addr \ "address").asOpt[Seq[String]].getOrElse(Seq.empty),
-        postcode = (addr \ "postcode").as[String],
+        addressLine1 = lines.headOption,
+        addressLine2 = lines.lift(1),
+        addressLine3 = (address \ "town").asOpt[String],
+        postCode = (address \ "postcode").asOpt[String],
         uprn = (addr \ "uprn").asOpt[Long].map(_.toString)
       )
     }

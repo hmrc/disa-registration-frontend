@@ -17,7 +17,7 @@
 package forms
 
 import forms.mappings.Mappings
-import models.journeydata.orgdetails.AddAnotherAddressForm
+import models.journeydata.orgdetails.AddAnotherAddress
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional}
 
@@ -25,39 +25,43 @@ import javax.inject.Inject
 
 class AddAnotherAddressFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[AddAnotherAddressForm] =
+  def apply(): Form[AddAnotherAddress] =
     Form(
       mapping(
-        "postcode" -> text("AddAnotherAddress.postcode.error.required")
-          .transform(
-            AddAnotherAddressFormProvider.normalisePostcode,
-            identity
-          )
-          .verifying(
-            "AddAnotherAddress.postcode.error.invalid",
-            postcode =>
-              AddAnotherAddressFormProvider
-                .isValidPostcode(postcode)
-          ),
-
-        "filter" -> optional(
-          text()
+        "postcode" ->
+          text("AddAnotherAddress.postcode.error.required")
             .transform(_.trim, identity)
             .verifying(
-              maxLength(
-                255,
-                "AddAnotherAddress.filter.error.length"
-              )
+              "AddAnotherAddress.postcode.error.tooShort",
+              _.length >= 5
             )
-        )
-      )(
-        (postcode, filter) =>
-          AddAnotherAddressForm(postcode, filter)
-      )(
-        form =>
-          Some(
-            (form.postcode, form.filter)
+            .verifying(
+              "AddAnotherAddress.postcode.error.tooLong",
+              _.length <= 8
+            )
+            .verifying(
+              "AddAnotherAddress.postcode.error.invalid",
+              AddAnotherAddressFormProvider.isValidPostcode
+            ),
+        "filter"   ->
+          optional(
+            text()
+              .transform(_.trim, identity)
+              .verifying(
+                "AddAnotherAddress.filter.error.incorrectLength",
+                _.length <= 255
+              )
           )
+      )((postcode, filter) =>
+        AddAnotherAddress(
+          postcode = postcode,
+          filter = filter,
+          addresses = Seq.empty
+        )
+      )(form =>
+        Some(
+          (form.postcode, form.filter)
+        )
       )
     )
 }
@@ -65,8 +69,6 @@ class AddAnotherAddressFormProvider @Inject() extends Mappings {
 object AddAnotherAddressFormProvider {
 
   import java.util.regex.Pattern
-
-  // Mirrors address-lookup-frontend approach
 
   private val outcodePattern =
     Pattern.compile("^GIR|[A-Z]{1,2}[0-9][0-9A-Z]?$")
@@ -88,12 +90,12 @@ object AddAnotherAddressFormProvider {
       val incode  = normalised.substring(splitIndex)
 
       outcodePattern.matcher(outcode).matches() &&
-        incodePattern.matcher(incode).matches()
+      incodePattern.matcher(incode).matches()
     }
   }
 
   def normalisePostcode(postcode: String): String =
-    postcode.trim
-      .replaceAll("[ \\t]+", "")
+    postcode
+      .replaceAll("\\s+", "")
       .toUpperCase
 }

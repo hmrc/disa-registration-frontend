@@ -19,10 +19,10 @@ package services
 import base.SpecBase
 import config.Constants.defaultUprn
 import models.journeydata.RegisteredAddress
+import models.addresslookup.LookupAddress
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
-import play.api.libs.json.Json
 import play.api.test.Helpers.await
 import play.api.test.Helpers.defaultAwaitTimeout
 
@@ -36,143 +36,105 @@ class AddressLookupServiceSpec extends SpecBase {
     addressLine1 = Some("line1"),
     addressLine2 = Some("line2"),
     addressLine3 = Some("line3"),
-    postCode = Some("AA1 1AA")
+    postCode = Some("AA1 1AA"),
+    uprn = None
   )
 
-  "AddressLookupService" - {
+  "getUprn" - {
 
-    "getUprn" - {
+    "must return UPRN when present in lookup results" in {
 
-      "must return UPRN from first address in response" in {
-
-        val jsonResponse = Json.parse(
-          """
-            |[
-            |  {
-            |    "id": "GB123",
-            |    "uprn": 123456789012,
-            |    "address": {
-            |      "lines": ["line1", "line2"],
-            |      "postcode": "AA1 1AA"
-            |    }
-            |  }
-            |]
-            |""".stripMargin
+      val results = Seq(
+        LookupAddress(
+          addressLine1 = Some("1 Test Street"),
+          addressLine2 = None,
+          addressLine3 = Some("Test Town"),
+          postCode = Some("AA1 1AA"),
+          uprn = Some("123456789012")
         )
+      )
 
-        when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
-          .thenReturn(Future.successful(jsonResponse))
+      when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
+        .thenReturn(Future.successful(results))
 
-        val result = service.getUprn(address).futureValue
+      val result = service.getUprn(address).futureValue
 
-        result shouldBe Some("123456789012")
+      result shouldBe Some("123456789012")
+    }
 
-        verify(mockAddressLookupConnector)
-          .searchAddress("AA1 1AA", Some("line1"))
-      }
+    "must return default UPRN when no UPRN is found in results" in {
 
-      "must return default UPRN when uprn is missing" in {
-
-        val jsonResponse = Json.parse(
-          """
-            |[
-            |  {
-            |    "address": {
-            |      "lines": ["10 Test Street"],
-            |      "postcode": "AA1 1AA"
-            |    }
-            |  }
-            |]
-            |""".stripMargin
+      val results = Seq(
+        LookupAddress(
+          addressLine1 = Some("1 Test Street"),
+          addressLine2 = None,
+          addressLine3 = Some("Test Town"),
+          postCode = Some("AA1 1AA"),
+          uprn = None
         )
+      )
 
-        when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
-          .thenReturn(Future.successful(jsonResponse))
+      when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
+        .thenReturn(Future.successful(results))
 
-        val result = service.getUprn(address).futureValue
+      val result = service.getUprn(address).futureValue
 
-        result shouldBe Some(defaultUprn)
+      result shouldBe Some(defaultUprn)
+    }
+
+    "must return none for UPRN when connector fails" in {
+
+      when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val result = service.getUprn(address).futureValue
+
+      result shouldBe None
+    }
+
+    "must throw IllegalArgumentException when postcode is missing" in {
+
+      val invalid = address.copy(postCode = None)
+
+      val thrown = intercept[IllegalArgumentException] {
+        await(service.getUprn(invalid))
       }
 
-      "must return default UPRN when response list is empty" in {
+      thrown.getMessage should include("Postcode is required")
+    }
+  }
 
-        val jsonResponse = Json.parse(
-          """
-            |[]
-            |""".stripMargin
+  "lookup" - {
+
+    "must return parsed lookup results from connector" in {
+
+      val results = Seq(
+        LookupAddress(
+          addressLine1 = Some("1 Test Street"),
+          addressLine2 = None,
+          addressLine3 = Some("Test Town"),
+          postCode = Some("AA1 1AA"),
+          uprn = Some("111")
         )
+      )
 
-        when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
-          .thenReturn(Future.successful(jsonResponse))
+      when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
+        .thenReturn(Future.successful(results))
 
-        val result = service.getUprn(address).futureValue
+      val result = service.lookup("AA1 1AA", Some("filter")).futureValue
 
-        result shouldBe Some(defaultUprn)
+      result shouldBe results
+    }
+
+    "must propagate failure when connector fails" in {
+
+      when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
+        .thenReturn(Future.failed(new RuntimeException("boom")))
+
+      val thrown = intercept[RuntimeException] {
+        await(service.lookup("AA1 1AA", Some("filter")))
       }
-
-      "must return default UPRN when connector fails" in {
-
-        val exception = new RuntimeException("Connector failed")
-
-        when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
-          .thenReturn(Future.failed(exception))
-
-        val result = service.getUprn(address).futureValue
-
-        result shouldBe None
-      }
-
-      "must throw IllegalArgumentException when postcode is missing" in {
-
-        val invalidAddress = address.copy(postCode = None)
-
-        val thrown = intercept[IllegalArgumentException] {
-          await(service.getUprn(invalidAddress))
-        }
-
-        thrown.getMessage should include("Postcode is required")
-      }
-
-      "must return UPRN from first address when multiple are returned" in {
-
-        val jsonResponse = Json.parse(
-          """
-            |[
-            |  {
-            |    "id": "GB1",
-            |    "uprn": 999999999991,
-            |    "address": {
-            |      "lines": ["First Street"],
-            |      "postcode": "AA1 1AA"
-            |    }
-            |  },
-            |  {
-            |    "id": "GB2",
-            |    "uprn": 999999999999,
-            |    "address": {
-            |      "lines": ["Second Street"],
-            |      "postcode": "AA1 1AA"
-            |    }
-            |  },
-            |  {
-            |    "id": "GB3",
-            |    "uprn": 123456789012,
-            |    "address": {
-            |      "lines": ["Third Street"],
-            |      "postcode": "AA1 1AA"
-            |    }
-            |  }
-            |]
-            |""".stripMargin
-        )
-
-        when(mockAddressLookupConnector.searchAddress(any[String], any())(any()))
-          .thenReturn(Future.successful(jsonResponse))
-
-        val result = service.getUprn(address).futureValue
-
-        result shouldBe Some("999999999991")
-      }
+      thrown.getMessage shouldBe "boom"
     }
   }
 }

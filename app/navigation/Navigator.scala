@@ -83,6 +83,7 @@ class Navigator @Inject() () {
     case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
+    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
     case OrganisationEmailAddressPage              => TaskListController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
     case LiaisonOfficerEmailPage(id)               => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
@@ -211,4 +212,21 @@ class Navigator @Inject() () {
       case Nil => ProductsManagedByThirdPartyController.onPageLoad()
       case _   => AddedThirdPartiesController.onPageLoad()
     }
+
+  private def addAnotherAddressRouting(answers: OrganisationDetails): Call = {
+
+    val count =
+      answers.addAnotherAddress
+        .map(_.addresses.size)
+        .getOrElse(0)
+
+    count match {
+      case 1          =>
+        TaskListController.onPageLoad()
+      case n if n > 1 =>
+        TaskListController.onPageLoad()
+      case _          =>
+        TaskListController.onPageLoad()
+    }
+  }
 }

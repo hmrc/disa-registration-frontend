@@ -16,13 +16,24 @@
 
 package models.journeydata.orgdetails
 
-import play.api.libs.json.{Json, OFormat}
+import models.requests.AddressLookupRequest
+import play.api.libs.json.*
+import utils.JsonFormatSpec
 
-case class AddAnotherAddressForm(
-  postcode: String,
-  filter: Option[String]
-)
+class AddressLookupRequestJsonSpec extends JsonFormatSpec[AddressLookupRequest] {
 
-object AddAnotherAddressForm {
-  implicit val format: OFormat[AddAnotherAddressForm] = Json.format[AddAnotherAddressForm]
+  override val model: AddressLookupRequest =
+    AddressLookupRequest(
+      postcode = "AA1 1AA",
+      filter = Some("Test Filter")
+    )
+
+  override val expectedJsonFromWrites: JsValue =
+    Json.obj(
+      "postcode" -> "AA1 1AA",
+      "filter"   -> "Test Filter"
+    )
+
+  override implicit val format: OFormat[AddressLookupRequest] =
+    AddressLookupRequest.writes
 }
