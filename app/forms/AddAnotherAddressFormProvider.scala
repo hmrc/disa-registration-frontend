@@ -18,7 +18,6 @@ package forms
 
 import forms.mappings.Mappings
 import models.journeydata.orgdetails.AddAnotherAddressForm
-import models.journeydata.thirdparty.ThirdPartyOrgDetailsForm
 import play.api.data.Form
 import play.api.data.Forms.{mapping, optional}
 
@@ -30,25 +29,71 @@ class AddAnotherAddressFormProvider @Inject() extends Mappings {
     Form(
       mapping(
         "postcode" -> text("AddAnotherAddress.postcode.error.required")
-          .transform(_.trim, identity)
+          .transform(
+            AddAnotherAddressFormProvider.normalisePostcode,
+            identity
+          )
           .verifying(
-            regexp(
-              AddAnotherAddressFormProvider.postcodeRegex,
-              "AddAnotherAddress.postcode.error.required"
-            )
+            "AddAnotherAddress.postcode.error.invalid",
+            postcode =>
+              AddAnotherAddressFormProvider
+                .isValidPostcode(postcode)
           ),
-        "filter"            -> optional(
+
+        "filter" -> optional(
           text()
             .transform(_.trim, identity)
-            .verifying(minLength(6, "AddAnotherAddress.postcode.error.required"))
-            .verifying(maxLength(7, "AddAnotherAddress.postcode.error.required"))
-            .verifying(regexp(AddAnotherAddressFormProvider.filterRegex, "AddAnotherAddress.postcode.error.required"))
+            .verifying(
+              maxLength(
+                255,
+                "AddAnotherAddress.filter.error.length"
+              )
+            )
         )
-      )((postcode, filter) => AddAnotherAddressForm(postcode, filter))(form => Some((form.postcode, form.filter)))
+      )(
+        (postcode, filter) =>
+          AddAnotherAddressForm(postcode, filter)
+      )(
+        form =>
+          Some(
+            (form.postcode, form.filter)
+          )
+      )
     )
 }
 
 object AddAnotherAddressFormProvider {
-  private[forms] val postcodeRegex = "^[\\p{L}'’ -]+$"
-  private[forms] val filterRegex            = "^[0-9]+$"
+
+  import java.util.regex.Pattern
+
+  // Mirrors address-lookup-frontend approach
+
+  private val outcodePattern =
+    Pattern.compile("^GIR|[A-Z]{1,2}[0-9][0-9A-Z]?$")
+
+  private val incodePattern =
+    Pattern.compile("^[0-9][A-Z]{2}$")
+
+  def isValidPostcode(postcode: String): Boolean = {
+
+    val normalised = normalisePostcode(postcode)
+
+    if (normalised.length < 5) {
+      false
+    } else {
+
+      val splitIndex = normalised.length - 3
+
+      val outcode = normalised.substring(0, splitIndex)
+      val incode  = normalised.substring(splitIndex)
+
+      outcodePattern.matcher(outcode).matches() &&
+        incodePattern.matcher(incode).matches()
+    }
+  }
+
+  def normalisePostcode(postcode: String): String =
+    postcode.trim
+      .replaceAll("[ \\t]+", "")
+      .toUpperCase
 }
