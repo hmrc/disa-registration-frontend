@@ -20,6 +20,7 @@ import connectors.EmailVerificationConnector
 import controllers.actions.*
 import forms.OrganisationEmailAddressFormProvider
 import handlers.ErrorHandler
+import handlers.JourneyHandler.clearStalePages
 import models.Mode
 import models.journeydata.OrganisationEmail
 import models.requests.DataRequest
@@ -89,10 +90,8 @@ class OrganisationEmailAddressController @Inject() (
               emailVerificationConnector
                 .sendCode(email)
                 .flatMap { _ =>
-                  val updatedSection = OrganisationEmail(
-                    organisationEmail = Some(email),
-                    verified = Some(false)
-                  )
+                  val updatedSection =
+                    clearStalePages(OrganisationEmailAddressPage, OrganisationEmail(organisationEmail = Some(email)))
 
                   journeyAnswersService
                     .update(updatedSection, request.groupId, request.credentials.providerId)
@@ -100,6 +99,7 @@ class OrganisationEmailAddressController @Inject() (
                       Redirect(
                         navigator.nextPage(
                           OrganisationEmailAddressPage,
+                          None,
                           savedSection,
                           mode,
                           None
