@@ -80,6 +80,8 @@ GET        /email-verification-code                      controllers.orgemail.Em
 POST       /email-verification-code                      controllers.orgemail.EmailVerificationCodeController.onSubmit(mode: Mode = NormalMode)
 POST       /request-new-code                             controllers.orgemail.EmailVerificationCodeController.requestNewCode()
 
+GET        /organisation-email-check-your-answers        controllers.orgemail.OrganisationEmailCyaController.onPageLoad()
+
 ## ISA Products
 GET        /isa-products                                 controllers.isaproducts.IsaProductsController.onPageLoad(mode: Mode = NormalMode)
 POST       /isa-products                                 controllers.isaproducts.IsaProductsController.onSubmit(mode: Mode = NormalMode)

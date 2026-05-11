@@ -158,7 +158,7 @@ organisationEmailAddress.hint = This email will be used to notify you of any mes
 organisationEmailAddress.checkYourAnswersLabel = Organisation email
 organisationEmailAddress.error.required = Enter the email address of your organisation. Use a name, @ symbol and a domain name, like yourname@example.com
 organisationEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
-organisationEmailAddress.change.hidden = organisation email
+organisationEmailAddress.change.hidden = organisation email address
 
 emailVerificationCode.title = Enter the code to confirm your organisation email
 emailVerificationCode.heading = Enter the code to confirm your organisation email
@@ -173,6 +173,9 @@ emailVerificationCode.error.format = You need to enter a confirmation code in th
 emailVerificationCode.error.invalid = The code you entered is invalid
 emailVerificationCode.error.tooLong = The code you have used is too long. It should be 6 letters
 emailVerificationCode.error.tooShort = The code you have used is too short. It should be 6 letters
+
+organisationEmailCya.title = Check your verified organisation email
+organisationEmailCya.heading = Check your verified organisation email
 
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?

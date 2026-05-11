@@ -101,7 +101,7 @@ class Navigator @Inject() () {
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
-    case EmailVerificationCodePage                 => TaskListController.onPageLoad() // TODO hook to CYA
+    case EmailVerificationCodePage                 => OrganisationEmailCyaController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
     case LiaisonOfficerEmailPage(id)               => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
     case LiaisonOfficerPhoneNumberPage(id)         => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
