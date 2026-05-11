@@ -190,6 +190,122 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
           investorFundsPercentage = Some("10")
         )
       }
+      "must update connectedOrganisations when an existing third party name changes" in {
+
+        val existing =
+          ThirdPartyOrganisations(
+            managedByThirdParty = None,
+            thirdParties = Seq(
+              ThirdParty(
+                id = "existing-id",
+                thirdPartyName = Some("Old Name"),
+                thirdPartyFrn = Some("123456")
+              )
+            ),
+            connectedOrganisations = Seq("Old Name", "Another Org")
+          )
+
+        val result =
+          existing.upsertThirdParty("existing-id", "Updated Name", Some("654321"))
+
+        result.connectedOrganisations mustBe Seq(
+          "Updated Name",
+          "Another Org"
+        )
+      }
+
+      "must not update connectedOrganisations when the third party name is unchanged" in {
+
+        val existing =
+          ThirdPartyOrganisations(
+            managedByThirdParty = None,
+            thirdParties = Seq(
+              ThirdParty(
+                id = "existing-id",
+                thirdPartyName = Some("Same Name"),
+                thirdPartyFrn = Some("123456")
+              )
+            ),
+            connectedOrganisations = Seq("Same Name", "Another Org")
+          )
+
+        val result =
+          existing.upsertThirdParty("existing-id", "Same Name", Some("654321"))
+
+        result.connectedOrganisations mustBe Seq(
+          "Same Name",
+          "Another Org"
+        )
+      }
+
+      "must not update connectedOrganisations when the existing third party has no name" in {
+
+        val existing =
+          ThirdPartyOrganisations(
+            managedByThirdParty = None,
+            thirdParties = Seq(
+              ThirdParty(
+                id = "existing-id",
+                thirdPartyName = None,
+                thirdPartyFrn = Some("123456")
+              )
+            ),
+            connectedOrganisations = Seq("Another Org")
+          )
+
+        val result =
+          existing.upsertThirdParty("existing-id", "Updated Name", Some("654321"))
+
+        result.connectedOrganisations mustBe Seq("Another Org")
+      }
+
+      "must not modify connectedOrganisations when adding a new third party" in {
+
+        val existing =
+          ThirdPartyOrganisations(
+            managedByThirdParty = None,
+            thirdParties = Seq(
+              ThirdParty(
+                id = "other-id",
+                thirdPartyName = Some("Other Org")
+              )
+            ),
+            connectedOrganisations = Seq("Other Org")
+          )
+
+        val result =
+          existing.upsertThirdParty("new-id", "New Org", Some("222222"))
+
+        result.connectedOrganisations mustBe Seq("Other Org")
+      }
+
+      "must update only the matching connected organisation when multiple organisations exist" in {
+
+        val existing =
+          ThirdPartyOrganisations(
+            managedByThirdParty = None,
+            thirdParties = Seq(
+              ThirdParty(
+                id = "existing-id",
+                thirdPartyName = Some("Old Name")
+              )
+            ),
+            connectedOrganisations = Seq(
+              "Org A",
+              "Old Name",
+              "Org B"
+            )
+          )
+
+        val result =
+          existing.upsertThirdParty("existing-id", "Updated Name", None)
+
+        result.connectedOrganisations mustBe Seq(
+          "Org A",
+          "Updated Name",
+          "Org B"
+        )
+      }
     }
 
     ".sectionName" - {
