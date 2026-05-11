@@ -20,6 +20,7 @@ import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
+import controllers.orgemail.routes.*
 import controllers.routes.*
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
@@ -99,7 +100,8 @@ class Navigator @Inject() () {
     case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
-    case OrganisationEmailAddressPage              => TaskListController.onPageLoad()
+    case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
+    case EmailVerificationCodePage                 => TaskListController.onPageLoad() // TODO hook to CYA
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
     case LiaisonOfficerEmailPage(id)               => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
     case LiaisonOfficerPhoneNumberPage(id)         => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)

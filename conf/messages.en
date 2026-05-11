@@ -160,6 +160,20 @@ organisationEmailAddress.error.required = Enter the email address of your organi
 organisationEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
 organisationEmailAddress.change.hidden = organisation email
 
+emailVerificationCode.title = Enter the code to confirm your organisation email
+emailVerificationCode.heading = Enter the code to confirm your organisation email
+emailVerificationCode.p1 = We have sent an email to <strong>{0}</strong>
+emailVerificationCode.p2 = The email may take a few minutes to arrive. Its subject line is: ‘Confirm your email address - Government Gateway’. Check your spam or junk folder. If it still has not arrived you can request a new code. You can also {0}.
+emailVerificationCode.p2.link = change the email address
+emailVerificationCode.link = Request a new code
+emailVerificationCode.label = Confirmation code
+emailVerificationCode.hint = For example WSGMCN
+emailVerificationCode.error.required = You need to enter a valid confirmation code. Use a code, like WXYZRS or ABCDEF
+emailVerificationCode.error.format = You need to enter a confirmation code in the correct format. Use a code that contains letters only
+emailVerificationCode.error.invalid = The code you entered is invalid
+emailVerificationCode.error.tooLong = The code you have used is too long. It should be 6 letters
+emailVerificationCode.error.tooShort = The code you have used is too short. It should be 6 letters
+
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?
 isaProducts.heading = Which ISA products does your organisation offer?

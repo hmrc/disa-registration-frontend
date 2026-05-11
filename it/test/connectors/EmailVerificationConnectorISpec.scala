@@ -17,6 +17,7 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlEqualTo, verify}
+import models.emailverification.VerifyEmailCodeResult.{InvalidCode, Verified}
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK, SERVICE_UNAVAILABLE}
 import play.api.libs.json.Json
 import play.api.test.Helpers.await
@@ -137,7 +138,7 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
 
       val result = await(connector.verifyCode("test@example.com", "123456"))
 
-      result shouldBe ()
+      result shouldBe Verified
     }
 
     "send the correct request body to email-verification" in {
@@ -147,7 +148,7 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
           """
             |{
             |  "email": "test@example.com",
-            |  "code": "123456"
+            |  "verificationCode": "123456"
             |}
             |""".stripMargin
         )
@@ -180,15 +181,9 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
 
       stubPost(verifyCodePath, BAD_REQUEST, errorResponse)
 
-      val ex = intercept[UpstreamErrorResponse] {
-        await(connector.verifyCode("test@example.com", "123456"))
-      }
+      val result = await(connector.verifyCode("test@example.com", "123456"))
 
-      ex.statusCode shouldBe BAD_REQUEST
-      ex.reportAs shouldBe INTERNAL_SERVER_ERROR
-      ex.getMessage should include("Email verification call [POST /v2/verify-code] failed")
-      ex.getMessage should include(s"upstream status [$BAD_REQUEST]")
-      ex.getMessage should include("Code not valid")
+      result shouldBe InvalidCode
     }
 
     "throw UpstreamErrorResponse when email-verification returns 503 Service Unavailable" in {

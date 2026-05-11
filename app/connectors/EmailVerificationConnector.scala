@@ -17,7 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.emailverification.{SendEmailVerificationCodeRequest, VerifyEmailCodeRequest}
+import models.emailverification.{SendEmailVerificationCodeRequest, VerifyEmailCodeRequest, VerifyEmailCodeResult}
 import play.api.Logging
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.Json
@@ -63,7 +63,7 @@ class EmailVerificationConnector @Inject() (
       }
   }
 
-  def verifyCode(email: String, code: String)(implicit hc: HeaderCarrier): Future[Unit] = {
+  def verifyCode(email: String, code: String)(implicit hc: HeaderCarrier): Future[VerifyEmailCodeResult] = {
     val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/v2/verify-code"
 
     httpClient
@@ -73,9 +73,19 @@ class EmailVerificationConnector @Inject() (
       .map { response =>
         response.status match {
           case OK =>
-            ()
+            VerifyEmailCodeResult.Verified
 
-          case status =>
+          case status if status >= 400 && status < 500 =>
+            logger.warn(
+              upstreamErrorMessage(
+                endpoint = "POST /v2/verify-code",
+                status = response.status,
+                body = response.body
+              )
+            )
+            VerifyEmailCodeResult.InvalidCode
+
+          case _ =>
             val msg = upstreamErrorMessage(
               endpoint = "POST /v2/verify-code",
               status = response.status,

@@ -25,7 +25,7 @@ object SendEmailVerificationCodeRequest {
     Json.format[SendEmailVerificationCodeRequest]
 }
 
-case class VerifyEmailCodeRequest(email: String, code: String)
+case class VerifyEmailCodeRequest(email: String, verificationCode: String)
 
 object VerifyEmailCodeRequest {
   implicit val format: OFormat[VerifyEmailCodeRequest] =
