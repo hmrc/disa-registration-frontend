@@ -95,7 +95,8 @@ class LiaisonOfficerNameController @Inject() (
                       navigator.nextPage(
                         LiaisonOfficerNamePage(id),
                         updatedSection,
-                        mode
+                        mode,
+                        None
                       )
                     )
                   }

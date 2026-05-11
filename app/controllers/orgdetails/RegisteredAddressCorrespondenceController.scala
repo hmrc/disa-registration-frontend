@@ -95,7 +95,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
               journeyAnswersService
                 .update(updatedOrganisationDetails, request.groupId, request.credentials.providerId)
                 .map { updated =>
-                  Redirect(navigator.nextPage(RegisteredAddressCorrespondencePage, updated, mode))
+                  Redirect(navigator.nextPage(RegisteredAddressCorrespondencePage, updated, mode, None))
                 }
                 .recoverWith { case NonFatal(e) =>
                   logger.warn(

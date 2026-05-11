@@ -334,7 +334,7 @@ productsManagedByThirdParty.title = Are any of your ISA products managed by thir
 productsManagedByThirdParty.heading = Are any of your ISA products managed by third-party organisations?
 productsManagedByThirdParty.error.required = Select yes if any of your ISA products are managed by a third-party organisation
 productsManagedByThirdParty.checkYourAnswersLabel = Outsourcing ISA management or administration
-productsManagedByThirdParty.change.hidden = outsourcing ISA management
+productsManagedByThirdParty.change.hidden = whether you are using a third-party organisation
 
 thirdPartyOrgDetails.title = Third-party organisation details
 thirdPartyOrgDetails.heading = Third-party organisation details
@@ -346,20 +346,20 @@ thirdPartyOrgDetails.frnInputHint = The FRN is usually a 6 or 7 digit number
 thirdPartyOrgDetails.frn.error.invalid = The FCA, FRN must not include letters a to z, hyphens, spaces or apostrophes
 thirdPartyOrgDetails.frn.error.incorrectLength = The FCA, FRN  must be a six or seven digit number
 thirdPartyOrgDetails.checkYourAnswersLabel = Third-party {0} details
-thirdPartyOrgDetails.change.hidden = third-party {0} details
+thirdPartyOrgDetails.change.hidden = details of third-party {0}
 
 returnsManagedByThirdParty.title = Will {0} manage your ISA returns and reporting?
 returnsManagedByThirdParty.heading = Will {0} manage your ISA returns and reporting?
 returnsManagedByThirdParty.error.required = Select yes if the third-party organisation will manage your ISA returns and reporting
 returnsManagedByThirdParty.checkYourAnswersLabel = Will {0} manage your ISA monthly reporting?
-returnsManagedByThirdParty.change.hidden = will this third-party manage monthly ISA reporting
+returnsManagedByThirdParty.change.hidden = if this third-party will manage monthly ISA reporting
 
 investorFundsUsedByThirdParty.title = Will any investor funds be used to pay fees, commissions, or incentives for managing or marketing ISA products to {0}?
 investorFundsUsedByThirdParty.heading = Will any investor funds be used to pay fees, commissions, or incentives for managing or marketing ISA products to {0}?
 investorFundsUsedByThirdParty.error.required = Select yes if the third-party organisation will receive any investor funds to pay fees, commissions or incentives for managing or marketing ISAs products
 investorFundsUsedByThirdParty.checkYourAnswersLabel = Will investor funds be used for payments to {0}?
 investorFundsUsedByThirdParty.checkYourAnswersValue = {0}%
-investorFundsUsedByThirdParty.change.hidden = will investor funds be used for payments to third-party
+investorFundsUsedByThirdParty.change.hidden = if investor funds will be used for payments to {0}
 
 thirdPartyInvestorFundsPercentage.title = What percentage of investor funds will be paid to {0} as commissions or incentives?
 thirdPartyInvestorFundsPercentage.heading = What percentage of investor funds will be paid to {0} as commissions or incentives?
@@ -394,10 +394,18 @@ thirdPartyConnectedOrganisations.hint = Select all that apply
 thirdPartyConnectedOrganisations.noneSelected = None are connected
 thirdPartyConnectedOrganisations.checkBoxDivider = or
 thirdPartyConnectedOrganisations.error.required = Select an option. If any of the organisations are connected select how many. If none of them are connected, select ‘None are connected’
+thirdPartyConnectedOrganisations.checkYourAnswersLabel = Are any of these organisations connected?
 
 removeThirdParty.title = Are you sure you want to remove {0} as a third-party organisation?
 removeThirdParty.heading = Are you sure you want to remove {0} as a third-party organisation?
 removeThirdParty.error.required = Select yes if you want to remove this third-party organisation
+
+thirdPartiesCheckYourAnswers.title = Check added third-party organisations
+thirdPartiesCheckYourAnswers.heading = Check added third-party organisations
+thirdPartiesCheckYourAnswers.sub.heading = Third-party {0}
+thirdPartiesCheckYourAnswers.connectedOrganisations.sub.heading = Connected organisations
+thirdPartiesCheckYourAnswers.addAnother.sub.heading = Add another
+thirdPartiesCheckYourAnswers.addAnother.label = Add or remove third party
 
 ### Certificates of Authority
 

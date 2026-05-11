@@ -27,27 +27,95 @@ case class ThirdPartyOrganisations(
 ) extends TaskListSection {
   def sectionName: String = ThirdPartyOrganisations.sectionName
 
-  def upsertThirdParty(id: String, name: String, frn: Option[String]): ThirdPartyOrganisations = {
-    val exists = thirdParties.exists(_.id == id)
+  def upsertThirdParty(
+    id: String,
+    name: String,
+    frn: Option[String]
+  ): ThirdPartyOrganisations = {
 
-    val updated =
-      if (exists)
-        thirdParties.map {
-          case tp if tp.id == id =>
-            tp.copy(
-              thirdPartyName = Some(name),
-              thirdPartyFrn = frn
-            )
-          case tp                => tp
+    val existingThirdPartyOpt =
+      thirdParties.find(_.id == id)
+
+    val updatedThirdParties =
+      existingThirdPartyOpt match {
+
+        case Some(existingThirdParty) =>
+          thirdParties.map {
+            case tp if tp.id == id =>
+              tp.copy(
+                thirdPartyName = Some(name),
+                thirdPartyFrn = frn
+              )
+
+            case tp =>
+              tp
+          }
+
+        case None =>
+          thirdParties :+ ThirdParty(
+            id = id,
+            thirdPartyName = Some(name),
+            thirdPartyFrn = frn
+          )
+      }
+
+    val updatedConnectedOrganisations =
+      existingThirdPartyOpt
+        .flatMap(_.thirdPartyName)
+        .filter(_ != name)
+        .map { existingName =>
+          connectedOrganisations.map {
+            case `existingName` => name
+            case other          => other
+          }
         }
-      else
-        thirdParties :+ ThirdParty(
-          id = id,
-          thirdPartyName = Some(name),
-          thirdPartyFrn = frn
-        )
+        .getOrElse(connectedOrganisations)
 
-    copy(thirdParties = updated)
+    copy(
+      thirdParties = updatedThirdParties,
+      connectedOrganisations = updatedConnectedOrganisations
+    )
+  }
+
+  def completedThirdParties: Seq[ThirdParty] =
+    thirdParties.filterNot(_.inProgress)
+
+  def completedCount: Int =
+    completedThirdParties.size
+
+  def hasMultipleCompleted: Boolean =
+    completedCount > 1
+
+  def hasSingleCompleted: Boolean =
+    completedCount == 1
+
+  def canAccessCheckYourAnswers: Boolean =
+    hasMultipleCompleted
+
+  def removeThirdParty(id: String): ThirdPartyOrganisations = {
+
+    val removedThirdPartyOpt =
+      thirdParties.find(_.id == id)
+
+    val updatedThirdParties =
+      thirdParties.filterNot(_.id == id)
+
+    val connectedAfterNameRemoval =
+      removedThirdPartyOpt
+        .flatMap(_.thirdPartyName)
+        .map { name =>
+          connectedOrganisations.filterNot(_ == name)
+        }
+        .getOrElse(connectedOrganisations)
+
+    val finalConnectedOrgs =
+      if (updatedThirdParties.size == 1) Nil
+      else connectedAfterNameRemoval
+
+    copy(
+      thirdParties = updatedThirdParties,
+      connectedOrganisations = finalConnectedOrgs
+    )
   }
 }
 

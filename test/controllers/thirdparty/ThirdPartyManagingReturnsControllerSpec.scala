@@ -31,11 +31,11 @@ import play.api.libs.json.Writes
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.thirdparty.ReturnsManagedByThirdPartyView
+import views.html.thirdparty.ThirdPartyManagingReturnsView
 
 import scala.concurrent.Future
 
-class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
+class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
 
   private val existingId = "existing-id"
   private val otherId    = "other-id"
@@ -47,12 +47,12 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
   val form: Form[YesNoAnswer] = formProvider("returnsManagedByThirdParty.error.required")
 
   lazy val routeUrl: String =
-    routes.ReturnsManagedByThirdPartyController.onPageLoad(existingId, NormalMode).url
+    routes.ThirdPartyManagingReturnsController.onPageLoad(existingId, NormalMode, None).url
 
   lazy val submitUrl: String =
-    routes.ReturnsManagedByThirdPartyController.onSubmit(existingId, NormalMode).url
+    routes.ThirdPartyManagingReturnsController.onSubmit(existingId, NormalMode, None).url
 
-  "ReturnsManagedByThirdPartyController" - {
+  "ThirdPartyManagingReturnsController" - {
 
     "GET" - {
 
@@ -77,10 +77,10 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
           val request = FakeRequest(GET, routeUrl)
 
           val result = route(application, request).value
-          val view   = application.injector.instanceOf[ReturnsManagedByThirdPartyView]
+          val view   = application.injector.instanceOf[ThirdPartyManagingReturnsView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(existingId, name, form, NormalMode)(
+          contentAsString(result) mustEqual view(existingId, name, form, NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -111,10 +111,10 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
           val request = FakeRequest(GET, routeUrl)
 
           val result = route(application, request).value
-          val view   = application.injector.instanceOf[ReturnsManagedByThirdPartyView]
+          val view   = application.injector.instanceOf[ThirdPartyManagingReturnsView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(existingId, name, form.fill(yesAnswer), NormalMode)(
+          contentAsString(result) mustEqual view(existingId, name, form.fill(yesAnswer), NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -185,12 +185,12 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
 
           val boundForm = form.bind(Map("value" -> ""))
 
-          val view = application.injector.instanceOf[ReturnsManagedByThirdPartyView]
+          val view = application.injector.instanceOf[ThirdPartyManagingReturnsView]
 
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(existingId, name, boundForm, NormalMode)(
+          contentAsString(result) mustEqual view(existingId, name, boundForm, NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -259,7 +259,7 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual InvestorFundsUsedByThirdPartyController
-            .onPageLoad(existingId, NormalMode)
+            .onPageLoad(existingId, NormalMode, None)
             .url
         }
       }
@@ -335,13 +335,13 @@ class ReturnsManagedByThirdPartyControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(GET, routes.ReturnsManagedByThirdPartyController.onPageLoad(existingId, CheckMode).url)
+            FakeRequest(GET, routes.ThirdPartyManagingReturnsController.onPageLoad(existingId, CheckMode, None).url)
 
           val result = route(application, request).value
-          val view   = application.injector.instanceOf[ReturnsManagedByThirdPartyView]
+          val view   = application.injector.instanceOf[ThirdPartyManagingReturnsView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(existingId, name, form.fill(noAnswer), CheckMode)(
+          contentAsString(result) mustEqual view(existingId, name, form.fill(noAnswer), CheckMode, None)(
             request,
             messages(application)
           ).toString

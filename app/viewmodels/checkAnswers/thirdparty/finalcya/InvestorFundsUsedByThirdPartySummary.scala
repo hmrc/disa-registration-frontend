@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.thirdparty
+package viewmodels.checkAnswers.thirdparty.finalcya
 
 import controllers.thirdparty.routes.InvestorFundsUsedByThirdPartyController
-import models.CheckMode
 import models.journeydata.thirdparty.ThirdParty
+import models.{CheckMode, ReturnTo}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -28,7 +28,9 @@ import viewmodels.implicits.*
 
 object InvestorFundsUsedByThirdPartySummary {
 
-  def row(thirdParty: ThirdParty)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(thirdParty: ThirdParty, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     for {
       name   <- thirdParty.thirdPartyName
       answer <- thirdParty.usingInvestorFunds
@@ -42,9 +44,9 @@ object InvestorFundsUsedByThirdPartySummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          InvestorFundsUsedByThirdPartyController.onPageLoad(thirdParty.id, CheckMode).url
+          InvestorFundsUsedByThirdPartyController.onPageLoad(thirdParty.id, CheckMode, returnTo).url
         )
-          .withVisuallyHiddenText(messages("investorFundsUsedByThirdParty.change.hidden"))
+          .withVisuallyHiddenText(messages("investorFundsUsedByThirdParty.change.hidden", name))
       )
     )
 

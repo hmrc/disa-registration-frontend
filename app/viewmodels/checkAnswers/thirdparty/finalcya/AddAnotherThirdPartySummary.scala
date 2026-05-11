@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.thirdparty
+package viewmodels.checkAnswers.thirdparty.finalcya
 
-import controllers.thirdparty.routes.ThirdPartyInvestorFundsPercentageController
+import controllers.thirdparty.routes.AddedThirdPartiesController
 import models.CheckMode
-import models.journeydata.thirdparty.ThirdParty
+import models.ReturnTo.FinalCya
+import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -26,25 +27,22 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListR
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ThirdPartyInvestorFundsPercentageSummary {
+object AddAnotherThirdPartySummary {
 
-  def row(thirdParty: ThirdParty)(implicit messages: Messages): Option[SummaryListRow] =
-    for {
-      name   <- thirdParty.thirdPartyName
-      answer <- thirdParty.investorFundsPercentage
-    } yield SummaryListRowViewModel(
-      key = Key(Text(messages("thirdPartyInvestorFundsPercentage.checkYourAnswersLabel", name))),
+  def row(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit messages: Messages): SummaryListRow =
+    SummaryListRowViewModel(
+      key = Key(Text(messages("thirdPartiesCheckYourAnswers.addAnother.label"))),
       value = ValueViewModel(
         HtmlContent(
-          HtmlFormat.escape(messages("investorFundsUsedByThirdParty.checkYourAnswersValue", answer))
+          HtmlFormat.escape(messages("site.no"))
         )
       ),
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          ThirdPartyInvestorFundsPercentageController.onPageLoad(thirdParty.id, CheckMode).url
+          AddedThirdPartiesController.onPageLoad(CheckMode, Some(FinalCya)).url
         )
-          .withVisuallyHiddenText(messages("thirdPartyInvestorFundsPercentage.change.hidden"))
+          .withVisuallyHiddenText(messages("productsManagedByThirdParty.change.hidden"))
       )
     )
 }

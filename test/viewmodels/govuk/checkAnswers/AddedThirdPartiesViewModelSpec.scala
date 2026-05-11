@@ -101,7 +101,7 @@ class AddedThirdPartiesViewModelSpec extends SpecBase {
       val html = vm(form, Seq(tp1), Nil)
 
       html.toString must include(
-        ThirdPartyOrgDetailsController.onPageLoad(Some("1"), NormalMode).url
+        ThirdPartyOrgDetailsController.onPageLoad(Some("1"), NormalMode, None).url
       )
     }
 

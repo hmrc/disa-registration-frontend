@@ -31,8 +31,8 @@ import views.html.thirdparty.AddedThirdPartiesView
 
 class AddedThirdPartiesControllerSpec extends SpecBase {
 
-  private val routeUrl  = AddedThirdPartiesController.onPageLoad().url
-  private val submitUrl = AddedThirdPartiesController.onSubmit().url
+  private val routeUrl  = AddedThirdPartiesController.onPageLoad(NormalMode, None).url
+  private val submitUrl = AddedThirdPartiesController.onSubmit(NormalMode).url
 
   private val tp1 = ThirdParty("1", Some("Org 1"))
   private val tp2 = ThirdParty("2", Some("Org 2"))
@@ -68,7 +68,42 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           form = new forms.YesNoAnswerFormProvider()("addedThirdParties.error.required"),
-          AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties)
+          AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
+          NormalMode
+        )(request, messages(application)).toString
+      }
+    }
+
+    "must pre-fill form with NO when returnTo query param is present" in {
+
+      val routeWithReturnTo =
+        AddedThirdPartiesController
+          .onPageLoad(
+            mode = NormalMode,
+            returnTo = Some(models.ReturnTo.FinalCya)
+          )
+          .url
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData(Seq(tp1, tp2)))).build()
+
+      val appConfig = application.injector.instanceOf[FrontendAppConfig]
+
+      running(application) {
+        val request = FakeRequest(GET, routeWithReturnTo)
+        val result  = route(application, request).value
+
+        val view = application.injector.instanceOf[AddedThirdPartiesView]
+
+        val (inProgress, complete) = Seq(tp1, tp2).partition(_.inProgress)
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual view(
+          form = new forms.YesNoAnswerFormProvider()("addedThirdParties.error.required")
+            .fill(YesNoAnswer.No),
+          AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
+          NormalMode
         )(request, messages(application)).toString
       }
     }
@@ -200,7 +235,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual
-          ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode).url
+          ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode, None).url
       }
     }
 

@@ -25,6 +25,7 @@ import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.checkAnswers.thirdparty.*
+import viewmodels.checkAnswers.thirdparty.finalcya.{InvestorFundsUsedByThirdPartySummary, ThirdPartyInvestorFundsPercentageSummary, ThirdPartyManagingReturnsSummary, ThirdPartyOrgDetailsSummary}
 import viewmodels.govuk.summarylist.*
 import views.html.thirdparty.ThirdPartyCheckYourAnswersView
 
@@ -79,7 +80,7 @@ class ThirdPartyCheckYourAnswersControllerSpec extends SpecBase {
         val expectedRows =
           Seq(
             ThirdPartyOrgDetailsSummary.row(thirdParty, 2),
-            ReturnsManagedByThirdPartySummary.row(thirdParty),
+            ThirdPartyManagingReturnsSummary.row(thirdParty),
             InvestorFundsUsedByThirdPartySummary.row(thirdParty),
             ThirdPartyInvestorFundsPercentageSummary.row(thirdParty)
           ).flatten

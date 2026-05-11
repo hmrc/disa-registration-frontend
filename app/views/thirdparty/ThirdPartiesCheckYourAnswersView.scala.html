@@ -16,28 +16,30 @@
 
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.pageheading.PageHeading
-@import controllers.thirdparty.routes._
+@import controllers.routes.TaskListController
+@import viewmodels.checkAnswers.thirdparty.finalcya.ThirdPartiesCheckYourAnswersViewModel
+@import models.journeydata.thirdparty.ThirdPartyOrganisations
 
 @this(
   layout: templates.Layout,
   hmrcPageHeading: HmrcPageHeading,
   formHelper: FormWithCSRF,
   govukButton: GovukButton,
-  govukSummaryList: GovukSummaryList
+  viewModel: ThirdPartiesCheckYourAnswersViewModel
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("thirdPartyCya.title"))) {
+@layout(pageTitle = titleNoForm(messages("thirdPartiesCheckYourAnswers.title"))) {
 
   @hmrcPageHeading(PageHeading(
-    text = messages("thirdPartyCya.heading"),
+    text = messages("thirdPartiesCheckYourAnswers.heading"),
     headingClasses = Some("govuk-heading-l"),
   ))
 
-  @formHelper(action = AddedThirdPartiesController.onPageLoad(NormalMode, None), Symbol("autoComplete") -> "off") {
+  @formHelper(action = TaskListController.onPageLoad(), Symbol("autoComplete") -> "off") {
 
-    @govukSummaryList(list)
+    @viewModel.apply(thirdPartyOrganisations)
 
     @govukButton(
       ButtonViewModel(messages("site.saveAndContinue")).preventingDoubleClick()

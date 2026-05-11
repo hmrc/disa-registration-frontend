@@ -22,7 +22,7 @@ import forms.ThirdPartyInvestorFundsPercentageFormProvider
 import handlers.ErrorHandler
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.requests.DataRequest
-import models.{Mode, YesNoAnswer}
+import models.{Mode, ReturnTo, YesNoAnswer}
 import navigation.Navigator
 import pages.thirdparty.ThirdPartyInvestorFundsPercentagePage
 import play.api.i18n.Lang.logger
@@ -53,17 +53,17 @@ class ThirdPartyInvestorFundsPercentageController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(id: String, mode: Mode): Action[AnyContent] =
+  def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       findThirdPartyWithDetails(id).fold {
         Redirect(IndexController.onPageLoad())
       } { case (thirdParty, name, answer) =>
         val preparedForm = answer.fold(form)(form.fill)
-        Ok(view(id, name, preparedForm, mode))
+        Ok(view(id, name, preparedForm, mode, returnTo))
       }
     }
 
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] =
+  def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
@@ -72,7 +72,7 @@ class ThirdPartyInvestorFundsPercentageController @Inject() (
             findThirdPartyWithDetails(id).fold {
               Future.successful(Redirect(IndexController.onPageLoad()))
             } { case (_, name, _) =>
-              Future.successful(BadRequest(view(id, name, formWithErrors, mode)))
+              Future.successful(BadRequest(view(id, name, formWithErrors, mode, returnTo)))
             },
           answer =>
             updatedSectionWithAnswer(id, answer).fold {
@@ -85,7 +85,8 @@ class ThirdPartyInvestorFundsPercentageController @Inject() (
                     navigator.nextPage(
                       ThirdPartyInvestorFundsPercentagePage(id),
                       savedSection,
-                      mode
+                      mode,
+                      returnTo
                     )
                   )
                 }

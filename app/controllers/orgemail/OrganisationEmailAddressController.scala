@@ -80,7 +80,8 @@ class OrganisationEmailAddressController @Inject() (
                   navigator.nextPage(
                     OrganisationEmailAddressPage,
                     request.journeyData.organisationEmail.get,
-                    mode
+                    mode,
+                    None
                   )
                 )
               )
@@ -100,7 +101,8 @@ class OrganisationEmailAddressController @Inject() (
                         navigator.nextPage(
                           OrganisationEmailAddressPage,
                           savedSection,
-                          mode
+                          mode,
+                          None
                         )
                       )
                     }

@@ -173,35 +173,42 @@ POST       /remove-signatory                             controllers.signatories
 
 ## Third Party Organisations
 
-GET        /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad()
-POST       /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit()
-GET        /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad()
-POST       /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit()
+GET        /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad(mode: Mode = NormalMode)
+POST       /products-managed-by-third-party              controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit(mode: Mode = NormalMode)
+GET        /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-products-managed-by-third-party       controllers.thirdparty.ProductsManagedByThirdPartyController.onSubmit(mode: Mode = CheckMode)
 
-GET        /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = NormalMode)
-POST       /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = CheckMode)
-POST       /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = CheckMode)
+GET        /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /third-party-details                          controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onPageLoad(id: Option[String], mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-third-party-details                   controllers.thirdparty.ThirdPartyOrgDetailsController.onSubmit(id: String, mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
-GET        /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /isa-returns-managed-by-third-party           controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-isa-returns-managed-by-third-party    controllers.thirdparty.ReturnsManagedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode)
+GET        /isa-returns-managed-by-third-party           controllers.thirdparty.ThirdPartyManagingReturnsController.onPageLoad(id: String, mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /isa-returns-managed-by-third-party           controllers.thirdparty.ThirdPartyManagingReturnsController.onSubmit(id: String, mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-isa-returns-managed-by-third-party    controllers.thirdparty.ThirdPartyManagingReturnsController.onPageLoad(id: String, mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-isa-returns-managed-by-third-party    controllers.thirdparty.ThirdPartyManagingReturnsController.onSubmit(id: String, mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
-GET        /investor-funds-used-by-third-party           controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /investor-funds-used-by-third-party           controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode)
+GET        /investor-funds-used-by-third-party           controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onPageLoad(id: String, mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /investor-funds-used-by-third-party           controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onSubmit(id: String, mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onPageLoad(id: String, mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-investor-funds-used-by-third-party    controllers.thirdparty.InvestorFundsUsedByThirdPartyController.onSubmit(id: String, mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
-GET        /percentage-of-investor-funds-used            controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onPageLoad(id: String, mode: Mode = NormalMode)
-POST       /percentage-of-investor-funds-used            controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onSubmit(id: String, mode: Mode = NormalMode)
-GET        /change-percentage-of-investor-funds-used     controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onPageLoad(id: String, mode: Mode = CheckMode)
-POST       /change-percentage-of-investor-funds-used     controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onSubmit(id: String, mode: Mode = CheckMode)
+GET        /percentage-of-investor-funds-used            controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onPageLoad(id: String, mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /percentage-of-investor-funds-used            controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onSubmit(id: String, mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-percentage-of-investor-funds-used     controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onPageLoad(id: String, mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-percentage-of-investor-funds-used     controllers.thirdparty.ThirdPartyInvestorFundsPercentageController.onSubmit(id: String, mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
 GET        /check-added-third-party                      controllers.thirdparty.ThirdPartyCheckYourAnswersController.onPageLoad(id: String)
 
-GET        /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onPageLoad()
-POST       /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onSubmit()
+GET        /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /added-third-parties                          controllers.thirdparty.AddedThirdPartiesController.onSubmit(mode: Mode = NormalMode)
+GET        /change-added-third-parties                   controllers.thirdparty.AddedThirdPartiesController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-added-third-parties                   controllers.thirdparty.AddedThirdPartiesController.onSubmit(mode: Mode = CheckMode)
+
+GET        /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = NormalMode)
+POST       /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onSubmit(mode: Mode = NormalMode)
+GET        /change-connected-third-parties               controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-connected-third-parties               controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onSubmit(mode: Mode = CheckMode)
 
 GET        /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onPageLoad(mode: Mode = NormalMode)
 POST       /connected-third-parties                      controllers.thirdparty.ThirdPartyConnectedOrganisationsController.onSubmit(mode: Mode = NormalMode)
@@ -210,6 +217,8 @@ POST       /change-connected-third-parties               controllers.thirdparty.
 
 GET        /remove-third-party-organisation              controllers.thirdparty.RemoveThirdPartyController.onPageLoad(id: String)
 POST       /remove-third-party-organisation              controllers.thirdparty.RemoveThirdPartyController.onSubmit(id: String)
+
+GET        /check-added-third-parties                    controllers.thirdparty.ThirdPartiesCheckYourAnswersController.onPageLoad()
 
 ## Declare & Submit
 

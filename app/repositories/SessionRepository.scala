@@ -17,7 +17,7 @@
 package repositories
 
 import config.FrontendAppConfig
-import models.session.Session
+import models.session.*
 import org.bson.conversions.Bson
 import org.mongodb.scala.model.*
 import uk.gov.hmrc.mongo.MongoComponent

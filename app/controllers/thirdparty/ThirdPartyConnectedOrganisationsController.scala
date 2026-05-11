@@ -24,6 +24,7 @@ import models.Mode
 import models.journeydata.thirdparty.*
 import models.journeydata.thirdparty.ConnectedThirdPartySelection.noneAreConnectedFormValue
 import navigation.Navigator
+import pages.thirdparty.ThirdPartyConnectedOrganisationsPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -31,7 +32,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.thirdparty.ThirdPartyConnectedOrganisationsView
-
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -82,12 +82,17 @@ class ThirdPartyConnectedOrganisationsController @Inject() (
                   connectedOrganisations = if (values.contains(noneAreConnectedFormValue)) Nil else values
                 )
               journeyAnswersService
-                .update(
-                  updatedSection,
-                  request.groupId,
-                  request.credentials.providerId
-                )
-                .map(_ => Redirect(TaskListController.onPageLoad()))
+                .update(updatedSection, request.groupId, request.credentials.providerId)
+                .map { savedSection =>
+                  Redirect(
+                    navigator.nextPage(
+                      ThirdPartyConnectedOrganisationsPage,
+                      savedSection,
+                      mode,
+                      None
+                    )
+                  )
+                }
                 .recoverWith { case NonFatal(e) =>
                   logger.warn(
                     s"Failed updating answers for section [${ThirdPartyOrganisations.sectionName}] " +

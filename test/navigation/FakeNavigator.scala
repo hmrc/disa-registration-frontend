@@ -18,7 +18,7 @@ package navigation
 
 import play.api.mvc.Call
 import pages.*
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.TaskListSection
 
 class FakeNavigator(desiredRoute: Call) extends Navigator {
@@ -27,9 +27,10 @@ class FakeNavigator(desiredRoute: Call) extends Navigator {
     page: PageWithDependents[A],
     existing: Option[A],
     updated: A,
-    mode: Mode
+    mode: Mode,
+    returnTo: Option[ReturnTo]
   ): Call = desiredRoute
 
-  override def nextPage[A <: TaskListSection](page: Page[A], updated: A, mode: Mode): Call =
+  override def nextPage[A <: TaskListSection](page: Page[A], updated: A, mode: Mode, returnTo: Option[ReturnTo]): Call =
     desiredRoute
 }

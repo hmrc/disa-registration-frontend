@@ -86,7 +86,8 @@ class LiaisonOfficerPhoneNumberController @Inject() (
                     navigator.nextPage(
                       LiaisonOfficerPhoneNumberPage(id),
                       savedSection,
-                      mode
+                      mode,
+                      None
                     )
                   )
                 }
