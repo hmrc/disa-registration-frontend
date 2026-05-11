@@ -33,7 +33,7 @@ case object ProductsManagedByThirdPartyPage extends PageWithDependents[ThirdPart
       List(
         new ClearablePage[ThirdPartyOrganisations] {
           override def clearAnswer(section: ThirdPartyOrganisations): ThirdPartyOrganisations =
-            section.copy(thirdParties = Nil)
+            section.copy(thirdParties = Nil, connectedOrganisations = Nil)
         }
       )
     } else {
