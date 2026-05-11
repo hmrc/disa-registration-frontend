@@ -69,6 +69,11 @@ POST       /organisation-telephone-number                controllers.orgdetails.
 GET        /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = CheckMode)
 
+GET        /add-another-address                          controllers.orgdetails.AddAnotherAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /add-another-address                          controllers.orgdetails.AddAnotherAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /change-add-another-address                   controllers.orgdetails.AddAnotherAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-add-another-address                   controllers.orgdetails.AddAnotherAddressController.onSubmit(mode: Mode = CheckMode)
+
 ## Organisation Email
 
 GET        /organisation-email-address                   controllers.orgemail.OrganisationEmailAddressController.onPageLoad(mode: Mode = NormalMode)

@@ -150,6 +150,19 @@ registeredAddressCorrespondence.title = Do you want us to use the registered add
 registeredAddressCorrespondence.heading = Do you want us to use the registered address to send you letters?
 registeredAddressCorrespondence.error.required = Select yes if you want HMRC to use the address given for correspondence
 
+AddAnotherAddress.title = Add another address for your organisation
+AddAnotherAddress.heading = Add another address for your organisation
+AddAnotherAddress.postcode.input.label = Postcode
+AddAnotherAddress.postcode.error.required = Enter your postcode in the correct format, for example, AA1 1AA
+AddAnotherAddress.postcode.error.invalid = Enter your postcode in the correct format, for example, AA1 1AA
+AddAnotherAddress.filter.input.label = Property name or number (optional)
+AddAnotherAddress.filter.input.hint = For example, The Mill, 116 or Flat 37a
+AddAnotherAddress.filter.error.invalid = The FCA, FRN must not include letters a to z, hyphens, spaces or apostrophes
+AddAnotherAddress.filter.error.incorrectLength = The FCA, FRN  must be a six or seven digit number
+AddAnotherAddress.link.text = Enter the address manually
+AddAnotherAddress.checkYourAnswersLabel = Third-party {0} details
+AddAnotherAddress.change.hidden = third-party {0} details
+
 ### Organisation Email
 
 organisationEmailAddress.title = What is the email address of your organisation?

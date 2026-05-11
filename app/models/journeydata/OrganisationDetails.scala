@@ -16,6 +16,7 @@
 
 package models.journeydata
 
+import models.journeydata.orgdetails.AddAnotherAddressForm
 import play.api.libs.json.{Json, OFormat}
 
 case class OrganisationDetails(
@@ -26,7 +27,8 @@ case class OrganisationDetails(
   fcaNumber: Option[String] = None,
   registeredAddressCorrespondence: Option[Boolean] = None,
   correspondenceAddress: Option[CorrespondenceAddress] = None,
-  orgTelephoneNumber: Option[String] = None
+  orgTelephoneNumber: Option[String] = None,
+  addAnotherAddress: Option[AddAnotherAddressForm] = None
 ) extends TaskListSection {
   override def sectionName: String = "organisationDetails"
 }
