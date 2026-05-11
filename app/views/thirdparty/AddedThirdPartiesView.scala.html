@@ -29,11 +29,11 @@
     addedThirdPartiesViewModel: AddedThirdPartiesViewModel
 )
 
-@(form: Form[_], summary: AddedThirdPartiesSummary)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], summary: AddedThirdPartiesSummary, mode: Mode)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages(summary.title, summary.count), Some(messages("sectionTitle.thirdParty")))) {
 
-    @formHelper(action = AddedThirdPartiesController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = AddedThirdPartiesController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(

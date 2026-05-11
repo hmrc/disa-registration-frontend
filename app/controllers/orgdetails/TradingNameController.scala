@@ -76,7 +76,7 @@ class TradingNameController @Inject() (
           journeyAnswersService
             .update(updatedSection, request.groupId, request.credentials.providerId)
             .map { updatedSection =>
-              Redirect(navigator.nextPage(TradingNamePage, updatedSection, mode))
+              Redirect(navigator.nextPage(TradingNamePage, updatedSection, mode, None))
             }
             .recoverWith { case NonFatal(e) =>
               logger.warn(

@@ -29,6 +29,7 @@ class OrganisationEmailAddressFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "value" -> text("organisationEmailAddress.error.required")
+        .transform(_.trim, identity: String => String)
         .verifying(regexp(emailRegex, "organisationEmailAddress.error.format"))
     )
 }

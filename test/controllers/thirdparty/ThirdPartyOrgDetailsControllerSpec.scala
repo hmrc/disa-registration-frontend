@@ -64,14 +64,14 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(Some(existingId), NormalMode).url)
+          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(Some(existingId), NormalMode, None).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ThirdPartyOrgDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, NormalMode)(
+        contentAsString(result) mustEqual view(generatedId, form, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -100,7 +100,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(Some(existingId), NormalMode).url)
+          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(Some(existingId), NormalMode, None).url)
 
         val result = route(application, request).value
 
@@ -115,7 +115,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
           )
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, filledForm, NormalMode)(
+        contentAsString(result) mustEqual view(existingId, filledForm, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -149,7 +149,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode).url)
+          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode, None).url)
 
         val result = route(application, request).value
 
@@ -168,7 +168,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, NormalMode).url)
+          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, NormalMode, None).url)
             .withFormUrlEncodedBody(
               "thirdPartyName" -> "",
               "frn"            -> "abc"
@@ -186,7 +186,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ThirdPartyOrgDetailsView]
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(existingId, boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(existingId, boundForm, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -230,7 +230,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, NormalMode).url)
+          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, NormalMode, None).url)
             .withFormUrlEncodedBody(
               "thirdPartyName" -> "Updated Name",
               "frn"            -> "654321"
@@ -278,7 +278,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(newId, NormalMode).url)
+          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(newId, NormalMode, None).url)
             .withFormUrlEncodedBody(
               "thirdPartyName" -> "New Name",
               "frn"            -> "123456"
@@ -316,7 +316,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, NormalMode).url)
+          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, NormalMode, None).url)
             .withFormUrlEncodedBody(
               "thirdPartyName" -> testString,
               "frn"            -> "123456"
@@ -341,14 +341,14 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(Some(existingId), CheckMode).url)
+          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(Some(existingId), CheckMode, None).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[ThirdPartyOrgDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, CheckMode)(
+        contentAsString(result) mustEqual view(generatedId, form, CheckMode, None)(
           request,
           messages(application)
         ).toString
@@ -376,7 +376,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, CheckMode).url)
+          FakeRequest(POST, ThirdPartyOrgDetailsController.onSubmit(existingId, CheckMode, None).url)
             .withFormUrlEncodedBody(
               "thirdPartyName" -> "Name",
               "frn"            -> ""

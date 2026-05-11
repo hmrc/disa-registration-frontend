@@ -16,21 +16,20 @@
 
 package controllers.thirdparty
 
+import com.google.inject.Inject
 import config.FrontendAppConfig
-import controllers.actions.*
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes.*
 import controllers.thirdparty.routes.*
 import forms.YesNoAnswerFormProvider
-import models.{NormalMode, YesNoAnswer}
 import models.requests.DataRequest
+import models.{Mode, NormalMode, ReturnTo, YesNoAnswer}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.thirdparty.AddedThirdPartiesSummary
 import views.html.thirdparty.AddedThirdPartiesView
-
-import javax.inject.Inject
 
 class AddedThirdPartiesController @Inject() (
   override val messagesApi: MessagesApi,
@@ -41,21 +40,34 @@ class AddedThirdPartiesController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: AddedThirdPartiesView,
   appConfig: FrontendAppConfig
-)() extends FrontendBaseController
+) extends FrontendBaseController
     with I18nSupport {
 
   val form: Form[YesNoAnswer] =
     formProvider("addedThirdParties.error.required")
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getInProgressAndCompleteThirdParty.fold {
-      Redirect(TaskListController.onPageLoad())
-    } { case (inProgress, complete) =>
-      Ok(view(form, AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties)))
-    }
-  }
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      getInProgressAndCompleteThirdParty.fold {
+        Redirect(TaskListController.onPageLoad())
+      } { case (inProgress, complete) =>
+        val preparedForm =
+          returnTo match {
+            case Some(_) => form.fill(YesNoAnswer.No)
+            case None    => form
+          }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+        Ok(
+          view(
+            preparedForm,
+            AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
+            mode
+          )
+        )
+      }
+    }
+
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     getInProgressAndCompleteThirdParty.fold {
       Redirect(TaskListController.onPageLoad())
     } { case (inProgress, complete) =>
@@ -68,17 +80,17 @@ class AddedThirdPartiesController @Inject() (
           .fold(
             formWithErrors =>
               BadRequest(
-                view(formWithErrors, AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties))
+                view(formWithErrors, AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties), mode)
               ),
             {
-              case YesNoAnswer.No =>
-                if (count > 1) {
-                  Redirect(ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode))
-                } else {
-                  Redirect(TaskListController.onPageLoad())
-                }
-              case _              =>
-                Redirect(ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode))
+              case YesNoAnswer.No if count > 1 =>
+                val route =
+                  if (mode == NormalMode) ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode)
+                  else ThirdPartiesCheckYourAnswersController.onPageLoad()
+                Redirect(route)
+              case YesNoAnswer.No              => Redirect(TaskListController.onPageLoad())
+              case _                           =>
+                Redirect(ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode, None))
             }
           )
       }

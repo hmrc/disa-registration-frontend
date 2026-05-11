@@ -119,7 +119,7 @@ class AddedThirdPartiesViewModel @Inject() (
   ): Option[SummaryListRow] = {
     val changeLink = if (inProgress) {
       ThirdPartyOrgDetailsController
-        .onPageLoad(Some(thirdParty.id), NormalMode)
+        .onPageLoad(Some(thirdParty.id), NormalMode, None)
         .url
     } else {
       ThirdPartyCheckYourAnswersController.onPageLoad(thirdParty.id).url

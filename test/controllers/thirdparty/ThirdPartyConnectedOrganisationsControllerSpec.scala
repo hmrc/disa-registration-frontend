@@ -129,7 +129,7 @@ class ThirdPartyConnectedOrganisationsControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+        redirectLocation(result).value mustEqual ThirdPartiesCheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -156,7 +156,7 @@ class ThirdPartyConnectedOrganisationsControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+        redirectLocation(result).value mustEqual ThirdPartiesCheckYourAnswersController.onPageLoad().url
       }
     }
 

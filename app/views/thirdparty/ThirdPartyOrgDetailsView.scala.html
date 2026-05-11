@@ -29,11 +29,11 @@
     hmrcPageHeading: HmrcPageHeading
 )
 
-@(id: String, form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(id: String, form: Form[_], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("thirdPartyOrgDetails.title"), Some(messages("sectionTitle.thirdParty")))) {
 
-    @formHelper(action = ThirdPartyOrgDetailsController.onSubmit(id, mode)) {
+    @formHelper(action = ThirdPartyOrgDetailsController.onSubmit(id, mode, returnTo)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

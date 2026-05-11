@@ -43,10 +43,10 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
   val form: Form[String] = formProvider()
 
   lazy val routeUrl: String =
-    ThirdPartyInvestorFundsPercentageController.onPageLoad(existingId, NormalMode).url
+    ThirdPartyInvestorFundsPercentageController.onPageLoad(existingId, NormalMode, None).url
 
   lazy val submitUrl: String =
-    ThirdPartyInvestorFundsPercentageController.onSubmit(existingId, NormalMode).url
+    ThirdPartyInvestorFundsPercentageController.onSubmit(existingId, NormalMode, None).url
 
   def onwardRoute: String =
     ThirdPartyCheckYourAnswersController.onPageLoad(existingId).url
@@ -77,7 +77,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
           val view   = application.injector.instanceOf[ThirdPartyInvestorFundsPercentageView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(existingId, name, form, NormalMode)(
+          contentAsString(result) mustEqual view(existingId, name, form, NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -113,7 +113,8 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
             existingId,
             name,
             form.fill("50"),
-            NormalMode
+            NormalMode,
+            None
           )(request, messages(application)).toString
         }
       }
@@ -186,7 +187,7 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(existingId, name, boundForm, NormalMode)(
+          contentAsString(result) mustEqual view(existingId, name, boundForm, NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -312,7 +313,10 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(GET, routes.ThirdPartyInvestorFundsPercentageController.onPageLoad(existingId, CheckMode).url)
+            FakeRequest(
+              GET,
+              routes.ThirdPartyInvestorFundsPercentageController.onPageLoad(existingId, CheckMode, None).url
+            )
 
           val result = route(application, request).value
           val view   = application.injector.instanceOf[ThirdPartyInvestorFundsPercentageView]
@@ -322,7 +326,8 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
             existingId,
             name,
             form.fill("50"),
-            CheckMode
+            CheckMode,
+            None
           )(request, messages(application)).toString
         }
       }

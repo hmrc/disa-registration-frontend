@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers.thirdparty
+package viewmodels.checkAnswers.thirdparty.finalcya
 
-import controllers.thirdparty.routes.ReturnsManagedByThirdPartyController
+import controllers.thirdparty.routes.ProductsManagedByThirdPartyController
 import models.CheckMode
-import models.journeydata.thirdparty.ThirdParty
+import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -26,14 +26,13 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListR
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object ReturnsManagedByThirdPartySummary {
+object ProductsManagedByThirdPartySummary {
 
-  def row(thirdParty: ThirdParty)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit messages: Messages): Option[SummaryListRow] =
     for {
-      name   <- thirdParty.thirdPartyName
-      answer <- thirdParty.managingIsaReturns
+      answer <- thirdPartyOrganisations.managedByThirdParty
     } yield SummaryListRowViewModel(
-      key = Key(Text(messages("returnsManagedByThirdParty.checkYourAnswersLabel", name))),
+      key = Key(Text(messages("productsManagedByThirdParty.checkYourAnswersLabel"))),
       value = ValueViewModel(
         HtmlContent(
           HtmlFormat.escape(messages(s"site.$answer"))
@@ -42,9 +41,9 @@ object ReturnsManagedByThirdPartySummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          ReturnsManagedByThirdPartyController.onPageLoad(thirdParty.id, CheckMode).url
+          ProductsManagedByThirdPartyController.onPageLoad(CheckMode).url
         )
-          .withVisuallyHiddenText(messages("returnsManagedByThirdParty.change.hidden"))
+          .withVisuallyHiddenText(messages("productsManagedByThirdParty.change.hidden"))
       )
     )
 }

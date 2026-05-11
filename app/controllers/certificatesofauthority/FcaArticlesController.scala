@@ -83,7 +83,8 @@ class FcaArticlesController @Inject() (
                   navigator.nextPage(
                     FcaArticlesPage,
                     updatedSection,
-                    mode
+                    mode,
+                    None
                   )
                 )
               }

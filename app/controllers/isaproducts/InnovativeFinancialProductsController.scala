@@ -83,7 +83,8 @@ class InnovativeFinancialProductsController @Inject() (
                   InnovativeFinancialProductsPage,
                   existingSection,
                   updatedSection,
-                  mode
+                  mode,
+                  None
                 )
               )
             }

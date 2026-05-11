@@ -26,6 +26,7 @@ import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
 import models.addresslookup.LookupAddress
+import models.ReturnTo.FinalCya
 import models.journeydata.OrganisationDetails
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
@@ -45,7 +46,7 @@ import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, Peer
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.signatories.*
-import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, RemoveThirdPartyPage, ReturnsManagedByThirdPartyPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyOrgDetailsPage}
+import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, RemoveThirdPartyPage, ThirdPartyConnectedOrganisationsPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyManagingReturnsPage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -93,7 +94,8 @@ class NavigatorSpec extends SpecBase {
           page = IsaProductsPage,
           existing = Some(emptyIsaProductsAnswers),
           updated = answerWithIfpSelected,
-          mode = CheckMode
+          mode = CheckMode,
+          returnTo = None
         )
 
       result shouldBe InnovativeFinancialProductsController.onPageLoad(NormalMode)
@@ -109,7 +111,8 @@ class NavigatorSpec extends SpecBase {
           page = InnovativeFinancialProductsPage,
           existing = Some(emptyIsaProductsAnswers),
           updated = emptyIsaProductsAnswers,
-          mode = CheckMode
+          mode = CheckMode,
+          returnTo = None
         )
 
       result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
@@ -121,7 +124,8 @@ class NavigatorSpec extends SpecBase {
           page = IsaProductsPage,
           existing = None,
           updated = answersWithIsaProducts(Seq(InnovativeFinanceIsas)),
-          mode = CheckMode
+          mode = CheckMode,
+          returnTo = None
         )
 
       result shouldBe InnovativeFinancialProductsController.onPageLoad(NormalMode)
@@ -136,10 +140,11 @@ class NavigatorSpec extends SpecBase {
       spiedNav.nextPage(
         page = PeerToPeerPlatformPage,
         updated = emptyIsaProductsAnswers,
-        mode = NormalMode
+        mode = NormalMode,
+        returnTo = None
       )
 
-      verify(spiedNav).normalRoutes(any, any)
+      verify(spiedNav).normalRoutes(any, any, any)
     }
 
     "lookup check routes in Check Mode" in {
@@ -148,10 +153,11 @@ class NavigatorSpec extends SpecBase {
       spiedNav.nextPage(
         page = PeerToPeerPlatformPage,
         updated = emptyIsaProductsAnswers,
-        mode = CheckMode
+        mode = CheckMode,
+        returnTo = None
       )
 
-      verify(spiedNav).checkRouteMap(any)
+      verify(spiedNav).checkRouteMap(any, any)
     }
   }
 
@@ -160,7 +166,7 @@ class NavigatorSpec extends SpecBase {
     "route TradingUsingDifferentNamePage to TradingNamePage when Yes selected" in {
       val answers = OrganisationDetails(tradingUsingDifferentName = Some(true))
 
-      val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers)
+      val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers, None)
 
       result shouldBe TradingNameController.onPageLoad(NormalMode)
     }
@@ -168,20 +174,20 @@ class NavigatorSpec extends SpecBase {
     "route TradingUsingDifferentNamePage to FirmReferenceNumberPage when No selected" in {
       val answers = OrganisationDetails(tradingUsingDifferentName = Some(false))
 
-      val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers)
+      val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers, None)
 
       result shouldBe FirmReferenceNumberController.onPageLoad(NormalMode)
     }
 
     "route TradingNamePage to FirmReferenceNumberPage" in {
-      val result: Call = navigator.normalRoutes(TradingNamePage, OrganisationDetails())
+      val result: Call = navigator.normalRoutes(TradingNamePage, OrganisationDetails(), None)
       result shouldBe FirmReferenceNumberController.onPageLoad(NormalMode)
     }
 
     "route IsaProductsPage  to IF products when IF ISA selected" in {
       val answers = answersWithIsaProducts(Seq(InnovativeFinanceIsas))
 
-      val result: Call = navigator.normalRoutes(IsaProductsPage, answers)
+      val result: Call = navigator.normalRoutes(IsaProductsPage, answers, None)
 
       result shouldBe InnovativeFinancialProductsController.onPageLoad(NormalMode)
     }
@@ -189,7 +195,7 @@ class NavigatorSpec extends SpecBase {
     "route IsaProductsPage to CYA when IF ISA not selected" in {
       val answers = answersWithIsaProducts(Seq(CashIsas))
 
-      val result: Call = navigator.normalRoutes(IsaProductsPage, answers)
+      val result: Call = navigator.normalRoutes(IsaProductsPage, answers, None)
 
       result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
     }
@@ -197,7 +203,7 @@ class NavigatorSpec extends SpecBase {
     "route IsaProductsPage to Index when isaProducts is missing" in {
       val answers = emptyIsaProductsAnswers.copy(isaProducts = None)
 
-      val result: Call = navigator.normalRoutes(IsaProductsPage, answers)
+      val result: Call = navigator.normalRoutes(IsaProductsPage, answers, None)
 
       result shouldBe IndexController.onPageLoad()
     }
@@ -205,7 +211,7 @@ class NavigatorSpec extends SpecBase {
     "route InnovativeFinancialProductsPage to P2P platform when 36H selected" in {
       val answers = answersWithInnovativeFinancialProducts(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions))
 
-      val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers)
+      val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers, None)
 
       result shouldBe PeerToPeerPlatformController.onPageLoad(NormalMode)
     }
@@ -213,7 +219,7 @@ class NavigatorSpec extends SpecBase {
     "route InnovativeFinancialProductsPage to CYA when 36H not selected" in {
       val answers = answersWithInnovativeFinancialProducts(Seq(CrowdFundedDebentures))
 
-      val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers)
+      val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers, None)
 
       result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
     }
@@ -221,49 +227,50 @@ class NavigatorSpec extends SpecBase {
     "route InnovativeFinancialProductsPage to Index when innovativeFinancialProducts is missing" in {
       val answers = emptyIsaProductsAnswers.copy(innovativeFinancialProducts = None)
 
-      val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers)
+      val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers, None)
 
       result shouldBe IndexController.onPageLoad()
     }
 
     "route PeerToPeerPlatformPage to PeerToPeerPlatformNumberPage" in {
-      val result: Call = navigator.normalRoutes(PeerToPeerPlatformPage, emptyIsaProductsAnswers)
+      val result: Call = navigator.normalRoutes(PeerToPeerPlatformPage, emptyIsaProductsAnswers, None)
 
       result shouldBe PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
     }
 
     "route PeerToPeerPlatformNumberPage to ISA products CYA" in {
-      val result: Call = navigator.normalRoutes(PeerToPeerPlatformNumberPage, emptyIsaProductsAnswers)
+      val result: Call = navigator.normalRoutes(PeerToPeerPlatformNumberPage, emptyIsaProductsAnswers, None)
 
       result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
     "route CertificatesOfAuthorityYesNoPage to FcaArticlesPage if yes submitted" in {
-      val result: Call = navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers)
+      val result: Call = navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers, None)
       result shouldBe FcaArticlesController.onPageLoad(NormalMode)
     }
 
     "route CertificatesOfAuthorityYesNoPage to FinancialOrganisationPage if no submitted" in {
       val result: Call =
-        navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers.copy(certificatesYesNo = Some(No)))
+        navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers.copy(certificatesYesNo = Some(No)), None)
       result shouldBe FinancialOrganisationController.onPageLoad(NormalMode)
     }
 
     "route to CertificatesOfAuthorityYesNoPage if no answer is present for certificatesYesNo" in {
       val result: Call =
-        navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers.copy(certificatesYesNo = None))
+        navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers.copy(certificatesYesNo = None), None)
       result shouldBe CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode)
     }
 
     "route RegisteredAddressCorrespondencePage to RegisteredAddressCorrespondenceController" in {
-      val result: Call = navigator.normalRoutes(FirmReferenceNumberPage, testOrganisationDetails)
+      val result: Call = navigator.normalRoutes(FirmReferenceNumberPage, testOrganisationDetails, None)
       result shouldBe RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
     }
 
     "route RegisteredAddressCorrespondencePage to OrganisationTelephoneNumberController if yes submitted" in {
       val result: Call = navigator.normalRoutes(
         RegisteredAddressCorrespondencePage,
-        testOrganisationDetails.copy(registeredAddressCorrespondence = Some(true))
+        testOrganisationDetails.copy(registeredAddressCorrespondence = Some(true)),
+        None
       )
       result shouldBe OrganisationTelephoneNumberController.onPageLoad(NormalMode)
     }
@@ -272,7 +279,8 @@ class NavigatorSpec extends SpecBase {
       val result: Call =
         navigator.normalRoutes(
           RegisteredAddressCorrespondencePage,
-          testOrganisationDetails.copy(registeredAddressCorrespondence = Some(false))
+          testOrganisationDetails.copy(registeredAddressCorrespondence = Some(false)),
+          None
         )
       result shouldBe AddAnotherAddressController.onPageLoad(NormalMode)
     }
@@ -281,7 +289,8 @@ class NavigatorSpec extends SpecBase {
       val result: Call =
         navigator.normalRoutes(
           RegisteredAddressCorrespondencePage,
-          testOrganisationDetails.copy(registeredAddressCorrespondence = None)
+          testOrganisationDetails.copy(registeredAddressCorrespondence = None),
+          None
         )
       result shouldBe IndexController.onPageLoad()
     }
@@ -338,116 +347,124 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route FcaArticlesPage to ISA products CYA" in {
-      val result: Call = navigator.normalRoutes(FcaArticlesPage, coaAnswers)
+      val result: Call = navigator.normalRoutes(FcaArticlesPage, coaAnswers, None)
       result shouldBe CoaCheckYourAnswersController.onPageLoad()
     }
 
     "route FinancialOrganisationPage to ISA products CYA" in {
-      val result: Call = navigator.normalRoutes(FinancialOrganisationPage, coaAnswers)
+      val result: Call = navigator.normalRoutes(FinancialOrganisationPage, coaAnswers, None)
       result shouldBe CoaCheckYourAnswersController.onPageLoad()
     }
 
     "route RemoveSignatoryPage to AddedSignatoryController when signatory exists in journeyAnswers" in {
-      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), signatoriesAnswers)
+      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), signatoriesAnswers, None)
       result shouldBe AddedSignatoryController.onPageLoad()
     }
 
     "route RemoveSignatoryPage to AddedSignatoryController when a signatory doesn't exists in journeyAnswers" in {
-      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), Signatories(Seq.empty))
+      val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), Signatories(Seq.empty), None)
       result shouldBe AddASignatoryController.onPageLoad()
     }
 
     "route SignatoryNamePage to SignatoryJobTitleController" in {
-      val result: Call = navigator.normalRoutes(SignatoryNamePage(signatoryId), signatoriesAnswers)
+      val result: Call = navigator.normalRoutes(SignatoryNamePage(signatoryId), signatoriesAnswers, None)
       result shouldBe SignatoryJobTitleController.onPageLoad(id = signatoryId, mode = NormalMode)
     }
 
     "route SignatoryJobTitlePage to SignatoryCheckYourAnswersController" in {
-      val result: Call = navigator.normalRoutes(SignatoryJobTitlePage(signatoryId), signatoriesAnswers)
+      val result: Call = navigator.normalRoutes(SignatoryJobTitlePage(signatoryId), signatoriesAnswers, None)
       result shouldBe SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
     "route LiaisonOfficerNamePage to LiaisonOfficerEmailController" in {
-      val result: Call = navigator.normalRoutes(LiaisonOfficerNamePage(testString), liaisonOfficersAnswers)
+      val result: Call = navigator.normalRoutes(LiaisonOfficerNamePage(testString), liaisonOfficersAnswers, None)
 
       result shouldBe LiaisonOfficerEmailController.onPageLoad(testString, NormalMode)
     }
 
     "route LiaisonOfficerEmailPage to LiaisonOfficerPhoneNumberController" in {
-      val result: Call = navigator.normalRoutes(LiaisonOfficerEmailPage(testString), liaisonOfficersAnswers)
+      val result: Call = navigator.normalRoutes(LiaisonOfficerEmailPage(testString), liaisonOfficersAnswers, None)
 
       result shouldBe LiaisonOfficerPhoneNumberController.onPageLoad(testString, NormalMode)
     }
 
     "route LiaisonOfficerPhoneNumberPage to LiaisonOfficerCommunicationController" in {
-      val result: Call = navigator.normalRoutes(LiaisonOfficerPhoneNumberPage(testString), liaisonOfficersAnswers)
+      val result: Call = navigator.normalRoutes(LiaisonOfficerPhoneNumberPage(testString), liaisonOfficersAnswers, None)
 
       result shouldBe LiaisonOfficerCommunicationController.onPageLoad(testString, NormalMode)
     }
 
     "route LiaisonOfficerCommunicationPage to LO CYA" in {
-      val result: Call = navigator.normalRoutes(LiaisonOfficerCommunicationPage(testString), liaisonOfficersAnswers)
+      val result: Call =
+        navigator.normalRoutes(LiaisonOfficerCommunicationPage(testString), liaisonOfficersAnswers, None)
 
       result shouldBe LoCheckYourAnswersController.onPageLoad(testString)
     }
 
     "route RemoveLiaisonOfficerPage to AddLiaisonOfficerController when no liaison officers remain" in {
-      val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, LiaisonOfficers(Nil))
+      val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, LiaisonOfficers(Nil), None)
 
       result shouldBe AddLiaisonOfficerController.onPageLoad()
     }
 
     "route RemoveLiaisonOfficerPage to AddedLiaisonOfficersController when liaison officers remain" in {
-      val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, liaisonOfficersAnswers)
+      val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, liaisonOfficersAnswers, None)
 
       result shouldBe AddedLiaisonOfficersController.onPageLoad()
     }
 
     "route ProductsManagedByThirdParty to TaskList when answer is no" in {
       val result: Call =
-        navigator.normalRoutes(ProductsManagedByThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.No)))
+        navigator.normalRoutes(ProductsManagedByThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.No)), None)
 
       result shouldBe TaskListController.onPageLoad()
     }
 
     "route ProductsManagedByThirdParty to ThirdPartyOrgDetailsPage when answer is yes" in {
       val result: Call =
-        navigator.normalRoutes(ProductsManagedByThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.Yes)))
+        navigator.normalRoutes(ProductsManagedByThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.Yes)), None)
 
-      result shouldBe ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode)
+      result shouldBe ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode, returnTo = None)
     }
 
     "route ThirdPartyOrgDetailsPage to ReturnsManagedByThirdParty" in {
       val result: Call = navigator.normalRoutes(
         ThirdPartyOrgDetailsPage(testString),
-        ThirdPartyOrganisations(Some(YesNoAnswer.No), Seq(ThirdParty(testString)))
+        ThirdPartyOrganisations(Some(YesNoAnswer.No), Seq(ThirdParty(testString))),
+        None
       )
 
-      result shouldBe ReturnsManagedByThirdPartyController.onPageLoad(testString, NormalMode)
+      result shouldBe ThirdPartyManagingReturnsController.onPageLoad(testString, NormalMode, None)
     }
 
-    "route ReturnsManagedByThirdPartyPage to InvestorFundsUsedByThirdPartyController when 'yes' is submitted" in {
+    "route ThirdPartyManagingReturnsPage to InvestorFundsUsedByThirdPartyController when 'yes' is submitted" in {
       val result: Call = navigator.normalRoutes(
-        ReturnsManagedByThirdPartyPage(testString),
+        ThirdPartyManagingReturnsPage(testString),
         ThirdPartyOrganisations(
           Some(YesNoAnswer.No),
           Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes)))
-        )
+        ),
+        None
       )
 
-      result shouldBe InvestorFundsUsedByThirdPartyController.onPageLoad(testString, NormalMode)
+      result shouldBe InvestorFundsUsedByThirdPartyController.onPageLoad(testString, NormalMode, None)
     }
 
-    "route ReturnsManagedByThirdPartyPage to TaskList when 'no' is submitted" in {
+    "route ThirdPartyManagingReturnsPage to TaskList when 'no' is submitted" in {
       val result: Call = navigator.normalRoutes(
-        ReturnsManagedByThirdPartyPage(testString),
+        ThirdPartyManagingReturnsPage(testString),
         ThirdPartyOrganisations(
           Some(YesNoAnswer.No),
           Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.No)))
-        )
+        ),
+        None
       )
 
-      result shouldBe InvestorFundsUsedByThirdPartyController.onPageLoad(id = testString, mode = NormalMode)
+      result shouldBe InvestorFundsUsedByThirdPartyController.onPageLoad(
+        id = testString,
+        mode = NormalMode,
+        returnTo = None
+      )
     }
 
     "route InvestorFundsUsedByThirdPartyPage to TaskList when 'yes' is submitted" in {
@@ -456,10 +473,15 @@ class NavigatorSpec extends SpecBase {
         ThirdPartyOrganisations(
           Some(YesNoAnswer.No),
           Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.Yes)))
-        )
+        ),
+        None
       )
 
-      result shouldBe ThirdPartyInvestorFundsPercentageController.onPageLoad(id = testString, mode = NormalMode)
+      result shouldBe ThirdPartyInvestorFundsPercentageController.onPageLoad(
+        id = testString,
+        mode = NormalMode,
+        returnTo = None
+      )
     }
 
     "route InvestorFundsUsedByThirdPartyPage to ThirdPartyCheckYourAnswersController when 'no' is submitted" in {
@@ -468,7 +490,8 @@ class NavigatorSpec extends SpecBase {
         ThirdPartyOrganisations(
           Some(YesNoAnswer.No),
           Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.No)))
-        )
+        ),
+        None
       )
 
       result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(id = testString)
@@ -480,7 +503,8 @@ class NavigatorSpec extends SpecBase {
         ThirdPartyOrganisations(
           Some(YesNoAnswer.Yes),
           Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), None))
-        )
+        ),
+        None
       )
 
       result shouldBe TaskListController.onPageLoad()
@@ -492,7 +516,8 @@ class NavigatorSpec extends SpecBase {
         ThirdPartyOrganisations(
           Some(YesNoAnswer.No),
           Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.No), Some("20")))
-        )
+        ),
+        None
       )
       result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(id = testString)
     }
@@ -503,17 +528,18 @@ class NavigatorSpec extends SpecBase {
         ThirdPartyOrganisations(
           Some(YesNoAnswer.Yes),
           Seq(ThirdParty(testString, Some(testString), None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.No)))
-        )
+        ),
+        None
       )
 
-      result shouldBe AddedThirdPartiesController.onPageLoad()
+      result shouldBe AddedThirdPartiesController.onPageLoad(NormalMode, None)
     }
 
     "route RemoveThirdPartyPage to ProductsManagedByThirdPartyPage when no third parties exist in answers" in {
       val result: Call =
-        navigator.normalRoutes(RemoveThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.Yes), Seq.empty))
+        navigator.normalRoutes(RemoveThirdPartyPage, ThirdPartyOrganisations(Some(YesNoAnswer.Yes), Seq.empty), None)
 
-      result shouldBe ProductsManagedByThirdPartyController.onPageLoad()
+      result shouldBe ProductsManagedByThirdPartyController.onPageLoad(NormalMode)
     }
 
     "route unknown page to Index" in {
@@ -522,7 +548,7 @@ class NavigatorSpec extends SpecBase {
       }
 
       assertThrows[NotImplementedError] {
-        navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers)
+        navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers, None)
       }
     }
   }
@@ -530,90 +556,121 @@ class NavigatorSpec extends SpecBase {
   "Navigator.checkRouteMap" - {
 
     "route IsaProductsPage to ISA products CYA" in {
-      navigator.checkRouteMap(IsaProductsPage) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+      navigator.checkRouteMap(IsaProductsPage, None) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
     "route InnovativeFinancialProductsPage to ISA products CYA" in {
-      navigator.checkRouteMap(InnovativeFinancialProductsPage) shouldBe IsaProductsCheckYourAnswersController
+      navigator.checkRouteMap(InnovativeFinancialProductsPage, None) shouldBe IsaProductsCheckYourAnswersController
         .onPageLoad()
     }
 
     "route PeerToPeerPlatformPage to ISA products CYA" in {
-      navigator.checkRouteMap(PeerToPeerPlatformPage) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+      navigator.checkRouteMap(PeerToPeerPlatformPage, None) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
     "route PeerToPeerPlatformNumberPage to ISA products CYA" in {
-      navigator.checkRouteMap(PeerToPeerPlatformNumberPage) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+      navigator.checkRouteMap(PeerToPeerPlatformNumberPage, None) shouldBe IsaProductsCheckYourAnswersController
+        .onPageLoad()
     }
 
     "route CertificatesOfAuthorityYesNoPage to COA CYA" in {
-      navigator.checkRouteMap(CertificatesOfAuthorityYesNoPage) shouldBe
+      navigator.checkRouteMap(CertificatesOfAuthorityYesNoPage, None) shouldBe
         CoaCheckYourAnswersController.onPageLoad()
     }
 
     "route FcaArticlesPage to COA CYA" in {
-      navigator.checkRouteMap(FcaArticlesPage) shouldBe
+      navigator.checkRouteMap(FcaArticlesPage, None) shouldBe
         CoaCheckYourAnswersController.onPageLoad()
     }
 
     "route FinancialOrganisationPage to COA CYA" in {
-      navigator.checkRouteMap(FinancialOrganisationPage) shouldBe
+      navigator.checkRouteMap(FinancialOrganisationPage, None) shouldBe
         CoaCheckYourAnswersController.onPageLoad()
     }
 
     "route RegisteredAddressCorrespondencePage to COA CYA" in {
-      navigator.checkRouteMap(RegisteredAddressCorrespondencePage) shouldBe
+      navigator.checkRouteMap(RegisteredAddressCorrespondencePage, None) shouldBe
         IndexController.onPageLoad()
     }
 
     "route SignatoryNamePage to SignatoryCheckYourAnswersController" in {
-      navigator.checkRouteMap(SignatoryNamePage(signatoryId)) shouldBe
+      navigator.checkRouteMap(SignatoryNamePage(signatoryId), None) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
     "route SignatoryJobTitlePage to SignatoryCheckYourAnswersController" in {
-      navigator.checkRouteMap(SignatoryJobTitlePage(signatoryId)) shouldBe
+      navigator.checkRouteMap(SignatoryJobTitlePage(signatoryId), None) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
     }
 
     "route LiaisonOfficerNamePage to LO CYA" in {
-      navigator.checkRouteMap(LiaisonOfficerNamePage(testString)) shouldBe
+      navigator.checkRouteMap(LiaisonOfficerNamePage(testString), None) shouldBe
         LoCheckYourAnswersController.onPageLoad(testString)
     }
 
     "route LiaisonOfficerEmailPage to LO CYA" in {
-      navigator.checkRouteMap(LiaisonOfficerEmailPage(testString)) shouldBe
+      navigator.checkRouteMap(LiaisonOfficerEmailPage(testString), None) shouldBe
         LoCheckYourAnswersController.onPageLoad(testString)
     }
 
     "route LiaisonOfficerPhoneNumberPage to LO CYA" in {
-      navigator.checkRouteMap(LiaisonOfficerPhoneNumberPage(testString)) shouldBe
+      navigator.checkRouteMap(LiaisonOfficerPhoneNumberPage(testString), None) shouldBe
         LoCheckYourAnswersController.onPageLoad(testString)
     }
 
     "route LiaisonOfficerCommunicationPage to LO CYA" in {
-      navigator.checkRouteMap(LiaisonOfficerCommunicationPage(testString)) shouldBe
+      navigator.checkRouteMap(LiaisonOfficerCommunicationPage(testString), None) shouldBe
         LoCheckYourAnswersController.onPageLoad(testString)
     }
 
+    "route ProductsManagedByThirdPartyPage to Third Parties CYA" in {
+      navigator.checkRouteMap(ProductsManagedByThirdPartyPage, None) shouldBe
+        ThirdPartiesCheckYourAnswersController.onPageLoad()
+    }
+
+    "route ThirdPartyOrgDetailsPage to Final Third Party CYA if ReturnTo param passed" in {
+      navigator.checkRouteMap(ThirdPartyOrgDetailsPage(testString), Some(FinalCya)) shouldBe
+        ThirdPartiesCheckYourAnswersController.onPageLoad()
+    }
+
     "route ThirdPartyOrgDetailsPage to Third Party CYA" in {
-      navigator.checkRouteMap(ThirdPartyOrgDetailsPage(testString)) shouldBe
+      navigator.checkRouteMap(ThirdPartyOrgDetailsPage(testString), None) shouldBe
         ThirdPartyCheckYourAnswersController.onPageLoad(testString)
     }
 
-    "route ReturnsManagedByThirdPartyPage to Third Party CYA" in {
-      navigator.checkRouteMap(ReturnsManagedByThirdPartyPage(testString)) shouldBe
+    "route ThirdPartyManagingReturnsPage to Third Party CYA" in {
+      navigator.checkRouteMap(ThirdPartyManagingReturnsPage(testString), None) shouldBe
         ThirdPartyCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route ThirdPartyManagingReturnsPage to Final Third Party CYA if ReturnTo param passed" in {
+      navigator.checkRouteMap(ThirdPartyManagingReturnsPage(testString), Some(FinalCya)) shouldBe
+        ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
     "route InvestorFundsUsedByThirdPartyPage to Third Party CYA" in {
-      navigator.checkRouteMap(InvestorFundsUsedByThirdPartyPage(testString)) shouldBe
+      navigator.checkRouteMap(InvestorFundsUsedByThirdPartyPage(testString), None) shouldBe
         ThirdPartyCheckYourAnswersController.onPageLoad(testString)
     }
 
+    "route InvestorFundsUsedByThirdPartyPage to Final Third Party CYA if ReturnTo param passed" in {
+      navigator.checkRouteMap(InvestorFundsUsedByThirdPartyPage(testString), Some(FinalCya)) shouldBe
+        ThirdPartiesCheckYourAnswersController.onPageLoad()
+    }
+
     "route ThirdPartyInvestorFundsPercentagePage to Third Party CYA" in {
-      navigator.checkRouteMap(ThirdPartyInvestorFundsPercentagePage(testString)) shouldBe
+      navigator.checkRouteMap(ThirdPartyInvestorFundsPercentagePage(testString), None) shouldBe
         ThirdPartyCheckYourAnswersController.onPageLoad(testString)
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to Final Third Party CYA if ReturnTo param passed" in {
+      navigator.checkRouteMap(ThirdPartyInvestorFundsPercentagePage(testString), Some(FinalCya)) shouldBe
+        ThirdPartiesCheckYourAnswersController.onPageLoad()
+    }
+
+    "route ThirdPartyConnectedOrganisationsPage to Third Parties CYA" in {
+      navigator.checkRouteMap(ThirdPartyConnectedOrganisationsPage, None) shouldBe
+        ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
     "route unknown page to Index" in {
@@ -622,7 +679,7 @@ class NavigatorSpec extends SpecBase {
       }
 
       assertThrows[NotImplementedError] {
-        navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers)
+        navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers, None)
       }
     }
   }

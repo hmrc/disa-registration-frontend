@@ -104,6 +104,12 @@ trait Generators extends ModelGenerators {
       chars  <- listOfN(length, numChar)
     } yield chars.mkString
 
+  def alphaOfLength(min: Int, max: Int): Gen[String] =
+    for {
+      length <- choose(min, max)
+      chars  <- listOfN(length, alphaChar)
+    } yield chars.mkString
+
   def stringsNotMatching(pattern: Regex): Gen[String] =
     Gen.alphaNumStr.suchThat(s => !pattern.pattern.matcher(s).matches() && s.nonEmpty)
 

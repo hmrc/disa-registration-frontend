@@ -85,7 +85,8 @@ class LiaisonOfficerEmailController @Inject() (
                     navigator.nextPage(
                       LiaisonOfficerEmailPage(id),
                       savedSection,
-                      mode
+                      mode,
+                      None
                     )
                   )
                 }

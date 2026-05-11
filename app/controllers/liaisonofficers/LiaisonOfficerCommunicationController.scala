@@ -86,7 +86,8 @@ class LiaisonOfficerCommunicationController @Inject() (
                     navigator.nextPage(
                       LiaisonOfficerCommunicationPage(id),
                       savedSection,
-                      mode
+                      mode,
+                      None
                     )
                   )
                 }

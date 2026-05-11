@@ -83,7 +83,8 @@ class OrganisationTelephoneNumberController @Inject() (
                   navigator.nextPage(
                     OrganisationTelephoneNumberPage,
                     updatedSection,
-                    mode
+                    mode,
+                    None
                   )
                 )
               }

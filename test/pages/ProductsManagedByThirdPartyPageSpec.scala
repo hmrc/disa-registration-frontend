@@ -43,16 +43,16 @@ class ProductsManagedByThirdPartyPageSpec extends SpecBase {
       ProductsManagedByThirdPartyPage.resumeNormalMode(empty) shouldBe true
     }
 
-    "pagesToClear should clear third party details when answer is No and data exists" in {
+    "pagesToClear should clear third party details and connected organisations when answer is No and data exists" in {
       val pages = ProductsManagedByThirdPartyPage.pagesToClear(withNoAndExistingDependentAnswer)
-
       pages should have size 1
 
       val result = pages.foldLeft(withNoAndExistingDependentAnswer) { case (acc, page) =>
         page.clearAnswer(acc)
       }
 
-      result.thirdParties shouldBe Nil
+      result.thirdParties           shouldBe Nil
+      result.connectedOrganisations shouldBe Nil
     }
 
     "pagesToClear should return Nil when answer is No but no third party details exist" in {

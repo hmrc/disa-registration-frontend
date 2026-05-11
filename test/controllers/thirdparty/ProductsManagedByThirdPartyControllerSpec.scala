@@ -19,7 +19,7 @@ package controllers.thirdparty
 import base.SpecBase
 import controllers.thirdparty.routes.ProductsManagedByThirdPartyController
 import forms.YesNoAnswerFormProvider
-import models.YesNoAnswer
+import models.{NormalMode, YesNoAnswer}
 import models.YesNoAnswer.*
 import models.journeydata.JourneyData
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
@@ -40,8 +40,8 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val routeUrl: String  = ProductsManagedByThirdPartyController.onPageLoad().url
-  lazy val submitUrl: String = ProductsManagedByThirdPartyController.onSubmit().url
+  lazy val routeUrl: String  = ProductsManagedByThirdPartyController.onPageLoad(NormalMode).url
+  lazy val submitUrl: String = ProductsManagedByThirdPartyController.onSubmit(NormalMode).url
 
   val formProvider: YesNoAnswerFormProvider = new YesNoAnswerFormProvider()
   val form: Form[YesNoAnswer]               = formProvider("productsManagedByThirdParty.error.required")
@@ -60,7 +60,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -87,7 +87,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Yes))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(Yes), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -114,7 +114,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(No))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(No), NormalMode)(request, messages(application)).toString
       }
     }
 
@@ -134,7 +134,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
       }
     }
 

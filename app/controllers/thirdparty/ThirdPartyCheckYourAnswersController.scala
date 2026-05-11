@@ -25,6 +25,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.thirdparty
 import viewmodels.checkAnswers.thirdparty.*
+import viewmodels.checkAnswers.thirdparty.finalcya.*
 import viewmodels.govuk.summarylist.*
 import views.html.thirdparty.ThirdPartyCheckYourAnswersView
 
@@ -57,7 +58,7 @@ class ThirdPartyCheckYourAnswersController @Inject() (
         val displayIndex = idx + 1
         Seq(
           ThirdPartyOrgDetailsSummary.row(thirdParty, displayIndex),
-          ReturnsManagedByThirdPartySummary.row(thirdParty),
+          ThirdPartyManagingReturnsSummary.row(thirdParty),
           InvestorFundsUsedByThirdPartySummary.row(thirdParty),
           ThirdPartyInvestorFundsPercentageSummary.row(thirdParty)
         ).flatten
@@ -66,5 +67,4 @@ class ThirdPartyCheckYourAnswersController @Inject() (
 
   private def findThirdParty(id: String)(implicit request: DataRequest[_]): Option[ThirdParty] =
     request.journeyData.thirdPartyOrganisations.flatMap(_.thirdParties.find(_.id == id))
-
 }

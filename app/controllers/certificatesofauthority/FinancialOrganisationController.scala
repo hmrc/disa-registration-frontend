@@ -83,7 +83,8 @@ class FinancialOrganisationController @Inject() (
                   navigator.nextPage(
                     FinancialOrganisationPage,
                     updatedSection,
-                    mode
+                    mode,
+                    None
                   )
                 )
               }

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package pages.thirdparty
+package pages
 
-import models.journeydata.thirdparty.ThirdPartyOrganisations
-import pages.IdentifiedPage
+import models.journeydata.OrganisationEmail
 
-final case class ReturnsManagedByThirdPartyPage(id: String) extends IdentifiedPage[ThirdPartyOrganisations]
+case object EmailVerificationCodePage extends Page[OrganisationEmail]

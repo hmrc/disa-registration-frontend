@@ -85,7 +85,8 @@ class SignatoryJobTitleController @Inject() (
                     navigator.nextPage(
                       SignatoryJobTitlePage(id),
                       savedSection,
-                      mode
+                      mode,
+                      None
                     )
                   )
                 }

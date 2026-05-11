@@ -89,7 +89,8 @@ class IsaProductsController @Inject() (
                   IsaProductsPage,
                   existingSection,
                   updatedSection,
-                  mode
+                  mode,
+                  None
                 )
               )
             }

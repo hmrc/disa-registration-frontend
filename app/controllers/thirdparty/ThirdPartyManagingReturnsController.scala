@@ -22,21 +22,21 @@ import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.requests.DataRequest
-import models.{Mode, YesNoAnswer}
+import models.{Mode, ReturnTo, YesNoAnswer}
 import navigation.Navigator
-import pages.thirdparty.ReturnsManagedByThirdPartyPage
+import pages.thirdparty.ThirdPartyManagingReturnsPage
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.thirdparty.ReturnsManagedByThirdPartyView
+import views.html.thirdparty.ThirdPartyManagingReturnsView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class ReturnsManagedByThirdPartyController @Inject() (
+class ThirdPartyManagingReturnsController @Inject() (
   override val messagesApi: MessagesApi,
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
@@ -46,24 +46,24 @@ class ReturnsManagedByThirdPartyController @Inject() (
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: ReturnsManagedByThirdPartyView
+  view: ThirdPartyManagingReturnsView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider("returnsManagedByThirdParty.error.required")
 
-  def onPageLoad(id: String, mode: Mode): Action[AnyContent] =
+  def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       findThirdPartyWithDetails(id).fold {
         Redirect(IndexController.onPageLoad())
-      } { case (thirdParty, name, answer) =>
+      } { case (_, name, answer) =>
         val preparedForm = answer.fold(form)(form.fill)
-        Ok(view(id, name, preparedForm, mode))
+        Ok(view(id, name, preparedForm, mode, returnTo))
       }
     }
 
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] =
+  def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
@@ -72,7 +72,7 @@ class ReturnsManagedByThirdPartyController @Inject() (
             findThirdPartyWithDetails(id).fold {
               Future.successful(Redirect(IndexController.onPageLoad()))
             } { case (_, name, _) =>
-              Future.successful(BadRequest(view(id, name, formWithErrors, mode)))
+              Future.successful(BadRequest(view(id, name, formWithErrors, mode, returnTo)))
             },
           answer =>
             updatedSectionWithAnswer(id, answer).fold {
@@ -83,9 +83,10 @@ class ReturnsManagedByThirdPartyController @Inject() (
                 .map { savedSection =>
                   Redirect(
                     navigator.nextPage(
-                      ReturnsManagedByThirdPartyPage(id),
+                      ThirdPartyManagingReturnsPage(id),
                       savedSection,
-                      mode
+                      mode,
+                      returnTo
                     )
                   )
                 }
