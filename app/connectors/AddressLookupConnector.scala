@@ -17,7 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.addresslookup.LookupAddress
+import models.addresslookup.{AddressLookupResponse, LookupAddress}
 import models.requests.AddressLookupRequest
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -32,40 +32,23 @@ class AddressLookupConnector @Inject() (
   appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext) {
 
-  def searchAddress(postcode: String, filter: Option[String])(implicit
-    hc: HeaderCarrier
-  ): Future[Seq[LookupAddress]] = {
+  def searchAddress(
+    postcode: String,
+    filter: Option[String]
+  )(implicit hc: HeaderCarrier): Future[Seq[LookupAddress]] = {
 
-    val url = s"${appConfig.addressLookupBaseUrl}/address-lookup/lookup"
+    val url =
+      s"${appConfig.addressLookupBaseUrl}/address-lookup/lookup"
 
-    val requestBody = AddressLookupRequest(
-      postcode = postcode,
-      filter = filter
-    )
-
+    val requestBody =
+      AddressLookupRequest(
+        postcode = postcode,
+        filter = filter
+      )
     httpClient
       .post(url"$url")
       .withBody(Json.toJson(requestBody))
-      .execute[JsValue]
-      .map(parse)
+      .execute[Seq[AddressLookupResponse]]
+      .map(_.map(_.toLookupAddress))
   }
-
-  private def parse(json: JsValue): Seq[LookupAddress] =
-    json.asOpt[Seq[JsValue]].getOrElse(Seq.empty).map { addr =>
-
-      val address =
-        (addr \ "address").as[JsValue]
-
-      val lines =
-        (address \ "lines").asOpt[Seq[String]].getOrElse(Seq.empty)
-
-      LookupAddress(
-        addressLine1 = lines.headOption,
-        addressLine2 = lines.lift(1),
-        addressLine3 = (address \ "town").asOpt[String],
-        postCode = (address \ "postcode").asOpt[String],
-        uprn = (addr \ "uprn").asOpt[Long].map(_.toString),
-        country = (address \ "country" \ "name").asOpt[String]
-      )
-    }
 }

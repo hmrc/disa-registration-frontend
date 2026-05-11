@@ -16,7 +16,7 @@
 
 package models.addresslookup
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.*
 
 case class LookupAddress(
   addressLine1: Option[String] = None,
