@@ -14,20 +14,26 @@
  * limitations under the License.
  *@
 
+@*
+* Copyright 2026 HM Revenue & Customs
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*@
 @import viewmodels.InputWidth._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import controllers.routes.TaskListController
 @import controllers.orgdetails.routes.AddAnotherAddressController
 
-
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
-    govukButton: GovukButton,
-    hmrcPageHeading: HmrcPageHeading
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
@@ -40,34 +46,35 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @hmrcPageHeading(PageHeading(
-            text = messages("AddAnotherAddress.heading"),
-            section = Some(messages("sectionTitle.orgDetails")),
-            headingClasses = Some("govuk-heading-l"),
-            captionClasses = Some("govuk-caption-l")
-        ))
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <span class="govuk-caption-l">@messages("sectionTitle.orgDetails")</span>
+                <h1 class="govuk-fieldset__heading">@messages("AddAnotherAddress.heading")</h1>
+            </legend>
 
-        @govukInput(
-            InputViewModel(
-                field = form("postcode"),
-                label = Label(content = Text(messages("AddAnotherAddress.postcode.input.label")), classes = "govuk-label--m"),
+            @govukInput(
+                InputViewModel(
+                    field = form("postcode"),
+                    label = Label(
+                        content = Text(messages("AddAnotherAddress.postcode.input.label"))
+                    )).withWidth(Fixed10)
             )
-            .withWidth(Full)
-        )
 
-        @govukInput(
-            InputViewModel(
+            @govukInput(
+                InputViewModel(
                     field = form("filter"),
-                    label = Label(content = Text(messages("AddAnotherAddress.filter.input.label")), classes = "govuk-label--m"),
+                    label = Label(content = Text(messages("AddAnotherAddress.filter.input.label")))
+                ).withWidth(Full)
+                .withHint(HintViewModel(content = Text(messages("AddAnotherAddress.filter.input.hint"))))
             )
-            .withWidth(Full)
-            .withHint(HintViewModel(messages("AddAnotherAddress.filter.input.hint")))
-        )
 
-        <div class="govuk-body">
+        </fieldset>
+
+        <p class="govuk-body">
             <a class="govuk-link" href="@TaskListController.onPageLoad().url">
-                @messages("AddAnotherAddress.link.text")</a>
-        </div>
+            @messages("AddAnotherAddress.link.text")
+            </a>
+        </p>
 
         @govukButton(
             ButtonViewModel(messages("site.saveAndContinue"))
