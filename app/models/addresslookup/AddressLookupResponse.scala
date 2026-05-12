@@ -19,9 +19,9 @@ package models.addresslookup
 import play.api.libs.json.{Json, OFormat}
 
 case class AddressLookupResponse(
-                                  address: AddressLookupAddress,
-                                  uprn: Option[Long]
-                                ) {
+  address: AddressLookupAddress,
+  uprn: Option[Long]
+) {
 
   def toLookupAddress: LookupAddress =
     LookupAddress(
@@ -40,11 +40,11 @@ object AddressLookupResponse {
 }
 
 case class AddressLookupAddress(
-                                 lines: Seq[String],
-                                 town: Option[String],
-                                 postcode: Option[String],
-                                 country: Option[AddressLookupCountry]
-                               )
+  lines: Seq[String],
+  town: Option[String],
+  postcode: Option[String],
+  country: Option[AddressLookupCountry]
+)
 
 object AddressLookupAddress {
   implicit val format: OFormat[AddressLookupAddress] =
@@ -52,9 +52,9 @@ object AddressLookupAddress {
 }
 
 case class AddressLookupCountry(
-                                 code: String,
-                                 name: String
-                               )
+  code: String,
+  name: String
+)
 
 object AddressLookupCountry {
   implicit val format: OFormat[AddressLookupCountry] =
