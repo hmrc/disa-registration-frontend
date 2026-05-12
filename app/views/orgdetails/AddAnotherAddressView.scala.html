@@ -48,7 +48,10 @@
 
         <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                <span class="govuk-caption-l">@messages("sectionTitle.orgDetails")</span>
+                <span class="govuk-caption-l">
+                    <span class="govuk-visually-hidden">@messages("this.section.is")</span>
+                    @messages("sectionTitle.orgDetails")
+                </span>
                 <h1 class="govuk-fieldset__heading">@messages("AddAnotherAddress.heading")</h1>
             </legend>
 
