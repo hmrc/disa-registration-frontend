@@ -35,5 +35,5 @@ class EmailVerificationCodeFormProvider @Inject() extends Mappings {
 }
 
 object EmailVerificationCodeFormProvider {
-  private[forms] val emailVerificationCodePattern = "^[\\p{Upper}]+$"
+  private[forms] val emailVerificationCodePattern = "^[A-Za-z]+$"
 }

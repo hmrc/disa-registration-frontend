@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package pages
+package pages.orgemail
 
 import models.journeydata.OrganisationEmail
+import pages.ClearablePage
 
-case object EmailVerificationCodePage extends Page[OrganisationEmail]
+case object OrganisationEmailVerificationCodePage extends ClearablePage[OrganisationEmail] {
+  def clearAnswer(answers: OrganisationEmail): OrganisationEmail = answers.copy(verified = Some(false))
+}

@@ -40,7 +40,7 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
-import pages.orgemail.OrganisationEmailAddressPage
+import pages.orgemail.{OrganisationEmailAddressPage, OrganisationEmailVerificationCodePage}
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import pages.thirdparty.*
 import play.api.mvc.Call
@@ -101,7 +101,7 @@ class Navigator @Inject() () {
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
-    case EmailVerificationCodePage                 => TaskListController.onPageLoad() // TODO hook to CYA
+    case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
     case LiaisonOfficerEmailPage(id)               => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
     case LiaisonOfficerPhoneNumberPage(id)         => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
@@ -119,7 +119,7 @@ class Navigator @Inject() () {
     case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckRoute(id, returnTo)
     case RemoveThirdPartyPage                      => removeThirdPartyNextPage(answers)
     case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
-    case _                                         => throw new NotImplementedError("No route for this page")
+    case _                                         => throw new NotImplementedError("No route for this page in normal mode")
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A], returnTo: Option[ReturnTo]): Call =
@@ -136,6 +136,7 @@ class Navigator @Inject() () {
       case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
       case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
       case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
+      case OrganisationEmailAddressPage              => OrganisationEmailCyaController.onPageLoad()
       case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerPhoneNumberPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
@@ -148,7 +149,7 @@ class Navigator @Inject() () {
       case InvestorFundsUsedByThirdPartyPage(id)     => thirdPartyCheckRoute(id, returnTo)
       case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckRoute(id, returnTo)
       case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
-      case _                                         => throw new NotImplementedError("No route for this page")
+      case _                                         => throw new NotImplementedError("No route for this page in check mode")
     }
 
   private def tradingUsingDifferentNameNextPage(answers: OrganisationDetails): Call =
