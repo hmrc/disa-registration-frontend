@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.routes.IndexController
+import controllers.routes.TaskListController
 import models.journeydata.isaproducts.IsaProduct
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, CashJuniorIsas, StocksAndShareJuniorIsas, StocksAndSharesIsas}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -75,7 +75,7 @@ class DeclarationForIsaManagersControllerSpec extends SpecBase {
           val result  = route(application, request).value
 
           status(result) mustEqual 303
-          redirectLocation(result) mustBe Some(IndexController.onPageLoad().url)
+          redirectLocation(result) mustBe Some(TaskListController.onPageLoad().url)
         }
       }
     }
@@ -88,10 +88,10 @@ class DeclarationForIsaManagersControllerSpec extends SpecBase {
         val application =
           applicationBuilder(journeyData = Some(jd), bind[SubmissionService].toInstance(mockSubmissionService)).build()
 
-        val receiptId = "receipt-123"
+        val subscriptionId = "receipt-123"
 
         when(mockSubmissionService.declareAndSubmit(any(), any(), eqTo(jd))(any(), any()))
-          .thenReturn(Future.successful(receiptId))
+          .thenReturn(Future.successful(subscriptionId))
 
         running(application) {
           val request = FakeRequest(POST, routes.DeclarationForIsaManagersController.onSubmit().url)
@@ -99,7 +99,7 @@ class DeclarationForIsaManagersControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.ConfirmationController.onPageLoad(receiptId).url)
+          redirectLocation(result) mustBe Some(routes.ConfirmationController.onPageLoad().url)
         }
       }
 

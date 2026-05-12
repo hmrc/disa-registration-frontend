@@ -42,7 +42,7 @@ class SubmissionServiceSpec extends SpecBase {
 
   "SubmissionService.declareAndSubmit" - {
 
-    "must return receiptId when connector call succeeds and audit success" in {
+    "must return subscriptionId when connector call succeeds and audit success" in {
 
       val jd        = testJourneyData
       val receiptId = testString
