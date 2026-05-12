@@ -17,7 +17,6 @@
 package models.journeydata.orgdetails
 
 import models.addresslookup.LookupAddress
-import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
 import play.api.libs.json.*
 import utils.JsonFormatSpec
 
