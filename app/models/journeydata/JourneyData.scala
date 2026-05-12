@@ -26,6 +26,7 @@ import play.api.libs.json.{Format, Json, OWrites}
 case class JourneyData(
   groupId: String,
   enrolmentId: String,
+  subscriptionId: Option[String] = None,
   businessVerification: Option[BusinessVerification] = None,
   organisationDetails: Option[OrganisationDetails] = None,
   organisationEmail: Option[OrganisationEmail] = None,
@@ -46,6 +47,7 @@ object JourneyData {
       "groupId"                      -> jd.groupId,
       "groupName"                    -> jd.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
       "internalRegistrationId"       -> jd.enrolmentId,
+      "subscriptionId"               -> jd.subscriptionId,
       "organisationDetails"          -> jd.organisationDetails,
       "organisationEmail"            -> jd.organisationEmail,
       "isaProducts"                  -> jd.isaProducts,

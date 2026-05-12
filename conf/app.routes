@@ -233,4 +233,4 @@ GET        /declaration-for-isa-managers                 controllers.Declaration
 POST       /declaration-for-isa-managers                 controllers.DeclarationForIsaManagersController.onSubmit()
 
 ### Confirmation
-GET        /confirmation                                 controllers.ConfirmationController.onPageLoad(receiptId: String)
+GET        /confirmation                                 controllers.ConfirmationController.onPageLoad()

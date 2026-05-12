@@ -18,7 +18,7 @@ package models.submission
 
 import play.api.libs.json.{Json, OFormat}
 
-case class EnrolmentSubmissionResponse(receiptId: String)
+case class EnrolmentSubmissionResponse(subscriptionId: String)
 
 object EnrolmentSubmissionResponse {
   implicit val format: OFormat[EnrolmentSubmissionResponse] = Json.format[EnrolmentSubmissionResponse]
