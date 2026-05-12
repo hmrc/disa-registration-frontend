@@ -103,6 +103,8 @@ class Navigator @Inject() () {
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
     case ChooseAddressPage                         => chooseAddressNextPage(answers)
     case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
+    case EnterYourOrganisationAddressPage          =>
+      TaskListController.onPageLoad() // TODO hook to review and confim page in DFI-934
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
     case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
@@ -140,6 +142,7 @@ class Navigator @Inject() () {
       case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
       case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
       case ChooseAddressPage                         => TaskListController.onPageLoad()
+      case EnterYourOrganisationAddressPage          => TaskListController.onPageLoad() // TODO hook up to CYA in DFI-1743
       case OrganisationEmailAddressPage              => OrganisationEmailCyaController.onPageLoad()
       case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)

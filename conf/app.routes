@@ -64,6 +64,11 @@ POST       /registered-address-correspondence            controllers.orgdetails.
 GET        /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onSubmit(mode: Mode = CheckMode)
 
+GET        /enter-your-organisation-address              controllers.orgdetails.EnterYourOrganisationAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /enter-your-organisation-address              controllers.orgdetails.EnterYourOrganisationAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /change-enter-your-organisation-address       controllers.orgdetails.EnterYourOrganisationAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-enter-your-organisation-address       controllers.orgdetails.EnterYourOrganisationAddressController.onSubmit(mode: Mode = CheckMode)
+
 GET        /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)
