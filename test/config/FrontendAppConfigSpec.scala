@@ -43,6 +43,8 @@ class FrontendAppConfigSpec extends SpecBase {
   private val isaManagersGuidanceCollectionUrl =
     "https://www.gov.uk/government/collections/isa-managers-guidance"
 
+  private val businessTaxAccountUrl = "https://businesstaxaccount.co.uk"
+
   private val configuration: Configuration = Configuration.from(
     Map(
       "host"                                                                       -> frontendHost,
@@ -55,6 +57,7 @@ class FrontendAppConfigSpec extends SpecBase {
       "urls.external.listOfRegisteredIsaManagers"                                  -> listOfRegisteredIsaManagersUrl,
       "urls.external.p2pLoansInformation"                                          -> p2pLoansInformationUrl,
       "urls.external.isaManagerGuidanceCollection"                                 -> isaManagersGuidanceCollectionUrl,
+      "urls.external.businessTaxAccount"                                           -> businessTaxAccountUrl,
       "features.welsh-translation"                                                 -> true,
       "timeout-dialog.timeout"                                                     -> 900,
       "timeout-dialog.countdown"                                                   -> 120,
@@ -178,7 +181,7 @@ class FrontendAppConfigSpec extends SpecBase {
     }
 
     "must return businessTaxAccountUrl" in {
-      appConfig.businessTaxAccountUrl mustBe "#"
+      appConfig.businessTaxAccountUrl mustBe businessTaxAccountUrl
     }
 
     "must return isaManagersGuidanceUrl" in {
