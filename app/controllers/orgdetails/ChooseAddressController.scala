@@ -21,8 +21,9 @@ import forms.ChooseAddressFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.addresslookup.LookupAddress
-import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
-import models.journeydata.orgdetails.ChooseAddressAnswer
+import models.journeydata.OrganisationDetails
+import models.journeydata.orgdetails.SelectedCorrespondenceAddress
+import models.journeydata.orgdetails.SelectedCorrespondenceAddress.*
 import navigation.Navigator
 import pages.organisationdetails.ChooseAddressPage
 import play.api.Logging
@@ -62,7 +63,7 @@ class ChooseAddressController @Inject() (
       val addresses           = extractAddresses(organisationDetails)
 
       val preparedForm =
-        preselectedValue(organisationDetails, addresses)
+        preselectedValue(organisationDetails)
           .fold(form)(form.fill)
 
       Ok(view(preparedForm, addresses, mode))
@@ -80,18 +81,23 @@ class ChooseAddressController @Inject() (
               BadRequest(view(formWithErrors, addresses, mode))
             ),
           answer => {
-            val chooseAddressAnswer: ChooseAddressAnswer =
-              parseAnswer(answer, addresses)
-            val updatedSection: OrganisationDetails      =
+            val selectedAddress          = parseAnswer(answer, addresses)
+            val updatedAddAnotherAddress =
+              organisationDetails
+                .flatMap(_.addAnotherAddress)
+                .map(
+                  _.copy(
+                    selectedAddress = Some(selectedAddress)
+                  )
+                )
+
+            val updatedSection =
               organisationDetails match {
                 case Some(existing) =>
-                  existing.copy(chooseAddressAnswer = Some(chooseAddressAnswer))
+                  existing.copy(addAnotherAddress = updatedAddAnotherAddress)
                 case None           =>
-                  OrganisationDetails(
-                    chooseAddressAnswer = Some(chooseAddressAnswer)
-                  )
+                  OrganisationDetails(addAnotherAddress = updatedAddAnotherAddress)
               }
-
             journeyAnswersService
               .update(
                 updatedSection,
@@ -99,14 +105,7 @@ class ChooseAddressController @Inject() (
                 request.credentials.providerId
               )
               .map { persistedSection =>
-                Redirect(
-                  navigator.nextPage(
-                    ChooseAddressPage,
-                    persistedSection,
-                    mode,
-                    None
-                  )
-                )
+                Redirect(navigator.nextPage(ChooseAddressPage, persistedSection, mode, None))
               }
               .recoverWith { case NonFatal(e) =>
                 logger.warn(
@@ -122,41 +121,32 @@ class ChooseAddressController @Inject() (
   private def parseAnswer(
     answer: String,
     addresses: Seq[LookupAddress]
-  ): ChooseAddressAnswer =
+  ): SelectedCorrespondenceAddress =
     answer match {
       case "none" =>
-        ChooseAddressAnswer.NoneOfThese
-
-      case idx =>
-        val address =
-          addresses
-            .lift(idx.toInt)
-            .getOrElse(
-              throw new IllegalArgumentException("Invalid address index")
-            )
-
-        ChooseAddressAnswer.Selected(
-          CorrespondenceAddress.fromLookup(address)
-        )
+        ManualEntry
+      case idx    =>
+        val index = idx.toInt
+        addresses
+          .lift(index)
+          .getOrElse(
+            throw new IllegalArgumentException("Invalid address index")
+          )
+        SelectedCorrespondenceAddress.LookupAddress(index)
     }
 
   private def preselectedValue(
-    organisationDetails: Option[OrganisationDetails],
-    addresses: Seq[LookupAddress]
+    organisationDetails: Option[OrganisationDetails]
   ): Option[String] =
-    organisationDetails.flatMap(_.chooseAddressAnswer).map {
-
-      case ChooseAddressAnswer.NoneOfThese =>
-        "none"
-
-      case ChooseAddressAnswer.Selected(selected) =>
-        addresses.zipWithIndex
-          .find { case (lookup, _) =>
-            CorrespondenceAddress.matches(selected, lookup)
-          }
-          .map(_._2.toString)
-          .getOrElse("none")
-    }
+    organisationDetails
+      .flatMap(_.addAnotherAddress)
+      .flatMap(_.selectedAddress)
+      .map {
+        case SelectedCorrespondenceAddress.LookupAddress(index) =>
+          index.toString
+        case ManualEntry                                        =>
+          "none"
+      }
 
   private def extractAddresses(
     organisationDetails: Option[OrganisationDetails]

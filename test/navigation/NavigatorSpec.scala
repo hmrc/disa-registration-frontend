@@ -34,8 +34,8 @@ import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDeb
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
-import models.journeydata.orgdetails.ChooseAddressAnswer.{NoneOfThese, Selected}
-import models.journeydata.orgdetails.{AddAnotherAddress, ChooseAddressAnswer}
+import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
+import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails, OrganisationEmail}
@@ -313,7 +313,8 @@ class NavigatorSpec extends SpecBase {
                     addressLine2 = Some(testString),
                     postCode = Some(testString)
                   )
-                )
+                ),
+                selectedAddress = None
               )
             )
           ),
@@ -342,7 +343,8 @@ class NavigatorSpec extends SpecBase {
                     addressLine2 = Some(testString),
                     postCode = Some(testString)
                   )
-                )
+                ),
+                selectedAddress = None
               )
             )
           ),
@@ -355,7 +357,27 @@ class NavigatorSpec extends SpecBase {
       val result: Call =
         navigator.normalRoutes(
           ChooseAddressPage,
-          testOrganisationDetails.copy(chooseAddressAnswer = Some(NoneOfThese)),
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(ManualEntry)
+              )
+            )
+          ),
           returnTo = None
         )
 
@@ -366,15 +388,24 @@ class NavigatorSpec extends SpecBase {
       val result: Call =
         navigator.normalRoutes(
           ChooseAddressPage,
-          testOrganisationDetails.copy(chooseAddressAnswer =
+          testOrganisationDetails.copy(addAnotherAddress =
             Some(
-              Selected(address =
-                CorrespondenceAddress(
-                  addressLine1 = Some(testString),
-                  addressLine2 = Some(testString),
-                  addressLine3 = Some(testString),
-                  postCode = Some(testString)
-                )
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(SelectedCorrespondenceAddress.LookupAddress(0))
               )
             )
           ),

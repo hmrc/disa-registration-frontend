@@ -17,13 +17,14 @@
 package controllers.orgdetails
 
 import base.SpecBase
+import controllers.routes.TaskListController
 import controllers.orgdetails.routes.*
-import controllers.routes.*
 import forms.ChooseAddressFormProvider
 import models.NormalMode
 import models.addresslookup.LookupAddress
-import models.journeydata.orgdetails.{AddAnotherAddress, ChooseAddressAnswer}
-import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
+import models.journeydata.{JourneyData, OrganisationDetails}
+import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
+import models.journeydata.orgdetails.SelectedCorrespondenceAddress.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -60,23 +61,30 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
 
   private val addresses = Seq(address1, address2)
 
+  private val addAnotherAddress =
+    AddAnotherAddress(
+      postcode = testString,
+      filter = None,
+      addresses = addresses,
+      selectedAddress = None
+    )
+
   val journeyData: JourneyData =
     JourneyData(
       groupId = testGroupId,
       enrolmentId = testString,
       organisationDetails = Some(
         OrganisationDetails(
-          addAnotherAddress = Some(
-            AddAnotherAddress(postcode = testString, filter = None, addresses = addresses)
-          ),
-          chooseAddressAnswer = None
+          addAnotherAddress = Some(addAnotherAddress)
         )
       )
     )
 
-  lazy val routeUrl = ChooseAddressController.onPageLoad(NormalMode).url
+  lazy val routeUrl =
+    ChooseAddressController.onPageLoad(NormalMode).url
 
-  lazy val submitUrl = ChooseAddressController.onSubmit(NormalMode).url
+  lazy val submitUrl =
+    ChooseAddressController.onSubmit(NormalMode).url
 
   "ChooseAddressController" - {
 
@@ -94,20 +102,26 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ChooseAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, addresses, NormalMode)(
-          request,
-          messages(application)
-        ).toString
+
+        contentAsString(result) mustEqual view(
+          form,
+          addresses,
+          NormalMode
+        )(request, messages(application)).toString
       }
     }
 
-    "must prepopulate form when previously answered (None selected)" in {
+    "must prepopulate form when lookup address previously selected" in {
 
       val updatedJourney =
         journeyData.copy(
           organisationDetails = journeyData.organisationDetails.map(
             _.copy(
-              chooseAddressAnswer = Some(ChooseAddressAnswer.NoneOfThese)
+              addAnotherAddress = Some(
+                addAnotherAddress.copy(
+                  selectedAddress = Some(SelectedCorrespondenceAddress.LookupAddress(1))
+                )
+              )
             )
           )
         )
@@ -122,7 +136,36 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) must include("value=\"none\"")
+        contentAsString(result) must include("""value="1"""")
+      }
+    }
+
+    "must prepopulate form when manual entry previously selected" in {
+
+      val updatedJourney =
+        journeyData.copy(
+          organisationDetails = journeyData.organisationDetails.map(
+            _.copy(
+              addAnotherAddress = Some(
+                addAnotherAddress.copy(
+                  selectedAddress = Some(ManualEntry)
+                )
+              )
+            )
+          )
+        )
+
+      val application =
+        applicationBuilder(journeyData = Some(updatedJourney)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual OK
+        contentAsString(result) must include("""value="none"""")
       }
     }
 
@@ -130,10 +173,11 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
 
       val expected =
         OrganisationDetails(
-          addAnotherAddress = Some(AddAnotherAddress(postcode = testString, filter = None, addresses = addresses)),
-          chooseAddressAnswer = Some(
-            ChooseAddressAnswer.Selected(
-              CorrespondenceAddress.fromLookup(address1)
+          addAnotherAddress = Some(
+            addAnotherAddress.copy(
+              selectedAddress = Some(
+                SelectedCorrespondenceAddress.LookupAddress(0)
+              )
             )
           )
         )
@@ -155,15 +199,19 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 
-    "must redirect when None of these selected" in {
+    "must redirect when none of these selected" in {
 
       val expected =
         OrganisationDetails(
-          addAnotherAddress = Some(AddAnotherAddress(postcode = testString, filter = None, addresses = addresses)),
-          chooseAddressAnswer = Some(ChooseAddressAnswer.NoneOfThese)
+          addAnotherAddress = Some(
+            addAnotherAddress.copy(
+              selectedAddress = Some(ManualEntry)
+            )
+          )
         )
 
       when(
@@ -183,6 +231,7 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 
@@ -193,7 +242,8 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
 
       running(application) {
 
-        val request = FakeRequest(POST, submitUrl)
+        val request =
+          FakeRequest(POST, submitUrl)
 
         val result = route(application, request).value
 

@@ -32,6 +32,7 @@ import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoans
 import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
+import models.journeydata.orgdetails.SelectedCorrespondenceAddress
 import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.ThirdPartyOrganisations
 import models.journeydata.{OrganisationDetails, TaskListSection}
@@ -40,7 +41,7 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
-import pages.orgemail._
+import pages.orgemail.*
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import pages.thirdparty.*
 import play.api.mvc.Call
@@ -267,9 +268,13 @@ class Navigator @Inject() () {
   private def chooseAddressNextPage(
     answers: OrganisationDetails
   ): Call =
-    if (answers.hasSelectedCorrespondenceAddress) {
-      TaskListController.onPageLoad()
-    } else {
-      TaskListController.onPageLoad()
+    answers.addAnotherAddress
+      .flatMap(_.selectedAddress) match {
+      case Some(SelectedCorrespondenceAddress.ManualEntry)      =>
+        TaskListController.onPageLoad()
+      case Some(SelectedCorrespondenceAddress.LookupAddress(_)) =>
+        TaskListController.onPageLoad()
+      case None                                                 =>
+        TaskListController.onPageLoad()
     }
 }
