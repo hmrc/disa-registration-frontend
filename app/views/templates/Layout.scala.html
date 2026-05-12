@@ -29,7 +29,7 @@
     hmrcStandardPage: HmrcStandardPage
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, showTechnicalIssueHelper: Boolean = true)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @head = {
 
@@ -45,11 +45,9 @@
 
 @content = {
     @contentBlock
-    @if(showTechnicalIssueHelper) {
-      <p>
-        @hmrcReportTechnicalIssueHelper()
-      </p>
-    }
+    <p>
+      @hmrcReportTechnicalIssueHelper()
+    </p>
 }
 
 @hmrcStandardPage(HmrcStandardPageParams(
