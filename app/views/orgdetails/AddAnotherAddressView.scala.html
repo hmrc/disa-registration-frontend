@@ -14,17 +14,10 @@
  * limitations under the License.
  *@
 
-@*
-* Copyright 2026 HM Revenue & Customs
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*@
 @import viewmodels.InputWidth._
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+@import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLegend
 @import controllers.routes.TaskListController
 @import controllers.orgdetails.routes.AddAnotherAddressController
 
@@ -32,13 +25,56 @@
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
+        govukFieldset: GovukFieldset,
         govukInput: GovukInput,
         govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("AddAnotherAddress.title"), Some(messages("sectionTitle.orgDetails")))) {
+@inputsHtml = {
+@govukInput(
+    InputViewModel(
+        field = form("postcode"),
+        label = Label(
+            content = Text(messages("AddAnotherAddress.postcode.input.label"))
+        )
+    ).withWidth(Fixed10)
+)
+
+@govukInput(
+    InputViewModel(
+        field = form("filter"),
+        label = Label(
+            content = Text(messages("AddAnotherAddress.filter.input.label"))
+        )
+    )
+    .withWidth(Full)
+    .withHint(
+        HintViewModel(
+            content = Text(messages("AddAnotherAddress.filter.input.hint"))
+        )
+    )
+)
+}
+
+@fieldset = @{
+    FieldsetViewModel(
+        HmrcPageHeadingLegend(
+            content = Text(messages("AddAnotherAddress.heading")),
+            caption = Text(messages("sectionTitle.orgDetails")),
+            classes = "govuk-fieldset__legend--l"
+        )
+    ).withHtml(inputsHtml)
+}
+
+@layout(
+    pageTitle = title(
+        form,
+        messages("AddAnotherAddress.title"),
+        Some(messages("sectionTitle.orgDetails"))
+    )
+) {
 
     @formHelper(action = AddAnotherAddressController.onSubmit(mode)) {
 
@@ -46,32 +82,7 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <fieldset class="govuk-fieldset">
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                <span class="govuk-caption-l">
-                    <span class="govuk-visually-hidden">@messages("this.section.is")</span>
-                    @messages("sectionTitle.orgDetails")
-                </span>
-                <h1 class="govuk-fieldset__heading">@messages("AddAnotherAddress.heading")</h1>
-            </legend>
-
-            @govukInput(
-                InputViewModel(
-                    field = form("postcode"),
-                    label = Label(
-                        content = Text(messages("AddAnotherAddress.postcode.input.label"))
-                    )).withWidth(Fixed10)
-            )
-
-            @govukInput(
-                InputViewModel(
-                    field = form("filter"),
-                    label = Label(content = Text(messages("AddAnotherAddress.filter.input.label")))
-                ).withWidth(Full)
-                .withHint(HintViewModel(content = Text(messages("AddAnotherAddress.filter.input.hint"))))
-            )
-
-        </fieldset>
+        @govukFieldset(fieldset)
 
         <p class="govuk-body">
             <a class="govuk-link" href="@TaskListController.onPageLoad().url">
