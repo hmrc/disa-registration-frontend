@@ -16,24 +16,19 @@
 
 package forms
 
-import forms.EmailVerificationCodeFormProvider.emailVerificationCodePattern
-
-import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
+import play.api.data.Forms.single
 
-class EmailVerificationCodeFormProvider @Inject() extends Mappings {
+import javax.inject.Inject
+
+class ChooseAddressFormProvider @Inject() extends Mappings {
 
   def apply(): Form[String] =
     Form(
-      "value" -> text("emailVerificationCode.error.required")
-        .transform(_.trim.toUpperCase, identity: String => String)
-        .verifying(regexp(emailVerificationCodePattern, "emailVerificationCode.error.format"))
-        .verifying(minLength(6, "emailVerificationCode.error.tooShort"))
-        .verifying(maxLength(6, "emailVerificationCode.error.tooLong"))
+      single(
+        "value" ->
+          text("chooseAddress.error.required")
+      )
     )
-}
-
-object EmailVerificationCodeFormProvider {
-  private[forms] val emailVerificationCodePattern = "^[A-Za-z]+$"
 }

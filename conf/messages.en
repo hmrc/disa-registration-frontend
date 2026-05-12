@@ -148,7 +148,7 @@ organisationTelephoneNumber.change.hidden = organisation telephone number
 
 registeredAddressCorrespondence.title = Do you want us to use the registered address to send you letters?
 registeredAddressCorrespondence.heading = Do you want us to use the registered address to send you letters?
-registeredAddressCorrespondence.error.required = Select yes if you want HMRC to use the address given for correspondence
+registeredAddressCorrespondence.error.required = Select yes if you want HMRC to use this address to send you letters
 
 AddAnotherAddress.title = Add another address for your organisation
 AddAnotherAddress.heading = Add another address for your organisation
@@ -165,6 +165,13 @@ AddAnotherAddress.link.text = Enter the address manually
 AddAnotherAddress.checkYourAnswersLabel = Third-party {0} details
 AddAnotherAddress.change.hidden = third-party {0} details
 
+chooseAddress.title = Choose the correct address
+chooseAddress.heading = Choose the correct address
+chooseAddress.error.required = Select one of the address options or choose ‘none of these’, if the addresses given aren’t correct
+chooseAddress.none.of.these = None of these
+chooseAddress.radio.divider = or
+
+
 ### Organisation Email
 
 organisationEmailAddress.title = What is the email address of your organisation?
@@ -173,7 +180,7 @@ organisationEmailAddress.hint = This email will be used to notify you of any mes
 organisationEmailAddress.checkYourAnswersLabel = Organisation email
 organisationEmailAddress.error.required = Enter the email address of your organisation. Use a name, @ symbol and a domain name, like yourname@example.com
 organisationEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
-organisationEmailAddress.change.hidden = organisation email
+organisationEmailAddress.change.hidden = organisation email address
 
 emailVerificationCode.title = Enter the code to confirm your organisation email
 emailVerificationCode.heading = Enter the code to confirm your organisation email
@@ -188,6 +195,9 @@ emailVerificationCode.error.format = You need to enter a confirmation code in th
 emailVerificationCode.error.invalid = The code you entered is invalid
 emailVerificationCode.error.tooLong = The code you have used is too long. It should be 6 letters
 emailVerificationCode.error.tooShort = The code you have used is too short. It should be 6 letters
+
+organisationEmailCya.title = Check your verified organisation email
+organisationEmailCya.heading = Check your verified organisation email
 
 ### ISA Products
 isaProducts.title = Which ISA products does your organisation offer?

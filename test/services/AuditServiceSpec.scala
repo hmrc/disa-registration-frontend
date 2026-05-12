@@ -93,6 +93,8 @@ class AuditServiceSpec extends SpecBase {
       (detail \ EventData.providerType.toString).as[String] mustEqual testString
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.submissionStatus.toString).as[String] mustEqual SubmissionResult.Success.toString
+      (detail \ EventData.numberLiasonOfficers.toString).as[String] mustEqual "1"
+      (detail \ EventData.numberSignatories.toString).as[String] mustEqual "1"
       (detail \ EventData.payload.toString \ EventData.groupName.toString).as[String] mustEqual "unknown"
 
       (detail \ EventData.payload.toString).toOption.isDefined mustEqual true

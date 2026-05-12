@@ -16,7 +16,7 @@
 
 package models.journeydata
 
-import models.journeydata.orgdetails.AddAnotherAddress
+import models.journeydata.orgdetails.{AddAnotherAddress, ChooseAddressAnswer}
 import play.api.libs.json.{Json, OFormat}
 
 case class OrganisationDetails(
@@ -28,11 +28,19 @@ case class OrganisationDetails(
   registeredAddressCorrespondence: Option[Boolean] = None,
   correspondenceAddress: Option[CorrespondenceAddress] = None,
   orgTelephoneNumber: Option[String] = None,
-  addAnotherAddress: Option[AddAnotherAddress] = None
+  addAnotherAddress: Option[AddAnotherAddress] = None,
+  chooseAddressAnswer: Option[ChooseAddressAnswer] = None
 ) extends TaskListSection {
   override def sectionName: String = "organisationDetails"
+
+  def hasSelectedCorrespondenceAddress: Boolean =
+    correspondenceAddress.exists(_.isPopulated)
+
+  def hasNoSelectedCorrespondenceAddress: Boolean =
+    !hasSelectedCorrespondenceAddress
 }
 
 object OrganisationDetails {
   implicit val format: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
+
 }

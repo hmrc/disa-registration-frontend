@@ -40,7 +40,7 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
-import pages.orgemail.OrganisationEmailAddressPage
+import pages.orgemail._
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import pages.thirdparty.*
 import play.api.mvc.Call
@@ -100,9 +100,10 @@ class Navigator @Inject() () {
     case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
+    case ChooseAddressPage                         => chooseAddressNextPage(answers)
     case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
-    case EmailVerificationCodePage                 => TaskListController.onPageLoad() // TODO hook to CYA
+    case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
     case LiaisonOfficerEmailPage(id)               => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
     case LiaisonOfficerPhoneNumberPage(id)         => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
@@ -117,10 +118,10 @@ class Navigator @Inject() () {
     case ThirdPartyManagingReturnsPage(id)         =>
       InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode, None)
     case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id, returnTo)
-    case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckRoute(id, returnTo)
+    case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckNextPage(id, returnTo)
     case RemoveThirdPartyPage                      => removeThirdPartyNextPage(answers)
     case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
-    case _                                         => throw new NotImplementedError("No route for this page")
+    case _                                         => throw new NotImplementedError("No route for this page in normal mode")
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A], returnTo: Option[ReturnTo]): Call =
@@ -137,6 +138,8 @@ class Navigator @Inject() () {
       case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
       case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
       case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
+      case ChooseAddressPage                         => TaskListController.onPageLoad()
+      case OrganisationEmailAddressPage              => OrganisationEmailCyaController.onPageLoad()
       case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerPhoneNumberPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
@@ -144,12 +147,12 @@ class Navigator @Inject() () {
       case SignatoryNamePage(id)                     => SignatoryCheckYourAnswersController.onPageLoad(id = id)
       case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
       case ProductsManagedByThirdPartyPage           => ThirdPartiesCheckYourAnswersController.onPageLoad()
-      case ThirdPartyOrgDetailsPage(id)              => thirdPartyCheckRoute(id, returnTo)
-      case ThirdPartyManagingReturnsPage(id)         => thirdPartyCheckRoute(id, returnTo)
-      case InvestorFundsUsedByThirdPartyPage(id)     => thirdPartyCheckRoute(id, returnTo)
-      case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckRoute(id, returnTo)
+      case ThirdPartyOrgDetailsPage(id)              => thirdPartyCheckNextPage(id, returnTo)
+      case ThirdPartyManagingReturnsPage(id)         => thirdPartyCheckNextPage(id, returnTo)
+      case InvestorFundsUsedByThirdPartyPage(id)     => thirdPartyCheckNextPage(id, returnTo)
+      case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckNextPage(id, returnTo)
       case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
-      case _                                         => throw new NotImplementedError("No route for this page")
+      case _                                         => throw new NotImplementedError("No route for this page in check mode")
     }
 
   private def tradingUsingDifferentNameNextPage(answers: OrganisationDetails): Call =
@@ -244,13 +247,13 @@ class Navigator @Inject() () {
       case 1          =>
         TaskListController.onPageLoad()
       case n if n > 1 =>
-        TaskListController.onPageLoad()
+        ChooseAddressController.onPageLoad(NormalMode)
       case _          =>
         TaskListController.onPageLoad()
     }
   }
 
-  private def thirdPartyCheckRoute(
+  private def thirdPartyCheckNextPage(
     id: String,
     returnTo: Option[ReturnTo]
   ): Call =
@@ -261,4 +264,12 @@ class Navigator @Inject() () {
         ThirdPartyCheckYourAnswersController.onPageLoad(id)
     }
 
+  private def chooseAddressNextPage(
+    answers: OrganisationDetails
+  ): Call =
+    if (answers.hasSelectedCorrespondenceAddress) {
+      TaskListController.onPageLoad()
+    } else {
+      TaskListController.onPageLoad()
+    }
 }

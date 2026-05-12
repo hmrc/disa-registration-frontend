@@ -21,22 +21,24 @@ import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
+import controllers.orgemail.routes.*
 import controllers.routes.{IndexController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
-import models.addresslookup.LookupAddress
 import models.ReturnTo.FinalCya
-import models.journeydata.OrganisationDetails
+import models.addresslookup.LookupAddress
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
-import models.journeydata.orgdetails.AddAnotherAddress
+import models.journeydata.orgdetails.ChooseAddressAnswer.{NoneOfThese, Selected}
+import models.journeydata.orgdetails.{AddAnotherAddress, ChooseAddressAnswer}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
+import models.journeydata.{CorrespondenceAddress, OrganisationDetails, OrganisationEmail}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -45,8 +47,9 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
+import pages.orgemail.{OrganisationEmailAddressPage, OrganisationEmailVerificationCodePage}
 import pages.signatories.*
-import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, RemoveThirdPartyPage, ThirdPartyConnectedOrganisationsPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyManagingReturnsPage, ThirdPartyOrgDetailsPage}
+import pages.thirdparty.*
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -345,6 +348,39 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
+      result shouldBe ChooseAddressController.onPageLoad(NormalMode)
+    }
+
+    "route to ManualAddressEntryPage if none is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(chooseAddressAnswer = Some(NoneOfThese)),
+          returnTo = None
+        )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route to ConfirmAddressPage if an address is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(chooseAddressAnswer =
+            Some(
+              Selected(address =
+                CorrespondenceAddress(
+                  addressLine1 = Some(testString),
+                  addressLine2 = Some(testString),
+                  addressLine3 = Some(testString),
+                  postCode = Some(testString)
+                )
+              )
+            )
+          ),
+          returnTo = None
+        )
+
       result shouldBe TaskListController.onPageLoad()
     }
 
@@ -356,6 +392,21 @@ class NavigatorSpec extends SpecBase {
     "route FinancialOrganisationPage to ISA products CYA" in {
       val result: Call = navigator.normalRoutes(FinancialOrganisationPage, coaAnswers, None)
       result shouldBe CoaCheckYourAnswersController.onPageLoad()
+    }
+
+    "route OrganisationEmailAddressPage to OrganisationEmailVerificationCodePage" in {
+      val result: Call = navigator.normalRoutes(OrganisationEmailAddressPage, OrganisationEmail(Some(testString)), None)
+      result shouldBe EmailVerificationCodeController.onPageLoad()
+    }
+
+    "route OrganisationEmailVerificationCodePage to OrganisationEmail CYA" in {
+      val result: Call =
+        navigator.normalRoutes(
+          OrganisationEmailVerificationCodePage,
+          OrganisationEmail(Some(testString), Some(true)),
+          None
+        )
+      result shouldBe OrganisationEmailCyaController.onPageLoad()
     }
 
     "route RemoveSignatoryPage to AddedSignatoryController when signatory exists in journeyAnswers" in {
@@ -593,6 +644,11 @@ class NavigatorSpec extends SpecBase {
     "route RegisteredAddressCorrespondencePage to COA CYA" in {
       navigator.checkRouteMap(RegisteredAddressCorrespondencePage, None) shouldBe
         IndexController.onPageLoad()
+    }
+
+    "route OrganisationEmailAddressPage to Org email CYA" in {
+      navigator.checkRouteMap(OrganisationEmailAddressPage, None) shouldBe
+        OrganisationEmailCyaController.onPageLoad()
     }
 
     "route SignatoryNamePage to SignatoryCheckYourAnswersController" in {

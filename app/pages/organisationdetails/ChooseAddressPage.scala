@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package pages.orgemail
+package pages.organisationdetails
 
-import models.journeydata.OrganisationEmail
-import pages.{ClearablePage, PageWithDependents}
+import models.journeydata.OrganisationDetails
+import pages.Page
 
-case object OrganisationEmailAddressPage extends PageWithDependents[OrganisationEmail] {
-  def pagesToClear(currentAnswers: OrganisationEmail): List[ClearablePage[OrganisationEmail]] = List(
-    OrganisationEmailVerificationCodePage
-  )
-
-  def resumeNormalMode(currentAnswers: OrganisationEmail): Boolean = currentAnswers.verified.forall(_ == false)
-}
+case object ChooseAddressPage extends Page[OrganisationDetails]
