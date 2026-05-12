@@ -28,6 +28,7 @@ import controllers.thirdparty.routes.*
 import models.*
 import models.ReturnTo.FinalCya
 import models.addresslookup.LookupAddress
+import models.journeydata.{OrganisationDetails, OrganisationEmail}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
