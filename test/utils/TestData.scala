@@ -23,6 +23,8 @@ import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
 import models.journeydata.certificatesofauthority.FinancialOrganisation.EuropeanInstitution
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
+import models.journeydata.signatories.{Signatories, Signatory}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -61,8 +63,20 @@ trait TestData extends Generators {
       fcaArticles = Some(Seq(Article14))
     )
 
+  val testLiaisonOfficers = LiaisonOfficers(Seq(LiaisonOfficer(id = testString, fullName = Some(testString))))
+
+  val testSignatories = Signatories(Seq(Signatory(id = testString, fullName = Some(testString))))
+
   val testJourneyData: JourneyData =
-    JourneyData(groupId = testGroupId, enrolmentId = testEnrolmentId, isaProducts = Some(testIsaProductsAnswers))
+    JourneyData(
+      groupId = testGroupId,
+      enrolmentId = testEnrolmentId,
+      isaProducts = Some(testIsaProductsAnswers),
+      organisationDetails = Some(testOrganisationDetails),
+      certificatesOfAuthority = Some(testCoaAnswersWithArticles),
+      liaisonOfficers = Some(testLiaisonOfficers),
+      signatories = Some(testSignatories)
+    )
 
   val testRegisteredAddress: RegisteredAddress = RegisteredAddress(
     addressLine1 = Some("testLine1"),

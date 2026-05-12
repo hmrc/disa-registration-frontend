@@ -81,11 +81,13 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
   )(implicit hc: HeaderCarrier): Future[Unit] = {
     implicit val payloadWrites: OWrites[JourneyData] = auditWrites
     val baseData                                     = Json.obj(
-      EventData.providerType.toString     -> credentials.providerType,
-      EventData.credId.toString           -> credentials.providerId,
-      EventData.credentialRole.toString   -> credentialRole.toString,
-      EventData.submissionStatus.toString -> status.toString,
-      EventData.payload.toString          -> journeyData
+      EventData.providerType.toString         -> credentials.providerType,
+      EventData.credId.toString               -> credentials.providerId,
+      EventData.credentialRole.toString       -> credentialRole.toString,
+      EventData.submissionStatus.toString     -> status.toString,
+      EventData.numberLiasonOfficers.toString -> journeyData.liaisonOfficers.fold(0)(_.liaisonOfficers.size).toString,
+      EventData.numberSignatories.toString    -> journeyData.signatories.fold(0)(_.signatories.size).toString,
+      EventData.payload.toString              -> journeyData
     )
 
     val failureData: String => JsObject = reason =>
@@ -134,5 +136,6 @@ object AuditTypes extends Enumeration {
 object EventData extends Enumeration {
   type Data = Value
   val providerType, credId, credentialRole, groupId, submissionStatus, failureReason, payload, journeyType,
-    internalRegistrationId, continuingSection, startEnrolment, continueEnrolment, groupName = Value
+    internalRegistrationId, continuingSection, startEnrolment, continueEnrolment, groupName, numberLiasonOfficers,
+    numberSignatories = Value
 }
