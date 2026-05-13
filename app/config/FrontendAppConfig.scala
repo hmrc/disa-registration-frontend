@@ -66,6 +66,8 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
 
   lazy val listOfRegisteredIsaManagersUrl: String = getString("urls.external.listOfRegisteredIsaManagers")
   lazy val p2pLoansInformationUrl: String         = getString("urls.external.p2pLoansInformation")
+  lazy val businessTaxAccountUrl: String          = getString("urls.external.businessTaxAccount")
+  lazy val isaManagersGuidanceUrl: String         = getString("urls.external.isaManagerGuidanceCollection")
 
   lazy val incorporatedEntityIdentificationHost: String =
     baseUrl("incorporated-entity-identification-frontend")

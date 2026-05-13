@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions.*
-import controllers.routes.{ConfirmationController, IndexController}
+import controllers.routes.{ConfirmationController, TaskListController}
 import handlers.ErrorHandler
 import models.journeydata.isaproducts.IsaProduct.{CashJuniorIsas, StocksAndShareJuniorIsas}
 import play.api.Logging
@@ -52,8 +52,7 @@ class DeclarationForIsaManagersController @Inject() (
 
     showJuniorContent.fold {
       logger.warn(s"User with groupId [${request.groupId}] did not have requisite data to make a declaration")
-      // TODO Repoint to task list when built
-      Redirect(IndexController.onPageLoad())
+      Redirect(TaskListController.onPageLoad())
     } { showJuniorContent =>
       Ok(view(showJuniorContent))
     }
@@ -62,13 +61,15 @@ class DeclarationForIsaManagersController @Inject() (
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     submissionService
       .declareAndSubmit(request.credentials, request.credentialRole, request.journeyData)
-      .map { submissionReceiptId =>
-        logger.info(s"Successful submission by IM with groupId [${request.groupId}]")
-        Redirect(ConfirmationController.onPageLoad(submissionReceiptId))
+      .map { subscriptionId =>
+        logger.info(
+          s"Successful submission by IM with groupId [${request.groupId}] returned subscriberId [$subscriptionId]"
+        )
+        Redirect(ConfirmationController.onPageLoad())
       }
       .recoverWith { case NonFatal(e) =>
         logger.error(
-          s"Unexpected response from the backend submitting declaration for groupId [${request.groupId}] with error: [${e.getMessage}]"
+          s"Unexpected response submitting declaration for groupId [${request.groupId}] with error: [${e.getMessage}]"
         )
         errorHandler.internalServerError(request)
       }

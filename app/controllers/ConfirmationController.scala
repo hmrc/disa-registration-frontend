@@ -16,22 +16,33 @@
 
 package controllers
 
-import controllers.actions._
+import config.FrontendAppConfig
+import controllers.actions.*
+import controllers.routes.TaskListController
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.RegistrationSubmittedViewModel
 import views.html.ConfirmationView
 
 class ConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
+  appConfig: FrontendAppConfig,
   identify: IdentifierAction,
+  retrieveData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: ConfirmationView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(receiptId: String): Action[AnyContent] = identify { implicit request =>
-    Ok(view(receiptId))
+  def onPageLoad(): Action[AnyContent] = (identify andThen retrieveData andThen requireData) { implicit request =>
+    RegistrationSubmittedViewModel
+      .from(request.journeyData, appConfig)
+      .fold(Redirect(TaskListController.onPageLoad())) { viewModel =>
+        Ok(view(viewModel))
+      }
   }
 }

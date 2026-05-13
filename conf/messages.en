@@ -544,5 +544,28 @@ declarationForIsaManagers.p2 = By continuing, I confirm that I have understood a
 declarationForIsaManagers.action = I agree, submit
 
 ## Confirmation
-confirmation.title = confirmation dummy
-confirmation.heading = confirmation dummy
+registrationSubmitted.panel.subscriptionId = Your reference number
+
+registrationSubmitted.whatHappensNext.heading = What happens next?
+
+registrationSubmitted.existing.panel.title = Enrolment completed
+registrationSubmitted.existing.thankYou = Thank you for submitting your enrolment application for the digital service.
+registrationSubmitted.existing.letterIntro = You will receive a letter to confirm if:
+registrationSubmitted.existing.bullet.1 = you have been successful enrolling onto the Manage ISAs service
+registrationSubmitted.existing.bullet.2 = we need further information to support your enrolment
+
+registrationSubmitted.existing.manage.heading = Manage your account
+registrationSubmitted.existing.manage.paragraph = You can use your {0} to manage your ISAs and upload monthly reports and annual statistical returns.
+registrationSubmitted.existing.manage.paragraph.linkText = business tax account
+
+registrationSubmitted.new.panel.title = Application submitted
+registrationSubmitted.new.thankYou = Thank you for your application. We will process it as soon as possible.
+registrationSubmitted.new.letterIntro = You will receive a letter to confirm:
+registrationSubmitted.new.bullet.1 = if your application has been successful
+registrationSubmitted.new.bullet.2 = your Z-reference number if your application is successful
+registrationSubmitted.new.bullet.3 = that your application has been unsuccessful
+
+registrationSubmitted.guidance.paragraph = If you need to find out more you can {0}.
+registrationSubmitted.guidance.linkText = read the guidance in the ISA managers’ guidance collection
+
+registrationSubmitted.feedback.linkText = What did you think of this service?

@@ -14,21 +14,97 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+@import play.twirl.api.HtmlFormat
+@import viewmodels.RegistrationSubmittedViewModel
+@import uk.gov.hmrc.govukfrontend.views.Aliases.Panel
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukPanel
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 @this(
-    layout: templates.Layout,
-    hmrcPageHeading: HmrcPageHeading
+  layout: templates.Layout,
+  govukPanel: GovukPanel,
+  hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
 )
 
-@(submissionReceiptId: String)(implicit request: Request[_], messages: Messages)
+@(viewModel: RegistrationSubmittedViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("confirmation.title"))) {
+@panelContent = {
+  @messages("registrationSubmitted.panel.subscriptionId")<br>
+  <strong>@viewModel.subscriptionId</strong>
+}
 
-  @hmrcPageHeading(PageHeading(
-    text = messages("confirmation.heading"),
-    headingClasses = Some("govuk-heading-l")
+@standardLink(textKey: String, href: String) = {
+  <a class="govuk-link" href="@href">@messages(textKey)</a>
+}
+
+@linkedParagraph(paragraphKey: String, link: HtmlFormat.Appendable) = {
+  <p class="govuk-body">
+    @HtmlContent(messages(paragraphKey, link)).asHtml
+  </p>
+}
+
+@businessTaxAccountLink = @{
+  standardLink(
+    viewModel.manageAccountLinkTextKey,
+    viewModel.businessTaxAccountUrl
+  )
+}
+
+@guidanceLink = @{
+  hmrcNewTabLinkHelper(NewTabLinkHelper(
+    text = messages(viewModel.guidanceLinkTextKey),
+    href = Some(viewModel.guidanceUrl)
+  ))
+}
+
+@layout(
+  pageTitle = titleNoForm(messages(viewModel.panelTitleKey)), showBackLink = false
+) {
+
+  @govukPanel(Panel(
+  title = Text(messages(viewModel.panelTitleKey)),
+  content = HtmlContent(panelContent)
   ))
 
-  <p class="govuk-body">submissionReceiptId is @submissionReceiptId</p>
+  <p class="govuk-body">
+    @messages(viewModel.thankYouKey)
+  </p>
+
+  <h2 class="govuk-heading-m">
+    @messages("registrationSubmitted.whatHappensNext.heading")
+  </h2>
+
+  <p class="govuk-body">
+    @messages(viewModel.letterIntroKey)
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    @for(bulletKey <- viewModel.bulletKeys) {
+      <li>@messages(bulletKey)</li>
+    }
+  </ul>
+
+  @if(viewModel.showManageAccount) {
+    <h2 class="govuk-heading-m">
+      @messages(viewModel.manageAccountHeadingKey)
+    </h2>
+
+    @linkedParagraph(
+      paragraphKey = viewModel.manageAccountParagraphKey,
+      link = businessTaxAccountLink
+    )
+  }
+
+  @linkedParagraph(
+    paragraphKey = viewModel.guidanceParagraphKey,
+    link = guidanceLink
+  )
+
+  <p class="govuk-body">
+    <a class="govuk-link" href="@viewModel.feedbackUrl">
+      @messages(viewModel.feedbackTextKey)
+    </a>
+  </p>
 }
