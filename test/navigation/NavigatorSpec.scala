@@ -28,6 +28,7 @@ import controllers.thirdparty.routes.*
 import models.*
 import models.addresslookup.LookupAddress
 import models.ReturnTo.FinalCya
+import models.addresslookup.LookupAddress
 import models.journeydata.{OrganisationDetails, OrganisationEmail}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
@@ -35,9 +36,12 @@ import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDeb
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
+import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
+import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
 import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
+import models.journeydata.{CorrespondenceAddress, OrganisationDetails, OrganisationEmail}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -48,7 +52,7 @@ import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.orgemail.{OrganisationEmailAddressPage, OrganisationEmailVerificationCodePage}
 import pages.signatories.*
-import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, RemoveThirdPartyPage, ThirdPartyConnectedOrganisationsPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyManagingReturnsPage, ThirdPartyOrgDetailsPage}
+import pages.thirdparty.*
 import play.api.mvc.Call
 
 class NavigatorSpec extends SpecBase {
@@ -312,7 +316,8 @@ class NavigatorSpec extends SpecBase {
                     addressLine2 = Some(testString),
                     postCode = Some(testString)
                   )
-                )
+                ),
+                selectedAddress = None
               )
             )
           ),
@@ -341,7 +346,69 @@ class NavigatorSpec extends SpecBase {
                     addressLine2 = Some(testString),
                     postCode = Some(testString)
                   )
-                )
+                ),
+                selectedAddress = None
+              )
+            )
+          ),
+          returnTo = None
+        )
+      result shouldBe ChooseAddressController.onPageLoad(NormalMode)
+    }
+
+    "route to ManualAddressEntryPage if none is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(ManualEntry)
+              )
+            )
+          ),
+          returnTo = None
+        )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route to ConfirmAddressPage if an address is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(SelectedCorrespondenceAddress.Address(0))
               )
             )
           ),

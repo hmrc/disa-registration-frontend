@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package models.journeydata.orgdetails
+package forms
 
-import models.addresslookup.LookupAddress
-import play.api.libs.json.{Json, OFormat}
+import forms.mappings.Mappings
+import play.api.data.Form
+import play.api.data.Forms.single
 
-case class AddAnotherAddress(
-  postcode: String,
-  filter: Option[String],
-  addresses: Seq[LookupAddress],
-  selectedAddress: Option[SelectedCorrespondenceAddress]
-)
+import javax.inject.Inject
 
-object AddAnotherAddress {
-  implicit val format: OFormat[AddAnotherAddress] = Json.format[AddAnotherAddress]
+class ChooseAddressFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      single(
+        "value" ->
+          text("chooseAddress.error.required")
+      )
+    )
 }

@@ -74,6 +74,11 @@ POST       /add-another-address                          controllers.orgdetails.
 GET        /change-add-another-address                   controllers.orgdetails.AddAnotherAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-add-another-address                   controllers.orgdetails.AddAnotherAddressController.onSubmit(mode: Mode = CheckMode)
 
+GET        /choose-address                               controllers.orgdetails.ChooseAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /choose-address                               controllers.orgdetails.ChooseAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /change-choose-address                        controllers.orgdetails.ChooseAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-choose-address                        controllers.orgdetails.ChooseAddressController.onSubmit(mode: Mode = CheckMode)
+
 ## Organisation Email
 
 GET        /organisation-email-address                   controllers.orgemail.OrganisationEmailAddressController.onPageLoad(mode: Mode = NormalMode)
