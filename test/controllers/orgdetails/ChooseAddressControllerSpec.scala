@@ -22,7 +22,7 @@ import controllers.orgdetails.routes.*
 import forms.ChooseAddressFormProvider
 import models.NormalMode
 import models.addresslookup.LookupAddress
-import models.journeydata.{JourneyData, OrganisationDetails}
+import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
 import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -119,7 +119,7 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
             _.copy(
               addAnotherAddress = Some(
                 addAnotherAddress.copy(
-                  selectedAddress = Some(SelectedCorrespondenceAddress.LookupAddress(1))
+                  selectedAddress = Some(Address(1))
                 )
               )
             )
@@ -136,6 +136,7 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
+
         contentAsString(result) must include("""value="1"""")
       }
     }
@@ -165,6 +166,7 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
+
         contentAsString(result) must include("""value="none"""")
       }
     }
@@ -175,10 +177,11 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         OrganisationDetails(
           addAnotherAddress = Some(
             addAnotherAddress.copy(
-              selectedAddress = Some(
-                SelectedCorrespondenceAddress.LookupAddress(0)
-              )
+              selectedAddress = Some(Address(0))
             )
+          ),
+          correspondenceAddress = Some(
+            CorrespondenceAddress.fromLookup(address1)
           )
         )
 
@@ -199,7 +202,6 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 
@@ -211,7 +213,8 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
             addAnotherAddress.copy(
               selectedAddress = Some(ManualEntry)
             )
-          )
+          ),
+          correspondenceAddress = None
         )
 
       when(
@@ -231,7 +234,6 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
 

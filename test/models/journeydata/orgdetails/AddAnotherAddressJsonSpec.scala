@@ -37,7 +37,7 @@ class AddAnotherAddressJsonSpec extends JsonFormatSpec[AddAnotherAddress] {
       filter = Some("Test Filter"),
       addresses = Seq(lookupAddress),
       selectedAddress = Some(
-        SelectedCorrespondenceAddress.LookupAddress(0)
+        SelectedCorrespondenceAddress.Address(0)
       )
     )
 

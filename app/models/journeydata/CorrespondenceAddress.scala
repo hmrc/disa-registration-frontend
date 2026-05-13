@@ -17,7 +17,8 @@
 package models.journeydata
 
 import models.addresslookup.LookupAddress
-import play.api.libs.json._
+import models.journeydata.orgdetails.SelectedCorrespondenceAddress
+import play.api.libs.json.*
 
 case class CorrespondenceAddress(
   addressLine1: Option[String] = None,
@@ -41,9 +42,17 @@ object CorrespondenceAddress {
       postCode = address.postCode
     )
 
-  def matches(selected: CorrespondenceAddress, lookup: LookupAddress): Boolean =
-    selected.addressLine1 == lookup.addressLine1 &&
-      selected.addressLine2 == lookup.addressLine2 &&
-      selected.addressLine3 == lookup.addressLine3 &&
-      selected.postCode == lookup.postCode
+  def fromSelectedAddress(
+    selected: SelectedCorrespondenceAddress,
+    addresses: Seq[LookupAddress]
+  ): Option[CorrespondenceAddress] =
+    selected match {
+      case SelectedCorrespondenceAddress.Address(index) =>
+        addresses
+          .lift(index)
+          .map(fromLookup)
+
+      case SelectedCorrespondenceAddress.ManualEntry =>
+        None
+    }
 }

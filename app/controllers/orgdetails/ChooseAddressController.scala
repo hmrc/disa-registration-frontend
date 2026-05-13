@@ -22,7 +22,7 @@ import forms.ChooseAddressFormProvider
 import handlers.ErrorHandler
 import models.Mode
 import models.addresslookup.LookupAddress
-import models.journeydata.OrganisationDetails
+import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.*
 import navigation.Navigator
@@ -82,23 +82,29 @@ class ChooseAddressController @Inject() (
               BadRequest(view(formWithErrors, addresses, mode))
             ),
           answer => {
-            val selectedAddress          = parseAnswer(answer, addresses)
+            val selectedAddress =
+              SelectedCorrespondenceAddress.fromFormValue(answer, addresses)
+
+            val correspondenceAddress =
+              CorrespondenceAddress.fromSelectedAddress(selectedAddress, addresses)
+
             val updatedAddAnotherAddress =
               organisationDetails
                 .flatMap(_.addAnotherAddress)
-                .map(
-                  _.copy(
-                    selectedAddress = Some(selectedAddress)
-                  )
-                )
+                .map(_.copy(selectedAddress = Some(selectedAddress)))
 
             val updatedSection =
               organisationDetails match {
                 case Some(existing) =>
-                  existing.copy(addAnotherAddress = updatedAddAnotherAddress)
+                  existing
+                    .copy(correspondenceAddress = correspondenceAddress, addAnotherAddress = updatedAddAnotherAddress)
                 case None           =>
-                  OrganisationDetails(addAnotherAddress = updatedAddAnotherAddress)
+                  OrganisationDetails(
+                    correspondenceAddress = correspondenceAddress,
+                    addAnotherAddress = updatedAddAnotherAddress
+                  )
               }
+
             journeyAnswersService
               .update(
                 updatedSection,
@@ -119,23 +125,6 @@ class ChooseAddressController @Inject() (
         )
     }
 
-  private def parseAnswer(
-    answer: String,
-    addresses: Seq[LookupAddress]
-  ): SelectedCorrespondenceAddress =
-    answer match {
-      case `noneRadioValue` =>
-        ManualEntry
-      case idx              =>
-        val index = idx.toInt
-        addresses
-          .lift(index)
-          .getOrElse(
-            throw new IllegalArgumentException("Invalid address index")
-          )
-        SelectedCorrespondenceAddress.LookupAddress(index)
-    }
-
   private def preselectedValue(
     organisationDetails: Option[OrganisationDetails]
   ): Option[String] =
@@ -143,9 +132,9 @@ class ChooseAddressController @Inject() (
       .flatMap(_.addAnotherAddress)
       .flatMap(_.selectedAddress)
       .map {
-        case SelectedCorrespondenceAddress.LookupAddress(index) =>
+        case SelectedCorrespondenceAddress.Address(index) =>
           index.toString
-        case ManualEntry                                        =>
+        case ManualEntry                                  =>
           noneRadioValue
       }
 

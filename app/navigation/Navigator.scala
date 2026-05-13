@@ -270,11 +270,11 @@ class Navigator @Inject() () {
   ): Call =
     answers.addAnotherAddress
       .flatMap(_.selectedAddress) match {
-      case Some(SelectedCorrespondenceAddress.ManualEntry)      =>
+      case Some(SelectedCorrespondenceAddress.ManualEntry) =>
         TaskListController.onPageLoad()
-      case Some(SelectedCorrespondenceAddress.LookupAddress(_)) =>
+      case Some(SelectedCorrespondenceAddress.Address(_))  =>
         TaskListController.onPageLoad()
-      case None                                                 =>
+      case None                                            =>
         TaskListController.onPageLoad()
     }
 }

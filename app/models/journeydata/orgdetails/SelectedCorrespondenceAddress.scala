@@ -17,11 +17,13 @@
 package models.journeydata.orgdetails
 
 import play.api.libs.json.{Format, JsError, JsSuccess, Json, Reads, Writes}
+import config.Constants.noneRadioValue
+import models.addresslookup.LookupAddress
 
 sealed trait SelectedCorrespondenceAddress
 
 object SelectedCorrespondenceAddress {
-  final case class LookupAddress(index: Int) extends SelectedCorrespondenceAddress
+  final case class Address(index: Int) extends SelectedCorrespondenceAddress
 
   case object ManualEntry extends SelectedCorrespondenceAddress
 
@@ -32,14 +34,14 @@ object SelectedCorrespondenceAddress {
     Format(
       Reads {
         case json if (json \ "type").asOpt[String].contains(LookupType) =>
-          (json \ "index").validate[Int].map(LookupAddress.apply)
+          (json \ "index").validate[Int].map(Address.apply)
         case json if (json \ "type").asOpt[String].contains(ManualType) =>
           JsSuccess(ManualEntry)
         case _                                                          =>
           JsError("Invalid SelectedCorrespondenceAddress")
       },
       Writes {
-        case LookupAddress(index) =>
+        case Address(index) =>
           Json.obj(
             "type"  -> LookupType,
             "index" -> index
@@ -51,4 +53,17 @@ object SelectedCorrespondenceAddress {
           )
       }
     )
+
+  def fromFormValue(
+    value: String,
+    addresses: Seq[LookupAddress]
+  ): SelectedCorrespondenceAddress =
+    value match {
+      case `noneRadioValue` =>
+        ManualEntry
+      case idx              =>
+        val index = idx.toInt
+        if (addresses.isDefinedAt(index)) Address(index)
+        else throw new IllegalArgumentException("Invalid address index")
+    }
 }

@@ -406,7 +406,7 @@ class NavigatorSpec extends SpecBase {
                     postCode = Some(testString)
                   )
                 ),
-                selectedAddress = Some(SelectedCorrespondenceAddress.LookupAddress(0))
+                selectedAddress = Some(SelectedCorrespondenceAddress.Address(0))
               )
             )
           ),
