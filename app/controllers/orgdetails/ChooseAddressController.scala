@@ -16,6 +16,7 @@
 
 package controllers.orgdetails
 
+import config.Constants.noneRadioValue
 import controllers.actions.*
 import forms.ChooseAddressFormProvider
 import handlers.ErrorHandler
@@ -123,9 +124,9 @@ class ChooseAddressController @Inject() (
     addresses: Seq[LookupAddress]
   ): SelectedCorrespondenceAddress =
     answer match {
-      case "none" =>
+      case `noneRadioValue` =>
         ManualEntry
-      case idx    =>
+      case idx              =>
         val index = idx.toInt
         addresses
           .lift(index)
@@ -145,7 +146,7 @@ class ChooseAddressController @Inject() (
         case SelectedCorrespondenceAddress.LookupAddress(index) =>
           index.toString
         case ManualEntry                                        =>
-          "none"
+          noneRadioValue
       }
 
   private def extractAddresses(

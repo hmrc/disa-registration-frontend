@@ -16,6 +16,7 @@
 
 package viewmodels.address
 
+import config.Constants.noneRadioValue
 import models.addresslookup.LookupAddress
 import play.api.data.Form
 import play.api.i18n.Messages
@@ -69,7 +70,7 @@ class ChooseAddressViewModel @Inject() (
       ),
       RadioItem(
         content = Text(messages("chooseAddress.none.of.these")),
-        value = Some("none")
+        value = Some(noneRadioValue)
       )
     )
 
