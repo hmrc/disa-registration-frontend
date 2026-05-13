@@ -17,6 +17,12 @@
 package pages.orgemail
 
 import models.journeydata.OrganisationEmail
-import pages.Page
+import pages.{ClearablePage, PageWithDependents}
 
-case object OrganisationEmailAddressPage extends Page[OrganisationEmail]
+case object OrganisationEmailAddressPage extends PageWithDependents[OrganisationEmail] {
+  def pagesToClear(currentAnswers: OrganisationEmail): List[ClearablePage[OrganisationEmail]] = List(
+    OrganisationEmailVerificationCodePage
+  )
+
+  def resumeNormalMode(currentAnswers: OrganisationEmail): Boolean = currentAnswers.verified.forall(_ == false)
+}

@@ -21,13 +21,14 @@ import controllers.certificatesofauthority.routes.*
 import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
+import controllers.orgemail.routes.*
 import controllers.routes.{IndexController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
 import models.addresslookup.LookupAddress
 import models.ReturnTo.FinalCya
-import models.journeydata.OrganisationDetails
+import models.journeydata.{OrganisationDetails, OrganisationEmail}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
@@ -45,6 +46,7 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
+import pages.orgemail.{OrganisationEmailAddressPage, OrganisationEmailVerificationCodePage}
 import pages.signatories.*
 import pages.thirdparty.{InvestorFundsUsedByThirdPartyPage, ProductsManagedByThirdPartyPage, RemoveThirdPartyPage, ThirdPartyConnectedOrganisationsPage, ThirdPartyInvestorFundsPercentagePage, ThirdPartyManagingReturnsPage, ThirdPartyOrgDetailsPage}
 import play.api.mvc.Call
@@ -358,6 +360,21 @@ class NavigatorSpec extends SpecBase {
       result shouldBe CoaCheckYourAnswersController.onPageLoad()
     }
 
+    "route OrganisationEmailAddressPage to OrganisationEmailVerificationCodePage" in {
+      val result: Call = navigator.normalRoutes(OrganisationEmailAddressPage, OrganisationEmail(Some(testString)), None)
+      result shouldBe EmailVerificationCodeController.onPageLoad()
+    }
+
+    "route OrganisationEmailVerificationCodePage to OrganisationEmail CYA" in {
+      val result: Call =
+        navigator.normalRoutes(
+          OrganisationEmailVerificationCodePage,
+          OrganisationEmail(Some(testString), Some(true)),
+          None
+        )
+      result shouldBe OrganisationEmailCyaController.onPageLoad()
+    }
+
     "route RemoveSignatoryPage to AddedSignatoryController when signatory exists in journeyAnswers" in {
       val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), signatoriesAnswers, None)
       result shouldBe AddedSignatoryController.onPageLoad()
@@ -593,6 +610,11 @@ class NavigatorSpec extends SpecBase {
     "route RegisteredAddressCorrespondencePage to COA CYA" in {
       navigator.checkRouteMap(RegisteredAddressCorrespondencePage, None) shouldBe
         IndexController.onPageLoad()
+    }
+
+    "route OrganisationEmailAddressPage to Org email CYA" in {
+      navigator.checkRouteMap(OrganisationEmailAddressPage, None) shouldBe
+        OrganisationEmailCyaController.onPageLoad()
     }
 
     "route SignatoryNamePage to SignatoryCheckYourAnswersController" in {
