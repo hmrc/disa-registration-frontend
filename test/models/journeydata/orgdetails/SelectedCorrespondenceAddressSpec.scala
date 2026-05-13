@@ -16,14 +16,14 @@
 
 package models.journeydata.orgdetails
 
-import models.journeydata.orgdetails.SelectedCorrespondenceAddress.{LookupAddress, ManualEntry}
+import models.journeydata.orgdetails.SelectedCorrespondenceAddress.{Address, ManualEntry}
 import play.api.libs.json.{Format, JsValue, Json}
 import utils.JsonFormatSpec
 
 class SelectedCorrespondenceAddressSpec extends JsonFormatSpec[SelectedCorrespondenceAddress] {
 
   override def model: SelectedCorrespondenceAddress =
-    LookupAddress(index = 1)
+    Address(index = 1)
 
   override def expectedJsonFromWrites: JsValue =
     Json.obj(

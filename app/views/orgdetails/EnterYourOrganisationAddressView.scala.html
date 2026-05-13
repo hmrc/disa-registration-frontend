@@ -62,7 +62,7 @@
   )
 }
 
-@layout(pageTitle = title(form, messages("enterYourOrganisationAddress.title"))) {
+@layout(pageTitle = title(form, messages("enterYourOrganisationAddress.title"), Some(messages("sectionTitle.orgDetails")))) {
 
     @formHelper(action = EnterYourOrganisationAddressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
