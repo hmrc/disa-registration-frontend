@@ -17,6 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
+import models.addresslookup.{AddressLookupResponse, LookupAddress}
 import models.requests.AddressLookupRequest
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -31,16 +32,23 @@ class AddressLookupConnector @Inject() (
   appConfig: FrontendAppConfig
 )(implicit ec: ExecutionContext) {
 
-  def searchAddress(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[JsValue] = {
-    val url         = s"${appConfig.addressLookupBaseUrl}/lookup"
-    val requestBody = AddressLookupRequest(
-      postcode = postcode,
-      filter = filter
-    )
+  def searchAddress(
+    postcode: String,
+    filter: Option[String]
+  )(implicit hc: HeaderCarrier): Future[Seq[LookupAddress]] = {
 
+    val url =
+      s"${appConfig.addressLookupBaseUrl}/address-lookup/lookup"
+
+    val requestBody =
+      AddressLookupRequest(
+        postcode = postcode,
+        filter = filter
+      )
     httpClient
       .post(url"$url")
       .withBody(Json.toJson(requestBody))
-      .execute[JsValue]
+      .execute[Seq[AddressLookupResponse]]
+      .map(_.map(_.toLookupAddress))
   }
 }

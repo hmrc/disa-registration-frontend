@@ -16,8 +16,8 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlEqualTo, verify}
-import play.api.libs.json.Json
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import models.addresslookup.LookupAddress
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.BaseIntegrationSpec
@@ -27,18 +27,27 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
 
   val connector: AddressLookupConnector = app.injector.instanceOf[AddressLookupConnector]
 
-  private val basePath = "/lookup"
+  private val basePath = "/address-lookup/lookup"
 
   "AddressLookupConnector.searchAddress" should {
 
-    "return JSON response when backend returns 200 OK" in {
+    "return parsed LookupAddress sequence when backend returns 200 OK" in {
 
       val responseBody =
         """
           |[
           |  {
           |    "id": "GB1",
-          |    "uprn": 123456789
+          |    "uprn": 123456789,
+          |    "address": {
+          |      "lines": ["1 Test Street", "Test Area"],
+          |      "town": "Test Town",
+          |      "postcode": "BB00 0BB",
+          |      "country": {
+          |        "code": "GB",
+          |        "name": "United Kingdom"
+          |      }
+          |    }
           |  }
           |]
           |""".stripMargin
@@ -47,27 +56,41 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
 
       val result = await(connector.searchAddress("BB00 0BB", Some("Test")))
 
-      result shouldBe Json.parse(responseBody)
+      result shouldBe Seq(
+        LookupAddress(
+          addressLine1 = Some("1 Test Street"),
+          addressLine2 = Some("Test Area"),
+          addressLine3 = Some("Test Town"),
+          postCode = Some("BB00 0BB"),
+          uprn = Some("123456789"),
+          country = Some("United Kingdom")
+        )
+      )
     }
 
     "send correct request body to downstream" in {
 
       val expectedRequestBody =
-        Json.parse(
-          """
-            |{
-            |  "postcode": "BB00 0BB",
-            |  "filter": "Test"
-            |}
-            |""".stripMargin
-        )
+        """
+          |{
+          |  "postcode": "BB00 0BB",
+          |  "filter": "Test"
+          |}
+          |""".stripMargin
 
       val responseBody =
         """
           |[
           |  {
-          |    "id": "GB200000698110",
-          |    "uprn": 200000698110
+          |    "uprn": 200000698110,
+          |    "address": {
+          |      "lines": ["Test Street"],
+          |      "postcode": "BB00 0BB",
+          |      "country": {
+          |        "code": "GB",
+          |        "name": "United Kingdom"
+          |      }
+          |    }
           |  }
           |]
           |""".stripMargin
@@ -78,7 +101,7 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
 
       verify(
         postRequestedFor(urlEqualTo(basePath))
-          .withRequestBody(equalToJson(expectedRequestBody.toString))
+          .withRequestBody(equalToJson(expectedRequestBody))
       )
     }
 

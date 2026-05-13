@@ -100,6 +100,7 @@ class Navigator @Inject() () {
     case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
+    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
     case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
@@ -188,7 +189,7 @@ class Navigator @Inject() () {
       case true  =>
         OrganisationTelephoneNumberController.onPageLoad(NormalMode)
       case false =>
-        IndexController.onPageLoad()
+        AddAnotherAddressController.onPageLoad(NormalMode)
     }
 
   private def removeSignatoryNextPage(
@@ -232,6 +233,23 @@ class Navigator @Inject() () {
       case Nil => ProductsManagedByThirdPartyController.onPageLoad(NormalMode)
       case _   => AddedThirdPartiesController.onPageLoad(NormalMode, None)
     }
+
+  private def addAnotherAddressRouting(answers: OrganisationDetails): Call = {
+
+    val count =
+      answers.addAnotherAddress
+        .map(_.addresses.size)
+        .getOrElse(0)
+
+    count match {
+      case 1          =>
+        TaskListController.onPageLoad()
+      case n if n > 1 =>
+        TaskListController.onPageLoad()
+      case _          =>
+        TaskListController.onPageLoad()
+    }
+  }
 
   private def thirdPartyCheckRoute(
     id: String,

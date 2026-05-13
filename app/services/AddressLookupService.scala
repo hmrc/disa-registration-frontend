@@ -16,25 +16,25 @@
 
 package services
 
+import config.Constants.defaultUprn
 import connectors.AddressLookupConnector
+import models.addresslookup.LookupAddress
 import models.journeydata.RegisteredAddress
 import play.api.Logging
-import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
-import config.Constants.defaultUprn
 
 class AddressLookupService @Inject() (
   connector: AddressLookupConnector
 )(implicit ec: ExecutionContext)
     extends Logging {
 
+  // TODO: Further discussion to be had around what happens if GRS/BV doesn't return all expected address fields
   def getUprn(address: RegisteredAddress)(implicit hc: HeaderCarrier): Future[Option[String]] = {
 
-    // TODO: Further discussion to be had around what happens if GRS/BV doesn't return all expected address fields
     val postcode = address.postCode.getOrElse {
       val message = s"Postcode is required for address lookup but was missing. Address: $address"
       logger.error(message)
@@ -45,13 +45,12 @@ class AddressLookupService @Inject() (
 
     connector
       .searchAddress(postcode, filter)
-      .map { json =>
-        extractUprn(json) match {
+      .map { results =>
+        results.headOption.flatMap(_.uprn) match {
           case Some(uprn) =>
             logger.info(s"UPRN found for postcode: $postcode")
             Some(uprn)
-
-          case None =>
+          case None       =>
             logger.warn(
               s"No UPRN found in lookup response, using default. Postcode: $postcode, filter: $filter"
             )
@@ -59,17 +58,12 @@ class AddressLookupService @Inject() (
         }
       }
       .recover { case NonFatal(e) =>
-        logger.warn(
-          s"Address lookup failed for postcode: $postcode, filter: $filter",
-          e
-        )
+        logger.warn(s"Address lookup failed for postcode: $postcode, filter: $filter", e)
         None
       }
   }
 
-  private def extractUprn(json: JsValue): Option[String] =
-    json
-      .asOpt[Seq[JsValue]]
-      .flatMap(_.headOption)
-      .flatMap(addr => (addr \ "uprn").asOpt[Long].map(_.toString))
+  def lookup(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[Seq[LookupAddress]] =
+    connector
+      .searchAddress(postcode, filter)
 }

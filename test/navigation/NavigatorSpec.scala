@@ -26,6 +26,7 @@ import controllers.routes.{IndexController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
+import models.addresslookup.LookupAddress
 import models.ReturnTo.FinalCya
 import models.journeydata.{OrganisationDetails, OrganisationEmail}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
@@ -34,6 +35,7 @@ import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDeb
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
+import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import org.mockito.ArgumentMatchers.any
@@ -282,7 +284,7 @@ class NavigatorSpec extends SpecBase {
           testOrganisationDetails.copy(registeredAddressCorrespondence = Some(false)),
           None
         )
-      result shouldBe IndexController.onPageLoad()
+      result shouldBe AddAnotherAddressController.onPageLoad(NormalMode)
     }
 
     "route to RegisteredAddressCorrespondencePage if no answer is present for registeredAddressCorrespondence" in {
@@ -293,6 +295,59 @@ class NavigatorSpec extends SpecBase {
           None
         )
       result shouldBe IndexController.onPageLoad()
+    }
+
+    "route to AddAnotherAddressPage if 1 address is persisted in user answers to the ConfirmAddressPage" in {
+      val result: Call =
+        navigator.normalRoutes(
+          AddAnotherAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                )
+              )
+            )
+          ),
+          returnTo = None
+        )
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route to AddAnotherAddressPage if multiple addresses are persisted in user answers to the SelectAddressPage" in {
+      val result: Call =
+        navigator.normalRoutes(
+          AddAnotherAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                )
+              )
+            )
+          ),
+          returnTo = None
+        )
+      result shouldBe TaskListController.onPageLoad()
     }
 
     "route FcaArticlesPage to ISA products CYA" in {
