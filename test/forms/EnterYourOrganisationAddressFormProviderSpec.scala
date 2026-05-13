@@ -19,6 +19,7 @@ package forms
 import forms.behaviours.StringFieldBehaviours
 import models.journeydata.CorrespondenceAddress
 import org.scalacheck.Gen
+import org.scalacheck.Gen.{alphaChar, alphaNumChar}
 import play.api.data.FormError
 
 class EnterYourOrganisationAddressFormProviderSpec extends StringFieldBehaviours {
@@ -147,14 +148,16 @@ class EnterYourOrganisationAddressFormProviderSpec extends StringFieldBehaviours
       form,
       fieldName,
       minLength,
-      FormError(fieldName, tooShortKey, Seq(minLength))
+      FormError(fieldName, tooShortKey, Seq(minLength)),
+      alphaNumChar
     )
 
     behave like fieldWithMaxLength(
       form,
       fieldName,
       maxLength,
-      FormError(fieldName, tooLongKey, Seq(maxLength))
+      FormError(fieldName, tooLongKey, Seq(maxLength)),
+      alphaNumChar
     )
 
     "must fail to bind when the postcode format is invalid" in {
