@@ -32,7 +32,6 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
   "AddressLookupConnector.searchAddress" should {
 
     "return parsed Address sequence when backend returns 200 OK" in {
-
       val responseBody =
         """
           |[

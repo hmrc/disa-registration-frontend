@@ -172,6 +172,21 @@ chooseAddress.none.of.these = None of these
 chooseAddress.radio.divider = or
 
 
+AddAnotherAddress.title = Add another address for your organisation
+AddAnotherAddress.heading = Add another address for your organisation
+AddAnotherAddress.postcode.input.label = Postcode
+AddAnotherAddress.postcode.error.required = Enter your postcode. Use the correct format, for example, AA1 1AA
+AddAnotherAddress.postcode.error.invalid = Enter your postcode in the correct format, for example, AA1 1AA
+AddAnotherAddress.postcode.error.tooShort = The postcode you entered is too short. Enter a postcode, like AA1 1AA
+AddAnotherAddress.postcode.error.tooLong = The postcode you entered is too long. Enter a postcode, like AA1 1AA
+AddAnotherAddress.postcode.error.not.found = The postcode you entered cannot be found - try again
+AddAnotherAddress.filter.input.label = Property name or number (optional)
+AddAnotherAddress.filter.input.hint = For example, The Mill, 116 or Flat 37a
+AddAnotherAddress.filter.error.incorrectLength = The property name you entered is too long. It should not be more than 255 characters
+AddAnotherAddress.link.text = Enter the address manually
+AddAnotherAddress.checkYourAnswersLabel = Third-party {0} details
+AddAnotherAddress.change.hidden = third-party {0} details
+
 ### Organisation Email
 
 organisationEmailAddress.title = What is the email address of your organisation?

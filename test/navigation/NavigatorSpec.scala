@@ -26,6 +26,7 @@ import controllers.routes.{IndexController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
+import models.addresslookup.LookupAddress
 import models.ReturnTo.FinalCya
 import models.addresslookup.LookupAddress
 import models.journeydata.{OrganisationDetails, OrganisationEmail}
@@ -37,6 +38,7 @@ import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, I
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
+import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails, OrganisationEmail}
@@ -412,7 +414,6 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-
       result shouldBe TaskListController.onPageLoad()
     }
 

@@ -62,7 +62,7 @@
     FieldsetViewModel(
         HmrcPageHeadingLegend(
             content = Text(messages("AddAnotherAddress.heading")),
-            caption = Text(messages("sectionTitle.orgDetails")),
+            caption = HmrcSectionCaption(messages("sectionTitle.orgDetails")),
             classes = "govuk-fieldset__legend--l"
         )
     ).withHtml(inputsHtml)
