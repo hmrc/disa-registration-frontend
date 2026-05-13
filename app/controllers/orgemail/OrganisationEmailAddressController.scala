@@ -21,7 +21,7 @@ import controllers.actions.*
 import forms.OrganisationEmailAddressFormProvider
 import handlers.ErrorHandler
 import handlers.JourneyHandler.clearStalePages
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.OrganisationEmail
 import models.requests.DataRequest
 import navigation.Navigator
@@ -57,7 +57,7 @@ class OrganisationEmailAddressController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen auditContinuation(OrganisationEmail.sectionName)) {
       implicit request =>
         val preparedForm =
@@ -65,15 +65,15 @@ class OrganisationEmailAddressController @Inject() (
             .flatMap(_.organisationEmail)
             .fold(form)(form.fill)
 
-        Ok(view(preparedForm, mode))
+        Ok(view(preparedForm, mode, returnTo))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           email =>
             if (submittedEmailIsAlreadyVerified(email)) {
               Future.successful(
@@ -82,7 +82,7 @@ class OrganisationEmailAddressController @Inject() (
                     OrganisationEmailAddressPage,
                     request.journeyData.organisationEmail.get,
                     mode,
-                    None
+                    returnTo
                   )
                 )
               )
@@ -102,7 +102,7 @@ class OrganisationEmailAddressController @Inject() (
                           None,
                           savedSection,
                           mode,
-                          None
+                          returnTo
                         )
                       )
                     }

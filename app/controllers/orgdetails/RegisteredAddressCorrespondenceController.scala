@@ -19,7 +19,7 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.RegisteredAddressCorrespondenceFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails, RegisteredAddress}
 import navigation.Navigator
 import pages.organisationdetails.RegisteredAddressCorrespondencePage
@@ -51,61 +51,67 @@ class RegisteredAddressCorrespondenceController @Inject() (
 
   val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    (for {
-      jd      <- request.journeyData
-      bv      <- jd.businessVerification
-      regAddr <- bv.registeredAddress
-    } yield regAddr) match {
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
+    implicit request =>
+      (for {
+        jd      <- request.journeyData
+        bv      <- jd.businessVerification
+        regAddr <- bv.registeredAddress
+      } yield regAddr) match {
 
-      case None =>
-        Redirect(controllers.routes.StartController.onPageLoad())
+        case None =>
+          Redirect(controllers.routes.StartController.onPageLoad())
 
-      case Some(registeredAddress) =>
-        val preparedForm = request.journeyData
-          .flatMap(_.organisationDetails)
-          .flatMap(_.registeredAddressCorrespondence)
-          .fold(form)(form.fill)
+        case Some(registeredAddress) =>
+          val preparedForm = request.journeyData
+            .flatMap(_.organisationDetails)
+            .flatMap(_.registeredAddressCorrespondence)
+            .fold(form)(form.fill)
 
-        Ok(view(preparedForm, mode, registeredAddress))
-    }
+          Ok(view(preparedForm, mode, returnTo, registeredAddress))
+      }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
 
-    val registeredAddress =
-      for {
-        jd   <- request.journeyData
-        bv   <- jd.businessVerification
-        addr <- bv.registeredAddress
-      } yield addr
+      val registeredAddress =
+        for {
+          jd   <- request.journeyData
+          bv   <- jd.businessVerification
+          addr <- bv.registeredAddress
+        } yield addr
 
-    registeredAddress match {
-      case None                    =>
-        Future.successful(Redirect(controllers.routes.StartController.onPageLoad()))
-      case Some(registeredAddress) =>
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, registeredAddress))),
-            answer => {
-              val updatedOrganisationDetails =
-                buildOrganisationDetails(request.journeyData.flatMap(_.organisationDetails), answer, registeredAddress)
-
-              journeyAnswersService
-                .update(updatedOrganisationDetails, request.groupId, request.credentials.providerId)
-                .map { updated =>
-                  Redirect(navigator.nextPage(RegisteredAddressCorrespondencePage, updated, mode, None))
-                }
-                .recoverWith { case NonFatal(e) =>
-                  logger.warn(
-                    s"Failed updating answers for section [${updatedOrganisationDetails.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+      registeredAddress match {
+        case None                    =>
+          Future.successful(Redirect(controllers.routes.StartController.onPageLoad()))
+        case Some(registeredAddress) =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo, registeredAddress))),
+              answer => {
+                val updatedOrganisationDetails =
+                  buildOrganisationDetails(
+                    request.journeyData.flatMap(_.organisationDetails),
+                    answer,
+                    registeredAddress
                   )
-                  errorHandler.internalServerError
-                }
-            }
-          )
-    }
+
+                journeyAnswersService
+                  .update(updatedOrganisationDetails, request.groupId, request.credentials.providerId)
+                  .map { updated =>
+                    Redirect(navigator.nextPage(RegisteredAddressCorrespondencePage, updated, mode, returnTo))
+                  }
+                  .recoverWith { case NonFatal(e) =>
+                    logger.warn(
+                      s"Failed updating answers for section [${updatedOrganisationDetails.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                    )
+                    errorHandler.internalServerError
+                  }
+              }
+            )
+      }
   }
 
   private def buildOrganisationDetails(

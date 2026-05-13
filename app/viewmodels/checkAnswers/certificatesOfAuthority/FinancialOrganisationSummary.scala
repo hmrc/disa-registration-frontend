@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.certificatesOfAuthority
 
 import controllers.certificatesofauthority.routes.FinancialOrganisationController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,7 +28,9 @@ import viewmodels.implicits.*
 
 object FinancialOrganisationSummary {
 
-  def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: JourneyData, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.certificatesOfAuthority.flatMap(_.financialOrganisation).map { answers =>
 
       val value = ValueViewModel(
@@ -45,7 +47,7 @@ object FinancialOrganisationSummary {
         key = "financialOrganisation.checkYourAnswersLabel",
         value = value,
         actions = Seq(
-          ActionItemViewModel("site.change", FinancialOrganisationController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", FinancialOrganisationController.onPageLoad(CheckMode, returnTo).url)
             .withVisuallyHiddenText(messages("financialOrganisation.change.hidden"))
         )
       )

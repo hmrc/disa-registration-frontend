@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.isaproducts
 
 import controllers.isaproducts.routes.InnovativeFinancialProductsController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,7 +28,9 @@ import viewmodels.implicits.*
 
 object InnovativeFinancialProductsSummary {
 
-  def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: JourneyData, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.isaProducts.flatMap(_.innovativeFinancialProducts).map { answers =>
       val value = ValueViewModel(
         HtmlContent(
@@ -44,7 +46,7 @@ object InnovativeFinancialProductsSummary {
         key = "innovativeFinancialProducts.checkYourAnswersLabel",
         value = value,
         actions = Seq(
-          ActionItemViewModel("site.change", InnovativeFinancialProductsController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", InnovativeFinancialProductsController.onPageLoad(CheckMode, returnTo).url)
             .withVisuallyHiddenText(messages("innovativeFinancialProducts.change.hidden"))
         )
       )

@@ -18,7 +18,7 @@ package viewmodels.checkAnswers
 
 import controllers.orgdetails.routes.TradingNameController
 import models.journeydata.JourneyData
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -27,13 +27,15 @@ import viewmodels.implicits.*
 
 object TradingNameSummary {
 
-  def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: JourneyData, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.organisationDetails.flatMap(_.tradingName).map { answer =>
       SummaryListRowViewModel(
         key = "tradingName.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", TradingNameController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", TradingNameController.onPageLoad(CheckMode, returnTo).url)
             .withVisuallyHiddenText(messages("tradingName.change.hidden"))
         )
       )

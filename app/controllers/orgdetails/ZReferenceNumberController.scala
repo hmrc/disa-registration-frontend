@@ -19,7 +19,7 @@ package controllers.orgdetails
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import forms.ZReferenceNumberFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.*
@@ -50,39 +50,41 @@ class ZReferenceNumberController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    val preparedForm = (for {
-      journeyData <- request.journeyData
-      orgDetails  <- journeyData.organisationDetails
-      value       <- orgDetails.zRefNumber
-    } yield form.fill(value)).getOrElse(form)
-    Future.successful(Ok(view(preparedForm, mode)))
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      val preparedForm = (for {
+        journeyData <- request.journeyData
+        orgDetails  <- journeyData.organisationDetails
+        value       <- orgDetails.zRefNumber
+      } yield form.fill(value)).getOrElse(form)
+      Future.successful(Ok(view(preparedForm, mode, returnTo)))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val updatedSection =
-            request.journeyData.flatMap(_.organisationDetails) match {
-              case Some(existing) => existing.copy(zRefNumber = Some(answer))
-              case None           => OrganisationDetails(zRefNumber = Some(answer))
-            }
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
+          answer => {
+            val updatedSection =
+              request.journeyData.flatMap(_.organisationDetails) match {
+                case Some(existing) => existing.copy(zRefNumber = Some(answer))
+                case None           => OrganisationDetails(zRefNumber = Some(answer))
+              }
 
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(navigator.nextPage(ZReferenceNumberPage, updatedSection, mode, None))
-            }
-            .recoverWith { case NonFatal(e) =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { updatedSection =>
+                Redirect(navigator.nextPage(ZReferenceNumberPage, updatedSection, mode, returnTo))
+              }
+              .recoverWith { case NonFatal(e) =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
   }
 }

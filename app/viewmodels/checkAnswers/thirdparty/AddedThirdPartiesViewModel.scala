@@ -19,7 +19,7 @@ package viewmodels.checkAnswers.thirdparty
 import config.FrontendAppConfig
 import controllers.thirdparty.routes.*
 import models.journeydata.thirdparty.ThirdParty
-import models.{NormalMode, YesNoAnswer}
+import models.{Mode, NormalMode, ReturnTo, YesNoAnswer}
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
@@ -67,7 +67,9 @@ class AddedThirdPartiesViewModel @Inject() (
   def apply(
     form: Form[_],
     inProgress: Seq[ThirdParty],
-    complete: Seq[ThirdParty]
+    complete: Seq[ThirdParty],
+    mode: Mode,
+    returnTo: Option[ReturnTo]
   )(implicit messages: Messages): Html = {
 
     val count = inProgress.size + complete.size
@@ -84,7 +86,9 @@ class AddedThirdPartiesViewModel @Inject() (
                   )
                 }
                 .getOrElse(HtmlFormat.empty),
-              govukSummaryList(SummaryListViewModel(rows = complete.flatMap(thirdParty => row(thirdParty))))
+              govukSummaryList(
+                SummaryListViewModel(rows = complete.flatMap(thirdParty => row(thirdParty, mode, returnTo)))
+              )
             )
           )
         },
@@ -95,7 +99,9 @@ class AddedThirdPartiesViewModel @Inject() (
                 s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(messages("addedThirdParties.inProgress"))}</h2>"""
               ),
               govukSummaryList(
-                SummaryListViewModel(rows = inProgress.flatMap(thirdParty => row(thirdParty, inProgress = true)))
+                SummaryListViewModel(rows =
+                  inProgress.flatMap(thirdParty => row(thirdParty, mode, returnTo, inProgress = true))
+                )
               )
             )
           )
@@ -114,15 +120,15 @@ class AddedThirdPartiesViewModel @Inject() (
     )
   }
 
-  private def row(thirdParty: ThirdParty, inProgress: Boolean = false)(implicit
+  private def row(thirdParty: ThirdParty, mode: Mode, returnTo: Option[ReturnTo], inProgress: Boolean = false)(implicit
     messages: Messages
   ): Option[SummaryListRow] = {
     val changeLink = if (inProgress) {
       ThirdPartyOrgDetailsController
-        .onPageLoad(Some(thirdParty.id), NormalMode, None)
+        .onPageLoad(Some(thirdParty.id), NormalMode, returnTo)
         .url
     } else {
-      ThirdPartyCheckYourAnswersController.onPageLoad(thirdParty.id).url
+      ThirdPartyCheckYourAnswersController.onPageLoad(thirdParty.id, returnTo).url
     }
     thirdParty.thirdPartyName.map { name =>
       SummaryListRowViewModel(
@@ -139,7 +145,7 @@ class AddedThirdPartiesViewModel @Inject() (
           ),
           ActionItemViewModel(
             content = messages("site.remove"),
-            href = RemoveThirdPartyController.onPageLoad(id = thirdParty.id).url
+            href = RemoveThirdPartyController.onPageLoad(id = thirdParty.id, returnTo).url
           ).withVisuallyHiddenText(
             messages("addedThirdParties.summary.action.hidden", name)
           )

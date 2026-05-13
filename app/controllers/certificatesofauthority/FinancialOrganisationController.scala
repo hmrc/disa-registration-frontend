@@ -19,7 +19,7 @@ package controllers.certificatesofauthority
 import controllers.actions.*
 import forms.FinancialOrganisationFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import navigation.Navigator
 import pages.certificatesofauthority.FinancialOrganisationPage
@@ -52,22 +52,23 @@ class FinancialOrganisationController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.journeyData.certificatesOfAuthority.flatMap(_.financialOrganisation) match {
-      case None        => form
-      case Some(value) => form.fill(value.toSet)
+      val preparedForm = request.journeyData.certificatesOfAuthority.flatMap(_.financialOrganisation) match {
+        case None        => form
+        case Some(value) => form.fill(value.toSet)
+      }
+
+      Ok(view(preparedForm, mode, returnTo))
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
             val updatedSection =
               request.journeyData.certificatesOfAuthority.fold {
@@ -96,5 +97,5 @@ class FinancialOrganisationController @Inject() (
               }
           }
         )
-  }
+    }
 }

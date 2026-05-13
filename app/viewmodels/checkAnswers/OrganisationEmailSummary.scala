@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.orgemail.routes.OrganisationEmailAddressController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -26,12 +26,12 @@ import viewmodels.implicits.*
 
 object OrganisationEmailSummary {
 
-  def row(answer: String)(implicit messages: Messages): SummaryListRow =
+  def row(answer: String, returnTo: Option[ReturnTo] = None)(implicit messages: Messages): SummaryListRow =
     SummaryListRowViewModel(
       key = "organisationEmailAddress.checkYourAnswersLabel",
       value = ValueViewModel(HtmlFormat.escape(answer).toString),
       actions = Seq(
-        ActionItemViewModel("site.change", OrganisationEmailAddressController.onPageLoad(CheckMode).url)
+        ActionItemViewModel("site.change", OrganisationEmailAddressController.onPageLoad(CheckMode, returnTo).url)
           .withVisuallyHiddenText(messages("organisationEmailAddress.change.hidden"))
       )
     )

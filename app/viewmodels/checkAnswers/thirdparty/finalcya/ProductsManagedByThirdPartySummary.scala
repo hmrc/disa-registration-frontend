@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.thirdparty.finalcya
 
 import controllers.thirdparty.routes.ProductsManagedByThirdPartyController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,7 +28,9 @@ import viewmodels.implicits.*
 
 object ProductsManagedByThirdPartySummary {
 
-  def row(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(thirdPartyOrganisations: ThirdPartyOrganisations, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     for {
       answer <- thirdPartyOrganisations.managedByThirdParty
     } yield SummaryListRowViewModel(
@@ -41,7 +43,7 @@ object ProductsManagedByThirdPartySummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          ProductsManagedByThirdPartyController.onPageLoad(CheckMode).url
+          ProductsManagedByThirdPartyController.onPageLoad(CheckMode, returnTo).url
         )
           .withVisuallyHiddenText(messages("productsManagedByThirdParty.change.hidden"))
       )

@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import controllers.routes.TaskListController
 @import controllers.liaisonofficers.routes.LiaisonOfficerNameController
+@import models.ReturnTo
 
 @this(
   layout: templates.Layout,
@@ -28,7 +29,7 @@
   appConfig: FrontendAppConfig
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("addLiaisonOfficer.title"), Some(messages("sectionTitle.liaisonOfficers")))) {
 
@@ -56,7 +57,7 @@
     <div class="govuk-button-group">
         @govukButton(
           ButtonViewModel(messages("addLiaisonOfficer.button"))
-            .asLink(LiaisonOfficerNameController.onPageLoad(None, NormalMode).url)
+            .asLink(LiaisonOfficerNameController.onPageLoad(None, NormalMode, returnTo).url)
         )
 
         <a class="govuk-link" href="@TaskListController.onPageLoad()">@messages("addLiaisonOfficer.link")</a>

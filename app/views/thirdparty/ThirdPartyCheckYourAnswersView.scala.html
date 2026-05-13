@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.pageheading.PageHeading
 @import controllers.thirdparty.routes._
+@import models.{NormalMode, ReturnTo}
 
 @this(
   layout: templates.Layout,
@@ -26,7 +27,7 @@
   govukSummaryList: GovukSummaryList
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("thirdPartyCya.title"))) {
 
@@ -35,7 +36,7 @@
     headingClasses = Some("govuk-heading-l"),
   ))
 
-  @formHelper(action = AddedThirdPartiesController.onPageLoad(NormalMode, None), Symbol("autoComplete") -> "off") {
+  @formHelper(action = AddedThirdPartiesController.onPageLoad(NormalMode, returnTo), Symbol("autoComplete") -> "off") {
 
     @govukSummaryList(list)
 

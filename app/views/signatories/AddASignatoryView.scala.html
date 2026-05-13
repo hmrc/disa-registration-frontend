@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import controllers.signatories.routes.*
 @import controllers.routes.*
+@import models.ReturnTo
 
 @this(
   layout: templates.Layout,
@@ -25,7 +26,7 @@
   hmrcPageHeading: HmrcPageHeading
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("addASignatory.title"), Some(messages("sectionTitle.signatories")))) {
 
@@ -46,7 +47,7 @@
     <div class="govuk-button-group">
         @govukButton(
             ButtonViewModel(messages("addASignatory.details.button"))
-            .asLink(SignatoryNameController.onPageLoad(id = None, mode = NormalMode).url)
+            .asLink(SignatoryNameController.onPageLoad(id = None, mode = NormalMode, returnTo = returnTo).url)
         )
         <p class="govuk-body">
             <a href="@controllers.routes.TaskListController.onPageLoad().url" class="govuk-link" target="_blank" rel="noreferrer noopener">@messages("addASignatory.details.link")</a>

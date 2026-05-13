@@ -31,10 +31,10 @@
             text = messages("taskList.heading"),
             headingClasses = Some("govuk-heading-l")
         ))
-        <a class="govuk-link govuk-body" href="@controllers.isaproducts.routes.IsaProductsController.onPageLoad(NormalMode).url">
+        <a class="govuk-link govuk-body" href="@controllers.isaproducts.routes.IsaProductsController.onPageLoad(NormalMode, None).url">
             ISA Products</a>
         <br>
-        <a class="govuk-link govuk-body" href="@controllers.signatories.routes.SignatoryNameController.onPageLoad(id = None, mode = NormalMode).url">
+        <a class="govuk-link govuk-body" href="@controllers.signatories.routes.SignatoryNameController.onPageLoad(id = None, mode = NormalMode, returnTo = None).url">
             Signatories</a>
 
     </div>

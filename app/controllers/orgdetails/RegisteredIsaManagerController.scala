@@ -19,7 +19,7 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.RegisteredIsaManagerFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.*
@@ -52,39 +52,41 @@ class RegisteredIsaManagerController @Inject() (
 
   val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.registeredToManageIsa match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }))
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
+    implicit request =>
+      val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.registeredToManageIsa match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }))
 
-    Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, returnTo))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val updatedSection =
-            request.journeyData.flatMap(_.organisationDetails) match {
-              case Some(existing) => existing.copy(registeredToManageIsa = Some(answer))
-              case None           => OrganisationDetails(registeredToManageIsa = Some(answer))
-            }
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
+          answer => {
+            val updatedSection =
+              request.journeyData.flatMap(_.organisationDetails) match {
+                case Some(existing) => existing.copy(registeredToManageIsa = Some(answer))
+                case None           => OrganisationDetails(registeredToManageIsa = Some(answer))
+              }
 
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(navigator.nextPage(RegisteredIsaManagerPage, updatedSection, mode, None))
-            }
-            .recoverWith { case NonFatal(e) =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { updatedSection =>
+                Redirect(navigator.nextPage(RegisteredIsaManagerPage, updatedSection, mode, returnTo))
+              }
+              .recoverWith { case NonFatal(e) =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
   }
 }

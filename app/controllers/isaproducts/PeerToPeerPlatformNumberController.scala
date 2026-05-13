@@ -19,7 +19,7 @@ package controllers.isaproducts
 import controllers.actions.*
 import forms.PeerToPeerPlatformNumberFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.isaproducts.IsaProducts
 import models.requests.DataRequest
 import navigation.Navigator
@@ -52,29 +52,29 @@ class PeerToPeerPlatformNumberController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       withPrerequisites { (isaProducts, platformName, form) =>
         val preparedForm = isaProducts.p2pPlatformNumber.fold(form)(form.fill)
 
-        Future.successful(Ok(view(preparedForm, platformName, mode)))
+        Future.successful(Ok(view(preparedForm, platformName, mode, returnTo)))
       }
-  }
+    }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       withPrerequisites { (isaProducts, platformName, form) =>
         form
           .bindFromRequest()
           .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors, platformName, mode))),
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors, platformName, mode, returnTo))),
             answer => {
               val updatedSection = isaProducts.copy(p2pPlatformNumber = Some(answer))
 
               journeyAnswersService
                 .update(updatedSection, request.groupId, request.credentials.providerId)
                 .map { updatedSection =>
-                  Redirect(navigator.nextPage(PeerToPeerPlatformNumberPage, updatedSection, mode, None))
+                  Redirect(navigator.nextPage(PeerToPeerPlatformNumberPage, updatedSection, mode, returnTo))
                 }
                 .recoverWith { case NonFatal(e) =>
                   logger.warn(
@@ -86,7 +86,7 @@ class PeerToPeerPlatformNumberController @Inject() (
           )
       }
 
-  }
+    }
 
   private def withPrerequisites(
     f: (IsaProducts, String, Form[String]) => Future[Result]

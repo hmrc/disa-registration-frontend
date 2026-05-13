@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes.IndexController
 import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
-import models.NormalMode
+import models.{NormalMode, ReturnTo}
 import models.YesNoAnswer.{No, Yes}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.requests.DataRequest
@@ -54,31 +54,33 @@ class RemoveLiaisonOfficerController @Inject() (
 
   val form = formProvider("removeLiaisonOfficer.error.required")
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      providingName(id, name => Future.successful(Ok(view(id, name, form))))
-  }
+  def onPageLoad(id: String, returnTo: Option[ReturnTo] = None): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      providingName(id, name => Future.successful(Ok(view(id, name, form, returnTo))))
+    }
 
-  def onSubmit(id: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(id: String, returnTo: Option[ReturnTo] = None): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       providingName(
         id,
         name =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(id, name, formWithErrors))),
+              formWithErrors => Future.successful(BadRequest(view(id, name, formWithErrors, returnTo))),
               value => {
                 val updatedSection = value match {
                   case Yes => updatedSectionWithLoRemoved(id)
                   case No  => request.journeyData.liaisonOfficers
                 }
 
-                updatedSection.fold(Future.successful(Redirect(IndexController.onPageLoad())))(updateAnswersAndRedirect)
+                updatedSection.fold(Future.successful(Redirect(IndexController.onPageLoad())))(section =>
+                  updateAnswersAndRedirect(section, returnTo)
+                )
               }
             )
       )
-  }
+    }
 
   private def providingName(id: String, block: String => Future[Result])(implicit request: DataRequest[_]) =
     (for {
@@ -88,12 +90,13 @@ class RemoveLiaisonOfficerController @Inject() (
       .getOrElse(Future.successful(Redirect(IndexController.onPageLoad())))
 
   private def updateAnswersAndRedirect(
-    updatedSection: LiaisonOfficers
+    updatedSection: LiaisonOfficers,
+    returnTo: Option[ReturnTo]
   )(implicit request: DataRequest[_], executionContext: ExecutionContext) =
     journeyAnswersService
       .update(updatedSection, request.groupId, request.credentials.providerId)
       .map { updatedSection =>
-        Redirect(navigator.nextPage(RemoveLiaisonOfficerPage, updatedSection, NormalMode, None))
+        Redirect(navigator.nextPage(RemoveLiaisonOfficerPage, updatedSection, NormalMode, returnTo))
       }
       .recoverWith { case NonFatal(e) =>
         logger.warn(

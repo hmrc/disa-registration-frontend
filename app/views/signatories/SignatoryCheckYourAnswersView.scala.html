@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.pageheading.PageHeading
 @import controllers.signatories.routes.AddedSignatoryController
+@import models.{NormalMode, ReturnTo}
 
 @this(
   layout: templates.Layout,
@@ -26,7 +27,7 @@
   govukSummaryList: GovukSummaryList
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("signatoryCya.title"))) {
 
@@ -35,12 +36,12 @@
     headingClasses = Some("govuk-heading-l"),
   ))
 
-  @formHelper(action = AddedSignatoryController.onPageLoad(), Symbol("autoComplete") -> "off") {
+  @govukSummaryList(list)
 
-    @govukSummaryList(list)
-
-    @govukButton(
-      ButtonViewModel(messages("site.saveAndContinue")).preventingDoubleClick()
+  @govukButton(
+    Button(
+      href = Some(AddedSignatoryController.onPageLoad(NormalMode, returnTo).url),
+      content = Text(messages("site.saveAndContinue"))
     )
-  }
+  )
 }

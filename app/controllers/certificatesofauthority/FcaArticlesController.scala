@@ -19,7 +19,7 @@ package controllers.certificatesofauthority
 import controllers.actions.*
 import forms.FcaArticlesFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, FcaArticles}
 import navigation.Navigator
 import pages.certificatesofauthority.FcaArticlesPage
@@ -52,22 +52,22 @@ class FcaArticlesController @Inject() (
 
   val form: Form[Set[FcaArticles]] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       val preparedForm = (for {
         certificatesOfAuthority <- request.journeyData.certificatesOfAuthority
         values                  <- certificatesOfAuthority.fcaArticles
       } yield form.fill(values.toSet)).getOrElse(form)
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, returnTo))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
             val updatedSection =
               request.journeyData.certificatesOfAuthority.fold {
@@ -96,5 +96,5 @@ class FcaArticlesController @Inject() (
               }
           }
         )
-  }
+    }
 }

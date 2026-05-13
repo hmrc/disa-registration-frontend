@@ -19,11 +19,11 @@ package controllers.thirdparty
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import controllers.routes.*
-import controllers.thirdparty.routes.*
+import controllers.routes.TaskListController
 import forms.YesNoAnswerFormProvider
 import models.requests.DataRequest
-import models.{Mode, NormalMode, ReturnTo, YesNoAnswer}
+import models.{Mode, ReturnTo, YesNoAnswer}
+import navigation.Navigator
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -37,6 +37,7 @@ class AddedThirdPartiesController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
+  navigator: Navigator,
   val controllerComponents: MessagesControllerComponents,
   view: AddedThirdPartiesView,
   appConfig: FrontendAppConfig
@@ -51,51 +52,43 @@ class AddedThirdPartiesController @Inject() (
       getInProgressAndCompleteThirdParty.fold {
         Redirect(TaskListController.onPageLoad())
       } { case (inProgress, complete) =>
-        val preparedForm =
-          returnTo match {
-            case Some(_) => form.fill(YesNoAnswer.No)
-            case None    => form
-          }
-
         Ok(
           view(
-            preparedForm,
+            form,
             AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
-            mode
+            mode,
+            returnTo
           )
         )
       }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getInProgressAndCompleteThirdParty.fold {
-      Redirect(TaskListController.onPageLoad())
-    } { case (inProgress, complete) =>
-      val count = inProgress.size + complete.size
-      if (count == appConfig.maxThirdParties) {
-        Redirect(ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode))
-      } else {
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              BadRequest(
-                view(formWithErrors, AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties), mode)
-              ),
-            {
-              case YesNoAnswer.No if count > 1 =>
-                val route =
-                  if (mode == NormalMode) ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode)
-                  else ThirdPartiesCheckYourAnswersController.onPageLoad()
-                Redirect(route)
-              case YesNoAnswer.No              => Redirect(TaskListController.onPageLoad())
-              case _                           =>
-                Redirect(ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode, None))
-            }
-          )
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      getInProgressAndCompleteThirdParty.fold {
+        Redirect(TaskListController.onPageLoad())
+      } { case (inProgress, complete) =>
+        val count = inProgress.size + complete.size
+        if (count == appConfig.maxThirdParties) {
+          Redirect(navigator.nextPageFromAddedThirdParties(YesNoAnswer.No, count, mode, returnTo))
+        } else {
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
+                    mode,
+                    returnTo
+                  )
+                ),
+              answer => Redirect(navigator.nextPageFromAddedThirdParties(answer, count, mode, returnTo))
+            )
+        }
       }
     }
-  }
 
   private def getInProgressAndCompleteThirdParty(implicit request: DataRequest[_]) =
     request.journeyData.thirdPartyOrganisations

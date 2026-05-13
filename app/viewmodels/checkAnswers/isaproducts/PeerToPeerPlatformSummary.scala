@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.isaproducts
 
 import controllers.isaproducts.routes.PeerToPeerPlatformController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -27,13 +27,15 @@ import viewmodels.implicits.*
 
 object PeerToPeerPlatformSummary {
 
-  def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: JourneyData, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.isaProducts.flatMap(_.p2pPlatform).map { answer =>
       SummaryListRowViewModel(
         key = "peerToPeerPlatform.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", PeerToPeerPlatformController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", PeerToPeerPlatformController.onPageLoad(CheckMode, returnTo).url)
             .withVisuallyHiddenText(messages("peerToPeerPlatform.change.hidden"))
         )
       )

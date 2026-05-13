@@ -27,11 +27,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("organisationEmailAddress.title"), Some(messages("sectionTitle.organisationEmail")))) {
 
-    @formHelper(action = OrganisationEmailAddressController.onSubmit(mode)) {
+    @formHelper(action = OrganisationEmailAddressController.onSubmit(mode, returnTo)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

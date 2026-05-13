@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,40 @@
  * limitations under the License.
  */
 
-package controllers.signatories
+package controllers
 
 import controllers.actions.*
-import models.ReturnTo
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.signatories.AddASignatoryView
+import viewmodels.checkAnswers.submission.SubmissionCyaViewModel
+import views.html.SubmissionCyaView
 
 import javax.inject.Inject
 
-class AddASignatoryController @Inject() (
+class SubmissionCyaController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: AddASignatoryView
+  view: SubmissionCyaView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(returnTo: Option[ReturnTo] = None): Action[AnyContent] = (Action andThen identify) {
-    implicit request =>
-      Ok(view(returnTo))
-  }
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val canSubmit = request.credentialRole == User
+      Ok(view(SubmissionCyaViewModel(request.journeyData, canSubmit)))
+    }
+
+  def onSubmit(): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      if (request.credentialRole == User) {
+        Redirect(routes.DeclarationForIsaManagersController.onPageLoad())
+      } else {
+        Redirect(routes.SubmissionCyaController.onPageLoad())
+      }
+    }
 }

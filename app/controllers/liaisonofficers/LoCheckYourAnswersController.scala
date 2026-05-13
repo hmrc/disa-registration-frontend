@@ -17,6 +17,7 @@
 package controllers.liaisonofficers
 
 import controllers.actions.*
+import models.ReturnTo
 import models.journeydata.liaisonofficers.LiaisonOfficer
 import models.requests.DataRequest
 import play.api.Logging
@@ -41,18 +42,21 @@ class LoCheckYourAnswersController @Inject() (
     with Logging {
 
   // TODO: Create ticket to ensure CYA validates required journeyData before loading
-  def onPageLoad(id: String): Action[AnyContent] =
+  def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view(SummaryListViewModel(buildSummaryRows(id))))
+      Ok(view(SummaryListViewModel(buildSummaryRows(id, returnTo)), returnTo))
     }
 
-  private def buildSummaryRows(id: String)(implicit request: DataRequest[_], messages: Messages) =
+  private def buildSummaryRows(id: String, returnTo: Option[ReturnTo])(implicit
+    request: DataRequest[_],
+    messages: Messages
+  ) =
     findLiaisonOfficer(id).toSeq.flatMap { lo =>
       Seq(
-        LiaisonOfficerNameSummary.row(lo),
-        LiaisonOfficerEmailSummary.row(lo),
-        LiaisonOfficerPhoneNumberSummary.row(lo),
-        LiaisonOfficerCommunicationSummary.row(lo)
+        LiaisonOfficerNameSummary.row(lo, returnTo),
+        LiaisonOfficerEmailSummary.row(lo, returnTo),
+        LiaisonOfficerPhoneNumberSummary.row(lo, returnTo),
+        LiaisonOfficerCommunicationSummary.row(lo, returnTo)
       ).flatten
     }
 

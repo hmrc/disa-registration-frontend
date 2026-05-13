@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.orgdetails.routes.OrganisationTelephoneNumberController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -27,13 +27,15 @@ import viewmodels.implicits.*
 
 object OrganisationTelephoneNumberSummary {
 
-  def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(answers: JourneyData, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     answers.organisationDetails.flatMap(_.orgTelephoneNumber).map { answer =>
       SummaryListRowViewModel(
         key = "organisationTelephoneNumber.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", OrganisationTelephoneNumberController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", OrganisationTelephoneNumberController.onPageLoad(CheckMode, returnTo).url)
             .withVisuallyHiddenText(messages("organisationTelephoneNumber.change.hidden"))
         )
       )
