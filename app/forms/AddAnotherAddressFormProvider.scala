@@ -56,7 +56,8 @@ class AddAnotherAddressFormProvider @Inject() extends Mappings {
         AddAnotherAddress(
           postcode = postcode,
           filter = filter,
-          addresses = Seq.empty
+          addresses = Seq.empty,
+          selectedAddress = None
         )
       )(form =>
         Some(

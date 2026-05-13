@@ -17,27 +17,62 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import viewmodels.RegistrationSubmittedViewModel
 import views.html.ConfirmationView
 
 class ConfirmationControllerSpec extends SpecBase {
 
+  private val subscriptionId = "XEIS1234567890"
+
   "Confirmation Controller" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when submission data is available" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val journeyData = emptyJourneyData.copy(
+        subscriptionId = Some(subscriptionId)
+      )
+
+      val application = applicationBuilder(
+        journeyData = Some(journeyData)
+      ).build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad(testString).url)
+        val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[ConfirmationView]
+        val view   = application.injector.instanceOf[ConfirmationView]
+        val config = application.injector.instanceOf[FrontendAppConfig]
+
+        val viewModel = RegistrationSubmittedViewModel
+          .from(journeyData, config)
+          .value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(testString)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
+      }
+    }
+
+    "must redirect to the task list when submission data is missing" in {
+
+      val journeyData = emptyJourneyData.copy(
+        subscriptionId = None
+      )
+
+      val application = applicationBuilder(
+        journeyData = Some(journeyData)
+      ).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.TaskListController.onPageLoad().url
       }
     }
   }

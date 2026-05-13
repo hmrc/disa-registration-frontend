@@ -47,7 +47,8 @@ class AddAnotherAddressControllerSpec extends SpecBase {
     AddAnotherAddress(
       postcode = "AA1 1AA",
       filter = Some("Test"),
-      addresses = Seq.empty
+      addresses = Seq.empty,
+      selectedAddress = None
     )
 
   private val journeyDetails =

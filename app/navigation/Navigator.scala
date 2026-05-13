@@ -32,6 +32,7 @@ import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoans
 import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
+import models.journeydata.orgdetails.SelectedCorrespondenceAddress
 import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.ThirdPartyOrganisations
 import models.journeydata.{OrganisationDetails, TaskListSection}
@@ -100,6 +101,7 @@ class Navigator @Inject() () {
     case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
+    case ChooseAddressPage                         => chooseAddressNextPage(answers)
     case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
     case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
@@ -117,7 +119,7 @@ class Navigator @Inject() () {
     case ThirdPartyManagingReturnsPage(id)         =>
       InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode, None)
     case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id, returnTo)
-    case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckRoute(id, returnTo)
+    case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckNextPage(id, returnTo)
     case RemoveThirdPartyPage                      => removeThirdPartyNextPage(answers)
     case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
     case _                                         => throw new NotImplementedError("No route for this page in normal mode")
@@ -137,6 +139,7 @@ class Navigator @Inject() () {
       case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
       case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
       case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
+      case ChooseAddressPage                         => TaskListController.onPageLoad()
       case OrganisationEmailAddressPage              => OrganisationEmailCyaController.onPageLoad()
       case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
@@ -145,10 +148,10 @@ class Navigator @Inject() () {
       case SignatoryNamePage(id)                     => SignatoryCheckYourAnswersController.onPageLoad(id = id)
       case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
       case ProductsManagedByThirdPartyPage           => ThirdPartiesCheckYourAnswersController.onPageLoad()
-      case ThirdPartyOrgDetailsPage(id)              => thirdPartyCheckRoute(id, returnTo)
-      case ThirdPartyManagingReturnsPage(id)         => thirdPartyCheckRoute(id, returnTo)
-      case InvestorFundsUsedByThirdPartyPage(id)     => thirdPartyCheckRoute(id, returnTo)
-      case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckRoute(id, returnTo)
+      case ThirdPartyOrgDetailsPage(id)              => thirdPartyCheckNextPage(id, returnTo)
+      case ThirdPartyManagingReturnsPage(id)         => thirdPartyCheckNextPage(id, returnTo)
+      case InvestorFundsUsedByThirdPartyPage(id)     => thirdPartyCheckNextPage(id, returnTo)
+      case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckNextPage(id, returnTo)
       case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
       case _                                         => throw new NotImplementedError("No route for this page in check mode")
     }
@@ -243,15 +246,15 @@ class Navigator @Inject() () {
 
     count match {
       case 1          =>
-        TaskListController.onPageLoad()
+        ConfirmCorrespondenceAddressController.onPageLoad(NormalMode)
       case n if n > 1 =>
-        TaskListController.onPageLoad()
+        ChooseAddressController.onPageLoad(NormalMode)
       case _          =>
         TaskListController.onPageLoad()
     }
   }
 
-  private def thirdPartyCheckRoute(
+  private def thirdPartyCheckNextPage(
     id: String,
     returnTo: Option[ReturnTo]
   ): Call =
@@ -262,4 +265,16 @@ class Navigator @Inject() () {
         ThirdPartyCheckYourAnswersController.onPageLoad(id)
     }
 
+  private def chooseAddressNextPage(
+    answers: OrganisationDetails
+  ): Call =
+    answers.addAnotherAddress
+      .flatMap(_.selectedAddress) match {
+      case Some(SelectedCorrespondenceAddress.ManualEntry) =>
+        TaskListController.onPageLoad()
+      case Some(SelectedCorrespondenceAddress.Address(_))  =>
+        ConfirmCorrespondenceAddressController.onPageLoad(NormalMode)
+      case None                                            =>
+        TaskListController.onPageLoad()
+    }
 }

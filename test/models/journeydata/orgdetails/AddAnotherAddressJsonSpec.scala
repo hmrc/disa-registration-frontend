@@ -35,14 +35,17 @@ class AddAnotherAddressJsonSpec extends JsonFormatSpec[AddAnotherAddress] {
     AddAnotherAddress(
       postcode = "AA1 1AA",
       filter = Some("Test Filter"),
-      addresses = Seq(lookupAddress)
+      addresses = Seq(lookupAddress),
+      selectedAddress = Some(
+        SelectedCorrespondenceAddress.Address(0)
+      )
     )
 
   override val expectedJsonFromWrites: JsValue =
     Json.obj(
-      "postcode"  -> "AA1 1AA",
-      "filter"    -> "Test Filter",
-      "addresses" -> Json.arr(
+      "postcode"        -> "AA1 1AA",
+      "filter"          -> "Test Filter",
+      "addresses"       -> Json.arr(
         Json.obj(
           "addressLine1" -> "1 Test Street",
           "addressLine2" -> "Line 2",
@@ -50,6 +53,10 @@ class AddAnotherAddressJsonSpec extends JsonFormatSpec[AddAnotherAddress] {
           "postCode"     -> "AA1 1AA",
           "uprn"         -> "123456789"
         )
+      ),
+      "selectedAddress" -> Json.obj(
+        "type"  -> "lookup",
+        "index" -> 0
       )
     )
 

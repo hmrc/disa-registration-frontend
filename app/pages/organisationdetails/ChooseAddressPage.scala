@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-package models.journeydata.orgdetails
+package pages.organisationdetails
 
-import models.addresslookup.LookupAddress
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.OrganisationDetails
+import pages.Page
 
-case class AddAnotherAddress(
-  postcode: String,
-  filter: Option[String],
-  addresses: Seq[LookupAddress],
-  selectedAddress: Option[SelectedCorrespondenceAddress]
-)
-
-object AddAnotherAddress {
-  implicit val format: OFormat[AddAnotherAddress] = Json.format[AddAnotherAddress]
-}
+case object ChooseAddressPage extends Page[OrganisationDetails]

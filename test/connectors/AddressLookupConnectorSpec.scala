@@ -56,7 +56,7 @@ class AddressLookupConnectorSpec extends SpecBase {
 
     "searchAddress" - {
 
-      "must return parsed LookupAddress sequence on success" in new TestSetup {
+      "must return parsed Address sequence on success" in new TestSetup {
 
         val response =
           Seq(

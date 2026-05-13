@@ -148,7 +148,7 @@ organisationTelephoneNumber.change.hidden = organisation telephone number
 
 registeredAddressCorrespondence.title = Do you want us to use the registered address to send you letters?
 registeredAddressCorrespondence.heading = Do you want us to use the registered address to send you letters?
-registeredAddressCorrespondence.error.required = Select yes if you want HMRC to use the address given for correspondence
+registeredAddressCorrespondence.error.required = Select yes if you want HMRC to use this address to send you letters
 
 AddAnotherAddress.title = Add another address for your organisation
 AddAnotherAddress.heading = Add another address for your organisation
@@ -164,6 +164,32 @@ AddAnotherAddress.filter.error.incorrectLength = The property name you entered i
 AddAnotherAddress.link.text = Enter the address manually
 AddAnotherAddress.checkYourAnswersLabel = Third-party {0} details
 AddAnotherAddress.change.hidden = third-party {0} details
+
+chooseAddress.title = Choose the correct address
+chooseAddress.heading = Choose the correct address
+chooseAddress.error.required = Select one of the address options or choose ‘none of these’, if the addresses given aren’t correct
+chooseAddress.none.of.these = None of these
+chooseAddress.radio.divider = or
+
+
+AddAnotherAddress.title = Add another address for your organisation
+AddAnotherAddress.heading = Add another address for your organisation
+AddAnotherAddress.postcode.input.label = Postcode
+AddAnotherAddress.postcode.error.required = Enter your postcode. Use the correct format, for example, AA1 1AA
+AddAnotherAddress.postcode.error.invalid = Enter your postcode in the correct format, for example, AA1 1AA
+AddAnotherAddress.postcode.error.tooShort = The postcode you entered is too short. Enter a postcode, like AA1 1AA
+AddAnotherAddress.postcode.error.tooLong = The postcode you entered is too long. Enter a postcode, like AA1 1AA
+AddAnotherAddress.postcode.error.not.found = The postcode you entered cannot be found - try again
+AddAnotherAddress.filter.input.label = Property name or number (optional)
+AddAnotherAddress.filter.input.hint = For example, The Mill, 116 or Flat 37a
+AddAnotherAddress.filter.error.incorrectLength = The property name you entered is too long. It should not be more than 255 characters
+AddAnotherAddress.link.text = Enter the address manually
+AddAnotherAddress.checkYourAnswersLabel = Third-party {0} details
+AddAnotherAddress.change.hidden = third-party {0} details
+
+confirmCorrespondenceAddress.title = Review and confirm
+confirmCorrespondenceAddress.heading = Review and confirm
+confirmCorrespondenceAddress.edit.address.link = Edit address
 
 ### Organisation Email
 
@@ -544,5 +570,28 @@ declarationForIsaManagers.p2 = By continuing, I confirm that I have understood a
 declarationForIsaManagers.action = I agree, submit
 
 ## Confirmation
-confirmation.title = confirmation dummy
-confirmation.heading = confirmation dummy
+registrationSubmitted.panel.subscriptionId = Your reference number
+
+registrationSubmitted.whatHappensNext.heading = What happens next?
+
+registrationSubmitted.existing.panel.title = Enrolment completed
+registrationSubmitted.existing.thankYou = Thank you for submitting your enrolment application for the digital service.
+registrationSubmitted.existing.letterIntro = You will receive a letter to confirm if:
+registrationSubmitted.existing.bullet.1 = you have been successful enrolling onto the Manage ISAs service
+registrationSubmitted.existing.bullet.2 = we need further information to support your enrolment
+
+registrationSubmitted.existing.manage.heading = Manage your account
+registrationSubmitted.existing.manage.paragraph = You can use your {0} to manage your ISAs and upload monthly reports and annual statistical returns.
+registrationSubmitted.existing.manage.paragraph.linkText = business tax account
+
+registrationSubmitted.new.panel.title = Application submitted
+registrationSubmitted.new.thankYou = Thank you for your application. We will process it as soon as possible.
+registrationSubmitted.new.letterIntro = You will receive a letter to confirm:
+registrationSubmitted.new.bullet.1 = if your application has been successful
+registrationSubmitted.new.bullet.2 = your Z-reference number if your application is successful
+registrationSubmitted.new.bullet.3 = that your application has been unsuccessful
+
+registrationSubmitted.guidance.paragraph = If you need to find out more you can {0}.
+registrationSubmitted.guidance.linkText = read the guidance in the ISA managers’ guidance collection
+
+registrationSubmitted.feedback.linkText = What did you think of this service?
