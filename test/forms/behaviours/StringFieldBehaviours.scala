@@ -16,25 +16,39 @@
 
 package forms.behaviours
 
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
 import scala.util.matching.Regex
 
 trait StringFieldBehaviours extends FieldBehaviours {
 
-  def fieldWithMaxLength(form: Form[_], fieldName: String, maxLength: Int, lengthError: FormError): Unit =
+  def fieldWithMaxLength(
+    form: Form[_],
+    fieldName: String,
+    maxLength: Int,
+    lengthError: FormError,
+    charType: Gen[Char] = arbitrary[Char]
+  ): Unit =
     s"not bind strings longer than $maxLength characters" in {
 
-      forAll(stringsLongerThan(maxLength) -> "longString") { (string: String) =>
+      forAll(stringsLongerThan(maxLength, charType) -> "longString") { (string: String) =>
         val result = form.bind(Map(fieldName -> string)).apply(fieldName)
         result.errors must contain(lengthError)
       }
     }
 
-  def fieldWithMinLength(form: Form[_], fieldName: String, minLength: Int, lengthError: FormError): Unit =
+  def fieldWithMinLength(
+    form: Form[_],
+    fieldName: String,
+    minLength: Int,
+    lengthError: FormError,
+    charType: Gen[Char] = arbitrary[Char]
+  ): Unit =
     s"not bind strings shorter than $minLength characters" in {
 
-      forAll(stringsShorterThan(minLength) -> "shortString") { (string: String) =>
+      forAll(stringsShorterThan(minLength, charType) -> "shortString") { (string: String) =>
         val result = form.bind(Map(fieldName -> string)).apply(fieldName)
         result.errors must contain(lengthError)
       }

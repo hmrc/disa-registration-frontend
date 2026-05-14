@@ -1,0 +1,84 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.InputWidth._
+@import controllers.orgdetails.routes.EnterYourOrganisationAddressController
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukFieldset: GovukFieldset,
+    govukInput: GovukInput,
+    govukButton: GovukButton
+)
+
+@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+
+@fields = {
+  @govukInput(
+    InputViewModel(
+      field = form("addressLine1"),
+      label = LabelViewModel(messages("enterYourOrganisationAddress.addressLine1"))
+    )
+    .withWidth(Full)
+  )
+
+  @govukInput(
+    InputViewModel(
+      field = form("addressLine2"),
+      label = LabelViewModel(messages("enterYourOrganisationAddress.addressLine2"))
+    )
+    .withWidth(Full)
+  )
+
+  @govukInput(
+    InputViewModel(
+      field = form("townOrCity"),
+      label = LabelViewModel(messages("enterYourOrganisationAddress.townOrCity"))
+    )
+    .withWidth(TwoThirds)
+  )
+
+  @govukInput(
+    InputViewModel(
+      field = form("postcode"),
+      label = LabelViewModel(messages("enterYourOrganisationAddress.postcode"))
+    )
+    .withWidth(Fixed10)
+  )
+}
+
+@layout(pageTitle = title(form, messages("enterYourOrganisationAddress.title"), Some(messages("sectionTitle.orgDetails")))) {
+
+    @formHelper(action = EnterYourOrganisationAddressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @govukFieldset(Fieldset(
+            legend = Some(
+                HmrcPageHeadingLegend.apply(Text(messages("enterYourOrganisationAddress.heading")), HmrcSectionCaption(messages("sectionTitle.orgDetails")), "govuk-fieldset__legend--l")
+            ),
+            html = fields
+        ))
+
+        @govukButton(
+            ButtonViewModel(messages("site.saveAndContinue"))
+        )
+    }
+}

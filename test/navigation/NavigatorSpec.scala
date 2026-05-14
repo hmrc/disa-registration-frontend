@@ -320,7 +320,7 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad(NormalMode)
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
     }
 
     "route from AddAnotherAddressPage if multiple addresses are persisted in user answers to the SelectAddressPage" in {
@@ -353,6 +353,67 @@ class NavigatorSpec extends SpecBase {
       result shouldBe ChooseAddressController.onPageLoad(NormalMode)
     }
 
+    "route to ManualAddressEntryPage if none is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(ManualEntry)
+              )
+            )
+          ),
+          returnTo = None
+        )
+
+      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode)
+    }
+
+    "route to ConfirmAddressPage if an address is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(SelectedCorrespondenceAddress.Address(0))
+              )
+            )
+          ),
+          returnTo = None
+        )
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
+    }
+
     "ChooseAddressPage route to ManualAddressEntryPage if none is selected and persisted in user answers" in {
       val result: Call =
         navigator.normalRoutes(
@@ -381,7 +442,7 @@ class NavigatorSpec extends SpecBase {
           returnTo = None
         )
 
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode)
     }
 
     "ChooseAddressPage route to ConfirmAddressPage if an address is selected and persisted in user answers" in {
@@ -411,7 +472,7 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad(NormalMode)
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
     }
 
     "route FcaArticlesPage to ISA products CYA" in {

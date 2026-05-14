@@ -14,7 +14,8 @@
  * limitations under the License.
  *@
 
-@import controllers.orgdetails.routes.OrganisationTelephoneNumberController
+@import controllers.orgdetails.routes.*
+@import controllers.routes.TaskListController
 @import models.journeydata.RegisteredAddress
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
@@ -29,7 +30,7 @@
     govukButton: GovukButton,
     hmrcPageHeading: HmrcPageHeading)
 
-@(mode: Mode, address: CorrespondenceAddress)(implicit request: Request[_], messages: Messages)
+@(address: CorrespondenceAddress)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle =  titleNoForm(messages("confirmCorrespondenceAddress.title"),Some(messages("sectionTitle.orgDetails")))) {
 
@@ -50,11 +51,11 @@
         </p>
 
         <p class="govuk-body">
-            <a href="" class="govuk-link">@messages("confirmCorrespondenceAddress.edit.address.link")</a>
+            <a href="@EnterYourOrganisationAddressController.onPageLoad(NormalMode).url" class="govuk-link">@messages("confirmCorrespondenceAddress.edit.address.link")</a>
         </p>
 
         @govukButton(
             ButtonViewModel(messages("site.saveAndContinue"))
-            .asLink("continueUrl")
+            .asLink(TaskListController.onPageLoad().url)
         )
 }

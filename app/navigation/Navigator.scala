@@ -41,7 +41,7 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
-import pages.orgemail.{OrganisationEmailAddressPage, OrganisationEmailVerificationCodePage}
+import pages.orgemail.*
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import pages.thirdparty.*
 import play.api.mvc.Call
@@ -103,6 +103,7 @@ class Navigator @Inject() () {
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
     case ChooseAddressPage                         => chooseAddressNextPage(answers)
     case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
+    case EnterYourOrganisationAddressPage          => ConfirmCorrespondenceAddressController.onPageLoad()
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
     case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
@@ -140,6 +141,7 @@ class Navigator @Inject() () {
       case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
       case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
       case ChooseAddressPage                         => TaskListController.onPageLoad()
+      case EnterYourOrganisationAddressPage          => TaskListController.onPageLoad() // TODO hook up to CYA in DFI-1743
       case OrganisationEmailAddressPage              => OrganisationEmailCyaController.onPageLoad()
       case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
@@ -246,7 +248,7 @@ class Navigator @Inject() () {
 
     count match {
       case 1          =>
-        ConfirmCorrespondenceAddressController.onPageLoad(NormalMode)
+        ConfirmCorrespondenceAddressController.onPageLoad()
       case n if n > 1 =>
         ChooseAddressController.onPageLoad(NormalMode)
       case _          =>
@@ -271,9 +273,9 @@ class Navigator @Inject() () {
     answers.addAnotherAddress
       .flatMap(_.selectedAddress) match {
       case Some(SelectedCorrespondenceAddress.ManualEntry) =>
-        TaskListController.onPageLoad()
+        EnterYourOrganisationAddressController.onPageLoad(NormalMode)
       case Some(SelectedCorrespondenceAddress.Address(_))  =>
-        ConfirmCorrespondenceAddressController.onPageLoad(NormalMode)
+        ConfirmCorrespondenceAddressController.onPageLoad()
       case None                                            =>
         TaskListController.onPageLoad()
     }

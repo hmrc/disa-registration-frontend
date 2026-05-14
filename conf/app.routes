@@ -64,6 +64,11 @@ POST       /registered-address-correspondence            controllers.orgdetails.
 GET        /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onSubmit(mode: Mode = CheckMode)
 
+GET        /enter-your-organisation-address              controllers.orgdetails.EnterYourOrganisationAddressController.onPageLoad(mode: Mode = NormalMode)
+POST       /enter-your-organisation-address              controllers.orgdetails.EnterYourOrganisationAddressController.onSubmit(mode: Mode = NormalMode)
+GET        /change-enter-your-organisation-address       controllers.orgdetails.EnterYourOrganisationAddressController.onPageLoad(mode: Mode = CheckMode)
+POST       /change-enter-your-organisation-address       controllers.orgdetails.EnterYourOrganisationAddressController.onSubmit(mode: Mode = CheckMode)
+
 GET        /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)
@@ -79,8 +84,7 @@ POST       /choose-address                               controllers.orgdetails.
 GET        /change-choose-address                        controllers.orgdetails.ChooseAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-choose-address                        controllers.orgdetails.ChooseAddressController.onSubmit(mode: Mode = CheckMode)
 
-GET        /confirm-correspondence-address               controllers.orgdetails.ConfirmCorrespondenceAddressController.onPageLoad(mode: Mode = NormalMode)
-GET        /change-confirm-correspondence-address        controllers.orgdetails.ConfirmCorrespondenceAddressController.onPageLoad(mode: Mode = CheckMode)
+GET        /confirm-correspondence-address               controllers.orgdetails.ConfirmCorrespondenceAddressController.onPageLoad()
 
 ## Organisation Email
 

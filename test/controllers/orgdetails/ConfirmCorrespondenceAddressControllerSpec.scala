@@ -17,26 +17,15 @@
 package controllers.orgdetails
 
 import base.SpecBase
-import controllers.routes.*
 import controllers.orgdetails.routes.*
-import forms.FirmReferenceNumberFormProvider
-import models.{Mode, NormalMode}
+import controllers.routes.*
 import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
-import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.data.Form
-import play.api.libs.json.Writes
-import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import views.html.orgdetails.{ConfirmCorrespondenceAddressView, FirmReferenceNumberView}
-
-import scala.concurrent.Future
+import views.html.orgdetails.ConfirmCorrespondenceAddressView
 
 class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSugar {
-
-  private val mode: Mode = models.NormalMode
 
   private val address =
     CorrespondenceAddress(
@@ -68,7 +57,7 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
       )
     )
 
-  private val routeUrl = ConfirmCorrespondenceAddressController.onPageLoad(mode).url
+  private val routeUrl = ConfirmCorrespondenceAddressController.onPageLoad().url
 
   "ConfirmCorrespondenceAddressController" - {
 
@@ -88,7 +77,7 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(mode, address)(request, messages(application)).toString
+          view(address)(request, messages(application)).toString
       }
     }
 

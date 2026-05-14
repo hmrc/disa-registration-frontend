@@ -18,8 +18,9 @@
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 @import uk.gov.hmrc.hmrcfrontend.views.config.HmrcPageHeadingLegend
-@import controllers.routes.TaskListController
+@import controllers.orgdetails.routes.EnterYourOrganisationAddressController
 @import controllers.orgdetails.routes.AddAnotherAddressController
+@import models.NormalMode
 
 @this(
         layout: templates.Layout,
@@ -85,7 +86,7 @@
         @govukFieldset(fieldset)
 
         <p class="govuk-body">
-            <a class="govuk-link" href="@TaskListController.onPageLoad().url">
+            <a class="govuk-link" href="@EnterYourOrganisationAddressController.onPageLoad(NormalMode).url">
             @messages("AddAnotherAddress.link.text")
             </a>
         </p>
