@@ -19,6 +19,7 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.TradingUsingDifferentNameFormProvider
 import handlers.ErrorHandler
+import handlers.JourneyHandler.clearStalePages
 import models.{Mode, ReturnTo}
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
@@ -66,15 +67,17 @@ class TradingUsingDifferentNameController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
+            val existingSection = request.journeyData.flatMap(_.organisationDetails)
             val updatedSection =
-              request.journeyData.flatMap(_.organisationDetails) match {
-                case Some(existing) => existing.copy(tradingUsingDifferentName = Some(answer))
+              existingSection match {
+                case Some(existing) if !existing.tradingUsingDifferentName.contains(answer) => clearStalePages(TradingUsingDifferentNamePage, existing.copy(tradingUsingDifferentName = Some(answer)))
+                case Some(existing) => existing
                 case None           => OrganisationDetails(tradingUsingDifferentName = Some(answer))
               }
             journeyAnswersService
               .update(updatedSection, request.groupId, request.credentials.providerId)
               .map { updatedSection =>
-                Redirect(navigator.nextPage(TradingUsingDifferentNamePage, updatedSection, mode, returnTo))
+                Redirect(navigator.nextPage(TradingUsingDifferentNamePage, existingSection, updatedSection, mode, returnTo))
               }
               .recoverWith { case NonFatal(e) =>
                 logger.warn(

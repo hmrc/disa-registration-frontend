@@ -19,6 +19,7 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.RegisteredIsaManagerFormProvider
 import handlers.ErrorHandler
+import handlers.JourneyHandler.clearStalePages
 import models.{Mode, ReturnTo}
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
@@ -69,16 +70,18 @@ class RegisteredIsaManagerController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
+            val existingSection = request.journeyData.flatMap(_.organisationDetails)
             val updatedSection =
-              request.journeyData.flatMap(_.organisationDetails) match {
-                case Some(existing) => existing.copy(registeredToManageIsa = Some(answer))
+              existingSection match {
+                case Some(existing) if !existing.registeredToManageIsa.contains(answer) => clearStalePages(RegisteredIsaManagerPage, existing.copy(registeredToManageIsa = Some(answer)))
+                case Some(existing) => existing
                 case None           => OrganisationDetails(registeredToManageIsa = Some(answer))
               }
 
             journeyAnswersService
               .update(updatedSection, request.groupId, request.credentials.providerId)
               .map { updatedSection =>
-                Redirect(navigator.nextPage(RegisteredIsaManagerPage, updatedSection, mode, returnTo))
+                Redirect(navigator.nextPage(RegisteredIsaManagerPage, existingSection, updatedSection, mode, returnTo))
               }
               .recoverWith { case NonFatal(e) =>
                 logger.warn(

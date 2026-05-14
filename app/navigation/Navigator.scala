@@ -112,10 +112,10 @@ class Navigator @Inject() () {
   ): Call = page match {
     case RegisteredIsaManagerPage                  => registeredIsaManagerNextPage(answers, returnTo)
     case ZReferenceNumberPage                      =>
-      returnToRoute(returnTo, TradingUsingDifferentNameController.onPageLoad(NormalMode, None))
+      returnToRoute(returnTo, TradingUsingDifferentNameController.onPageLoad(NormalMode))
     case FirmReferenceNumberPage                   => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode, returnTo)
     case TradingUsingDifferentNamePage             => tradingUsingDifferentNameNextPage(answers, returnTo)
-    case TradingNamePage                           => FirmReferenceNumberController.onPageLoad(NormalMode, returnTo)
+    case TradingNamePage                           => returnToRoute(returnTo, FirmReferenceNumberController.onPageLoad(NormalMode))
     case IsaProductsPage                           => isaProductsNextPage(answers, returnTo)
     case InnovativeFinancialProductsPage           => innovativeFinancialProductsNextPage(answers, returnTo)
     case PeerToPeerPlatformPage                    => PeerToPeerPlatformNumberController.onPageLoad(NormalMode, returnTo)
@@ -309,7 +309,6 @@ class Navigator @Inject() () {
     mode: Mode,
     returnTo: Option[ReturnTo]
   ): Call = {
-    logger.info("hello" + answer + mode + returnTo)
     answer match {
       case YesNoAnswer.Yes => SignatoryNameController.onPageLoad(None, NormalMode, returnTo)
       case YesNoAnswer.No  => returnToRoute(returnTo, TaskListController.onPageLoad())
