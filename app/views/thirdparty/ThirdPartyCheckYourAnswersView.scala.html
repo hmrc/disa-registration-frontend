@@ -36,12 +36,12 @@
     headingClasses = Some("govuk-heading-l"),
   ))
 
-  @formHelper(action = AddedThirdPartiesController.onPageLoad(NormalMode, returnTo), Symbol("autoComplete") -> "off") {
+  @govukSummaryList(list)
 
-    @govukSummaryList(list)
-
-    @govukButton(
-      ButtonViewModel(messages("site.saveAndContinue")).preventingDoubleClick()
+  @govukButton(
+    Button(
+      href = Some(AddedThirdPartiesController.onPageLoad(NormalMode, returnTo).url),
+      content = Text(messages("site.saveAndContinue"))
     )
-  }
+  )
 }

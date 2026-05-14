@@ -38,7 +38,7 @@
         captionClasses = Some("govuk-caption-l")
     ))
 
-    <p class="govuk-body"><a class="govuk-link" href="#" onclick="window.print(); return false;">@messages("submissionCya.printAnswers")</a></p>
+    <p class="govuk-body"><a class="govuk-link app-print-link" href="#">@messages("submissionCya.printAnswers")</a></p>
 
     @formHelper(action = SubmissionCyaController.onSubmit(), Symbol("autoComplete") -> "off") {
 
