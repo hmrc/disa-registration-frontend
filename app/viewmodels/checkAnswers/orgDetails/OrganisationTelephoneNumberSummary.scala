@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.orgDetails
 
-import controllers.orgdetails.routes.TradingNameController
-import models.journeydata.JourneyData
+import controllers.orgdetails.routes.OrganisationTelephoneNumberController
 import models.CheckMode
+import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TradingNameSummary {
+object OrganisationTelephoneNumberSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.organisationDetails.flatMap(_.tradingName).map { answer =>
+    answers.organisationDetails.flatMap(_.orgTelephoneNumber).map { answer =>
       SummaryListRowViewModel(
-        key = "tradingName.checkYourAnswersLabel",
+        key = "organisationTelephoneNumber.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", TradingNameController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("tradingName.change.hidden"))
+          ActionItemViewModel("site.change", OrganisationTelephoneNumberController.onPageLoad(CheckMode).url)
+            .withVisuallyHiddenText(messages("organisationTelephoneNumber.change.hidden"))
         )
       )
     }
