@@ -177,7 +177,6 @@ chooseAddress.error.required = Select one of the address options or choose ‘no
 chooseAddress.none.of.these = None of these
 chooseAddress.radio.divider = or
 
-
 AddAnotherAddress.title = Add another address for your organisation
 AddAnotherAddress.heading = Add another address for your organisation
 AddAnotherAddress.postcode.input.label = Postcode
@@ -192,6 +191,9 @@ AddAnotherAddress.filter.error.incorrectLength = The property name you entered i
 AddAnotherAddress.link.text = Enter the address manually
 AddAnotherAddress.checkYourAnswersLabel = Third-party {0} details
 AddAnotherAddress.change.hidden = third-party {0} details
+
+organisationDetailsCya.title = Check your organisation details
+organisationDetailsCya.heading = Check your organisation details
 
 ### Organisation Email
 

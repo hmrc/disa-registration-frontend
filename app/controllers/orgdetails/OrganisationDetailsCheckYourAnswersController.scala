@@ -22,10 +22,9 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.*
-import viewmodels.checkAnswers.isaproducts.{InnovativeFinancialProductsSummary, IsaProductsSummary, PeerToPeerPlatformNumberSummary, PeerToPeerPlatformSummary}
-import viewmodels.checkAnswers.orgDetails.{FirmReferenceNumberSummary, OrganisationTelephoneNumberSummary, RegisteredAddressCorrespondenceSummary, RegisteredIsaManagerSummary, TradingNameSummary, TradingUsingDifferentNameSummary, ZReferenceNumberSummary}
+import viewmodels.checkAnswers.orgDetails.*
 import viewmodels.govuk.summarylist.*
-import views.html.isaproducts.IsaProductsCheckYourAnswersView
+import views.html.orgdetails.OrganisationDetailsCheckYourAnswersView
 
 import javax.inject.Inject
 
@@ -34,7 +33,7 @@ class OrganisationDetailsCheckYourAnswersController @Inject()(
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
-  view: IsaProductsCheckYourAnswersView
+  view: OrganisationDetailsCheckYourAnswersView
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
