@@ -19,7 +19,7 @@ package viewmodels.checkAnswers.signatories
 import config.FrontendAppConfig
 import controllers.signatories.routes.{RemoveSignatoryController, SignatoryCheckYourAnswersController, SignatoryNameController}
 import models.journeydata.signatories.Signatory
-import models.{NormalMode, YesNoAnswer}
+import models.{Mode, NormalMode, ReturnTo, YesNoAnswer}
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
@@ -67,7 +67,9 @@ class AddedSignatoriesViewModel @Inject() (
   def apply(
     form: Form[_],
     inProgress: Seq[Signatory],
-    complete: Seq[Signatory]
+    complete: Seq[Signatory],
+    mode: Mode,
+    returnTo: Option[ReturnTo]
   )(implicit messages: Messages): Html = {
 
     val count = inProgress.size + complete.size
@@ -84,7 +86,9 @@ class AddedSignatoriesViewModel @Inject() (
                   )
                 }
                 .getOrElse(HtmlFormat.empty),
-              govukSummaryList(SummaryListViewModel(rows = complete.flatMap(signatory => row(signatory))))
+              govukSummaryList(
+                SummaryListViewModel(rows = complete.flatMap(signatory => row(signatory, returnTo)))
+              )
             )
           )
         },
@@ -93,7 +97,9 @@ class AddedSignatoriesViewModel @Inject() (
             Seq(
               Html(s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(messages("addedSignatory.inProgress"))}</h2>"""),
               govukSummaryList(
-                SummaryListViewModel(rows = inProgress.flatMap(signatory => row(signatory, inProgress = true)))
+                SummaryListViewModel(rows =
+                  inProgress.flatMap(signatory => row(signatory, returnTo, inProgress = true))
+                )
               )
             )
           )
@@ -112,15 +118,15 @@ class AddedSignatoriesViewModel @Inject() (
     )
   }
 
-  private def row(signatory: Signatory, inProgress: Boolean = false)(implicit
+  private def row(signatory: Signatory, returnTo: Option[ReturnTo], inProgress: Boolean = false)(implicit
     messages: Messages
   ): Option[SummaryListRow] = {
     val changeLink = if (inProgress) {
       SignatoryNameController
-        .onPageLoad(Some(signatory.id), NormalMode)
+        .onPageLoad(Some(signatory.id), NormalMode, returnTo)
         .url
     } else {
-      SignatoryCheckYourAnswersController.onPageLoad(signatory.id).url
+      SignatoryCheckYourAnswersController.onPageLoad(signatory.id, returnTo).url
     }
     signatory.fullName.map { name =>
       SummaryListRowViewModel(
@@ -138,7 +144,7 @@ class AddedSignatoriesViewModel @Inject() (
           ActionItemViewModel(
             content = messages("site.remove"),
             href = RemoveSignatoryController
-              .onPageLoad(signatory.id)
+              .onPageLoad(signatory.id, returnTo)
               .url
           ).withVisuallyHiddenText(
             messages("addedSignatory.summary.action.hidden", name)

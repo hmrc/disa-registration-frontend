@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.liaisonofficers
 
 import controllers.liaisonofficers.routes.LiaisonOfficerCommunicationController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.liaisonofficers.LiaisonOfficer
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -28,7 +28,9 @@ import viewmodels.implicits.*
 
 object LiaisonOfficerCommunicationSummary {
 
-  def row(liaisonOfficer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(liaisonOfficer: LiaisonOfficer, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     if (liaisonOfficer.communication.nonEmpty)
       val value = ValueViewModel(
         HtmlContent(
@@ -48,7 +50,7 @@ object LiaisonOfficerCommunicationSummary {
           actions = Seq(
             ActionItemViewModel(
               "site.change",
-              LiaisonOfficerCommunicationController.onPageLoad(liaisonOfficer.id, CheckMode).url
+              LiaisonOfficerCommunicationController.onPageLoad(liaisonOfficer.id, CheckMode, returnTo).url
             )
               .withVisuallyHiddenText(messages("liaisonOfficerCommunication.change.hidden"))
           )

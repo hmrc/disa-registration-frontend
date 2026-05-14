@@ -71,7 +71,8 @@ class ThirdPartyConnectedOrganisationsControllerSpec extends SpecBase {
         contentAsString(result) mustEqual view(
           Seq(tp1, tp2),
           form.fill(Seq("1")),
-          NormalMode
+          NormalMode,
+          None
         )(request, messages(application)).toString
       }
     }

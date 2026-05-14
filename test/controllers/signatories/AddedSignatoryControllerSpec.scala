@@ -29,8 +29,8 @@ import views.html.signatories.AddedSignatoryView
 
 class AddedSignatoryControllerSpec extends SpecBase {
 
-  private val routeUrl  = AddedSignatoryController.onPageLoad().url
-  private val submitUrl = AddedSignatoryController.onSubmit().url
+  private val routeUrl  = AddedSignatoryController.onPageLoad(NormalMode).url
+  private val submitUrl = AddedSignatoryController.onSubmit(NormalMode).url
 
   private val signatory1 = Signatory("1", Some("Alice"), Some("Dev"))
   private val signatory2 = Signatory("2", Some("Bob"), Some("Dev"))
@@ -61,7 +61,9 @@ class AddedSignatoryControllerSpec extends SpecBase {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           form = new forms.YesNoAnswerFormProvider()("addedSignatory.error.required"),
-          AddedSignatoriesSummary(inProgress, complete, appConfig.maxSignatories)
+          AddedSignatoriesSummary(inProgress, complete, appConfig.maxSignatories),
+          NormalMode,
+          None
         )(request, messages(application)).toString
       }
     }

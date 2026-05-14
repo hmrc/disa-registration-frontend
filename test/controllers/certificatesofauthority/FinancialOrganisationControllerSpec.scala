@@ -60,7 +60,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[FinancialOrganisationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, None)(request, messages(application)).toString
       }
     }
 
@@ -76,7 +76,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[FinancialOrganisationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, None)(request, messages(application)).toString
       }
     }
 
@@ -99,7 +99,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[FinancialOrganisationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Set(Bank)), NormalMode)(
+        contentAsString(result) mustEqual view(form.fill(Set(Bank)), NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -122,7 +122,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None)(request, messages(application)).toString
       }
     }
 

@@ -19,7 +19,7 @@ package forms
 import forms.behaviours.StringFieldBehaviours
 import models.journeydata.CorrespondenceAddress
 import org.scalacheck.Gen
-import org.scalacheck.Gen.{alphaChar, alphaNumChar}
+import org.scalacheck.Gen.alphaNumChar
 import play.api.data.FormError
 
 class EnterYourOrganisationAddressFormProviderSpec extends StringFieldBehaviours {

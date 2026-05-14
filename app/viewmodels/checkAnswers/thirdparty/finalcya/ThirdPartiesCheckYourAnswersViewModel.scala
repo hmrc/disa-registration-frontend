@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.thirdparty.finalcya
 
-import models.ReturnTo.FinalCya
+import models.ReturnTo.ThirdPartyCya
 import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
@@ -70,10 +70,10 @@ class ThirdPartiesCheckYourAnswersViewModel @Inject() (
     messages: Messages
   ): Seq[SummaryListRow] =
     Seq(
-      ThirdPartyOrgDetailsSummary.row(tp, index, Some(FinalCya)),
-      ThirdPartyManagingReturnsSummary.row(tp, Some(FinalCya)),
-      InvestorFundsUsedByThirdPartySummary.row(tp, Some(FinalCya)),
-      ThirdPartyInvestorFundsPercentageSummary.row(tp, Some(FinalCya))
+      ThirdPartyOrgDetailsSummary.row(tp, index, Some(ThirdPartyCya)),
+      ThirdPartyManagingReturnsSummary.row(tp, Some(ThirdPartyCya)),
+      InvestorFundsUsedByThirdPartySummary.row(tp, Some(ThirdPartyCya)),
+      ThirdPartyInvestorFundsPercentageSummary.row(tp, Some(ThirdPartyCya))
     ).flatten
 
   private def buildGlobalSections(section: ThirdPartyOrganisations)(implicit messages: Messages): Seq[Html] =
@@ -81,7 +81,7 @@ class ThirdPartiesCheckYourAnswersViewModel @Inject() (
       sectionHeading("thirdPartiesCheckYourAnswers.connectedOrganisations.sub.heading"),
       govukSummaryList(
         SummaryListViewModel(
-          ThirdPartyConnectedOrganisationsControllerSummary.row(section).toSeq
+          ThirdPartyConnectedOrganisationsControllerSummary.row(section, Some(ThirdPartyCya)).toSeq
         )
       ),
       sectionHeading("thirdPartiesCheckYourAnswers.addAnother.sub.heading"),

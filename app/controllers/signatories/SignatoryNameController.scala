@@ -21,7 +21,7 @@ import controllers.actions.*
 import controllers.routes.*
 import forms.SignatoryNameFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.requests.DataRequest
 import navigation.Navigator
@@ -60,7 +60,7 @@ class SignatoryNameController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] =
+  def onPageLoad(id: Option[String], mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen auditContinuation(Signatories.sectionName)) {
       implicit request =>
         if (id.isEmpty && signatoryCount(request) >= appConfig.maxSignatories) {
@@ -74,19 +74,19 @@ class SignatoryNameController @Inject() (
           } yield (form.fill(name), id))
             .getOrElse((form, uuidGenerator.generate()))
 
-          Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode))
+          Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode, returnTo))
         }
     }
 
   private def signatoryCount(request: DataRequest[_]): Int =
     request.journeyData.signatories.map(_.signatories.size).getOrElse(0)
 
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode, returnTo))),
           answer => {
             val updatedSection = request.journeyData.signatories match {
               case Some(existing) =>
@@ -117,7 +117,7 @@ class SignatoryNameController @Inject() (
                     SignatoryNamePage(id),
                     updatedSection,
                     mode,
-                    None
+                    returnTo
                   )
                 )
               }
@@ -129,5 +129,5 @@ class SignatoryNameController @Inject() (
               }
           }
         )
-  }
+    }
 }

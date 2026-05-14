@@ -59,7 +59,9 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
 
         val html = viewModel(
           form = form,
-          summary = AddedLiaisonOfficerSummary(Seq(inProgressOfficer), Seq(completeOfficer))
+          summary = AddedLiaisonOfficerSummary(Seq(inProgressOfficer), Seq(completeOfficer)),
+          mode = NormalMode,
+          returnTo = None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -78,7 +80,9 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
 
         val html = viewModel(
           form = form,
-          summary = AddedLiaisonOfficerSummary(Seq.empty, Seq(completeOfficer))
+          summary = AddedLiaisonOfficerSummary(Seq.empty, Seq(completeOfficer)),
+          mode = NormalMode,
+          returnTo = None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -95,7 +99,9 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
 
         val html = viewModel(
           form = form,
-          summary = AddedLiaisonOfficerSummary(Seq(inProgressOfficer), Seq.empty)
+          summary = AddedLiaisonOfficerSummary(Seq(inProgressOfficer), Seq.empty),
+          mode = NormalMode,
+          returnTo = None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -112,7 +118,9 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
 
         val html = viewModel(
           form = form,
-          summary = AddedLiaisonOfficerSummary(Seq(inProgressOfficer), Seq(completeOfficer))
+          summary = AddedLiaisonOfficerSummary(Seq(inProgressOfficer), Seq(completeOfficer)),
+          mode = NormalMode,
+          returnTo = None
         )(messages(app))
 
         val doc   = Jsoup.parse(html.toString)
@@ -132,7 +140,9 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
 
         val html = viewModel(
           form = form,
-          summary = AddedLiaisonOfficerSummary(Seq(inProgressOfficer), Seq.empty)
+          summary = AddedLiaisonOfficerSummary(Seq(inProgressOfficer), Seq.empty),
+          mode = NormalMode,
+          returnTo = None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -161,7 +171,9 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
 
         val html = viewModel(
           form = form,
-          summary = AddedLiaisonOfficerSummary(Seq.empty, complete)
+          summary = AddedLiaisonOfficerSummary(Seq.empty, complete),
+          mode = NormalMode,
+          returnTo = None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -190,7 +202,9 @@ class AddedLiaisonOfficersViewModelSpec extends SpecBase {
 
         val html = viewModel(
           form = form,
-          summary = AddedLiaisonOfficerSummary(Seq.empty, complete)
+          summary = AddedLiaisonOfficerSummary(Seq.empty, complete),
+          mode = NormalMode,
+          returnTo = None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)

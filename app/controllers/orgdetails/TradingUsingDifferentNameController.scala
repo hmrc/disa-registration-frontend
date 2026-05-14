@@ -19,7 +19,8 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.TradingUsingDifferentNameFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import handlers.JourneyHandler.clearStalePages
+import models.{Mode, ReturnTo}
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.organisationdetails.TradingUsingDifferentNamePage
@@ -53,34 +54,44 @@ class TradingUsingDifferentNameController @Inject() (
 
   val form: Form[Boolean] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = prepareForm(form)(_.organisationDetails.flatMap(_.tradingUsingDifferentName))(identity)
-    Ok(view(preparedForm, mode))
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
+    implicit request =>
+      val preparedForm = prepareForm(form)(_.organisationDetails.flatMap(_.tradingUsingDifferentName))(identity)
+      Ok(view(preparedForm, mode, returnTo))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val updatedSection =
-            request.journeyData.flatMap(_.organisationDetails) match {
-              case Some(existing) => existing.copy(tradingUsingDifferentName = Some(answer))
-              case None           => OrganisationDetails(tradingUsingDifferentName = Some(answer))
-            }
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(navigator.nextPage(TradingUsingDifferentNamePage, updatedSection, mode, None))
-            }
-            .recoverWith { case NonFatal(e) =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
+          answer => {
+            val existingSection = request.journeyData.flatMap(_.organisationDetails)
+            val updatedSection  =
+              existingSection match {
+                case Some(existing) if !existing.tradingUsingDifferentName.contains(answer) =>
+                  clearStalePages(
+                    TradingUsingDifferentNamePage,
+                    existing.copy(tradingUsingDifferentName = Some(answer))
+                  )
+                case Some(existing)                                                         => existing
+                case None                                                                   => OrganisationDetails(tradingUsingDifferentName = Some(answer))
+              }
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { updatedSection =>
+                Redirect(
+                  navigator.nextPage(TradingUsingDifferentNamePage, existingSection, updatedSection, mode, returnTo)
+                )
+              }
+              .recoverWith { case NonFatal(e) =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
   }
 }

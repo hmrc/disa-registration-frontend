@@ -62,7 +62,9 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
         val html = viewModel(
           form,
           Seq(inProgressSignatory),
-          Seq(completeSignatory)
+          Seq(completeSignatory),
+          NormalMode,
+          None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -82,7 +84,9 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
         val html = viewModel(
           form,
           Seq.empty,
-          Seq(completeSignatory)
+          Seq(completeSignatory),
+          NormalMode,
+          None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -101,7 +105,9 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
         val html = viewModel(
           form,
           Seq(inProgressSignatory),
-          Seq.empty
+          Seq.empty,
+          NormalMode,
+          None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -120,7 +126,9 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
         val html = viewModel(
           form,
           Seq(unnamedSignatory),
-          Seq.empty
+          Seq.empty,
+          NormalMode,
+          None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -137,7 +145,9 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
         val html = viewModel(
           form,
           Seq(inProgressSignatory),
-          Seq(completeSignatory)
+          Seq(completeSignatory),
+          NormalMode,
+          None
         )(messages(app))
 
         val doc   = Jsoup.parse(html.toString)
@@ -158,7 +168,9 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
         val html = viewModel(
           form,
           Seq(inProgressSignatory),
-          Seq.empty
+          Seq.empty,
+          NormalMode,
+          None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -182,7 +194,9 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
         val html = viewModel(
           form,
           Seq.empty,
-          complete
+          complete,
+          NormalMode,
+          None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)
@@ -206,7 +220,9 @@ class AddedSignatoriesViewModelSpec extends SpecBase {
         val html = viewModel(
           form,
           Seq.empty,
-          complete
+          complete,
+          NormalMode,
+          None
         )(messages(app))
 
         val doc = Jsoup.parse(html.toString)

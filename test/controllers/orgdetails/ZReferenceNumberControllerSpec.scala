@@ -58,7 +58,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[ZReferenceNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, None)(request, messages(application)).toString
       }
     }
 
@@ -81,7 +81,10 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("zRef"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("zRef"), NormalMode, None)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -153,7 +156,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None)(request, messages(application)).toString
       }
     }
 

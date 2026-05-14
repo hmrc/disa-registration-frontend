@@ -18,11 +18,11 @@ package controllers.signatories
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import controllers.routes.*
-import controllers.signatories.routes.*
+import controllers.routes.TaskListController
 import forms.YesNoAnswerFormProvider
 import models.requests.DataRequest
-import models.{NormalMode, YesNoAnswer}
+import models.{Mode, ReturnTo, YesNoAnswer}
+import navigation.Navigator
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -40,47 +40,50 @@ class AddedSignatoryController @Inject() (
   formProvider: YesNoAnswerFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: AddedSignatoryView,
-  appConfig: FrontendAppConfig
+  appConfig: FrontendAppConfig,
+  navigator: Navigator
 )() extends FrontendBaseController
     with I18nSupport {
 
   val form: Form[YesNoAnswer] =
     formProvider("addedSignatory.error.required")
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getInProgressAndCompleteSignatories.fold {
-      Redirect(TaskListController.onPageLoad())
-    } { case (inProgress, complete) =>
-      Ok(view(form, AddedSignatoriesSummary(inProgress, complete, appConfig.maxSignatories)))
-    }
-  }
-
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getInProgressAndCompleteSignatories.fold {
-      Redirect(TaskListController.onPageLoad())
-    } { case (inProgress, complete) =>
-      val count = inProgress.size + complete.size
-
-      if (count >= appConfig.maxSignatories) {
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      getInProgressAndCompleteSignatories.fold {
         Redirect(TaskListController.onPageLoad())
-      } else {
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              BadRequest(
-                view(formWithErrors, AddedSignatoriesSummary(inProgress, complete, appConfig.maxSignatories))
-              ),
-            {
-              case YesNoAnswer.Yes =>
-                Redirect(SignatoryNameController.onPageLoad(None, NormalMode))
-              case _               =>
-                Redirect(TaskListController.onPageLoad())
-            }
-          )
+      } { case (inProgress, complete) =>
+        Ok(view(form, AddedSignatoriesSummary(inProgress, complete, appConfig.maxSignatories), mode, returnTo))
       }
     }
-  }
+
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      getInProgressAndCompleteSignatories.fold {
+        Redirect(TaskListController.onPageLoad())
+      } { case (inProgress, complete) =>
+        val count = inProgress.size + complete.size
+
+        if (count >= appConfig.maxSignatories) {
+          Redirect(navigator.nextPageFromAddedSignatories(YesNoAnswer.No, mode, returnTo))
+        } else {
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    AddedSignatoriesSummary(inProgress, complete, appConfig.maxSignatories),
+                    mode,
+                    returnTo
+                  )
+                ),
+              answer => Redirect(navigator.nextPageFromAddedSignatories(answer, mode, returnTo))
+            )
+        }
+      }
+    }
 
   private def getInProgressAndCompleteSignatories(implicit request: DataRequest[_]) =
     request.journeyData.signatories

@@ -22,11 +22,11 @@ import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
 import controllers.orgemail.routes.*
-import controllers.routes.{IndexController, TaskListController}
+import controllers.routes.{IndexController, SubmissionCyaController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
-import models.ReturnTo.FinalCya
+import models.ReturnTo.{SubmissionCya, ThirdPartyCya}
 import models.addresslookup.LookupAddress
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
@@ -34,12 +34,11 @@ import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDeb
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
-import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
-import models.journeydata.orgdetails.AddAnotherAddress
+import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
-import models.journeydata.{OrganisationDetails, OrganisationEmail}
+import models.journeydata.{CorrespondenceAddress, OrganisationDetails, OrganisationEmail}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -105,6 +104,19 @@ class NavigatorSpec extends SpecBase {
       result shouldBe InnovativeFinancialProductsController.onPageLoad(NormalMode)
     }
 
+    "preserve returnTo when resuming NormalMode" in {
+      val result: Call =
+        navigator.nextPage(
+          page = IsaProductsPage,
+          existing = Some(emptyIsaProductsAnswers),
+          updated = answersWithIsaProducts(Seq(InnovativeFinanceIsas)),
+          mode = CheckMode,
+          returnTo = Some(SubmissionCya)
+        )
+
+      result shouldBe InnovativeFinancialProductsController.onPageLoad(NormalMode, Some(SubmissionCya))
+    }
+
     "stay in CheckMode when resumeNormalMode is false" in {
       val pageMock = mock[PageWithDependents[IsaProducts]]
 
@@ -120,6 +132,19 @@ class NavigatorSpec extends SpecBase {
         )
 
       result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route to Submission CYA when staying in CheckMode with returnTo SubmissionCya" in {
+      val result =
+        navigator.nextPage(
+          page = InnovativeFinancialProductsPage,
+          existing = Some(emptyIsaProductsAnswers),
+          updated = emptyIsaProductsAnswers,
+          mode = CheckMode,
+          returnTo = Some(SubmissionCya)
+        )
+
+      result shouldBe SubmissionCyaController.onPageLoad()
     }
 
     "default to NormalMode when no existing data is present" in {
@@ -162,6 +187,47 @@ class NavigatorSpec extends SpecBase {
       )
 
       verify(spiedNav).checkRouteMap(any, any)
+    }
+  }
+
+  "Navigator nextPageFrom add-another pages" - {
+
+    "route add another liaison officers to Submission CYA when No is selected with returnTo SubmissionCya" in {
+      navigator.nextPageFromAddedLiaisonOfficers(YesNoAnswer.No, NormalMode, Some(SubmissionCya)) shouldBe
+        SubmissionCyaController.onPageLoad()
+    }
+
+    "route add another signatories to Submission CYA when No is selected with returnTo SubmissionCya" in {
+      navigator.nextPageFromAddedSignatories(YesNoAnswer.No, NormalMode, Some(SubmissionCya)) shouldBe
+        SubmissionCyaController.onPageLoad()
+    }
+
+    "route add another third parties to Submission CYA when No is selected with returnTo SubmissionCya" in {
+      navigator.nextPageFromAddedThirdParties(YesNoAnswer.No, count = 1, Nil, NormalMode, Some(SubmissionCya)) shouldBe
+        SubmissionCyaController.onPageLoad()
+    }
+
+    "must route to connected organisations when user has more than one third party and no connected organisations are stored" in {
+      navigator.nextPageFromAddedThirdParties(
+        YesNoAnswer.No,
+        count = 2,
+        mode = NormalMode,
+        returnTo = Some(ReturnTo.SubmissionCya),
+        connectedOrganisations = Nil
+      ) shouldBe ThirdPartyConnectedOrganisationsController.onPageLoad(
+        NormalMode,
+        Some(ReturnTo.SubmissionCya)
+      )
+    }
+
+    "must return to Submission CYA when user has more than one third party and connected organisations are already stored" in {
+      navigator.nextPageFromAddedThirdParties(
+        YesNoAnswer.No,
+        count = 2,
+        mode = NormalMode,
+        returnTo = Some(ReturnTo.SubmissionCya),
+        connectedOrganisations = Seq("third-party-id")
+      ) shouldBe SubmissionCyaController.onPageLoad()
     }
   }
 
@@ -248,6 +314,13 @@ class NavigatorSpec extends SpecBase {
       result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
+    "route PeerToPeerPlatformNumberPage to Submission CYA when returnTo is SubmissionCya" in {
+      val result: Call =
+        navigator.normalRoutes(PeerToPeerPlatformNumberPage, emptyIsaProductsAnswers, Some(SubmissionCya))
+
+      result shouldBe SubmissionCyaController.onPageLoad()
+    }
+
     "route CertificatesOfAuthorityYesNoPage to FcaArticlesPage if yes submitted" in {
       val result: Call = navigator.normalRoutes(CertificatesOfAuthorityYesNoPage, coaAnswers, None)
       result shouldBe FcaArticlesController.onPageLoad(NormalMode)
@@ -321,10 +394,10 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
     }
 
-    "route to AddAnotherAddressPage if multiple addresses are persisted in user answers to the SelectAddressPage" in {
+    "route from AddAnotherAddressPage if multiple addresses are persisted in user answers to the SelectAddressPage" in {
       val result: Call =
         navigator.normalRoutes(
           AddAnotherAddressPage,
@@ -412,7 +485,68 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
+    }
+
+    "ChooseAddressPage route to ManualAddressEntryPage if none is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(ManualEntry)
+              )
+            )
+          ),
+          returnTo = None
+        )
+
+      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode)
+    }
+
+    "ChooseAddressPage route to ConfirmAddressPage if an address is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(SelectedCorrespondenceAddress.Address(0))
+              )
+            )
+          ),
+          returnTo = None
+        )
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
     }
 
     "route FcaArticlesPage to ISA products CYA" in {
@@ -427,7 +561,7 @@ class NavigatorSpec extends SpecBase {
 
     "route OrganisationEmailAddressPage to OrganisationEmailVerificationCodePage" in {
       val result: Call = navigator.normalRoutes(OrganisationEmailAddressPage, OrganisationEmail(Some(testString)), None)
-      result shouldBe EmailVerificationCodeController.onPageLoad()
+      result shouldBe EmailVerificationCodeController.onPageLoad(NormalMode)
     }
 
     "route OrganisationEmailVerificationCodePage to OrganisationEmail CYA" in {
@@ -442,7 +576,7 @@ class NavigatorSpec extends SpecBase {
 
     "route RemoveSignatoryPage to AddedSignatoryController when signatory exists in journeyAnswers" in {
       val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), signatoriesAnswers, None)
-      result shouldBe AddedSignatoryController.onPageLoad()
+      result shouldBe AddedSignatoryController.onPageLoad(NormalMode)
     }
 
     "route RemoveSignatoryPage to AddedSignatoryController when a signatory doesn't exists in journeyAnswers" in {
@@ -494,7 +628,7 @@ class NavigatorSpec extends SpecBase {
     "route RemoveLiaisonOfficerPage to AddedLiaisonOfficersController when liaison officers remain" in {
       val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, liaisonOfficersAnswers, None)
 
-      result shouldBe AddedLiaisonOfficersController.onPageLoad()
+      result shouldBe AddedLiaisonOfficersController.onPageLoad(NormalMode)
     }
 
     "route ProductsManagedByThirdParty to TaskList when answer is no" in {
@@ -672,14 +806,19 @@ class NavigatorSpec extends SpecBase {
         CoaCheckYourAnswersController.onPageLoad()
     }
 
-    "route RegisteredAddressCorrespondencePage to COA CYA" in {
+    "route RegisteredAddressCorrespondencePage to Org details CYA" in { // TODO needs updating to Organisation CYA when implemented
       navigator.checkRouteMap(RegisteredAddressCorrespondencePage, None) shouldBe
-        IndexController.onPageLoad()
+        TaskListController.onPageLoad()
     }
 
     "route OrganisationEmailAddressPage to Org email CYA" in {
       navigator.checkRouteMap(OrganisationEmailAddressPage, None) shouldBe
         OrganisationEmailCyaController.onPageLoad()
+    }
+
+    "route OrganisationEmailAddressPage to Submission CYA when returnTo is SubmissionCya" in {
+      navigator.checkRouteMap(OrganisationEmailAddressPage, Some(SubmissionCya)) shouldBe
+        SubmissionCyaController.onPageLoad()
     }
 
     "route SignatoryNamePage to SignatoryCheckYourAnswersController" in {
@@ -690,6 +829,13 @@ class NavigatorSpec extends SpecBase {
     "route SignatoryJobTitlePage to SignatoryCheckYourAnswersController" in {
       navigator.checkRouteMap(SignatoryJobTitlePage(signatoryId), None) shouldBe
         SignatoryCheckYourAnswersController.onPageLoad(id = signatoryId)
+    }
+
+    "route signatory pages to Submission CYA when returnTo is SubmissionCya" in {
+      navigator.checkRouteMap(SignatoryNamePage(signatoryId), Some(SubmissionCya))     shouldBe
+        SubmissionCyaController.onPageLoad()
+      navigator.checkRouteMap(SignatoryJobTitlePage(signatoryId), Some(SubmissionCya)) shouldBe
+        SubmissionCyaController.onPageLoad()
     }
 
     "route LiaisonOfficerNamePage to LO CYA" in {
@@ -712,13 +858,24 @@ class NavigatorSpec extends SpecBase {
         LoCheckYourAnswersController.onPageLoad(testString)
     }
 
+    "route Liaison officer pages to Submission CYA when returnTo is SubmissionCya" in {
+      navigator.checkRouteMap(LiaisonOfficerNamePage(testString), Some(SubmissionCya))          shouldBe
+        SubmissionCyaController.onPageLoad()
+      navigator.checkRouteMap(LiaisonOfficerEmailPage(testString), Some(SubmissionCya))         shouldBe
+        SubmissionCyaController.onPageLoad()
+      navigator.checkRouteMap(LiaisonOfficerPhoneNumberPage(testString), Some(SubmissionCya))   shouldBe
+        SubmissionCyaController.onPageLoad()
+      navigator.checkRouteMap(LiaisonOfficerCommunicationPage(testString), Some(SubmissionCya)) shouldBe
+        SubmissionCyaController.onPageLoad()
+    }
+
     "route ProductsManagedByThirdPartyPage to Third Parties CYA" in {
       navigator.checkRouteMap(ProductsManagedByThirdPartyPage, None) shouldBe
         ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
-    "route ThirdPartyOrgDetailsPage to Final Third Party CYA if ReturnTo param passed" in {
-      navigator.checkRouteMap(ThirdPartyOrgDetailsPage(testString), Some(FinalCya)) shouldBe
+    "route ThirdPartyOrgDetailsPage to Third Parties CYA if ReturnTo param passed" in {
+      navigator.checkRouteMap(ThirdPartyOrgDetailsPage(testString), Some(ThirdPartyCya)) shouldBe
         ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
@@ -732,8 +889,8 @@ class NavigatorSpec extends SpecBase {
         ThirdPartyCheckYourAnswersController.onPageLoad(testString)
     }
 
-    "route ThirdPartyManagingReturnsPage to Final Third Party CYA if ReturnTo param passed" in {
-      navigator.checkRouteMap(ThirdPartyManagingReturnsPage(testString), Some(FinalCya)) shouldBe
+    "route ThirdPartyManagingReturnsPage to Third Parties CYA if ReturnTo param passed" in {
+      navigator.checkRouteMap(ThirdPartyManagingReturnsPage(testString), Some(ThirdPartyCya)) shouldBe
         ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
@@ -742,8 +899,8 @@ class NavigatorSpec extends SpecBase {
         ThirdPartyCheckYourAnswersController.onPageLoad(testString)
     }
 
-    "route InvestorFundsUsedByThirdPartyPage to Final Third Party CYA if ReturnTo param passed" in {
-      navigator.checkRouteMap(InvestorFundsUsedByThirdPartyPage(testString), Some(FinalCya)) shouldBe
+    "route InvestorFundsUsedByThirdPartyPage to Third Parties CYA if ReturnTo param passed" in {
+      navigator.checkRouteMap(InvestorFundsUsedByThirdPartyPage(testString), Some(ThirdPartyCya)) shouldBe
         ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
@@ -752,9 +909,24 @@ class NavigatorSpec extends SpecBase {
         ThirdPartyCheckYourAnswersController.onPageLoad(testString)
     }
 
-    "route ThirdPartyInvestorFundsPercentagePage to Final Third Party CYA if ReturnTo param passed" in {
-      navigator.checkRouteMap(ThirdPartyInvestorFundsPercentagePage(testString), Some(FinalCya)) shouldBe
+    "route ThirdPartyInvestorFundsPercentagePage to Third Parties CYA if ReturnTo param passed" in {
+      navigator.checkRouteMap(ThirdPartyInvestorFundsPercentagePage(testString), Some(ThirdPartyCya)) shouldBe
         ThirdPartiesCheckYourAnswersController.onPageLoad()
+    }
+
+    "route third party pages to Submission CYA when returnTo is SubmissionCya" in {
+      navigator.checkRouteMap(ProductsManagedByThirdPartyPage, Some(SubmissionCya))                   shouldBe
+        SubmissionCyaController.onPageLoad()
+      navigator.checkRouteMap(ThirdPartyOrgDetailsPage(testString), Some(SubmissionCya))              shouldBe
+        SubmissionCyaController.onPageLoad()
+      navigator.checkRouteMap(ThirdPartyManagingReturnsPage(testString), Some(SubmissionCya))         shouldBe
+        SubmissionCyaController.onPageLoad()
+      navigator.checkRouteMap(InvestorFundsUsedByThirdPartyPage(testString), Some(SubmissionCya))     shouldBe
+        SubmissionCyaController.onPageLoad()
+      navigator.checkRouteMap(ThirdPartyInvestorFundsPercentagePage(testString), Some(SubmissionCya)) shouldBe
+        SubmissionCyaController.onPageLoad()
+      navigator.checkRouteMap(ThirdPartyConnectedOrganisationsPage, Some(SubmissionCya))              shouldBe
+        SubmissionCyaController.onPageLoad()
     }
 
     "route ThirdPartyConnectedOrganisationsPage to Third Parties CYA" in {

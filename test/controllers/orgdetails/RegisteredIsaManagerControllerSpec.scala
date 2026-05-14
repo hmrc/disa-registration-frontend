@@ -58,7 +58,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(form, NormalMode)(request, messages(app)).toString
+          view(form, NormalMode, None)(request, messages(app)).toString
       }
     }
 
@@ -82,7 +82,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(form, NormalMode)(request, messages(app)).toString
+          view(form, NormalMode, None)(request, messages(app)).toString
       }
     }
 
@@ -106,7 +106,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(form.fill(true), NormalMode)(request, messages(app)).toString
+          view(form.fill(true), NormalMode, None)(request, messages(app)).toString
       }
     }
   }
@@ -247,7 +247,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual BAD_REQUEST
 
         contentAsString(result) mustEqual
-          view(boundForm, NormalMode)(request, messages(app)).toString
+          view(boundForm, NormalMode, None)(request, messages(app)).toString
       }
     }
 

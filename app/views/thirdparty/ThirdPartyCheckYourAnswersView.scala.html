@@ -17,16 +17,16 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.pageheading.PageHeading
 @import controllers.thirdparty.routes._
+@import models.{NormalMode, ReturnTo}
 
 @this(
   layout: templates.Layout,
   hmrcPageHeading: HmrcPageHeading,
-  formHelper: FormWithCSRF,
   govukButton: GovukButton,
   govukSummaryList: GovukSummaryList
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("thirdPartyCya.title"))) {
 
@@ -35,12 +35,12 @@
     headingClasses = Some("govuk-heading-l"),
   ))
 
-  @formHelper(action = AddedThirdPartiesController.onPageLoad(NormalMode, None), Symbol("autoComplete") -> "off") {
+  @govukSummaryList(list)
 
-    @govukSummaryList(list)
-
-    @govukButton(
-      ButtonViewModel(messages("site.saveAndContinue")).preventingDoubleClick()
+  @govukButton(
+    Button(
+      href = Some(AddedThirdPartiesController.onPageLoad(NormalMode, returnTo).url),
+      content = Text(messages("site.saveAndContinue"))
     )
-  }
+  )
 }

@@ -25,7 +25,7 @@ import controllers.routes.*
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
-import models.ReturnTo.FinalCya
+import models.ReturnTo.{SubmissionCya, ThirdPartyCya}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
@@ -82,140 +82,284 @@ class Navigator @Inject() () {
         checkRouteMap(page, returnTo)
     }
 
+  def nextPageFromAddedLiaisonOfficers(
+    answer: YesNoAnswer,
+    mode: Mode,
+    returnTo: Option[ReturnTo]
+  ): Call =
+    addedLiaisonOfficersNextPage(answer, returnTo)
+
+  def nextPageFromAddedSignatories(
+    answer: YesNoAnswer,
+    mode: Mode,
+    returnTo: Option[ReturnTo]
+  ): Call =
+    addedSignatoriesNextPage(answer, returnTo)
+
+  def nextPageFromAddedThirdParties(
+    answer: YesNoAnswer,
+    count: Int,
+    connectedOrganisations: Seq[String] = Nil,
+    mode: Mode,
+    returnTo: Option[ReturnTo]
+  ): Call =
+    addedThirdPartiesNextPage(answer, count, connectedOrganisations, mode, returnTo)
+
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](
     page: Page[A],
     answers: A,
     returnTo: Option[ReturnTo]
   ): Call = page match {
-    case RegisteredIsaManagerPage                  => ???
-    case ZReferenceNumberPage                      => ???
-    case FirmReferenceNumberPage                   => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
-    case TradingUsingDifferentNamePage             => tradingUsingDifferentNameNextPage(answers)
-    case TradingNamePage                           => FirmReferenceNumberController.onPageLoad(NormalMode)
-    case IsaProductsPage                           => isaProductsNextPage(answers)
-    case InnovativeFinancialProductsPage           => innovativeFinancialProductsNextPage(answers)
-    case PeerToPeerPlatformPage                    => PeerToPeerPlatformNumberController.onPageLoad(NormalMode)
-    case PeerToPeerPlatformNumberPage              => IsaProductsCheckYourAnswersController.onPageLoad()
-    case CertificatesOfAuthorityYesNoPage          => certificatesOfAuthorityYesNoNextPage(answers)
-    case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
-    case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
-    case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
-    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
-    case ChooseAddressPage                         => chooseAddressNextPage(answers)
+    case RegisteredIsaManagerPage                  => registeredIsaManagerNextPage(answers, returnTo)
+    case ZReferenceNumberPage                      =>
+      returnToRoute(returnTo, TradingUsingDifferentNameController.onPageLoad(NormalMode))
+    case FirmReferenceNumberPage                   => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode, returnTo)
+    case TradingUsingDifferentNamePage             => tradingUsingDifferentNameNextPage(answers, returnTo)
+    case TradingNamePage                           => returnToRoute(returnTo, FirmReferenceNumberController.onPageLoad(NormalMode))
+    case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers, returnTo)
+    case ChooseAddressPage                         => chooseAddressNextPage(answers, returnTo)
+    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers, returnTo)
     case EnterYourOrganisationAddressPage          =>
-      TaskListController.onPageLoad() // TODO hook to review and confim page in DFI-934
-    case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
-    case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
-    case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
-    case LiaisonOfficerEmailPage(id)               => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode)
-    case LiaisonOfficerPhoneNumberPage(id)         => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode)
-    case LiaisonOfficerCommunicationPage(id)       => LoCheckYourAnswersController.onPageLoad(id)
-    case RemoveLiaisonOfficerPage                  => removeLiaisonOfficerNextPage(answers)
-    case RemoveSignatoryPage(id)                   => removeSignatoryNextPage(answers)
-    case SignatoryNamePage(id)                     => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode)
-    case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-    case ProductsManagedByThirdPartyPage           => productsManagedByThirdPartNextPage(answers)
+      ConfirmCorrespondenceAddressController.onPageLoad()
+    case OrganisationTelephoneNumberPage           =>
+      returnToRoute(
+        returnTo,
+        TaskListController.onPageLoad()
+      ) // TODO make default call to OrganisationDetailsCYA when built in 1743
+    case IsaProductsPage                           => isaProductsNextPage(answers, returnTo)
+    case InnovativeFinancialProductsPage           => innovativeFinancialProductsNextPage(answers, returnTo)
+    case PeerToPeerPlatformPage                    => PeerToPeerPlatformNumberController.onPageLoad(NormalMode, returnTo)
+    case PeerToPeerPlatformNumberPage              => returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
+    case CertificatesOfAuthorityYesNoPage          => certificatesOfAuthorityYesNoNextPage(answers, returnTo)
+    case FcaArticlesPage                           => returnToRoute(returnTo, CoaCheckYourAnswersController.onPageLoad())
+    case FinancialOrganisationPage                 => returnToRoute(returnTo, CoaCheckYourAnswersController.onPageLoad())
+    case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad(NormalMode, returnTo)
+    case OrganisationEmailVerificationCodePage     => returnToRoute(returnTo, OrganisationEmailCyaController.onPageLoad())
+    case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode, returnTo)
+    case LiaisonOfficerEmailPage(id)               => LiaisonOfficerPhoneNumberController.onPageLoad(id, NormalMode, returnTo)
+    case LiaisonOfficerPhoneNumberPage(id)         => LiaisonOfficerCommunicationController.onPageLoad(id, NormalMode, returnTo)
+    case LiaisonOfficerCommunicationPage(id)       => LoCheckYourAnswersController.onPageLoad(id, returnTo)
+    case RemoveLiaisonOfficerPage                  => removeLiaisonOfficerNextPage(answers, returnTo)
+    case RemoveSignatoryPage(id)                   => removeSignatoryNextPage(answers, returnTo)
+    case SignatoryNamePage(id)                     => SignatoryJobTitleController.onPageLoad(id = id, mode = NormalMode, returnTo)
+    case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id, returnTo)
+    case ProductsManagedByThirdPartyPage           => productsManagedByThirdPartyNextPage(answers, returnTo)
     case ThirdPartyOrgDetailsPage(id)              =>
-      ThirdPartyManagingReturnsController.onPageLoad(id = id, mode = NormalMode, None)
+      ThirdPartyManagingReturnsController.onPageLoad(id = id, mode = NormalMode, returnTo)
     case ThirdPartyManagingReturnsPage(id)         =>
-      InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode, None)
+      InvestorFundsUsedByThirdPartyController.onPageLoad(id = id, mode = NormalMode, returnTo)
     case InvestorFundsUsedByThirdPartyPage(id)     => investorFundsUsedByThirdPartyNextPage(answers, id, returnTo)
-    case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckNextPage(id, returnTo)
-    case RemoveThirdPartyPage                      => removeThirdPartyNextPage(answers)
-    case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
-    case _                                         => throw new NotImplementedError("No route for this page in normal mode")
+    case ThirdPartyInvestorFundsPercentagePage(id) =>
+      thirdPartyCheckNextPage(id, returnTo)
+
+    case RemoveThirdPartyPage =>
+      removeThirdPartyNextPage(answers, returnTo)
+
+    case ThirdPartyConnectedOrganisationsPage =>
+      returnToRoute(returnTo, ThirdPartiesCheckYourAnswersController.onPageLoad())
+    case _                                    => throw new NotImplementedError("No route for this page in normal mode")
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A], returnTo: Option[ReturnTo]): Call =
     page match {
-      case RegisteredIsaManagerPage                  => ???
-      case ZReferenceNumberPage                      => ???
-      case TradingUsingDifferentNamePage             => ???
-      case TradingNamePage                           => ???
-      case IsaProductsPage                           => IsaProductsCheckYourAnswersController.onPageLoad()
-      case InnovativeFinancialProductsPage           => IsaProductsCheckYourAnswersController.onPageLoad()
-      case PeerToPeerPlatformPage                    => IsaProductsCheckYourAnswersController.onPageLoad()
-      case PeerToPeerPlatformNumberPage              => IsaProductsCheckYourAnswersController.onPageLoad()
-      case CertificatesOfAuthorityYesNoPage          => CoaCheckYourAnswersController.onPageLoad()
-      case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
-      case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
-      case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
-      case ChooseAddressPage                         => TaskListController.onPageLoad()
-      case EnterYourOrganisationAddressPage          => TaskListController.onPageLoad() // TODO hook up to CYA in DFI-1743
-      case OrganisationEmailAddressPage              => OrganisationEmailCyaController.onPageLoad()
-      case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
-      case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
-      case LiaisonOfficerPhoneNumberPage(id)         => LoCheckYourAnswersController.onPageLoad(id)
-      case LiaisonOfficerCommunicationPage(id)       => LoCheckYourAnswersController.onPageLoad(id)
-      case SignatoryNamePage(id)                     => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-      case SignatoryJobTitlePage(id)                 => SignatoryCheckYourAnswersController.onPageLoad(id = id)
-      case ProductsManagedByThirdPartyPage           => ThirdPartiesCheckYourAnswersController.onPageLoad()
-      case ThirdPartyOrgDetailsPage(id)              => thirdPartyCheckNextPage(id, returnTo)
-      case ThirdPartyManagingReturnsPage(id)         => thirdPartyCheckNextPage(id, returnTo)
-      case InvestorFundsUsedByThirdPartyPage(id)     => thirdPartyCheckNextPage(id, returnTo)
-      case ThirdPartyInvestorFundsPercentagePage(id) => thirdPartyCheckNextPage(id, returnTo)
-      case ThirdPartyConnectedOrganisationsPage      => ThirdPartiesCheckYourAnswersController.onPageLoad()
-      case _                                         => throw new NotImplementedError("No route for this page in check mode")
+      case RegisteredIsaManagerPage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad())
+
+      case ZReferenceNumberPage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad())
+
+      case TradingUsingDifferentNamePage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad())
+
+      case TradingNamePage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad())
+
+      case FirmReferenceNumberPage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad())
+
+      case RegisteredAddressCorrespondencePage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad())
+
+      case ChooseAddressPage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad())
+
+      case OrganisationTelephoneNumberPage =>
+        returnToRoute(
+          returnTo,
+          TaskListController.onPageLoad()
+        ) // TODO make default call to OrganisationDetailsCYA when built in 1743
+
+      case EnterYourOrganisationAddressPage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad()) // TODO hook to review and confim page in DFI-934
+
+      case OrganisationEmailAddressPage =>
+        returnToRoute(returnTo, OrganisationEmailCyaController.onPageLoad())
+
+      case OrganisationEmailVerificationCodePage =>
+        returnToRoute(returnTo, OrganisationEmailCyaController.onPageLoad())
+
+      case IsaProductsPage =>
+        returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
+
+      case InnovativeFinancialProductsPage =>
+        returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
+
+      case PeerToPeerPlatformPage =>
+        returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
+
+      case PeerToPeerPlatformNumberPage =>
+        returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
+
+      case CertificatesOfAuthorityYesNoPage =>
+        returnToRoute(returnTo, CoaCheckYourAnswersController.onPageLoad())
+
+      case FcaArticlesPage =>
+        returnToRoute(returnTo, CoaCheckYourAnswersController.onPageLoad())
+
+      case FinancialOrganisationPage =>
+        returnToRoute(returnTo, CoaCheckYourAnswersController.onPageLoad())
+
+      case LiaisonOfficerNamePage(id) =>
+        liaisonOfficerCheckRoute(id, returnTo)
+
+      case LiaisonOfficerEmailPage(id) =>
+        liaisonOfficerCheckRoute(id, returnTo)
+
+      case LiaisonOfficerPhoneNumberPage(id) =>
+        liaisonOfficerCheckRoute(id, returnTo)
+
+      case LiaisonOfficerCommunicationPage(id) =>
+        liaisonOfficerCheckRoute(id, returnTo)
+
+      case SignatoryNamePage(id) =>
+        signatoryCheckRoute(id, returnTo)
+
+      case SignatoryJobTitlePage(id) =>
+        signatoryCheckRoute(id, returnTo)
+
+      case ProductsManagedByThirdPartyPage =>
+        returnToRoute(returnTo, ThirdPartiesCheckYourAnswersController.onPageLoad())
+
+      case ThirdPartyOrgDetailsPage(id) =>
+        thirdPartyCheckModeRoute(id, returnTo)
+
+      case ThirdPartyManagingReturnsPage(id) =>
+        thirdPartyCheckModeRoute(id, returnTo)
+
+      case InvestorFundsUsedByThirdPartyPage(id) =>
+        thirdPartyCheckModeRoute(id, returnTo)
+
+      case ThirdPartyInvestorFundsPercentagePage(id) =>
+        thirdPartyCheckModeRoute(id, returnTo)
+
+      case ThirdPartyConnectedOrganisationsPage =>
+        returnToRoute(returnTo, ThirdPartiesCheckYourAnswersController.onPageLoad())
+
+      case _ =>
+        throw new NotImplementedError("No route for this page in check mode")
     }
 
-  private def tradingUsingDifferentNameNextPage(answers: OrganisationDetails): Call =
+  private def registeredIsaManagerNextPage(answers: OrganisationDetails, returnTo: Option[ReturnTo]): Call =
+    answers.registeredToManageIsa match {
+      case Some(true) => ZReferenceNumberController.onPageLoad(NormalMode, returnTo)
+      case _          => TradingUsingDifferentNameController.onPageLoad(NormalMode, returnTo)
+    }
+
+  private def tradingUsingDifferentNameNextPage(answers: OrganisationDetails, returnTo: Option[ReturnTo]): Call =
     answers.tradingUsingDifferentName.fold(TaskListController.onPageLoad()) {
-      case true  => TradingNameController.onPageLoad(NormalMode)
-      case false => FirmReferenceNumberController.onPageLoad(NormalMode)
+      case true  => TradingNameController.onPageLoad(NormalMode, returnTo)
+      case false => FirmReferenceNumberController.onPageLoad(NormalMode, returnTo)
     }
 
-  private def isaProductsNextPage(answers: IsaProducts): Call =
+  private def isaProductsNextPage(answers: IsaProducts, returnTo: Option[ReturnTo]): Call =
     answers.isaProducts.fold(IndexController.onPageLoad()) { isaProducts =>
-      if (isaProducts.contains(InnovativeFinanceIsas)) InnovativeFinancialProductsController.onPageLoad(NormalMode)
-      else IsaProductsCheckYourAnswersController.onPageLoad()
+      if (isaProducts.contains(InnovativeFinanceIsas))
+        InnovativeFinancialProductsController.onPageLoad(NormalMode, returnTo)
+      else returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
     }
 
-  private def innovativeFinancialProductsNextPage(answers: IsaProducts): Call =
+  private def innovativeFinancialProductsNextPage(answers: IsaProducts, returnTo: Option[ReturnTo]): Call =
     answers.innovativeFinancialProducts.fold(IndexController.onPageLoad()) { ifps =>
       if (ifps.contains(PeertopeerLoansUsingAPlatformWith36hPermissions))
-        PeerToPeerPlatformController.onPageLoad(NormalMode)
-      else IsaProductsCheckYourAnswersController.onPageLoad()
+        PeerToPeerPlatformController.onPageLoad(NormalMode, returnTo)
+      else returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
     }
 
   private def certificatesOfAuthorityYesNoNextPage(
-    answers: CertificatesOfAuthority
+    answers: CertificatesOfAuthority,
+    returnTo: Option[ReturnTo]
   ): Call =
-    answers.certificatesYesNo.fold(CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode)) {
+    answers.certificatesYesNo.fold(CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode, returnTo)) {
       case Yes =>
-        FcaArticlesController.onPageLoad(NormalMode)
+        FcaArticlesController.onPageLoad(NormalMode, returnTo)
       case No  =>
-        FinancialOrganisationController.onPageLoad(NormalMode)
+        FinancialOrganisationController.onPageLoad(NormalMode, returnTo)
     }
 
   private def registeredAddressCorrespondenceNextPage(
-    answers: OrganisationDetails
+    answers: OrganisationDetails,
+    returnTo: Option[ReturnTo]
   ): Call =
     answers.registeredAddressCorrespondence.fold(IndexController.onPageLoad()) {
       case true  =>
-        OrganisationTelephoneNumberController.onPageLoad(NormalMode)
+        OrganisationTelephoneNumberController.onPageLoad(NormalMode, returnTo)
       case false =>
-        AddAnotherAddressController.onPageLoad(NormalMode)
+        AddAnotherAddressController.onPageLoad(NormalMode, returnTo)
     }
+
+  private def addedLiaisonOfficersNextPage(answer: YesNoAnswer, returnTo: Option[ReturnTo]) =
+    answer match {
+      case YesNoAnswer.Yes => LiaisonOfficerNameController.onPageLoad(None, NormalMode, returnTo)
+      case YesNoAnswer.No  => returnToRoute(returnTo, TaskListController.onPageLoad())
+    }
+
+  private def addedSignatoriesNextPage(answer: YesNoAnswer, returnTo: Option[ReturnTo]) =
+    answer match {
+      case YesNoAnswer.Yes => SignatoryNameController.onPageLoad(None, NormalMode, returnTo)
+      case YesNoAnswer.No  => returnToRoute(returnTo, TaskListController.onPageLoad())
+    }
+
+  private def addedThirdPartiesNextPage(
+    answer: YesNoAnswer,
+    count: Int,
+    connectedOrganisations: Seq[String],
+    mode: Mode,
+    returnTo: Option[ReturnTo]
+  ): Call =
+    answer match {
+      case YesNoAnswer.Yes => ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode, returnTo)
+      case YesNoAnswer.No  =>
+        if (count > 1 && connectedOrganisations.isEmpty)
+          ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode, returnTo)
+        else
+          returnToRoute(returnTo, addedThirdPartiesDefaultNoNextPage(count, mode))
+    }
+
+  private def addedThirdPartiesDefaultNoNextPage(count: Int, mode: Mode): Call =
+    if (count > 1 && mode == NormalMode) ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode, None)
+    else if (count > 1) ThirdPartiesCheckYourAnswersController.onPageLoad()
+    else TaskListController.onPageLoad()
 
   private def removeSignatoryNextPage(
-    answers: Signatories
+    answers: Signatories,
+    returnTo: Option[ReturnTo]
   ): Call =
     answers.signatories match {
-      case Seq() => AddASignatoryController.onPageLoad()
-      case _     => AddedSignatoryController.onPageLoad()
+      case Seq() => AddASignatoryController.onPageLoad(returnTo)
+      case _     => AddedSignatoryController.onPageLoad(NormalMode, returnTo)
     }
 
-  private def removeLiaisonOfficerNextPage(answers: LiaisonOfficers): Call =
+  private def removeLiaisonOfficerNextPage(answers: LiaisonOfficers, returnTo: Option[ReturnTo]): Call =
     answers.liaisonOfficers match {
-      case Nil => AddLiaisonOfficerController.onPageLoad()
-      case _   => AddedLiaisonOfficersController.onPageLoad()
+      case Nil => AddLiaisonOfficerController.onPageLoad(returnTo)
+      case _   => AddedLiaisonOfficersController.onPageLoad(NormalMode, returnTo)
     }
 
-  private def productsManagedByThirdPartNextPage(answers: ThirdPartyOrganisations): Call =
+  private def productsManagedByThirdPartyNextPage(answers: ThirdPartyOrganisations, returnTo: Option[ReturnTo]): Call =
     answers.managedByThirdParty match {
-      case Some(YesNoAnswer.Yes) => ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode, None)
-      case _                     => TaskListController.onPageLoad()
+      case Some(YesNoAnswer.Yes) => ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode, returnTo)
+      case _                     => returnToRoute(returnTo, TaskListController.onPageLoad())
     }
 
   private def investorFundsUsedByThirdPartyNextPage(
@@ -229,18 +373,18 @@ class Navigator @Inject() () {
       case Some(YesNoAnswer.Yes) =>
         ThirdPartyInvestorFundsPercentageController.onPageLoad(id = id, mode = NormalMode, returnTo)
       case Some(YesNoAnswer.No)  =>
-        ThirdPartyCheckYourAnswersController.onPageLoad(id = id)
+        ThirdPartyCheckYourAnswersController.onPageLoad(id = id, returnTo)
       case _                     =>
         TaskListController.onPageLoad()
     }
 
-  private def removeThirdPartyNextPage(answers: ThirdPartyOrganisations): Call =
+  private def removeThirdPartyNextPage(answers: ThirdPartyOrganisations, returnTo: Option[ReturnTo]): Call =
     answers.thirdParties match {
-      case Nil => ProductsManagedByThirdPartyController.onPageLoad(NormalMode)
-      case _   => AddedThirdPartiesController.onPageLoad(NormalMode, None)
+      case Nil => ProductsManagedByThirdPartyController.onPageLoad(NormalMode, returnTo)
+      case _   => AddedThirdPartiesController.onPageLoad(NormalMode, returnTo)
     }
 
-  private def addAnotherAddressRouting(answers: OrganisationDetails): Call = {
+  private def addAnotherAddressRouting(answers: OrganisationDetails, returnTo: Option[ReturnTo]): Call = {
 
     val count =
       answers.addAnotherAddress
@@ -249,9 +393,9 @@ class Navigator @Inject() () {
 
     count match {
       case 1          =>
-        TaskListController.onPageLoad()
+        ConfirmCorrespondenceAddressController.onPageLoad()
       case n if n > 1 =>
-        ChooseAddressController.onPageLoad(NormalMode)
+        ChooseAddressController.onPageLoad(NormalMode, returnTo)
       case _          =>
         TaskListController.onPageLoad()
     }
@@ -262,22 +406,48 @@ class Navigator @Inject() () {
     returnTo: Option[ReturnTo]
   ): Call =
     returnTo match {
-      case Some(FinalCya) =>
+      case Some(ThirdPartyCya) =>
         ThirdPartiesCheckYourAnswersController.onPageLoad()
-      case _              =>
-        ThirdPartyCheckYourAnswersController.onPageLoad(id)
+      case _                   =>
+        ThirdPartyCheckYourAnswersController.onPageLoad(id, returnTo)
     }
 
   private def chooseAddressNextPage(
-    answers: OrganisationDetails
+    answers: OrganisationDetails,
+    returnTo: Option[ReturnTo]
   ): Call =
     answers.addAnotherAddress
       .flatMap(_.selectedAddress) match {
       case Some(SelectedCorrespondenceAddress.ManualEntry) =>
-        EnterYourOrganisationAddressController.onPageLoad(NormalMode)
+        EnterYourOrganisationAddressController.onPageLoad(NormalMode, returnTo)
       case Some(SelectedCorrespondenceAddress.Address(_))  =>
-        TaskListController.onPageLoad()
+        ConfirmCorrespondenceAddressController.onPageLoad()
       case None                                            =>
         TaskListController.onPageLoad()
+    }
+
+  private def liaisonOfficerCheckRoute(id: String, returnTo: Option[ReturnTo]): Call =
+    returnToRoute(
+      returnTo,
+      LoCheckYourAnswersController.onPageLoad(id, None)
+    )
+
+  private def signatoryCheckRoute(id: String, returnTo: Option[ReturnTo]): Call =
+    returnToRoute(
+      returnTo,
+      SignatoryCheckYourAnswersController.onPageLoad(id = id, returnTo = None)
+    )
+
+  private def thirdPartyCheckModeRoute(id: String, returnTo: Option[ReturnTo]): Call =
+    returnToRoute(
+      returnTo,
+      ThirdPartyCheckYourAnswersController.onPageLoad(id = id, returnTo = None)
+    )
+
+  private def returnToRoute(returnTo: Option[ReturnTo], default: => Call): Call =
+    returnTo match {
+      case Some(SubmissionCya) => SubmissionCyaController.onPageLoad()
+      case Some(ThirdPartyCya) => ThirdPartiesCheckYourAnswersController.onPageLoad()
+      case _                   => default
     }
 }

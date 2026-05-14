@@ -48,6 +48,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
               uprn = None
             )
           ),
+          companyNumber = Some(testString),
           companyName = Some(testString),
           businessPartnerId = Some(testString)
         )
@@ -113,6 +114,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
           "postCode": "post code"
         },
         "companyName":"test",
+        "companyNumber":"test",
         "businessPartnerId":"test"
       },
       "organisationDetails": {
@@ -168,6 +170,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "uprn": null
       },
       "companyName":"test",
+      "companyNumber":"test",
       "businessPartnerId":"test"
     },
     "enrolmentId": "$testEnrolmentId",

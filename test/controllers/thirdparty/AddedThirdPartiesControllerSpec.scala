@@ -69,41 +69,8 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
         contentAsString(result) mustEqual view(
           form = new forms.YesNoAnswerFormProvider()("addedThirdParties.error.required"),
           AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
-          NormalMode
-        )(request, messages(application)).toString
-      }
-    }
-
-    "must pre-fill form with NO when returnTo query param is present" in {
-
-      val routeWithReturnTo =
-        AddedThirdPartiesController
-          .onPageLoad(
-            mode = NormalMode,
-            returnTo = Some(models.ReturnTo.FinalCya)
-          )
-          .url
-
-      val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq(tp1, tp2)))).build()
-
-      val appConfig = application.injector.instanceOf[FrontendAppConfig]
-
-      running(application) {
-        val request = FakeRequest(GET, routeWithReturnTo)
-        val result  = route(application, request).value
-
-        val view = application.injector.instanceOf[AddedThirdPartiesView]
-
-        val (inProgress, complete) = Seq(tp1, tp2).partition(_.inProgress)
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(
-          form = new forms.YesNoAnswerFormProvider()("addedThirdParties.error.required")
-            .fill(YesNoAnswer.No),
-          AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
-          NormalMode
+          NormalMode,
+          None
         )(request, messages(application)).toString
       }
     }

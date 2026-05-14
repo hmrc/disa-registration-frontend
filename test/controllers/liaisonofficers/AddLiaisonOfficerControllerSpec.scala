@@ -65,7 +65,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
         val result  = controller.onPageLoad()(request)
 
         status(result) mustEqual OK
-        contentAsString(result) must equal(view()(request, messages(application)).toString)
+        contentAsString(result) must equal(view(None)(request, messages(application)).toString)
       }
     }
 

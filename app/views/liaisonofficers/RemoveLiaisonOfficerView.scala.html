@@ -16,6 +16,7 @@
 
 @import controllers.liaisonofficers.routes.RemoveLiaisonOfficerController
 @import viewmodels.LegendSize.Large
+@import models.ReturnTo
 
 @this(
     layout: templates.Layout,
@@ -25,11 +26,11 @@
     govukButton: GovukButton
 )
 
-@(id: String, name: String, form: Form[_])(implicit request: Request[_], messages: Messages)
+@(id: String, name: String, form: Form[_], returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("removeLiaisonOfficer.title", name), Some(messages("sectionTitle.liaisonOfficers")))) {
 
-    @formHelper(action = RemoveLiaisonOfficerController.onSubmit(id), Symbol("autoComplete") -> "off") {
+    @formHelper(action = RemoveLiaisonOfficerController.onSubmit(id, returnTo), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))

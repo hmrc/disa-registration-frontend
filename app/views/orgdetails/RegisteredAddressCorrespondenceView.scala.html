@@ -34,11 +34,11 @@
     hmrcPageHeading: HmrcPageHeading,
     govukRadios: GovukRadios)
 
-@(form: Form[_], mode: Mode, address: RegisteredAddress)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, returnTo: Option[ReturnTo], address: RegisteredAddress)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle =  title(form,messages("registeredAddressCorrespondence.title"),Some(messages("sectionTitle.orgDetails")))) {
 
-    @formHelper(action = RegisteredAddressCorrespondenceController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = RegisteredAddressCorrespondenceController.onSubmit(mode, returnTo), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

@@ -14,31 +14,41 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.orgdetails
 
-import com.google.inject.Inject
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.*
+import models.ReturnTo
+import models.journeydata.CorrespondenceAddress
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.govuk.summarylist._
-import views.html.CheckYourAnswersView
+import views.html.orgdetails.ConfirmCorrespondenceAddressView
 
-class CheckYourAnswersController @Inject() (
+import javax.inject.Inject
+
+class ConfirmCorrespondenceAddressController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: CheckYourAnswersView
+  view: ConfirmCorrespondenceAddressView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val list = SummaryListViewModel(
-      rows = Seq.empty
-    )
+  def onPageLoad(returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData) { implicit request =>
+      val address =
+        for {
+          jd                    <- request.journeyData
+          orgDetails            <- jd.organisationDetails
+          correspondenceAddress <- orgDetails.correspondenceAddress
+        } yield correspondenceAddress
 
-    Ok(view(list))
-  }
+      address match {
+        case Some(correspondenceAddress) =>
+          Ok(view(correspondenceAddress, returnTo))
+        case None                        =>
+          Redirect(controllers.routes.TaskListController.onPageLoad())
+      }
+    }
 }

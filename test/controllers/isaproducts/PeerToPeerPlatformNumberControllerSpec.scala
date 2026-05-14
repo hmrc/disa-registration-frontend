@@ -64,7 +64,10 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
           val view = application.injector.instanceOf[PeerToPeerPlatformNumberView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, testString, NormalMode)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(form, testString, NormalMode, None)(
+            request,
+            messages(application)
+          ).toString
         }
       }
 
@@ -84,7 +87,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form.fill(validAnswer), testString, NormalMode)(
+          contentAsString(result) mustEqual view(form.fill(validAnswer), testString, NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -156,7 +159,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(boundForm, testString, NormalMode).toString
+          contentAsString(result) mustEqual view(boundForm, testString, NormalMode, None).toString
         }
       }
 
@@ -164,9 +167,7 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
 
         val dataMissingName = validJourneyData.copy(isaProducts = Some(IsaProducts(p2pPlatform = None)))
 
-        val application = applicationBuilder(
-          journeyData = Some(dataMissingName)
-        ).build()
+        val application = applicationBuilder(journeyData = Some(dataMissingName)).build()
 
         running(application) {
           val request = FakeRequest(POST, peerToPeerPlatformNumberRoute)

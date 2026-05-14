@@ -34,9 +34,11 @@ class EmailVerificationConnectorSpec extends SpecBase {
   trait TestSetup {
 
     val connector: EmailVerificationConnector = applicationBuilder(
-      None,
-      inject.bind[HttpClientV2].toInstance(mockHttpClient),
-      inject.bind[FrontendAppConfig].toInstance(mockAppConfig)
+      journeyData = None,
+      overrides = Seq(
+        inject.bind[HttpClientV2].toInstance(mockHttpClient),
+        inject.bind[FrontendAppConfig].toInstance(mockAppConfig)
+      )
     ).build().injector.instanceOf[EmailVerificationConnector]
 
     val testUrl: String = "http://localhost:9898"

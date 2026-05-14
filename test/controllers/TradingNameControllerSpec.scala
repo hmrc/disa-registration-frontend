@@ -63,7 +63,7 @@ class TradingNameControllerSpec extends SpecBase {
           val view = application.injector.instanceOf[TradingNameView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+          contentAsString(result) mustEqual view(form, NormalMode, None)(request, messages(application)).toString
         }
       }
 
@@ -83,7 +83,7 @@ class TradingNameControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode)(
+          contentAsString(result) mustEqual view(form.fill(validAnswer), NormalMode, None)(
             request,
             messages(application)
           ).toString
@@ -138,7 +138,7 @@ class TradingNameControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual BAD_REQUEST
-          contentAsString(result) mustEqual view(boundForm, NormalMode).toString
+          contentAsString(result) mustEqual view(boundForm, NormalMode, None).toString
         }
       }
 

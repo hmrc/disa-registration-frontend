@@ -23,7 +23,7 @@ import handlers.ErrorHandler
 import models.YesNoAnswer.{No, Yes}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.requests.DataRequest
-import models.{NormalMode, YesNoAnswer}
+import models.{NormalMode, ReturnTo, YesNoAnswer}
 import navigation.Navigator
 import pages.thirdparty.RemoveThirdPartyPage
 import play.api.data.Form
@@ -55,20 +55,20 @@ class RemoveThirdPartyController @Inject() (
 
   val form: Form[YesNoAnswer] = formProvider("removeThirdParty.error.required")
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      providingName(id, name => Future.successful(Ok(view(id, name, form))))
-  }
+  def onPageLoad(id: String, returnTo: Option[ReturnTo] = None): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      providingName(id, name => Future.successful(Ok(view(id, name, form, returnTo))))
+    }
 
-  def onSubmit(id: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(id: String, returnTo: Option[ReturnTo] = None): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       providingName(
         id,
         name =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(id, name, formWithErrors))),
+              formWithErrors => Future.successful(BadRequest(view(id, name, formWithErrors, returnTo))),
               value => {
                 val updatedSection = value match {
                   case Yes => updatedSectionWithThirdPartyRemoved(id)
@@ -76,11 +76,11 @@ class RemoveThirdPartyController @Inject() (
                 }
                 updatedSection.fold(
                   Future.successful(Redirect(TaskListController.onPageLoad()))
-                )(section => updateAnswersAndRedirect(section))
+                )(section => updateAnswersAndRedirect(section, returnTo))
               }
             )
       )
-  }
+    }
 
   private def providingName(id: String, block: String => Future[Result])(implicit request: DataRequest[_]) =
     (for {
@@ -90,12 +90,13 @@ class RemoveThirdPartyController @Inject() (
       .getOrElse(Future.successful(Redirect(TaskListController.onPageLoad())))
 
   private def updateAnswersAndRedirect(
-    updatedSection: ThirdPartyOrganisations
+    updatedSection: ThirdPartyOrganisations,
+    returnTo: Option[ReturnTo]
   )(implicit request: DataRequest[_], executionContext: ExecutionContext) =
     journeyAnswersService
       .update(updatedSection, request.groupId, request.credentials.providerId)
       .map { updatedSection =>
-        Redirect(navigator.nextPage(RemoveThirdPartyPage, updatedSection, NormalMode, None))
+        Redirect(navigator.nextPage(RemoveThirdPartyPage, updatedSection, NormalMode, returnTo))
       }
       .recoverWith { case NonFatal(e) =>
         logger.warn(

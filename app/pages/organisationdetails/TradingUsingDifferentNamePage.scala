@@ -17,12 +17,19 @@
 package pages.organisationdetails
 
 import models.journeydata.OrganisationDetails
-import pages.PageWithoutDependents
+import pages.{ClearablePage, PageWithDependents}
 
-case object TradingUsingDifferentNamePage extends PageWithoutDependents[OrganisationDetails] {
+case object TradingUsingDifferentNamePage extends PageWithDependents[OrganisationDetails] {
 
   override def toString: String = "tradingUsingDifferentName"
 
   def clearAnswer(answers: OrganisationDetails): OrganisationDetails =
     answers.copy(tradingUsingDifferentName = None)
+
+  def pagesToClear(currentAnswers: OrganisationDetails): List[ClearablePage[OrganisationDetails]] = List(
+    TradingNamePage
+  )
+
+  def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean =
+    currentAnswers.tradingUsingDifferentName.contains(true) && currentAnswers.tradingName.isEmpty
 }
