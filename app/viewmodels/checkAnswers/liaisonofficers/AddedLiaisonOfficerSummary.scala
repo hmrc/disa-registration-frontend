@@ -64,7 +64,7 @@ class AddedLiaisonOfficersViewModel @Inject() (
                     )}</h2>""")
                 }
                 .getOrElse(HtmlFormat.empty),
-              govukSummaryList(SummaryListViewModel(rows = summary.complete.flatMap(row(_, mode, returnTo))))
+              govukSummaryList(SummaryListViewModel(rows = summary.complete.flatMap(row(_, returnTo))))
             )
           )
         },
@@ -74,7 +74,7 @@ class AddedLiaisonOfficersViewModel @Inject() (
               Html(s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(
                   messages("addedLiaisonOfficers.inProgress")
                 )}</h2>"""),
-              govukSummaryList(SummaryListViewModel(rows = summary.inProgress.flatMap(row(_, mode, returnTo))))
+              govukSummaryList(SummaryListViewModel(rows = summary.inProgress.flatMap(row(_, returnTo))))
             )
           )
         },
@@ -91,7 +91,7 @@ class AddedLiaisonOfficersViewModel @Inject() (
       ).flatten
     )
 
-  private def row(liaisonOfficer: LiaisonOfficer, mode: Mode, returnTo: Option[ReturnTo])(implicit
+  private def row(liaisonOfficer: LiaisonOfficer, returnTo: Option[ReturnTo])(implicit
     messages: Messages
   ): Option[SummaryListRow] = {
     val changeLink =

@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.*
+import controllers.routes.TaskListController
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.User
@@ -39,7 +40,9 @@ class SubmissionCyaController @Inject() (
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       val canSubmit = request.credentialRole == User
-      Ok(view(SubmissionCyaViewModel(request.journeyData, canSubmit)))
+
+      if (canSubmit) Ok(view(SubmissionCyaViewModel(request.journeyData)))
+      else Redirect(TaskListController.onPageLoad())
     }
 
   def onSubmit(): Action[AnyContent] =
@@ -47,7 +50,7 @@ class SubmissionCyaController @Inject() (
       if (request.credentialRole == User) {
         Redirect(routes.DeclarationForIsaManagersController.onPageLoad())
       } else {
-        Redirect(routes.SubmissionCyaController.onPageLoad())
+        Redirect(TaskListController.onPageLoad())
       }
     }
 }

@@ -33,9 +33,7 @@ class TaskListControllerSpec extends SpecBase {
       when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
         .thenReturn(Future.successful(()))
 
-      val application = applicationBuilder(
-        journeyData = Some(emptyJourneyData)
-      ).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
 
@@ -58,9 +56,7 @@ class TaskListControllerSpec extends SpecBase {
       when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
-      val application = applicationBuilder(
-        journeyData = Some(emptyJourneyData)
-      ).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
 

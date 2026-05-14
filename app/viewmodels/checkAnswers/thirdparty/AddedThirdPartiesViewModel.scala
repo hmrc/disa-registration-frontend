@@ -87,7 +87,7 @@ class AddedThirdPartiesViewModel @Inject() (
                 }
                 .getOrElse(HtmlFormat.empty),
               govukSummaryList(
-                SummaryListViewModel(rows = complete.flatMap(thirdParty => row(thirdParty, mode, returnTo)))
+                SummaryListViewModel(rows = complete.flatMap(thirdParty => row(thirdParty, returnTo)))
               )
             )
           )
@@ -100,7 +100,7 @@ class AddedThirdPartiesViewModel @Inject() (
               ),
               govukSummaryList(
                 SummaryListViewModel(rows =
-                  inProgress.flatMap(thirdParty => row(thirdParty, mode, returnTo, inProgress = true))
+                  inProgress.flatMap(thirdParty => row(thirdParty, returnTo, inProgress = true))
                 )
               )
             )
@@ -120,7 +120,7 @@ class AddedThirdPartiesViewModel @Inject() (
     )
   }
 
-  private def row(thirdParty: ThirdParty, mode: Mode, returnTo: Option[ReturnTo], inProgress: Boolean = false)(implicit
+  private def row(thirdParty: ThirdParty, returnTo: Option[ReturnTo], inProgress: Boolean = false)(implicit
     messages: Messages
   ): Option[SummaryListRow] = {
     val changeLink = if (inProgress) {

@@ -86,7 +86,7 @@ class ThirdPartyCheckYourAnswersControllerSpec extends SpecBase {
           ).flatten
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(SummaryListViewModel(expectedRows))(
+        contentAsString(result) mustEqual view(SummaryListViewModel(expectedRows), None)(
           request,
           messages(application)
         ).toString

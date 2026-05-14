@@ -76,7 +76,10 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(generatedId, form, NormalMode, None)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -106,7 +109,7 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, form.fill(testString), NormalMode)(
+        contentAsString(result) mustEqual view(existingId, form.fill(testString), NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -130,7 +133,7 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, NormalMode)(
+        contentAsString(result) mustEqual view(generatedId, form, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -162,7 +165,7 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, form.fill("Existing Person"), NormalMode)(
+        contentAsString(result) mustEqual view(existingId, form.fill("Existing Person"), NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -233,7 +236,7 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(existingId, boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(existingId, boundForm, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -649,7 +652,10 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, CheckMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(generatedId, form, CheckMode, None)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 

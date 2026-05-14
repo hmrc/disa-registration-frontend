@@ -56,10 +56,8 @@
             }
         }
 
-        @if(viewModel.canSubmit) {
-            @govukButton(
-                ButtonViewModel(messages("site.confirmAndSave")).preventingDoubleClick()
-            )
-        }
+        @govukButton(
+            ButtonViewModel(messages("site.confirmAndSave")).preventingDoubleClick()
+        )
     }
 }

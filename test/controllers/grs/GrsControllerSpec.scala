@@ -41,7 +41,7 @@ class GrsControllerSpec extends SpecBase {
     ctutr: Option[String] = Some("1234567890")
   ) =
     GRSResponse(
-      companyNumber = "01234567",
+      companyNumber = testString,
       companyName = Some("Test Co"),
       ctutr = ctutr,
       chrn = None,
@@ -88,7 +88,8 @@ class GrsControllerSpec extends SpecBase {
                     addressLine3 = Some("address line 3"),
                     postCode = Some("postcode")
                   )
-                )
+                ),
+                companyNumber = Some(testString)
               )
             )
           )
@@ -171,7 +172,8 @@ class GrsControllerSpec extends SpecBase {
                     addressLine3 = Some("address line 3"),
                     postCode = Some("postcode")
                   )
-                )
+                ),
+                companyNumber = Some(testString)
               )
             )
           )
@@ -207,7 +209,8 @@ class GrsControllerSpec extends SpecBase {
                     addressLine3 = Some("address line 3"),
                     postCode = Some("postcode")
                   )
-                )
+                ),
+                companyNumber = Some(testString)
               )
             )
           )

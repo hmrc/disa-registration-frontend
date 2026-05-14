@@ -35,9 +35,7 @@ class ConfirmationControllerSpec extends SpecBase {
         subscriptionId = Some(subscriptionId)
       )
 
-      val application = applicationBuilder(
-        journeyData = Some(journeyData)
-      ).build()
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
@@ -62,9 +60,7 @@ class ConfirmationControllerSpec extends SpecBase {
         subscriptionId = None
       )
 
-      val application = applicationBuilder(
-        journeyData = Some(journeyData)
-      ).build()
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)

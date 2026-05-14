@@ -35,8 +35,8 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
   private val formProvider = new YesNoAnswerFormProvider()
   private val form         = formProvider("addedLiaisonOfficers.error.required")
 
-  private val routeUrl  = routes.AddedLiaisonOfficersController.onPageLoad().url
-  private val submitUrl = routes.AddedLiaisonOfficersController.onSubmit().url
+  private val routeUrl  = routes.AddedLiaisonOfficersController.onPageLoad(NormalMode).url
+  private val submitUrl = routes.AddedLiaisonOfficersController.onSubmit(NormalMode).url
 
   private val loInProgress = LiaisonOfficer(id = "1", fullName = Some("Jane Smith"))
   private val loComplete   = LiaisonOfficer(id = "2", fullName = Some("John Doe"), Some(""), Set(ByEmail), Some(""))
@@ -65,7 +65,9 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(
           form,
-          AddedLiaisonOfficerSummary(inProgress, complete)
+          AddedLiaisonOfficerSummary(inProgress, complete),
+          NormalMode,
+          None
         )(request, messages(application)).toString
       }
     }
@@ -128,7 +130,9 @@ class AddedLiaisonOfficersControllerSpec extends SpecBase {
           AddedLiaisonOfficerSummary(
             inProgress = Seq(loInProgress),
             complete = Seq.empty
-          )
+          ),
+          NormalMode,
+          None
         )(request, messages(application)).toString
       }
     }

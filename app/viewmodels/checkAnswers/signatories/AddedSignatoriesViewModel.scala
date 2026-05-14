@@ -87,7 +87,7 @@ class AddedSignatoriesViewModel @Inject() (
                 }
                 .getOrElse(HtmlFormat.empty),
               govukSummaryList(
-                SummaryListViewModel(rows = complete.flatMap(signatory => row(signatory, mode, returnTo)))
+                SummaryListViewModel(rows = complete.flatMap(signatory => row(signatory, returnTo)))
               )
             )
           )
@@ -98,7 +98,7 @@ class AddedSignatoriesViewModel @Inject() (
               Html(s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(messages("addedSignatory.inProgress"))}</h2>"""),
               govukSummaryList(
                 SummaryListViewModel(rows =
-                  inProgress.flatMap(signatory => row(signatory, mode, returnTo, inProgress = true))
+                  inProgress.flatMap(signatory => row(signatory, returnTo, inProgress = true))
                 )
               )
             )
@@ -118,7 +118,7 @@ class AddedSignatoriesViewModel @Inject() (
     )
   }
 
-  private def row(signatory: Signatory, mode: Mode, returnTo: Option[ReturnTo], inProgress: Boolean = false)(implicit
+  private def row(signatory: Signatory, returnTo: Option[ReturnTo], inProgress: Boolean = false)(implicit
     messages: Messages
   ): Option[SummaryListRow] = {
     val changeLink = if (inProgress) {

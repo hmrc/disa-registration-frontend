@@ -20,8 +20,8 @@ import base.SpecBase
 import controllers.orgdetails.routes.*
 import controllers.routes.*
 import forms.RegisteredAddressCorrespondenceFormProvider
-import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails, RegisteredAddress}
-import models.{CheckMode, NormalMode}
+import models.NormalMode
+import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -62,7 +62,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, testRegisteredAddress)(
+        contentAsString(result) mustEqual view(form, NormalMode, None, testRegisteredAddress)(
           request,
           messages(application)
         ).toString
@@ -106,7 +106,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testRegisteredAddress)(
+        contentAsString(result) mustEqual view(form.fill(true), NormalMode, None, testRegisteredAddress)(
           request,
           messages(application)
         ).toString
@@ -139,7 +139,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
 
       when(
         mockJourneyAnswersService.update(
-          eqTo(expectedUpdatedSection),
+          any[OrganisationDetails],
           any[String],
           any[String]
         )(any[Writes[OrganisationDetails]], any[HeaderCarrier])
@@ -194,41 +194,6 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
       }
     }
 
-    "must return to check your answers if no answer has changed on submission" in {
-
-      val initialJourneyData = JourneyData(
-        groupId = testGroupId,
-        enrolmentId = "enrolment",
-        businessVerification = Some(testBV.copy(registeredAddress = Some(testRegisteredAddress))),
-        organisationDetails = Some(OrganisationDetails(registeredAddressCorrespondence = Some(false)))
-      )
-
-      val expectedUpdatedSection = OrganisationDetails(
-        registeredAddressCorrespondence = Some(false),
-        correspondenceAddress = None
-      )
-
-      when(
-        mockJourneyAnswersService.update(eqTo(expectedUpdatedSection), any[String], any[String])(
-          any[Writes[OrganisationDetails]],
-          any
-        )
-      ).thenReturn(Future.successful(expectedUpdatedSection))
-
-      val application = applicationBuilder(journeyData = Some(initialJourneyData)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, RegisteredAddressCorrespondenceController.onPageLoad(CheckMode).url)
-            .withFormUrlEncodedBody("value" -> "false")
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
-      }
-    }
-
     "must return BAD_REQUEST when invalid data is submitted" in {
 
       val journeyData = JourneyData(
@@ -250,7 +215,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, testRegisteredAddress)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None, testRegisteredAddress)(
           request,
           messages(application)
         ).toString

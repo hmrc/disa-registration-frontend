@@ -60,7 +60,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, None)(request, messages(application)).toString
       }
     }
 
@@ -87,7 +87,10 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Yes), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(Yes), NormalMode, None)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -114,7 +117,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ProductsManagedByThirdPartyView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(No), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(No), NormalMode, None)(request, messages(application)).toString
       }
     }
 
@@ -134,7 +137,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None)(request, messages(application)).toString
       }
     }
 

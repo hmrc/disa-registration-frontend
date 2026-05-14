@@ -74,7 +74,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[AddAnotherAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, mode)(
+        contentAsString(result) mustEqual view(form, mode, None)(
           request,
           messages(application)
         ).toString
@@ -104,7 +104,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         val expectedForm = form.fill(baseAnswer)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(expectedForm, mode)(
+        contentAsString(result) mustEqual view(expectedForm, mode, None)(
           request,
           messages(application)
         ).toString

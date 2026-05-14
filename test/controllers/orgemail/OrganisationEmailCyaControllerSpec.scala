@@ -151,7 +151,7 @@ class OrganisationEmailCyaControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual EmailVerificationCodeController
-          .onPageLoad()
+          .onPageLoad(NormalMode)
           .url
       }
     }
@@ -181,7 +181,7 @@ class OrganisationEmailCyaControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual EmailVerificationCodeController
-          .onPageLoad()
+          .onPageLoad(NormalMode)
           .url
       }
     }

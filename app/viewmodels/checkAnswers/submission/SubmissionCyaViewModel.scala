@@ -19,11 +19,11 @@ package viewmodels.checkAnswers.submission
 import controllers.certificatesofauthority.routes.{CertificatesOfAuthorityYesNoController, FcaArticlesController, FinancialOrganisationController}
 import controllers.isaproducts.routes.{InnovativeFinancialProductsController, IsaProductsController, PeerToPeerPlatformController, PeerToPeerPlatformNumberController}
 import controllers.liaisonofficers.routes.AddedLiaisonOfficersController
-import controllers.orgdetails.routes.{FirmReferenceNumberController, OrganisationTelephoneNumberController, RegisteredAddressCorrespondenceController, RegisteredIsaManagerController, TradingNameController, TradingUsingDifferentNameController, ZReferenceNumberController}
+import controllers.orgdetails.routes.*
 import controllers.orgemail.routes.OrganisationEmailAddressController
 import controllers.signatories.routes.AddedSignatoryController
 import models.ReturnTo.SubmissionCya
-import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
+import models.journeydata.thirdparty.ThirdParty
 import models.journeydata.{CorrespondenceAddress, JourneyData, RegisteredAddress}
 import models.{CheckMode, ReturnTo}
 import play.api.i18n.Messages
@@ -32,7 +32,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow, Value}
 import viewmodels.checkAnswers.liaisonofficers.{LiaisonOfficerCommunicationSummary, LiaisonOfficerEmailSummary, LiaisonOfficerNameSummary, LiaisonOfficerPhoneNumberSummary}
 import viewmodels.checkAnswers.signatories.{SignatoryJobTitleSummary, SignatoryNameSummary}
-import viewmodels.checkAnswers.thirdparty.finalcya.{AddAnotherThirdPartySummary, InvestorFundsUsedByThirdPartySummary, ProductsManagedByThirdPartySummary, ThirdPartyConnectedOrganisationsControllerSummary, ThirdPartyInvestorFundsPercentageSummary, ThirdPartyManagingReturnsSummary, ThirdPartyOrgDetailsSummary}
+import viewmodels.checkAnswers.thirdparty.finalcya.*
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
@@ -44,13 +44,12 @@ case class SubmissionCyaSection(
 )
 
 case class SubmissionCyaViewModel(
-  sections: Seq[SubmissionCyaSection],
-  canSubmit: Boolean
+  sections: Seq[SubmissionCyaSection]
 )
 
 object SubmissionCyaViewModel {
 
-  def apply(answers: JourneyData, canSubmit: Boolean)(implicit messages: Messages): SubmissionCyaViewModel = {
+  def apply(answers: JourneyData)(implicit messages: Messages): SubmissionCyaViewModel = {
     val returnTo = Some(SubmissionCya)
 
     val sections =
@@ -72,8 +71,7 @@ object SubmissionCyaViewModel {
         thirdPartyOrganisationSections(answers, returnTo)
 
     SubmissionCyaViewModel(
-      sections = sections.filter(section => section.rows.nonEmpty || section.renderWhenEmpty),
-      canSubmit = canSubmit
+      sections = sections.filter(section => section.rows.nonEmpty || section.renderWhenEmpty)
     )
   }
 

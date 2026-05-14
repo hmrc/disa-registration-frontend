@@ -112,11 +112,6 @@ class RegisteredAddressCorrespondenceController @Inject() (
                       registeredAddress
                     )
                 }
-                buildOrganisationDetails(
-                  existingSection,
-                  answer,
-                  registeredAddress
-                )
 
                 journeyAnswersService
                   .update(updatedOrganisationDetails, request.groupId, request.credentials.providerId)

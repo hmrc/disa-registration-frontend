@@ -106,7 +106,8 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(
           form,
           addresses,
-          NormalMode
+          NormalMode,
+          None
         )(request, messages(application)).toString
       }
     }
