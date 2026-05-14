@@ -87,14 +87,14 @@ class Navigator @Inject() () {
     mode: Mode,
     returnTo: Option[ReturnTo]
   ): Call =
-    addedLiaisonOfficersNextPage(answer, mode, returnTo)
+    addedLiaisonOfficersNextPage(answer, returnTo)
 
   def nextPageFromAddedSignatories(
     answer: YesNoAnswer,
     mode: Mode,
     returnTo: Option[ReturnTo]
   ): Call =
-    addedSignatoriesNextPage(answer, mode, returnTo)
+    addedSignatoriesNextPage(answer, returnTo)
 
   def nextPageFromAddedThirdParties(
     answer: YesNoAnswer,
@@ -119,8 +119,13 @@ class Navigator @Inject() () {
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers, returnTo)
     case ChooseAddressPage                         => chooseAddressNextPage(answers)
     case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
-    case EnterYourOrganisationAddressPage          => ConfirmCorrespondenceAddressController.onPageLoad()
-    case OrganisationTelephoneNumberPage => returnToRoute(returnTo, TaskListController.onPageLoad()) // TODO make default call to OrganisationDetailsCYA when built in 1743
+    case EnterYourOrganisationAddressPage          =>
+      ConfirmCorrespondenceAddressController.onPageLoad()
+    case OrganisationTelephoneNumberPage           =>
+      returnToRoute(
+        returnTo,
+        TaskListController.onPageLoad()
+      ) // TODO make default call to OrganisationDetailsCYA when built in 1743
     case IsaProductsPage                           => isaProductsNextPage(answers, returnTo)
     case InnovativeFinancialProductsPage           => innovativeFinancialProductsNextPage(answers, returnTo)
     case PeerToPeerPlatformPage                    => PeerToPeerPlatformNumberController.onPageLoad(NormalMode, returnTo)
@@ -152,7 +157,7 @@ class Navigator @Inject() () {
 
     case ThirdPartyConnectedOrganisationsPage =>
       returnToRoute(returnTo, ThirdPartiesCheckYourAnswersController.onPageLoad())
-    case _                                         => throw new NotImplementedError("No route for this page in normal mode")
+    case _                                    => throw new NotImplementedError("No route for this page in normal mode")
   }
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A], returnTo: Option[ReturnTo]): Call =
@@ -175,14 +180,17 @@ class Navigator @Inject() () {
       case RegisteredAddressCorrespondencePage =>
         returnToRoute(returnTo, TaskListController.onPageLoad())
 
-      case ChooseAddressPage                         => TaskListController.onPageLoad()
-
       case ChooseAddressPage =>
         returnToRoute(returnTo, TaskListController.onPageLoad())
 
-      case OrganisationTelephoneNumberPage => returnToRoute(returnTo, TaskListController.onPageLoad()) // TODO make default call to OrganisationDetailsCYA when built in 1743
+      case OrganisationTelephoneNumberPage =>
+        returnToRoute(
+          returnTo,
+          TaskListController.onPageLoad()
+        ) // TODO make default call to OrganisationDetailsCYA when built in 1743
 
-      case EnterYourOrganisationAddressPage          => returnToRoute(returnTo, TaskListController.onPageLoad()) // TODO hook to review and confim page in DFI-934
+      case EnterYourOrganisationAddressPage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad()) // TODO hook to review and confim page in DFI-934
 
       case OrganisationEmailAddressPage =>
         returnToRoute(returnTo, OrganisationEmailCyaController.onPageLoad())
@@ -299,26 +307,17 @@ class Navigator @Inject() () {
         AddAnotherAddressController.onPageLoad(NormalMode, returnTo)
     }
 
-  private def addedLiaisonOfficersNextPage(
-    answer: YesNoAnswer,
-    mode: Mode,
-    returnTo: Option[ReturnTo]
-  ): Call =
+  private def addedLiaisonOfficersNextPage(answer: YesNoAnswer, returnTo: Option[ReturnTo]) =
     answer match {
       case YesNoAnswer.Yes => LiaisonOfficerNameController.onPageLoad(None, NormalMode, returnTo)
       case YesNoAnswer.No  => returnToRoute(returnTo, TaskListController.onPageLoad())
     }
 
-  private def addedSignatoriesNextPage(
-    answer: YesNoAnswer,
-    mode: Mode,
-    returnTo: Option[ReturnTo]
-  ): Call = {
+  private def addedSignatoriesNextPage(answer: YesNoAnswer, returnTo: Option[ReturnTo]) =
     answer match {
       case YesNoAnswer.Yes => SignatoryNameController.onPageLoad(None, NormalMode, returnTo)
       case YesNoAnswer.No  => returnToRoute(returnTo, TaskListController.onPageLoad())
     }
-  }
 
   private def addedThirdPartiesNextPage(
     answer: YesNoAnswer,

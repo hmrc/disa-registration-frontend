@@ -17,7 +17,7 @@
 package pages.organisationdetails
 
 import models.journeydata.OrganisationDetails
-import pages.{ClearablePage, EnterYourOrganisationAddressPage, PageWithDependents, PageWithoutDependents}
+import pages.{ClearablePage, EnterYourOrganisationAddressPage, PageWithDependents}
 
 object RegisteredAddressCorrespondencePage extends PageWithDependents[OrganisationDetails] {
 
@@ -26,7 +26,8 @@ object RegisteredAddressCorrespondencePage extends PageWithDependents[Organisati
   def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
     sectionAnswers.copy(registeredAddressCorrespondence = None)
 
-  def pagesToClear(currentAnswers: OrganisationDetails): List[ClearablePage[OrganisationDetails]] = List(ChooseAddressPage, EnterYourOrganisationAddressPage)
+  def pagesToClear(currentAnswers: OrganisationDetails): List[ClearablePage[OrganisationDetails]] =
+    List(ChooseAddressPage, EnterYourOrganisationAddressPage)
 
   def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean =
     currentAnswers.registeredAddressCorrespondence.contains(false) && currentAnswers.hasNoSelectedCorrespondenceAddress

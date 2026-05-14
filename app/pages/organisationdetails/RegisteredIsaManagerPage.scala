@@ -17,7 +17,7 @@
 package pages.organisationdetails
 
 import models.journeydata.OrganisationDetails
-import pages.{ClearablePage, PageWithDependents, PageWithoutDependents}
+import pages.{ClearablePage, PageWithDependents}
 
 object RegisteredIsaManagerPage extends PageWithDependents[OrganisationDetails] {
 
@@ -26,7 +26,9 @@ object RegisteredIsaManagerPage extends PageWithDependents[OrganisationDetails] 
   def clearAnswer(answers: OrganisationDetails): OrganisationDetails =
     answers.copy(registeredToManageIsa = None)
 
-  def pagesToClear(currentAnswers: OrganisationDetails): List[ClearablePage[OrganisationDetails]] = List(ZReferenceNumberPage)
+  def pagesToClear(currentAnswers: OrganisationDetails): List[ClearablePage[OrganisationDetails]] = List(
+    ZReferenceNumberPage
+  )
 
   def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean =
     currentAnswers.registeredToManageIsa.contains(true) && currentAnswers.zRefNumber.isEmpty

@@ -55,17 +55,18 @@ class EnterYourOrganisationAddressController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val preparedForm = (for {
-      section <- request.journeyData.organisationDetails
-      address <- section.correspondenceAddress
-    } yield form.fill(address)).getOrElse(form)
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val preparedForm = (for {
+        section <- request.journeyData.organisationDetails
+        address <- section.correspondenceAddress
+      } yield form.fill(address)).getOrElse(form)
 
-    Ok(view(preparedForm, mode, returnTo))
-  }
+      Ok(view(preparedForm, mode, returnTo))
+    }
 
-  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -101,5 +102,5 @@ class EnterYourOrganisationAddressController @Inject() (
             }
           }
         )
-  }
+    }
 }

@@ -68,16 +68,22 @@ class TradingUsingDifferentNameController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
             val existingSection = request.journeyData.flatMap(_.organisationDetails)
-            val updatedSection =
+            val updatedSection  =
               existingSection match {
-                case Some(existing) if !existing.tradingUsingDifferentName.contains(answer) => clearStalePages(TradingUsingDifferentNamePage, existing.copy(tradingUsingDifferentName = Some(answer)))
-                case Some(existing) => existing
-                case None           => OrganisationDetails(tradingUsingDifferentName = Some(answer))
+                case Some(existing) if !existing.tradingUsingDifferentName.contains(answer) =>
+                  clearStalePages(
+                    TradingUsingDifferentNamePage,
+                    existing.copy(tradingUsingDifferentName = Some(answer))
+                  )
+                case Some(existing)                                                         => existing
+                case None                                                                   => OrganisationDetails(tradingUsingDifferentName = Some(answer))
               }
             journeyAnswersService
               .update(updatedSection, request.groupId, request.credentials.providerId)
               .map { updatedSection =>
-                Redirect(navigator.nextPage(TradingUsingDifferentNamePage, existingSection, updatedSection, mode, returnTo))
+                Redirect(
+                  navigator.nextPage(TradingUsingDifferentNamePage, existingSection, updatedSection, mode, returnTo)
+                )
               }
               .recoverWith { case NonFatal(e) =>
                 logger.warn(

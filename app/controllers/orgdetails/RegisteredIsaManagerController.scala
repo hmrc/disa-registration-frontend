@@ -71,11 +71,12 @@ class RegisteredIsaManagerController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
             val existingSection = request.journeyData.flatMap(_.organisationDetails)
-            val updatedSection =
+            val updatedSection  =
               existingSection match {
-                case Some(existing) if !existing.registeredToManageIsa.contains(answer) => clearStalePages(RegisteredIsaManagerPage, existing.copy(registeredToManageIsa = Some(answer)))
-                case Some(existing) => existing
-                case None           => OrganisationDetails(registeredToManageIsa = Some(answer))
+                case Some(existing) if !existing.registeredToManageIsa.contains(answer) =>
+                  clearStalePages(RegisteredIsaManagerPage, existing.copy(registeredToManageIsa = Some(answer)))
+                case Some(existing)                                                     => existing
+                case None                                                               => OrganisationDetails(registeredToManageIsa = Some(answer))
               }
 
             journeyAnswersService

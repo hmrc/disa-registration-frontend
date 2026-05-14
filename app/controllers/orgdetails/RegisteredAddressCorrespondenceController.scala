@@ -74,8 +74,8 @@ class RegisteredAddressCorrespondenceController @Inject() (
       }
   }
 
-  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
 
       val registeredAddress =
         for {
@@ -95,28 +95,35 @@ class RegisteredAddressCorrespondenceController @Inject() (
                 val existingSection = request.journeyData.organisationDetails
 
                 val updatedOrganisationDetails = existingSection match {
-                  case Some(existing) if !existing.registeredAddressCorrespondence.contains(answer) => clearStalePages(RegisteredAddressCorrespondencePage, buildOrganisationDetails(
-                    existingSection,
-                    answer,
-                    registeredAddress
-                  ))
-                  case Some(existing) => existing
-                  case None => buildOrganisationDetails(
-                    existingSection,
-                    answer,
-                    registeredAddress
-                  )
+                  case Some(existing) if !existing.registeredAddressCorrespondence.contains(answer) =>
+                    clearStalePages(
+                      RegisteredAddressCorrespondencePage,
+                      buildOrganisationDetails(
+                        existingSection,
+                        answer,
+                        registeredAddress
+                      )
+                    )
+                  case Some(existing)                                                               => existing
+                  case None                                                                         =>
+                    buildOrganisationDetails(
+                      existingSection,
+                      answer,
+                      registeredAddress
+                    )
                 }
-                  buildOrganisationDetails(
-                    existingSection,
-                    answer,
-                    registeredAddress
-                  )
+                buildOrganisationDetails(
+                  existingSection,
+                  answer,
+                  registeredAddress
+                )
 
                 journeyAnswersService
                   .update(updatedOrganisationDetails, request.groupId, request.credentials.providerId)
                   .map { updated =>
-                    Redirect(navigator.nextPage(RegisteredAddressCorrespondencePage, existingSection, updated, mode, returnTo))
+                    Redirect(
+                      navigator.nextPage(RegisteredAddressCorrespondencePage, existingSection, updated, mode, returnTo)
+                    )
                   }
                   .recoverWith { case NonFatal(e) =>
                     logger.warn(
@@ -127,7 +134,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
               }
             )
       }
-  }
+    }
 
   private def buildOrganisationDetails(
     existing: Option[OrganisationDetails],

@@ -17,7 +17,7 @@
 package pages.organisationdetails
 
 import models.journeydata.OrganisationDetails
-import pages.{ClearablePage, PageWithDependents, PageWithoutDependents}
+import pages.{ClearablePage, PageWithDependents}
 
 case object TradingUsingDifferentNamePage extends PageWithDependents[OrganisationDetails] {
 
@@ -26,7 +26,9 @@ case object TradingUsingDifferentNamePage extends PageWithDependents[Organisatio
   def clearAnswer(answers: OrganisationDetails): OrganisationDetails =
     answers.copy(tradingUsingDifferentName = None)
 
-  def pagesToClear(currentAnswers: OrganisationDetails): List[ClearablePage[OrganisationDetails]] = List(TradingNamePage)
+  def pagesToClear(currentAnswers: OrganisationDetails): List[ClearablePage[OrganisationDetails]] = List(
+    TradingNamePage
+  )
 
   def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean =
     currentAnswers.tradingUsingDifferentName.contains(true) && currentAnswers.tradingName.isEmpty

@@ -57,7 +57,7 @@ class AddedSignatoryController @Inject() (
       }
     }
 
-  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = {
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       getInProgressAndCompleteSignatories.fold {
         Redirect(TaskListController.onPageLoad())
@@ -84,7 +84,6 @@ class AddedSignatoryController @Inject() (
         }
       }
     }
-  }
 
   private def getInProgressAndCompleteSignatories(implicit request: DataRequest[_]) =
     request.journeyData.signatories
