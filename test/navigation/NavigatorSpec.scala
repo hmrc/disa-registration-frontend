@@ -26,10 +26,8 @@ import controllers.routes.{IndexController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
-import models.addresslookup.LookupAddress
 import models.ReturnTo.FinalCya
 import models.addresslookup.LookupAddress
-import models.journeydata.{OrganisationDetails, OrganisationEmail}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
@@ -41,7 +39,7 @@ import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
 import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
-import models.journeydata.{CorrespondenceAddress, OrganisationDetails, OrganisationEmail}
+import models.journeydata.{OrganisationDetails, OrganisationEmail}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{spy, verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
@@ -384,7 +382,7 @@ class NavigatorSpec extends SpecBase {
           returnTo = None
         )
 
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode)
     }
 
     "route to ConfirmAddressPage if an address is selected and persisted in user answers" in {

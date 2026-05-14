@@ -86,16 +86,16 @@ trait Generators extends ModelGenerators {
       chars  <- listOfN(length, arbitrary[Char])
     } yield chars.mkString
 
-  def stringsLongerThan(minLength: Int): Gen[String] = for {
+  def stringsLongerThan(minLength: Int, charType: Gen[Char] = arbitrary[Char]): Gen[String] = for {
     maxLength <- (minLength * 2).max(100)
     length    <- Gen.chooseNum(minLength + 1, maxLength)
-    chars     <- listOfN(length, arbitrary[Char])
+    chars     <- listOfN(length, charType)
   } yield chars.mkString
 
-  def stringsShorterThan(maxLength: Int): Gen[String] = for {
+  def stringsShorterThan(maxLength: Int, charType: Gen[Char] = arbitrary[Char]): Gen[String] = for {
     minLength <- (maxLength / 2).min(1)
     length    <- Gen.chooseNum(minLength, maxLength - 1)
-    chars     <- listOfN(length, arbitrary[Char])
+    chars     <- listOfN(length, charType)
   } yield chars.mkString
 
   def numericOfLength(min: Int, max: Int): Gen[String] =

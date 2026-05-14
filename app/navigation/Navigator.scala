@@ -41,7 +41,7 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
-import pages.orgemail.{OrganisationEmailAddressPage, OrganisationEmailVerificationCodePage}
+import pages.orgemail.*
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import pages.thirdparty.*
 import play.api.mvc.Call
@@ -101,8 +101,10 @@ class Navigator @Inject() () {
     case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
-    case ChooseAddressPage                         => chooseAddressNextPage(answers)
     case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
+    case ChooseAddressPage                         => chooseAddressNextPage(answers)
+    case EnterYourOrganisationAddressPage          =>
+      TaskListController.onPageLoad() // TODO hook to review and confim page in DFI-934
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
     case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
@@ -140,6 +142,7 @@ class Navigator @Inject() () {
       case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
       case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
       case ChooseAddressPage                         => TaskListController.onPageLoad()
+      case EnterYourOrganisationAddressPage          => TaskListController.onPageLoad() // TODO hook up to CYA in DFI-1743
       case OrganisationEmailAddressPage              => OrganisationEmailCyaController.onPageLoad()
       case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
@@ -271,7 +274,7 @@ class Navigator @Inject() () {
     answers.addAnotherAddress
       .flatMap(_.selectedAddress) match {
       case Some(SelectedCorrespondenceAddress.ManualEntry) =>
-        TaskListController.onPageLoad()
+        EnterYourOrganisationAddressController.onPageLoad(NormalMode)
       case Some(SelectedCorrespondenceAddress.Address(_))  =>
         TaskListController.onPageLoad()
       case None                                            =>
