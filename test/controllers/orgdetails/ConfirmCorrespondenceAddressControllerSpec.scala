@@ -77,7 +77,7 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(address)(request, messages(application)).toString
+          view(address, None)(request, messages(application)).toString
       }
     }
 

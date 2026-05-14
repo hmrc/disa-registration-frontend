@@ -17,6 +17,7 @@
 package controllers.orgdetails
 
 import controllers.actions.*
+import models.ReturnTo
 import models.journeydata.CorrespondenceAddress
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,7 +35,7 @@ class ConfirmCorrespondenceAddressController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] =
+  def onPageLoad(returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData) { implicit request =>
       val address =
         for {
@@ -45,7 +46,7 @@ class ConfirmCorrespondenceAddressController @Inject() (
 
       address match {
         case Some(correspondenceAddress) =>
-          Ok(view(correspondenceAddress))
+          Ok(view(correspondenceAddress, returnTo))
         case None                        =>
           Redirect(controllers.routes.TaskListController.onPageLoad())
       }

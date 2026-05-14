@@ -30,7 +30,7 @@
     govukButton: GovukButton,
     hmrcPageHeading: HmrcPageHeading)
 
-@(address: CorrespondenceAddress)(implicit request: Request[_], messages: Messages)
+@(address: CorrespondenceAddress, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle =  titleNoForm(messages("confirmCorrespondenceAddress.title"),Some(messages("sectionTitle.orgDetails")))) {
 
@@ -51,7 +51,7 @@
         </p>
 
         <p class="govuk-body">
-            <a href="@EnterYourOrganisationAddressController.onPageLoad(NormalMode).url" class="govuk-link">@messages("confirmCorrespondenceAddress.edit.address.link")</a>
+            <a href="@EnterYourOrganisationAddressController.onPageLoad(NormalMode, returnTo).url" class="govuk-link">@messages("confirmCorrespondenceAddress.edit.address.link")</a>
         </p>
 
         @govukButton(
