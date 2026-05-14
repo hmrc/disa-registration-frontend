@@ -84,7 +84,7 @@ class FcaArticlesController @Inject() (
                     FcaArticlesPage,
                     updatedSection,
                     mode,
-                    None
+                    returnTo
                   )
                 )
               }

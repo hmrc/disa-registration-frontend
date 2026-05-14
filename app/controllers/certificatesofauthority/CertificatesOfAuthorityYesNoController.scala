@@ -87,7 +87,7 @@ class CertificatesOfAuthorityYesNoController @Inject() (
                     existingSection,
                     updatedSection,
                     mode,
-                    None
+                    returnTo
                   )
                 )
               }

@@ -203,7 +203,7 @@ object SubmissionCyaViewModel {
       },
       isaProducts.flatMap(_.p2pPlatformNumber).map { answer =>
         changeRow(
-          key = "submissionCya.platformFcaNumber.label",
+          key = "peerToPeerPlatformNumber.checkYourAnswersLabel",
           value = text(answer),
           href = PeerToPeerPlatformNumberController.onPageLoad(CheckMode, returnTo).url,
           hidden = "peerToPeerPlatformNumber.change.hidden"
@@ -211,7 +211,7 @@ object SubmissionCyaViewModel {
       },
       certificatesOfAuthority.flatMap(_.certificatesYesNo).map { answer =>
         changeRow(
-          key = "submissionCya.certificatesOfAuthority.label",
+          key = "certificatesOfAuthorityYesNo.checkYourAnswersLabel",
           value = text(messages(s"certificatesOfAuthorityYesNo.$answer")),
           href = CertificatesOfAuthorityYesNoController.onPageLoad(CheckMode, returnTo).url,
           hidden = "certificatesOfAuthorityYesNo.change.hidden"
@@ -219,7 +219,7 @@ object SubmissionCyaViewModel {
       },
       certificatesOfAuthority.flatMap(_.fcaArticles).map { selected =>
         changeRow(
-          key = "submissionCya.fcaArticles.label",
+          key = "fcaArticles.checkYourAnswersLabel",
           value = multiValue(selected.map(answer => messages(s"fcaArticles.$answer"))),
           href = FcaArticlesController.onPageLoad(CheckMode, returnTo).url,
           hidden = "fcaArticles.change.hidden"
@@ -227,7 +227,7 @@ object SubmissionCyaViewModel {
       },
       certificatesOfAuthority.flatMap(_.financialOrganisation).map { selected =>
         changeRow(
-          key = "submissionCya.financialOrganisation.label",
+          key = "financialOrganisation.checkYourAnswersLabel",
           value = multiValue(selected.map(answer => messages(s"financialOrganisation.$answer"))),
           href = FinancialOrganisationController.onPageLoad(CheckMode, returnTo).url,
           hidden = "financialOrganisation.change.hidden"
