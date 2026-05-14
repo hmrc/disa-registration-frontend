@@ -203,8 +203,31 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route add another third parties to Submission CYA when No is selected with returnTo SubmissionCya" in {
-      navigator.nextPageFromAddedThirdParties(YesNoAnswer.No, count = 1, NormalMode, Some(SubmissionCya)) shouldBe
+      navigator.nextPageFromAddedThirdParties(YesNoAnswer.No, count = 1, Nil, NormalMode, Some(SubmissionCya)) shouldBe
         SubmissionCyaController.onPageLoad()
+    }
+
+    "must route to connected organisations when user has more than one third party and no connected organisations are stored" in {
+      navigator.nextPageFromAddedThirdParties(
+        YesNoAnswer.No,
+        count = 2,
+        mode = NormalMode,
+        returnTo = Some(ReturnTo.SubmissionCya),
+        connectedOrganisations = Nil
+      ) shouldBe ThirdPartyConnectedOrganisationsController.onPageLoad(
+        NormalMode,
+        Some(ReturnTo.SubmissionCya)
+      )
+    }
+
+    "must return to Submission CYA when user has more than one third party and connected organisations are already stored" in {
+      navigator.nextPageFromAddedThirdParties(
+        YesNoAnswer.No,
+        count = 2,
+        mode = NormalMode,
+        returnTo = Some(ReturnTo.SubmissionCya),
+        connectedOrganisations = Seq("third-party-id")
+      ) shouldBe SubmissionCyaController.onPageLoad()
     }
   }
 

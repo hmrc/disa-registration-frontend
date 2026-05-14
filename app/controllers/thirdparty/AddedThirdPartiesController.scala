@@ -68,9 +68,14 @@ class AddedThirdPartiesController @Inject() (
       getInProgressAndCompleteThirdParty.fold {
         Redirect(TaskListController.onPageLoad())
       } { case (inProgress, complete) =>
-        val count = inProgress.size + complete.size
+        val count                  = inProgress.size + complete.size
+        val connectedOrganisations =
+          request.journeyData.thirdPartyOrganisations.map(_.connectedOrganisations).fold(Nil)(identity)
+
         if (count == appConfig.maxThirdParties) {
-          Redirect(navigator.nextPageFromAddedThirdParties(YesNoAnswer.No, count, mode, returnTo))
+          Redirect(
+            navigator.nextPageFromAddedThirdParties(YesNoAnswer.No, count, connectedOrganisations, mode, returnTo)
+          )
         } else {
           form
             .bindFromRequest()
@@ -84,7 +89,8 @@ class AddedThirdPartiesController @Inject() (
                     returnTo
                   )
                 ),
-              answer => Redirect(navigator.nextPageFromAddedThirdParties(answer, count, mode, returnTo))
+              answer =>
+                Redirect(navigator.nextPageFromAddedThirdParties(answer, count, connectedOrganisations, mode, returnTo))
             )
         }
       }

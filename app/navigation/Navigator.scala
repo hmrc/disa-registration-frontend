@@ -99,10 +99,11 @@ class Navigator @Inject() () {
   def nextPageFromAddedThirdParties(
     answer: YesNoAnswer,
     count: Int,
+    connectedOrganisations: Seq[String] = Nil,
     mode: Mode,
     returnTo: Option[ReturnTo]
   ): Call =
-    addedThirdPartiesNextPage(answer, count, mode, returnTo)
+    addedThirdPartiesNextPage(answer, count, connectedOrganisations, mode, returnTo)
 
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](
@@ -322,12 +323,17 @@ class Navigator @Inject() () {
   private def addedThirdPartiesNextPage(
     answer: YesNoAnswer,
     count: Int,
+    connectedOrganisations: Seq[String],
     mode: Mode,
     returnTo: Option[ReturnTo]
   ): Call =
     answer match {
       case YesNoAnswer.Yes => ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode, returnTo)
-      case YesNoAnswer.No  => returnToRoute(returnTo, addedThirdPartiesDefaultNoNextPage(count, mode))
+      case YesNoAnswer.No  =>
+        if (count > 1 && connectedOrganisations.isEmpty)
+          ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode, returnTo)
+        else
+          returnToRoute(returnTo, addedThirdPartiesDefaultNoNextPage(count, mode))
     }
 
   private def addedThirdPartiesDefaultNoNextPage(count: Int, mode: Mode): Call =
