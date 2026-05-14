@@ -20,7 +20,7 @@ import controllers.routes.TaskListController
 import controllers.actions.*
 import forms.EnterYourOrganisationAddressFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.OrganisationDetails
 import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
@@ -55,21 +55,21 @@ class EnterYourOrganisationAddressController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     val preparedForm = (for {
       section <- request.journeyData.organisationDetails
       address <- section.correspondenceAddress
     } yield form.fill(address)).getOrElse(form)
 
-    Ok(view(preparedForm, mode))
+    Ok(view(preparedForm, mode, returnTo))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
             val existing       = request.journeyData.organisationDetails
             val updatedSection =
@@ -90,7 +90,7 @@ class EnterYourOrganisationAddressController @Inject() (
               journeyAnswersService
                 .update(updatedSection, request.groupId, request.credentials.providerId)
                 .map { updatedSection =>
-                  Redirect(navigator.nextPage(EnterYourOrganisationAddressPage, updatedSection, mode, None))
+                  Redirect(navigator.nextPage(EnterYourOrganisationAddressPage, updatedSection, mode, returnTo))
                 }
                 .recoverWith { case NonFatal(e) =>
                   logger.warn(

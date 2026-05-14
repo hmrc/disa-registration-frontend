@@ -116,6 +116,11 @@ class Navigator @Inject() () {
     case FirmReferenceNumberPage                   => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode, returnTo)
     case TradingUsingDifferentNamePage             => tradingUsingDifferentNameNextPage(answers, returnTo)
     case TradingNamePage                           => returnToRoute(returnTo, FirmReferenceNumberController.onPageLoad(NormalMode))
+    case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers, returnTo)
+    case ChooseAddressPage                         => chooseAddressNextPage(answers)
+    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
+    case EnterYourOrganisationAddressPage          => ConfirmCorrespondenceAddressController.onPageLoad()
+    case OrganisationTelephoneNumberPage => returnToRoute(returnTo, TaskListController.onPageLoad()) // TODO make default call to OrganisationDetailsCYA when built in 1743
     case IsaProductsPage                           => isaProductsNextPage(answers, returnTo)
     case InnovativeFinancialProductsPage           => innovativeFinancialProductsNextPage(answers, returnTo)
     case PeerToPeerPlatformPage                    => PeerToPeerPlatformNumberController.onPageLoad(NormalMode, returnTo)
@@ -123,10 +128,6 @@ class Navigator @Inject() () {
     case CertificatesOfAuthorityYesNoPage          => certificatesOfAuthorityYesNoNextPage(answers, returnTo)
     case FcaArticlesPage                           => returnToRoute(returnTo, CoaCheckYourAnswersController.onPageLoad())
     case FinancialOrganisationPage                 => returnToRoute(returnTo, CoaCheckYourAnswersController.onPageLoad())
-    case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers, returnTo)
-    case ChooseAddressPage                         => chooseAddressNextPage(answers)
-    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
-    case EnterYourOrganisationAddressPage          => ConfirmCorrespondenceAddressController.onPageLoad()
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad(NormalMode, returnTo)
     case OrganisationEmailVerificationCodePage     => returnToRoute(returnTo, OrganisationEmailCyaController.onPageLoad())
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode, returnTo)
@@ -171,6 +172,24 @@ class Navigator @Inject() () {
       case FirmReferenceNumberPage =>
         returnToRoute(returnTo, TaskListController.onPageLoad())
 
+      case RegisteredAddressCorrespondencePage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad())
+
+      case ChooseAddressPage                         => TaskListController.onPageLoad()
+
+      case ChooseAddressPage =>
+        returnToRoute(returnTo, TaskListController.onPageLoad())
+
+      case OrganisationTelephoneNumberPage => returnToRoute(returnTo, TaskListController.onPageLoad()) // TODO make default call to OrganisationDetailsCYA when built in 1743
+
+      case EnterYourOrganisationAddressPage          => returnToRoute(returnTo, TaskListController.onPageLoad()) // TODO hook to review and confim page in DFI-934
+
+      case OrganisationEmailAddressPage =>
+        returnToRoute(returnTo, OrganisationEmailCyaController.onPageLoad())
+
+      case OrganisationEmailVerificationCodePage =>
+        returnToRoute(returnTo, OrganisationEmailCyaController.onPageLoad())
+
       case IsaProductsPage =>
         returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
 
@@ -191,20 +210,6 @@ class Navigator @Inject() () {
 
       case FinancialOrganisationPage =>
         returnToRoute(returnTo, CoaCheckYourAnswersController.onPageLoad())
-
-      case RegisteredAddressCorrespondencePage =>
-        returnToRoute(returnTo, TaskListController.onPageLoad())
-
-      case ChooseAddressPage                         => TaskListController.onPageLoad()
-
-      case ChooseAddressPage =>
-        returnToRoute(returnTo, TaskListController.onPageLoad())
-
-      case OrganisationEmailAddressPage =>
-        returnToRoute(returnTo, OrganisationEmailCyaController.onPageLoad())
-
-      case OrganisationEmailVerificationCodePage =>
-        returnToRoute(returnTo, OrganisationEmailCyaController.onPageLoad())
 
       case LiaisonOfficerNamePage(id) =>
         liaisonOfficerCheckRoute(id, returnTo)

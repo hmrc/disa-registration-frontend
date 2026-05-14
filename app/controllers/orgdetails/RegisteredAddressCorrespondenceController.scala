@@ -19,6 +19,7 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.RegisteredAddressCorrespondenceFormProvider
 import handlers.ErrorHandler
+import handlers.JourneyHandler.clearStalePages
 import models.{Mode, ReturnTo}
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails, RegisteredAddress}
 import navigation.Navigator
@@ -40,6 +41,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   formProvider: RegisteredAddressCorrespondenceFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
@@ -72,13 +74,12 @@ class RegisteredAddressCorrespondenceController @Inject() (
       }
   }
 
-  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
       val registeredAddress =
         for {
-          jd   <- request.journeyData
-          bv   <- jd.businessVerification
+          bv   <- request.journeyData.businessVerification
           addr <- bv.registeredAddress
         } yield addr
 
@@ -91,9 +92,23 @@ class RegisteredAddressCorrespondenceController @Inject() (
             .fold(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo, registeredAddress))),
               answer => {
-                val updatedOrganisationDetails =
+                val existingSection = request.journeyData.organisationDetails
+
+                val updatedOrganisationDetails = existingSection match {
+                  case Some(existing) if !existing.registeredAddressCorrespondence.contains(answer) => clearStalePages(RegisteredAddressCorrespondencePage, buildOrganisationDetails(
+                    existingSection,
+                    answer,
+                    registeredAddress
+                  ))
+                  case Some(existing) => existing
+                  case None => buildOrganisationDetails(
+                    existingSection,
+                    answer,
+                    registeredAddress
+                  )
+                }
                   buildOrganisationDetails(
-                    request.journeyData.flatMap(_.organisationDetails),
+                    existingSection,
                     answer,
                     registeredAddress
                   )
@@ -101,7 +116,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
                 journeyAnswersService
                   .update(updatedOrganisationDetails, request.groupId, request.credentials.providerId)
                   .map { updated =>
-                    Redirect(navigator.nextPage(RegisteredAddressCorrespondencePage, updated, mode, returnTo))
+                    Redirect(navigator.nextPage(RegisteredAddressCorrespondencePage, existingSection, updated, mode, returnTo))
                   }
                   .recoverWith { case NonFatal(e) =>
                     logger.warn(
