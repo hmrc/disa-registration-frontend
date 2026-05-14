@@ -117,8 +117,8 @@ class Navigator @Inject() () {
     case TradingUsingDifferentNamePage             => tradingUsingDifferentNameNextPage(answers, returnTo)
     case TradingNamePage                           => returnToRoute(returnTo, FirmReferenceNumberController.onPageLoad(NormalMode))
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers, returnTo)
-    case ChooseAddressPage                         => chooseAddressNextPage(answers)
-    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
+    case ChooseAddressPage                         => chooseAddressNextPage(answers, returnTo)
+    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers, returnTo)
     case EnterYourOrganisationAddressPage          =>
       ConfirmCorrespondenceAddressController.onPageLoad()
     case OrganisationTelephoneNumberPage           =>
@@ -378,7 +378,7 @@ class Navigator @Inject() () {
       case _   => AddedThirdPartiesController.onPageLoad(NormalMode, returnTo)
     }
 
-  private def addAnotherAddressRouting(answers: OrganisationDetails): Call = {
+  private def addAnotherAddressRouting(answers: OrganisationDetails, returnTo: Option[ReturnTo]): Call = {
 
     val count =
       answers.addAnotherAddress
@@ -389,7 +389,7 @@ class Navigator @Inject() () {
       case 1          =>
         ConfirmCorrespondenceAddressController.onPageLoad()
       case n if n > 1 =>
-        ChooseAddressController.onPageLoad(NormalMode)
+        ChooseAddressController.onPageLoad(NormalMode, returnTo)
       case _          =>
         TaskListController.onPageLoad()
     }
@@ -407,12 +407,13 @@ class Navigator @Inject() () {
     }
 
   private def chooseAddressNextPage(
-    answers: OrganisationDetails
+    answers: OrganisationDetails,
+    returnTo: Option[ReturnTo]
   ): Call =
     answers.addAnotherAddress
       .flatMap(_.selectedAddress) match {
       case Some(SelectedCorrespondenceAddress.ManualEntry) =>
-        EnterYourOrganisationAddressController.onPageLoad(NormalMode)
+        EnterYourOrganisationAddressController.onPageLoad(NormalMode, returnTo)
       case Some(SelectedCorrespondenceAddress.Address(_))  =>
         ConfirmCorrespondenceAddressController.onPageLoad()
       case None                                            =>
