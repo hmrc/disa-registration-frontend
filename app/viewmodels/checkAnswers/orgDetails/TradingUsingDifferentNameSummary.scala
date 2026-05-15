@@ -28,11 +28,9 @@ object TradingUsingDifferentNameSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
     answers.organisationDetails.flatMap(_.tradingUsingDifferentName).map { answer =>
-      val value = if (answer) "site.yes" else "site.no"
-
       SummaryListRowViewModel(
         key = "tradingUsingDifferentName.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        value = ValueViewModel(s"site.$answer"),
         actions = Seq(
           ActionItemViewModel("site.change", routes.TradingUsingDifferentNameController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("tradingUsingDifferentName.change.hidden"))

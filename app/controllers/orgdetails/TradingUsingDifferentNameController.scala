@@ -17,12 +17,14 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import forms.TradingUsingDifferentNameFormProvider
+import forms.{TradingUsingDifferentNameFormProvider, YesNoAnswerFormProvider}
 import handlers.ErrorHandler
-import models.Mode
+import handlers.JourneyHandler.clearStalePages
+import models.{Mode, YesNoAnswer}
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.organisationdetails.TradingUsingDifferentNamePage
+import pages.thirdparty.ProductsManagedByThirdPartyPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -37,26 +39,31 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 class TradingUsingDifferentNameController @Inject() (
-  override val messagesApi: MessagesApi,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  formProvider: TradingUsingDifferentNameFormProvider,
-  journeyAnswersService: JourneyAnswersService,
-  errorHandler: ErrorHandler,
-  val controllerComponents: MessagesControllerComponents,
-  view: TradingUsingDifferentNameView
+                                                      override val messagesApi: MessagesApi,
+                                                      navigator: Navigator,
+                                                      identify: IdentifierAction,
+                                                      getData: DataRetrievalAction,
+                                                      requireData: DataRequiredAction,
+                                                      formProvider: YesNoAnswerFormProvider,
+                                                      journeyAnswersService: JourneyAnswersService,
+                                                      errorHandler: ErrorHandler,
+                                                      val controllerComponents: MessagesControllerComponents,
+                                                      view: TradingUsingDifferentNameView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  val form: Form[Boolean] = formProvider()
+  val form: Form[YesNoAnswer] = formProvider("tradingUsingDifferentName.error.required")
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = prepareForm(form)(_.organisationDetails.flatMap(_.tradingUsingDifferentName))(identity)
-    Ok(view(preparedForm, mode))
-  }
+  def onPageLoad(mode: Mode): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val preparedForm = request.journeyData.organisationDetails
+        .flatMap(_.tradingUsingDifferentName)
+        .fold(form)(form.fill)
+
+      Ok(view(preparedForm, mode))
+    }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     form
@@ -66,7 +73,8 @@ class TradingUsingDifferentNameController @Inject() (
         answer => {
           val updatedSection =
             request.journeyData.flatMap(_.organisationDetails) match {
-              case Some(existing) => existing.copy(tradingUsingDifferentName = Some(answer))
+              case Some(existing) =>
+                clearStalePages(TradingUsingDifferentNamePage, existing.copy(tradingUsingDifferentName = Some(answer)))
               case None           => OrganisationDetails(tradingUsingDifferentName = Some(answer))
             }
           journeyAnswersService

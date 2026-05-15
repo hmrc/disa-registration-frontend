@@ -115,13 +115,13 @@ zReferenceNumber.checkYourAnswersLabel = Z-reference
 
 tradingUsingDifferentName.title = Does your organisation trade using a different name?
 tradingUsingDifferentName.heading = Does your organisation trade using a different name?
-tradingUsingDifferentName.checkYourAnswersLabel = Does your organisation trade using a different name?
+tradingUsingDifferentName.checkYourAnswersLabel = Different trading name
 tradingUsingDifferentName.error.required = You must select either yes or no. For example select yes, if your organisation trades using a different name
 tradingUsingDifferentName.change.hidden = trading using different a name
 
 tradingName.title = What is your organisation’s trading name?
 tradingName.heading = What is your organisation’s trading name?
-tradingName.checkYourAnswersLabel = tradingName
+tradingName.checkYourAnswersLabel = Trading name
 tradingName.error.required = You must tell us what your organisation’s trading name is
 tradingName.change.hidden = trading name
 
@@ -177,20 +177,28 @@ chooseAddress.error.required = Select one of the address options or choose ‘no
 chooseAddress.none.of.these = None of these
 chooseAddress.radio.divider = or
 
-AddAnotherAddress.title = Add another address for your organisation
-AddAnotherAddress.heading = Add another address for your organisation
-AddAnotherAddress.postcode.input.label = Postcode
-AddAnotherAddress.postcode.error.required = Enter your postcode. Use the correct format, for example, AA1 1AA
-AddAnotherAddress.postcode.error.invalid = Enter your postcode in the correct format, for example, AA1 1AA
-AddAnotherAddress.postcode.error.tooShort = The postcode you entered is too short. Enter a postcode, like AA1 1AA
-AddAnotherAddress.postcode.error.tooLong = The postcode you entered is too long. Enter a postcode, like AA1 1AA
-AddAnotherAddress.postcode.error.not.found = The postcode you entered cannot be found - try again
-AddAnotherAddress.filter.input.label = Property name or number (optional)
-AddAnotherAddress.filter.input.hint = For example, The Mill, 116 or Flat 37a
-AddAnotherAddress.filter.error.incorrectLength = The property name you entered is too long. It should not be more than 255 characters
-AddAnotherAddress.link.text = Enter the address manually
-AddAnotherAddress.checkYourAnswersLabel = Third-party {0} details
-AddAnotherAddress.change.hidden = third-party {0} details
+enterYourOrganisationAddress.title = Enter your organisation’s address
+enterYourOrganisationAddress.heading = Enter your organisation’s address
+enterYourOrganisationAddress.addressLine1 = Address line 1
+enterYourOrganisationAddress.addressLine2 = Address line 2 (optional)
+enterYourOrganisationAddress.townOrCity = Town or city
+enterYourOrganisationAddress.postcode = Postcode
+enterYourOrganisationAddress.checkYourAnswersLabel = Added correspondence address
+enterYourOrganisationAddress.error.addressLine1.required = Enter address line 1, typically the building and street
+enterYourOrganisationAddress.error.addressLine2.required = Enter address line 2
+enterYourOrganisationAddress.error.townOrCity.required = Enter town or city
+enterYourOrganisationAddress.error.postcode.required = Enter your postcode. Use the correct format, for example, AA1 1AA
+enterYourOrganisationAddress.error.postcode.invalid = Enter a postcode, like AA1 1AA
+enterYourOrganisationAddress.error.addressLine1.length = Address line 1 must be 255 characters or less
+enterYourOrganisationAddress.error.addressLine2.length = Address line 2 must be 255 characters or less
+enterYourOrganisationAddress.error.townOrCity.length = The town you entered is too long. It must be 255 characters or less
+enterYourOrganisationAddress.error.postcode.tooLong = The postcode you entered is too long. Enter a postcode, like AA1 1AA
+enterYourOrganisationAddress.error.postcode.tooShort = The postcode you entered is too short. Enter a postcode, like AA1 1AA
+enterYourOrganisationAddress.change.hidden = added address
+
+confirmCorrespondenceAddress.title = Review and confirm
+confirmCorrespondenceAddress.heading = Review and confirm
+confirmCorrespondenceAddress.edit.address.link = Edit address
 
 organisationDetailsCya.title = Check your organisation details
 organisationDetailsCya.heading = Check your organisation details

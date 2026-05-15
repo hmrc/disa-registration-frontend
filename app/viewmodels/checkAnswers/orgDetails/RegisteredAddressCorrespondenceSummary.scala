@@ -28,10 +28,9 @@ object RegisteredAddressCorrespondenceSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
     answers.organisationDetails.flatMap(_.registeredAddressCorrespondence).map { answer =>
-      val value = if (answer) "site.yes" else "site.no"
       SummaryListRowViewModel(
         key = "registeredAddressCorrespondence.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        value = ValueViewModel(s"site.$answer"),
         actions = Seq(
           ActionItemViewModel("site.change", RegisteredAddressCorrespondenceController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("registeredAddressCorrespondence.change.hidden"))

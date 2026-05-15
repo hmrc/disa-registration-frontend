@@ -24,7 +24,7 @@ import controllers.orgemail.routes.*
 import controllers.routes.*
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
-import models.*
+import models.{YesNoAnswer, *}
 import models.ReturnTo.FinalCya
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.*
@@ -41,7 +41,7 @@ import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArtic
 import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
-import pages.orgemail.{OrganisationEmailAddressPage, OrganisationEmailVerificationCodePage}
+import pages.orgemail.*
 import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
 import pages.thirdparty.*
 import play.api.mvc.Call
@@ -88,8 +88,8 @@ class Navigator @Inject() () {
     answers: A,
     returnTo: Option[ReturnTo]
   ): Call = page match {
-    case RegisteredIsaManagerPage                  => ???
-    case ZReferenceNumberPage                      => ???
+    case RegisteredIsaManagerPage                  => registeredIsaManagerPageNextPage(answers)
+    case ZReferenceNumberPage                      => TradingUsingDifferentNameController.onPageLoad(NormalMode)
     case FirmReferenceNumberPage                   => RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
     case TradingUsingDifferentNamePage             => tradingUsingDifferentNameNextPage(answers)
     case TradingNamePage                           => FirmReferenceNumberController.onPageLoad(NormalMode)
@@ -103,6 +103,8 @@ class Navigator @Inject() () {
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
     case ChooseAddressPage                         => chooseAddressNextPage(answers)
     case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
+    case EnterYourOrganisationAddressPage          => ConfirmCorrespondenceAddressController.onPageLoad()
+    case OrganisationTelephoneNumberPage           => OrganisationDetailsCheckYourAnswersController.onPageLoad()
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
     case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
@@ -127,10 +129,10 @@ class Navigator @Inject() () {
 
   private[navigation] def checkRouteMap[A <: TaskListSection](page: Page[A], returnTo: Option[ReturnTo]): Call =
     page match {
-      case RegisteredIsaManagerPage                  => ???
-      case ZReferenceNumberPage                      => ???
-      case TradingUsingDifferentNamePage             => ???
-      case TradingNamePage                           => ???
+      case RegisteredIsaManagerPage                  => OrganisationDetailsCheckYourAnswersController.onPageLoad()
+      case ZReferenceNumberPage                      => OrganisationDetailsCheckYourAnswersController.onPageLoad()
+      case TradingUsingDifferentNamePage             => OrganisationDetailsCheckYourAnswersController.onPageLoad()
+      case TradingNamePage                           => OrganisationDetailsCheckYourAnswersController.onPageLoad()
       case IsaProductsPage                           => IsaProductsCheckYourAnswersController.onPageLoad()
       case InnovativeFinancialProductsPage           => IsaProductsCheckYourAnswersController.onPageLoad()
       case PeerToPeerPlatformPage                    => IsaProductsCheckYourAnswersController.onPageLoad()
@@ -138,8 +140,9 @@ class Navigator @Inject() () {
       case CertificatesOfAuthorityYesNoPage          => CoaCheckYourAnswersController.onPageLoad()
       case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
       case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
-      case RegisteredAddressCorrespondencePage       => IndexController.onPageLoad()
+      case RegisteredAddressCorrespondencePage       => OrganisationDetailsCheckYourAnswersController.onPageLoad()
       case ChooseAddressPage                         => TaskListController.onPageLoad()
+      case EnterYourOrganisationAddressPage          => TaskListController.onPageLoad() // TODO hook up to CYA in DFI-1743
       case OrganisationEmailAddressPage              => OrganisationEmailCyaController.onPageLoad()
       case LiaisonOfficerNamePage(id)                => LoCheckYourAnswersController.onPageLoad(id)
       case LiaisonOfficerEmailPage(id)               => LoCheckYourAnswersController.onPageLoad(id)
@@ -156,10 +159,16 @@ class Navigator @Inject() () {
       case _                                         => throw new NotImplementedError("No route for this page in check mode")
     }
 
+  private def registeredIsaManagerPageNextPage(answers: OrganisationDetails): Call =
+    answers.registeredToManageIsa.fold(TaskListController.onPageLoad()) {
+      case YesNoAnswer.Yes => ZReferenceNumberController.onPageLoad(NormalMode)
+      case YesNoAnswer.No => TradingUsingDifferentNameController.onPageLoad(NormalMode)
+    }
+
   private def tradingUsingDifferentNameNextPage(answers: OrganisationDetails): Call =
     answers.tradingUsingDifferentName.fold(TaskListController.onPageLoad()) {
-      case true  => TradingNameController.onPageLoad(NormalMode)
-      case false => FirmReferenceNumberController.onPageLoad(NormalMode)
+      case YesNoAnswer.Yes  => TradingNameController.onPageLoad(NormalMode)
+      case YesNoAnswer.No => FirmReferenceNumberController.onPageLoad(NormalMode)
     }
 
   private def isaProductsNextPage(answers: IsaProducts): Call =
@@ -189,9 +198,9 @@ class Navigator @Inject() () {
     answers: OrganisationDetails
   ): Call =
     answers.registeredAddressCorrespondence.fold(IndexController.onPageLoad()) {
-      case true  =>
-        OrganisationTelephoneNumberController.onPageLoad(NormalMode)
-      case false =>
+      case YesNoAnswer.Yes  =>
+        ConfirmCorrespondenceAddressController.onPageLoad()
+      case YesNoAnswer.No =>
         AddAnotherAddressController.onPageLoad(NormalMode)
     }
 
@@ -246,7 +255,7 @@ class Navigator @Inject() () {
 
     count match {
       case 1          =>
-        TaskListController.onPageLoad()
+        ConfirmCorrespondenceAddressController.onPageLoad()
       case n if n > 1 =>
         ChooseAddressController.onPageLoad(NormalMode)
       case _          =>
@@ -271,9 +280,9 @@ class Navigator @Inject() () {
     answers.addAnotherAddress
       .flatMap(_.selectedAddress) match {
       case Some(SelectedCorrespondenceAddress.ManualEntry) =>
-        TaskListController.onPageLoad()
+        EnterYourOrganisationAddressController.onPageLoad(NormalMode)
       case Some(SelectedCorrespondenceAddress.Address(_))  =>
-        TaskListController.onPageLoad()
+        ConfirmCorrespondenceAddressController.onPageLoad()
       case None                                            =>
         TaskListController.onPageLoad()
     }

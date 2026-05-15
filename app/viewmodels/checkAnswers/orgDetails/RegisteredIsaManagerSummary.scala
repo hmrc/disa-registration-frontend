@@ -28,10 +28,9 @@ object RegisteredIsaManagerSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
     answers.organisationDetails.flatMap(_.registeredToManageIsa).map { answer =>
-      val value = if (answer) "site.yes" else "site.no"
       SummaryListRowViewModel(
         key = "registeredIsaManager.checkYourAnswersLabel",
-        value = ValueViewModel(value),
+        value = ValueViewModel(s"site.$answer"),
         actions = Seq(
           ActionItemViewModel("site.change", RegisteredIsaManagerController.onPageLoad(CheckMode).url)
             .withVisuallyHiddenText(messages("registeredIsaManager.change.hidden"))

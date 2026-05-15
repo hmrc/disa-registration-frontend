@@ -17,43 +17,37 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import play.api.Logging
+import models.journeydata.CorrespondenceAddress
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.*
-import viewmodels.checkAnswers.orgDetails.*
-import viewmodels.govuk.summarylist.*
-import views.html.orgdetails.OrganisationDetailsCheckYourAnswersView
+import views.html.orgdetails.ConfirmCorrespondenceAddressView
 
 import javax.inject.Inject
 
-class OrganisationDetailsCheckYourAnswersController @Inject()(
+class ConfirmCorrespondenceAddressController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
-  view: OrganisationDetailsCheckYourAnswersView
+  view: ConfirmCorrespondenceAddressView
 ) extends FrontendBaseController
-    with I18nSupport
-    with Logging {
+    with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val summaryListRows =
-      request.journeyData.toSeq.flatMap { jd =>
-        Seq(
-          RegisteredIsaManagerSummary.row(jd),
-          ZReferenceNumberSummary.row(jd),
-          TradingUsingDifferentNameSummary.row(jd),
-          TradingNameSummary.row(jd),
-          FirmReferenceNumberSummary.row(jd),
-          RegisteredAddressCorrespondenceSummary.row(jd),
-          AddedCorrespondenceAddressSummary.row(jd),
-          OrganisationTelephoneNumberSummary.row(jd)
-        )
-      }.flatten
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData) { implicit request =>
+      val address =
+        for {
+          jd                    <- request.journeyData
+          orgDetails            <- jd.organisationDetails
+          correspondenceAddress <- orgDetails.correspondenceAddress
+        } yield correspondenceAddress
 
-    Ok(view(SummaryListViewModel(summaryListRows)))
-  }
-
+      address match {
+        case Some(correspondenceAddress) =>
+          Ok(view(correspondenceAddress))
+        case None                        =>
+          Redirect(controllers.routes.TaskListController.onPageLoad())
+      }
+    }
 }

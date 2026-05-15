@@ -17,9 +17,10 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import forms.RegisteredAddressCorrespondenceFormProvider
+import forms.{RegisteredAddressCorrespondenceFormProvider, YesNoAnswerFormProvider}
 import handlers.ErrorHandler
-import models.Mode
+import models.YesNoAnswer.Yes
+import models.{Mode, YesNoAnswer}
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails, RegisteredAddress}
 import navigation.Navigator
 import pages.organisationdetails.RegisteredAddressCorrespondencePage
@@ -36,20 +37,20 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 class RegisteredAddressCorrespondenceController @Inject() (
-  override val messagesApi: MessagesApi,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  formProvider: RegisteredAddressCorrespondenceFormProvider,
-  journeyAnswersService: JourneyAnswersService,
-  errorHandler: ErrorHandler,
-  val controllerComponents: MessagesControllerComponents,
-  view: RegisteredAddressCorrespondenceView
+                                                            override val messagesApi: MessagesApi,
+                                                            navigator: Navigator,
+                                                            identify: IdentifierAction,
+                                                            getData: DataRetrievalAction,
+                                                            formProvider: YesNoAnswerFormProvider,
+                                                            journeyAnswersService: JourneyAnswersService,
+                                                            errorHandler: ErrorHandler,
+                                                            val controllerComponents: MessagesControllerComponents,
+                                                            view: RegisteredAddressCorrespondenceView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form: Form[Boolean] = formProvider()
+  val form: Form[YesNoAnswer] = formProvider("registeredAddressCorrespondence.error.required")
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
     (for {
@@ -57,7 +58,6 @@ class RegisteredAddressCorrespondenceController @Inject() (
       bv      <- jd.businessVerification
       regAddr <- bv.registeredAddress
     } yield regAddr) match {
-
       case None =>
         Redirect(controllers.routes.StartController.onPageLoad())
 
@@ -110,7 +110,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
 
   private def buildOrganisationDetails(
     existing: Option[OrganisationDetails],
-    answer: Boolean,
+    answer: YesNoAnswer,
     registeredAddress: RegisteredAddress
   ): OrganisationDetails = {
 
@@ -126,7 +126,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
 
     base.copy(
       registeredAddressCorrespondence = Some(answer),
-      correspondenceAddress = if (answer) Some(correspondenceAddress) else None
+      correspondenceAddress = if (answer == Yes) Some(correspondenceAddress) else None
     )
   }
 }

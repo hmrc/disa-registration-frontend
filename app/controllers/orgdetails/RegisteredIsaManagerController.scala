@@ -17,9 +17,9 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import forms.RegisteredIsaManagerFormProvider
+import forms.{RegisteredIsaManagerFormProvider, YesNoAnswerFormProvider}
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, YesNoAnswer}
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.*
@@ -37,20 +37,20 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 class RegisteredIsaManagerController @Inject() (
-  override val messagesApi: MessagesApi,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  formProvider: RegisteredIsaManagerFormProvider,
-  journeyAnswersService: JourneyAnswersService,
-  errorHandler: ErrorHandler,
-  val controllerComponents: MessagesControllerComponents,
-  view: RegisteredIsaManagerView
+                                                 override val messagesApi: MessagesApi,
+                                                 navigator: Navigator,
+                                                 identify: IdentifierAction,
+                                                 getData: DataRetrievalAction,
+                                                 formProvider: YesNoAnswerFormProvider,
+                                                 journeyAnswersService: JourneyAnswersService,
+                                                 errorHandler: ErrorHandler,
+                                                 val controllerComponents: MessagesControllerComponents,
+                                                 view: RegisteredIsaManagerView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form: Form[Boolean] = formProvider()
+  val form: Form[YesNoAnswer] = formProvider("registeredIsaManager.error.required")
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
     val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.registeredToManageIsa match {

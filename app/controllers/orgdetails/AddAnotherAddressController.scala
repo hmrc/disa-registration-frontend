@@ -20,8 +20,9 @@ import controllers.actions.*
 import forms.AddAnotherAddressFormProvider
 import handlers.ErrorHandler
 import models.Mode
-import models.journeydata.OrganisationDetails
-import models.journeydata.orgdetails.AddAnotherAddress
+import models.addresslookup.LookupAddress
+import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
+import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import navigation.Navigator
 import pages.organisationdetails.AddAnotherAddressPage
 import play.api.Logging
@@ -76,12 +77,8 @@ class AddAnotherAddressController @Inject() (
             addressLookupService.lookup(answer.postcode, answer.filter).flatMap { results =>
               val enrichedAnswer = answer.copy(addresses = results)
               val updatedSection =
-                request.journeyData.organisationDetails match {
-                  case Some(existing) =>
-                    existing.copy(addAnotherAddress = Some(enrichedAnswer))
-                  case None           =>
-                    OrganisationDetails(addAnotherAddress = Some(enrichedAnswer))
-                }
+                buildUpdatedSection(request.journeyData.organisationDetails, enrichedAnswer, results)
+
               journeyAnswersService
                 .update(
                   updatedSection,
@@ -111,5 +108,39 @@ class AddAnotherAddressController @Inject() (
                 }
             }
         )
+    }
+
+  private def buildUpdatedSection(
+    existingDetails: Option[OrganisationDetails],
+    enrichedAnswer: AddAnotherAddress,
+    results: Seq[LookupAddress]
+  ): OrganisationDetails =
+    results match {
+
+      case Seq(singleAddress) =>
+        val updatedAnswer =
+          enrichedAnswer.copy(selectedAddress = Some(SelectedCorrespondenceAddress.Address(0)))
+
+        existingDetails match {
+          case Some(existing) =>
+            existing.copy(
+              correspondenceAddress = Some(CorrespondenceAddress.fromLookup(singleAddress)),
+              addAnotherAddress = Some(updatedAnswer)
+            )
+
+          case None =>
+            OrganisationDetails(
+              correspondenceAddress = Some(CorrespondenceAddress.fromLookup(singleAddress)),
+              addAnotherAddress = Some(updatedAnswer)
+            )
+        }
+
+      case _ =>
+        existingDetails match {
+          case Some(existing) =>
+            existing.copy(addAnotherAddress = Some(enrichedAnswer))
+          case None           =>
+            OrganisationDetails(addAnotherAddress = Some(enrichedAnswer))
+        }
     }
 }

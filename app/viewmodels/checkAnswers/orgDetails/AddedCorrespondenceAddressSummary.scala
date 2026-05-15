@@ -16,11 +16,12 @@
 
 package viewmodels.checkAnswers.orgDetails
 
-import controllers.orgdetails.routes.FirmReferenceNumberController
+import controllers.orgdetails.routes.{EnterYourOrganisationAddressController, FirmReferenceNumberController}
 import models.CheckMode
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
@@ -28,13 +29,26 @@ import viewmodels.implicits.*
 object AddedCorrespondenceAddressSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.organisationDetails.flatMap(_.correspondenceAddress).map { answer =>
+    answers.organisationDetails.flatMap(_.correspondenceAddress).map { address =>
+
+      val formattedAddress = Seq(
+        address.addressLine1,
+        address.addressLine2,
+        address.addressLine3,
+        address.postCode
+      ).flatten.filter(_.nonEmpty)
+        .map(HtmlFormat.escape).mkString("<br>")
+
       SummaryListRowViewModel(
-        key = "firmReferenceNumber.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = "enterYourOrganisationAddress.checkYourAnswersLabel",
+        value = ValueViewModel(HtmlContent(formattedAddress)),
         actions = Seq(
-          ActionItemViewModel("site.change", FirmReferenceNumberController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("firmReferenceNumber.change.hidden"))
+          ActionItemViewModel(
+            "site.change",
+            EnterYourOrganisationAddressController.onPageLoad(CheckMode).url
+          ).withVisuallyHiddenText(
+            messages("enterYourOrganisationAddress.change.hidden")
+          )
         )
       )
     }

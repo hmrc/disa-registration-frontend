@@ -16,19 +16,20 @@
 
 package models.journeydata
 
+import models.YesNoAnswer
 import models.journeydata.orgdetails.AddAnotherAddress
 import play.api.libs.json.{Json, OFormat}
 
 case class OrganisationDetails(
-  registeredToManageIsa: Option[Boolean] = None,
-  zRefNumber: Option[String] = None,
-  tradingUsingDifferentName: Option[Boolean] = None,
-  tradingName: Option[String] = None,
-  fcaNumber: Option[String] = None,
-  registeredAddressCorrespondence: Option[Boolean] = None,
-  correspondenceAddress: Option[CorrespondenceAddress] = None,
-  orgTelephoneNumber: Option[String] = None,
-  addAnotherAddress: Option[AddAnotherAddress] = None
+                                registeredToManageIsa: Option[YesNoAnswer] = None,
+                                zRefNumber: Option[String] = None,
+                                tradingUsingDifferentName: Option[YesNoAnswer] = None,
+                                tradingName: Option[String] = None,
+                                fcaNumber: Option[String] = None,
+                                registeredAddressCorrespondence: Option[YesNoAnswer] = None,
+                                correspondenceAddress: Option[CorrespondenceAddress] = None,
+                                orgTelephoneNumber: Option[String] = None,
+                                addAnotherAddress: Option[AddAnotherAddress] = None
 ) extends TaskListSection {
   override def sectionName: String = "organisationDetails"
 

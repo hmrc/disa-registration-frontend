@@ -26,19 +26,16 @@ import controllers.routes.{IndexController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
-import models.addresslookup.LookupAddress
 import models.ReturnTo.FinalCya
 import models.addresslookup.LookupAddress
-import models.journeydata.{OrganisationDetails, OrganisationEmail}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
-import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
-import models.journeydata.orgdetails.AddAnotherAddress
+import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails, OrganisationEmail}
@@ -323,10 +320,10 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
     }
 
-    "route to AddAnotherAddressPage if multiple addresses are persisted in user answers to the SelectAddressPage" in {
+    "route from AddAnotherAddressPage if multiple addresses are persisted in user answers to the SelectAddressPage" in {
       val result: Call =
         navigator.normalRoutes(
           AddAnotherAddressPage,
@@ -384,7 +381,7 @@ class NavigatorSpec extends SpecBase {
           returnTo = None
         )
 
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode)
     }
 
     "route to ConfirmAddressPage if an address is selected and persisted in user answers" in {
@@ -414,7 +411,68 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe TaskListController.onPageLoad()
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
+    }
+
+    "ChooseAddressPage route to ManualAddressEntryPage if none is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(ManualEntry)
+              )
+            )
+          ),
+          returnTo = None
+        )
+
+      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode)
+    }
+
+    "ChooseAddressPage route to ConfirmAddressPage if an address is selected and persisted in user answers" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(addAnotherAddress =
+            Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(SelectedCorrespondenceAddress.Address(0))
+              )
+            )
+          ),
+          returnTo = None
+        )
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
     }
 
     "route FcaArticlesPage to ISA products CYA" in {

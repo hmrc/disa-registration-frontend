@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package pages.organisationdetails
+package pages
 
 import models.journeydata.OrganisationDetails
-import pages.{ClearablePage, PageWithDependents, PageWithoutDependents}
 
-object RegisteredAddressCorrespondencePage extends PageWithoutDependents[OrganisationDetails] {
-
-  override def toString: String = "registeredAddressCorrespondence"
-
-  def clearAnswer(sectionAnswers: OrganisationDetails): OrganisationDetails =
-    sectionAnswers.copy(registeredAddressCorrespondence = None)
-  
+case object EnterYourOrganisationAddressPage extends PageWithoutDependents[OrganisationDetails] {
+  def clearAnswer(answers: OrganisationDetails): OrganisationDetails = answers.copy(correspondenceAddress = None)
 }
