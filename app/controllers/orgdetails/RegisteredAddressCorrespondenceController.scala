@@ -17,11 +17,12 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import forms.{RegisteredAddressCorrespondenceFormProvider, YesNoAnswerFormProvider}
+import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
-import models.YesNoAnswer.Yes
-import models.{Mode, YesNoAnswer}
+import handlers.JourneyHandler.clearStalePages
+import models.YesNoAnswer.{No, Yes}
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails, RegisteredAddress}
+import models.{Mode, ReturnTo, YesNoAnswer}
 import navigation.Navigator
 import pages.organisationdetails.RegisteredAddressCorrespondencePage
 import play.api.data.Form
@@ -37,76 +38,96 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 class RegisteredAddressCorrespondenceController @Inject() (
-                                                            override val messagesApi: MessagesApi,
-                                                            navigator: Navigator,
-                                                            identify: IdentifierAction,
-                                                            getData: DataRetrievalAction,
-                                                            formProvider: YesNoAnswerFormProvider,
-                                                            journeyAnswersService: JourneyAnswersService,
-                                                            errorHandler: ErrorHandler,
-                                                            val controllerComponents: MessagesControllerComponents,
-                                                            view: RegisteredAddressCorrespondenceView
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  formProvider: YesNoAnswerFormProvider,
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler,
+  val controllerComponents: MessagesControllerComponents,
+  view: RegisteredAddressCorrespondenceView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   val form: Form[YesNoAnswer] = formProvider("registeredAddressCorrespondence.error.required")
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    (for {
-      jd      <- request.journeyData
-      bv      <- jd.businessVerification
-      regAddr <- bv.registeredAddress
-    } yield regAddr) match {
-      case None =>
-        Redirect(controllers.routes.StartController.onPageLoad())
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
+    implicit request =>
+      (for {
+        jd      <- request.journeyData
+        bv      <- jd.businessVerification
+        regAddr <- bv.registeredAddress
+      } yield regAddr) match {
+        case None =>
+          Redirect(controllers.routes.StartController.onPageLoad())
 
-      case Some(registeredAddress) =>
-        val preparedForm = request.journeyData
-          .flatMap(_.organisationDetails)
-          .flatMap(_.registeredAddressCorrespondence)
-          .fold(form)(form.fill)
+        case Some(registeredAddress) =>
+          val preparedForm = request.journeyData
+            .flatMap(_.organisationDetails)
+            .flatMap(_.registeredAddressCorrespondence)
+            .fold(form)(form.fill)
 
-        Ok(view(preparedForm, mode, registeredAddress))
-    }
+          Ok(view(preparedForm, mode, registeredAddress, returnTo))
+      }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData).async { implicit request =>
+      val registeredAddress =
+        for {
+          jd   <- request.journeyData
+          bv   <- jd.businessVerification
+          addr <- bv.registeredAddress
+        } yield addr
 
-    val registeredAddress =
-      for {
-        jd   <- request.journeyData
-        bv   <- jd.businessVerification
-        addr <- bv.registeredAddress
-      } yield addr
+      registeredAddress match {
+        case None       =>
+          Future.successful(Redirect(controllers.routes.StartController.onPageLoad()))
+        case Some(addr) =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, addr, returnTo))),
+              answer => {
+                val existing                   = request.journeyData.flatMap(_.organisationDetails)
+                val updatedOrganisationDetails = buildOrganisationDetails(existing, answer, addr)
+                val finalOrganisationDetails   =
+                  (existing.flatMap(_.registeredAddressCorrespondence), answer) match {
+                    case (Some(No), Yes) if updatedOrganisationDetails.addAnotherAddress.nonEmpty =>
+                      clearStalePages(
+                        RegisteredAddressCorrespondencePage,
+                        updatedOrganisationDetails
+                      )
+                    case _                                                                        =>
+                      updatedOrganisationDetails
+                  }
 
-    registeredAddress match {
-      case None                    =>
-        Future.successful(Redirect(controllers.routes.StartController.onPageLoad()))
-      case Some(registeredAddress) =>
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, registeredAddress))),
-            answer => {
-              val updatedOrganisationDetails =
-                buildOrganisationDetails(request.journeyData.flatMap(_.organisationDetails), answer, registeredAddress)
-
-              journeyAnswersService
-                .update(updatedOrganisationDetails, request.groupId, request.credentials.providerId)
-                .map { updated =>
-                  Redirect(navigator.nextPage(RegisteredAddressCorrespondencePage, updated, mode, None))
-                }
-                .recoverWith { case NonFatal(e) =>
-                  logger.warn(
-                    s"Failed updating answers for section [${updatedOrganisationDetails.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-                  )
-                  errorHandler.internalServerError
-                }
-            }
-          )
+                journeyAnswersService
+                  .update(finalOrganisationDetails, request.groupId, request.credentials.providerId)
+                  .map { _ =>
+                    Redirect(
+                      navigator.nextPage(
+                        RegisteredAddressCorrespondencePage,
+                        existing,
+                        finalOrganisationDetails,
+                        mode,
+                        returnTo
+                      )
+                    )
+                  }
+                  .recoverWith { case NonFatal(e) =>
+                    logger.warn(
+                      s"Failed updating answers for section [${finalOrganisationDetails.sectionName}] " +
+                        s"for groupId [${request.groupId}] with error: [$e]"
+                    )
+                    errorHandler.internalServerError
+                  }
+              }
+            )
+      }
     }
-  }
 
   private def buildOrganisationDetails(
     existing: Option[OrganisationDetails],
@@ -114,7 +135,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
     registeredAddress: RegisteredAddress
   ): OrganisationDetails = {
 
-    val correspondenceAddress =
+    val registeredCorrespondenceAddress =
       CorrespondenceAddress(
         addressLine1 = registeredAddress.addressLine1,
         addressLine2 = registeredAddress.addressLine2,
@@ -122,11 +143,18 @@ class RegisteredAddressCorrespondenceController @Inject() (
         postCode = registeredAddress.postCode
       )
 
-    val base = existing.getOrElse(OrganisationDetails())
+    val base                  = existing.getOrElse(OrganisationDetails())
+    val correspondenceAddress =
+      answer match {
+        case Yes =>
+          Some(registeredCorrespondenceAddress)
+        case No  =>
+          base.correspondenceAddress
+      }
 
     base.copy(
       registeredAddressCorrespondence = Some(answer),
-      correspondenceAddress = if (answer == Yes) Some(correspondenceAddress) else None
+      correspondenceAddress = correspondenceAddress
     )
   }
 }

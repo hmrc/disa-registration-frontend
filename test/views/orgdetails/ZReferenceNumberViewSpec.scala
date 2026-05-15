@@ -29,16 +29,16 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
   private val form: Form[String] = new ZReferenceNumberFormProvider().apply()
   private val view               = app.injector.instanceOf[ZReferenceNumberView]
 
-  private def docEmpty: Document = Jsoup.parse(view(form, NormalMode).body)
+  private def docEmpty: Document = Jsoup.parse(view(form, NormalMode, None).body)
 
   private def docWith(value: String): Document = {
     val bound = form.bind(Map("value" -> value))
-    Jsoup.parse(view(bound, NormalMode).body)
+    Jsoup.parse(view(bound, NormalMode, None).body)
   }
 
   private def docInvalid(value: String): Document = {
     val invalid = form.bind(Map("value" -> value))
-    Jsoup.parse(view(invalid, NormalMode).body)
+    Jsoup.parse(view(invalid, NormalMode, None).body)
   }
 
   "ZReferenceNumberView" should {
@@ -58,7 +58,8 @@ class ZReferenceNumberViewSpec extends ViewSpecBase {
 
       val formEl = doc.selectFirst("form")
       Option(formEl) mustBe defined
-      formEl.attr("action") mustBe controllers.orgdetails.routes.ZReferenceNumberController.onSubmit(NormalMode).url
+      formEl
+        .attr("action") mustBe controllers.orgdetails.routes.ZReferenceNumberController.onSubmit(NormalMode, None).url
       formEl.attr("method").toLowerCase mustBe "post"
 
       val input = doc.selectFirst("input[name=value]")

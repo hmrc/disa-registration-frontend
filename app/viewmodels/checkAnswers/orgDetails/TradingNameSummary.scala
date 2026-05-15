@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.orgDetails
 
 import controllers.orgdetails.routes.TradingNameController
 import models.CheckMode
+import models.ReturnTo.OrganisationDetailsCya
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -33,7 +34,10 @@ object TradingNameSummary {
         key = "tradingName.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", TradingNameController.onPageLoad(CheckMode).url)
+          ActionItemViewModel(
+            "site.change",
+            TradingNameController.onPageLoad(CheckMode, Some(OrganisationDetailsCya)).url
+          )
             .withVisuallyHiddenText(messages("tradingName.change.hidden"))
         )
       )

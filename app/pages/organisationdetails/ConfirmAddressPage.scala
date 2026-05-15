@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package forms
+package pages.organisationdetails
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.journeydata.OrganisationDetails
+import pages.Page
 
-import javax.inject.Inject
-
-class RegisteredAddressCorrespondenceFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[Boolean] =
-    Form(
-      "value" -> boolean("registeredAddressCorrespondence.error.required")
-    )
-}
+case object ConfirmAddressPage extends Page[OrganisationDetails]

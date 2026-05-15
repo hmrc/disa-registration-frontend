@@ -32,7 +32,7 @@
     config: FrontendAppConfig
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @link = @{ hmrcNewTabLinkHelper(NewTabLinkHelper(
   text = messages("zReferenceNumber.details.content.link"),
@@ -41,7 +41,7 @@
 
 @layout(pageTitle = title(form, messages("zReferenceNumber.title"), Some(messages("sectionTitle.orgDetails")))) {
 
-    @formHelper(action = ZReferenceNumberController.onSubmit(mode)) {
+    @formHelper(action = ZReferenceNumberController.onSubmit(mode, returnTo)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

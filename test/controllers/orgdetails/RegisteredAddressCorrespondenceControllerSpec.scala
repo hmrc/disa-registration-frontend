@@ -19,9 +19,12 @@ package controllers.orgdetails
 import base.SpecBase
 import controllers.orgdetails.routes.*
 import controllers.routes.*
-import forms.RegisteredAddressCorrespondenceFormProvider
+import forms.YesNoAnswerFormProvider
+import models.YesNoAnswer.{No, Yes}
+import models.addresslookup.LookupAddress
+import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails, RegisteredAddress}
-import models.{CheckMode, NormalMode}
+import models.{CheckMode, NormalMode, YesNoAnswer}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -37,11 +40,11 @@ import scala.concurrent.Future
 
 class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with MockitoSugar {
 
-  val formProvider        = new RegisteredAddressCorrespondenceFormProvider()
-  val form: Form[Boolean] = formProvider()
+  val formProvider            = new YesNoAnswerFormProvider()
+  val form: Form[YesNoAnswer] = formProvider("registeredAddressCorrespondence.error.required")
 
   lazy val registeredAddressCorrespondenceRoute: String =
-    RegisteredAddressCorrespondenceController.onPageLoad(NormalMode).url
+    RegisteredAddressCorrespondenceController.onPageLoad(NormalMode, None).url
 
   "RegisteredAddressCorrespondenceController onPageLoad" - {
 
@@ -62,7 +65,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, testRegisteredAddress)(
+        contentAsString(result) mustEqual view(form, NormalMode, testRegisteredAddress, None)(
           request,
           messages(application)
         ).toString
@@ -94,7 +97,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         groupId = testGroupId,
         enrolmentId = "enrolment",
         businessVerification = Some(testBV.copy(registeredAddress = Some(testRegisteredAddress))),
-        organisationDetails = Some(OrganisationDetails(registeredAddressCorrespondence = Some(true)))
+        organisationDetails = Some(OrganisationDetails(registeredAddressCorrespondence = Some(Yes)))
       )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
@@ -106,7 +109,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, testRegisteredAddress)(
+        contentAsString(result) mustEqual view(form.fill(Yes), NormalMode, testRegisteredAddress, None)(
           request,
           messages(application)
         ).toString
@@ -126,7 +129,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
       )
 
       val expectedUpdatedSection = OrganisationDetails(
-        registeredAddressCorrespondence = Some(true),
+        registeredAddressCorrespondence = Some(Yes),
         correspondenceAddress = Some(
           CorrespondenceAddress(
             addressLine1 = testRegisteredAddress.addressLine1,
@@ -149,7 +152,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request = FakeRequest(POST, registeredAddressCorrespondenceRoute)
-          .withFormUrlEncodedBody("value" -> "true")
+          .withFormUrlEncodedBody("value" -> Yes.toString)
 
         val result = route(application, request).value
 
@@ -170,7 +173,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
       )
 
       val expectedUpdatedSection = OrganisationDetails(
-        registeredAddressCorrespondence = Some(false),
+        registeredAddressCorrespondence = Some(No),
         correspondenceAddress = None
       )
 
@@ -185,12 +188,12 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request = FakeRequest(POST, registeredAddressCorrespondenceRoute)
-          .withFormUrlEncodedBody("value" -> "false")
+          .withFormUrlEncodedBody("value" -> No.toString)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual AddAnotherAddressController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual AddAnotherAddressController.onPageLoad(NormalMode, None).url
       }
     }
 
@@ -200,12 +203,57 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         groupId = testGroupId,
         enrolmentId = "enrolment",
         businessVerification = Some(testBV.copy(registeredAddress = Some(testRegisteredAddress))),
-        organisationDetails = Some(OrganisationDetails(registeredAddressCorrespondence = Some(false)))
+        organisationDetails = Some(
+          OrganisationDetails(
+            registeredAddressCorrespondence = Some(No),
+            addAnotherAddress = Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = None
+              )
+            ),
+            correspondenceAddress = Some(
+              CorrespondenceAddress(
+                addressLine1 = Some(testString),
+                addressLine2 = Some(testString),
+                postCode = Some(testString)
+              )
+            )
+          )
+        )
       )
 
       val expectedUpdatedSection = OrganisationDetails(
-        registeredAddressCorrespondence = Some(false),
-        correspondenceAddress = None
+        registeredAddressCorrespondence = Some(No),
+        correspondenceAddress = Some(
+          CorrespondenceAddress(
+            addressLine1 = Some(testString),
+            addressLine2 = Some(testString),
+            postCode = Some(testString)
+          )
+        ),
+        addAnotherAddress = Some(
+          AddAnotherAddress(
+            postcode = testString,
+            filter = Some(testString),
+            addresses = Seq(
+              LookupAddress(
+                addressLine1 = Some(testString),
+                addressLine2 = Some(testString),
+                postCode = Some(testString)
+              )
+            ),
+            selectedAddress = None
+          )
+        )
       )
 
       when(
@@ -219,13 +267,13 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request =
-          FakeRequest(POST, RegisteredAddressCorrespondenceController.onPageLoad(CheckMode).url)
-            .withFormUrlEncodedBody("value" -> "false")
+          FakeRequest(POST, RegisteredAddressCorrespondenceController.onPageLoad(CheckMode, None).url)
+            .withFormUrlEncodedBody("value" -> No.toString)
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual OrganisationDetailsCheckYourAnswersController.onPageLoad().url
       }
     }
 
@@ -250,7 +298,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, testRegisteredAddress)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, testRegisteredAddress, None)(
           request,
           messages(application)
         ).toString
@@ -298,7 +346,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
 
       running(application) {
         val request = FakeRequest(POST, registeredAddressCorrespondenceRoute)
-          .withFormUrlEncodedBody("value" -> "true")
+          .withFormUrlEncodedBody("value" -> Yes.toString)
 
         await(route(application, request).value)
 

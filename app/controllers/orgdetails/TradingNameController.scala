@@ -19,7 +19,7 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.TradingNameFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.organisationdetails.TradingNamePage
@@ -51,40 +51,42 @@ class TradingNameController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = (for {
-      journeyData <- request.journeyData
-      section     <- journeyData.organisationDetails
-      name        <- section.tradingName
-    } yield form.fill(name)).getOrElse(form)
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
+    implicit request =>
+      val preparedForm = (for {
+        journeyData <- request.journeyData
+        section     <- journeyData.organisationDetails
+        name        <- section.tradingName
+      } yield form.fill(name)).getOrElse(form)
 
-    Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, returnTo))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val updatedSection =
-            request.journeyData.flatMap(_.organisationDetails) match {
-              case Some(existing) => existing.copy(tradingName = Some(answer))
-              case None           => OrganisationDetails(tradingName = Some(answer))
-            }
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
+          answer => {
+            val updatedSection =
+              request.journeyData.flatMap(_.organisationDetails) match {
+                case Some(existing) => existing.copy(tradingName = Some(answer))
+                case None           => OrganisationDetails(tradingName = Some(answer))
+              }
 
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(navigator.nextPage(TradingNamePage, updatedSection, mode, None))
-            }
-            .recoverWith { case NonFatal(e) =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { updatedSection =>
+                Redirect(navigator.nextPage(TradingNamePage, updatedSection, mode, returnTo))
+              }
+              .recoverWith { case NonFatal(e) =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
   }
 }

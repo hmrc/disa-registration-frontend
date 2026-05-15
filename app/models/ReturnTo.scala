@@ -23,6 +23,7 @@ sealed trait ReturnTo
 object ReturnTo {
 
   case object FinalCya extends ReturnTo
+  case object OrganisationDetailsCya extends ReturnTo
 
   implicit val queryStringBindable: QueryStringBindable[ReturnTo] =
     new QueryStringBindable[ReturnTo] {
@@ -32,13 +33,15 @@ object ReturnTo {
         params: Map[String, Seq[String]]
       ): Option[Either[String, ReturnTo]] =
         params.get(key).flatMap(_.headOption).map {
-          case "FinalCya" => Right(FinalCya)
-          case other      => Left(s"Unknown returnTo value: $other")
+          case "FinalCya"               => Right(FinalCya)
+          case "OrganisationDetailsCya" => Right(OrganisationDetailsCya)
+          case other                    => Left(s"Unknown returnTo value: $other")
         }
 
       override def unbind(key: String, value: ReturnTo): String =
         value match {
-          case FinalCya => s"$key=FinalCya"
+          case FinalCya               => s"$key=FinalCya"
+          case OrganisationDetailsCya => s"$key=OrganisationDetailsCya"
         }
     }
 }

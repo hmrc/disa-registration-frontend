@@ -34,57 +34,58 @@ GET         /problem-with-service                        controllers.InternalSer
 # Journey Sections
 
 ## Organisation Details
-GET        /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode)
-POST       /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode)
-GET        /change-registered-isa-manager                controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-registered-isa-manager                controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = CheckMode)
+GET        /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /registered-isa-manager                       controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-registered-isa-manager                controllers.orgdetails.RegisteredIsaManagerController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-registered-isa-manager                controllers.orgdetails.RegisteredIsaManagerController.onSubmit(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
-GET        /z-reference-number                           controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /z-reference-number                           controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode)
+GET        /z-reference-number                           controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /z-reference-number                           controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-z-reference-number                    controllers.orgdetails.ZReferenceNumberController.onSubmit(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
-GET        /trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = NormalMode)
-GET        /change-trading-using-different-name          controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-trading-using-different-name          controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = CheckMode)
+GET        /trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /trading-using-different-name                 controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-trading-using-different-name          controllers.orgdetails.TradingUsingDifferentNameController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-trading-using-different-name          controllers.orgdetails.TradingUsingDifferentNameController.onSubmit(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
-GET        /trading-name                                 controllers.orgdetails.TradingNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /trading-name                                 controllers.orgdetails.TradingNameController.onSubmit(mode: Mode = NormalMode)
-GET        /change-trading-name                          controllers.orgdetails.TradingNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-trading-name                          controllers.orgdetails.TradingNameController.onSubmit(mode: Mode = CheckMode)
+GET        /trading-name                                 controllers.orgdetails.TradingNameController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /trading-name                                 controllers.orgdetails.TradingNameController.onSubmit(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-trading-name                          controllers.orgdetails.TradingNameController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-trading-name                          controllers.orgdetails.TradingNameController.onSubmit(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
 GET        /firm-reference-number                        controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /firm-reference-number                        controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-firm-reference-number                 controllers.orgdetails.FirmReferenceNumberController.onSubmit(mode: Mode = CheckMode)
 
-GET        /registered-address-correspondence            controllers.orgdetails.RegisteredAddressCorrespondenceController.onPageLoad(mode: Mode = NormalMode)
-POST       /registered-address-correspondence            controllers.orgdetails.RegisteredAddressCorrespondenceController.onSubmit(mode: Mode = NormalMode)
-GET        /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onSubmit(mode: Mode = CheckMode)
+GET        /registered-address-correspondence            controllers.orgdetails.RegisteredAddressCorrespondenceController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /registered-address-correspondence            controllers.orgdetails.RegisteredAddressCorrespondenceController.onSubmit(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-registered-address-correspondence     controllers.orgdetails.RegisteredAddressCorrespondenceController.onSubmit(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
 
-GET        /enter-your-organisation-address              controllers.orgdetails.EnterYourOrganisationAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /enter-your-organisation-address              controllers.orgdetails.EnterYourOrganisationAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /change-enter-your-organisation-address       controllers.orgdetails.EnterYourOrganisationAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-enter-your-organisation-address       controllers.orgdetails.EnterYourOrganisationAddressController.onSubmit(mode: Mode = CheckMode)
+GET        /enter-your-organisation-address              controllers.orgdetails.EnterYourOrganisationAddressController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /enter-your-organisation-address              controllers.orgdetails.EnterYourOrganisationAddressController.onSubmit(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-enter-your-organisation-address       controllers.orgdetails.EnterYourOrganisationAddressController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-enter-your-organisation-address       controllers.orgdetails.EnterYourOrganisationAddressController.onSubmit(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+
+GET        /add-another-address                          controllers.orgdetails.AddAnotherAddressController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /add-another-address                          controllers.orgdetails.AddAnotherAddressController.onSubmit(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-add-another-address                   controllers.orgdetails.AddAnotherAddressController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-add-another-address                   controllers.orgdetails.AddAnotherAddressController.onSubmit(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+
+GET        /choose-address                               controllers.orgdetails.ChooseAddressController.onPageLoad(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+POST       /choose-address                               controllers.orgdetails.ChooseAddressController.onSubmit(mode: Mode = NormalMode, returnTo: Option[ReturnTo])
+GET        /change-choose-address                        controllers.orgdetails.ChooseAddressController.onPageLoad(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+POST       /change-choose-address                        controllers.orgdetails.ChooseAddressController.onSubmit(mode: Mode = CheckMode, returnTo: Option[ReturnTo])
+
+GET        /confirm-correspondence-address               controllers.orgdetails.ConfirmCorrespondenceAddressController.onPageLoad(returnTo: Option[ReturnTo])
+POST       /confirm-correspondence-address               controllers.orgdetails.ConfirmCorrespondenceAddressController.onSubmit(returnTo: Option[ReturnTo])
 
 GET        /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = CheckMode)
-
-GET        /add-another-address                          controllers.orgdetails.AddAnotherAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /add-another-address                          controllers.orgdetails.AddAnotherAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /change-add-another-address                   controllers.orgdetails.AddAnotherAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-add-another-address                   controllers.orgdetails.AddAnotherAddressController.onSubmit(mode: Mode = CheckMode)
-
-GET        /choose-address                               controllers.orgdetails.ChooseAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /choose-address                               controllers.orgdetails.ChooseAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /change-choose-address                        controllers.orgdetails.ChooseAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /change-choose-address                        controllers.orgdetails.ChooseAddressController.onSubmit(mode: Mode = CheckMode)
-
-GET        /confirm-correspondence-address               controllers.orgdetails.ConfirmCorrespondenceAddressController.onPageLoad()
 
 GET        /organisation-details-check-your-answers      controllers.orgdetails.OrganisationDetailsCheckYourAnswersController.onPageLoad()
 

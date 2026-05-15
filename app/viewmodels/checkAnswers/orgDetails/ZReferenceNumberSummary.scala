@@ -16,7 +16,7 @@
 
 package viewmodels.checkAnswers.orgDetails
 
-import controllers.orgdetails.routes.{FirmReferenceNumberController, ZReferenceNumberController}
+import controllers.orgdetails.routes.ZReferenceNumberController
 import models.CheckMode
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
@@ -33,7 +33,7 @@ object ZReferenceNumberSummary {
         key = "zReferenceNumber.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", ZReferenceNumberController.onPageLoad(CheckMode).url)
+          ActionItemViewModel("site.change", ZReferenceNumberController.onPageLoad(CheckMode, None).url)
             .withVisuallyHiddenText(messages("zReferenceNumber.change.hidden"))
         )
       )

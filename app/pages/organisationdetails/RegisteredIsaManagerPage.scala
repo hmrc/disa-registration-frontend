@@ -16,13 +16,41 @@
 
 package pages.organisationdetails
 
+import models.YesNoAnswer.{No, Yes}
 import models.journeydata.OrganisationDetails
-import pages.PageWithoutDependents
+import pages.{ClearablePage, PageWithDependents}
 
-object RegisteredIsaManagerPage extends PageWithoutDependents[OrganisationDetails] {
+object RegisteredIsaManagerPage extends PageWithDependents[OrganisationDetails] {
 
   override def toString: String = "registeredIsaManager"
 
   def clearAnswer(answers: OrganisationDetails): OrganisationDetails =
     answers.copy(registeredToManageIsa = None)
+
+  override def pagesToClear(
+    currentAnswers: OrganisationDetails
+  ): List[ClearablePage[OrganisationDetails]] = {
+    val shouldClear =
+      currentAnswers.registeredToManageIsa.contains(No) &&
+        currentAnswers.zRefNumber.nonEmpty
+
+    if (shouldClear) {
+      List(
+        new ClearablePage[OrganisationDetails] {
+          override def clearAnswer(section: OrganisationDetails): OrganisationDetails =
+            section.copy(zRefNumber = None)
+        }
+      )
+    } else {
+      Nil
+    }
+  }
+
+  def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean =
+    currentAnswers.registeredToManageIsa match {
+      case Some(Yes) if currentAnswers.zRefNumber.isEmpty => true
+      case Some(No)                                       => true
+      case None                                           => true
+      case _                                              => false
+    }
 }

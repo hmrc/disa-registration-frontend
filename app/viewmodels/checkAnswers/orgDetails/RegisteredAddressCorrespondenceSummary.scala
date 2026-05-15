@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.orgDetails
 
 import controllers.orgdetails.routes.RegisteredAddressCorrespondenceController
 import models.CheckMode
+import models.ReturnTo.OrganisationDetailsCya
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -32,7 +33,10 @@ object RegisteredAddressCorrespondenceSummary {
         key = "registeredAddressCorrespondence.checkYourAnswersLabel",
         value = ValueViewModel(s"site.$answer"),
         actions = Seq(
-          ActionItemViewModel("site.change", RegisteredAddressCorrespondenceController.onPageLoad(CheckMode).url)
+          ActionItemViewModel(
+            "site.change",
+            RegisteredAddressCorrespondenceController.onPageLoad(CheckMode, Some(OrganisationDetailsCya)).url
+          )
             .withVisuallyHiddenText(messages("registeredAddressCorrespondence.change.hidden"))
         )
       )

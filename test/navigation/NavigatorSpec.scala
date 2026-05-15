@@ -25,8 +25,8 @@ import controllers.orgemail.routes.*
 import controllers.routes.{IndexController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
-import models.*
-import models.ReturnTo.FinalCya
+import models.{YesNoAnswer, *}
+import models.ReturnTo.{FinalCya, OrganisationDetailsCya}
 import models.addresslookup.LookupAddress
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
@@ -166,16 +166,170 @@ class NavigatorSpec extends SpecBase {
 
   "Navigator.normalRoutes" - {
 
+    "route RegisteredIsaManagerPage to ZReferenceNumberPage when yes selected and returnTo is OrganisationDetailsCya" in {
+      val answers =
+        OrganisationDetails(registeredToManageIsa = Some(YesNoAnswer.Yes))
+
+      val result: Call =
+        navigator.normalRoutes(
+          RegisteredIsaManagerPage,
+          answers,
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe ZReferenceNumberController.onPageLoad(
+        NormalMode,
+        Some(OrganisationDetailsCya)
+      )
+    }
+
+    "route RegisteredIsaManagerPage to OrganisationDetails CYA when no selected and returnTo is OrganisationDetailsCya" in {
+      val answers =
+        OrganisationDetails(registeredToManageIsa = Some(YesNoAnswer.No))
+
+      val result: Call =
+        navigator.normalRoutes(
+          RegisteredIsaManagerPage,
+          answers,
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route RegisteredIsaManagerPage to ZReferenceNumberPage when yes selected" in {
+      val answers =
+        OrganisationDetails(registeredToManageIsa = Some(YesNoAnswer.Yes))
+
+      val result: Call =
+        navigator.normalRoutes(
+          RegisteredIsaManagerPage,
+          answers,
+          None
+        )
+
+      result shouldBe ZReferenceNumberController.onPageLoad(
+        NormalMode,
+        None
+      )
+    }
+
+    "route RegisteredIsaManagerPage to TradingUsingDifferentNamePage when no selected" in {
+      val answers =
+        OrganisationDetails(registeredToManageIsa = Some(YesNoAnswer.No))
+
+      val result: Call =
+        navigator.normalRoutes(
+          RegisteredIsaManagerPage,
+          answers,
+          None
+        )
+
+      result shouldBe TradingUsingDifferentNameController.onPageLoad(
+        NormalMode,
+        None
+      )
+    }
+
+    "route RegisteredIsaManagerPage to TaskList when no answer is present" in {
+      val result: Call =
+        navigator.normalRoutes(
+          RegisteredIsaManagerPage,
+          OrganisationDetails(),
+          None
+        )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route ZReferenceNumberPage to OrganisationDetails CYA when returnTo is OrganisationDetailsCya" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ZReferenceNumberPage,
+          testOrganisationDetails,
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route ZReferenceNumberPage to TradingUsingDifferentNamePage when no returnTo present" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ZReferenceNumberPage,
+          testOrganisationDetails,
+          None
+        )
+
+      result shouldBe TradingUsingDifferentNameController.onPageLoad(
+        NormalMode,
+        None
+      )
+    }
+
+    "route TradingUsingDifferentNamePage to TradingNamePage when yes selected and returnTo is OrganisationDetailsCya" in {
+      val answers =
+        OrganisationDetails(tradingUsingDifferentName = Some(YesNoAnswer.Yes))
+
+      val result: Call =
+        navigator.normalRoutes(
+          TradingUsingDifferentNamePage,
+          answers,
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe TradingNameController.onPageLoad(
+        NormalMode,
+        Some(OrganisationDetailsCya)
+      )
+    }
+
+    "route TradingUsingDifferentNamePage to OrganisationDetails CYA when no selected and returnTo is OrganisationDetailsCya" in {
+      val answers =
+        OrganisationDetails(tradingUsingDifferentName = Some(YesNoAnswer.No))
+
+      val result: Call =
+        navigator.normalRoutes(
+          TradingUsingDifferentNamePage,
+          answers,
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route TradingUsingDifferentNamePage to TaskList when no answer is present" in {
+      val result: Call =
+        navigator.normalRoutes(
+          TradingUsingDifferentNamePage,
+          OrganisationDetails(),
+          None
+        )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route TradingNamePage to OrganisationDetails CYA when returnTo is OrganisationDetailsCya" in {
+      val result: Call =
+        navigator.normalRoutes(
+          TradingNamePage,
+          OrganisationDetails(),
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
     "route TradingUsingDifferentNamePage to TradingNamePage when Yes selected" in {
-      val answers = OrganisationDetails(tradingUsingDifferentName = Some(true))
+      val answers = OrganisationDetails(tradingUsingDifferentName = Some(YesNoAnswer.Yes))
 
       val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers, None)
 
-      result shouldBe TradingNameController.onPageLoad(NormalMode)
+      result shouldBe TradingNameController.onPageLoad(NormalMode, None)
     }
 
     "route TradingUsingDifferentNamePage to FirmReferenceNumberPage when No selected" in {
-      val answers = OrganisationDetails(tradingUsingDifferentName = Some(false))
+      val answers = OrganisationDetails(tradingUsingDifferentName = Some(YesNoAnswer.No))
 
       val result: Call = navigator.normalRoutes(TradingUsingDifferentNamePage, answers, None)
 
@@ -266,13 +420,13 @@ class NavigatorSpec extends SpecBase {
 
     "route RegisteredAddressCorrespondencePage to RegisteredAddressCorrespondenceController" in {
       val result: Call = navigator.normalRoutes(FirmReferenceNumberPage, testOrganisationDetails, None)
-      result shouldBe RegisteredAddressCorrespondenceController.onPageLoad(NormalMode)
+      result shouldBe RegisteredAddressCorrespondenceController.onPageLoad(NormalMode, None)
     }
 
     "route RegisteredAddressCorrespondencePage to OrganisationTelephoneNumberController if yes submitted" in {
       val result: Call = navigator.normalRoutes(
         RegisteredAddressCorrespondencePage,
-        testOrganisationDetails.copy(registeredAddressCorrespondence = Some(true)),
+        testOrganisationDetails.copy(registeredAddressCorrespondence = Some(YesNoAnswer.Yes)),
         None
       )
       result shouldBe OrganisationTelephoneNumberController.onPageLoad(NormalMode)
@@ -282,10 +436,10 @@ class NavigatorSpec extends SpecBase {
       val result: Call =
         navigator.normalRoutes(
           RegisteredAddressCorrespondencePage,
-          testOrganisationDetails.copy(registeredAddressCorrespondence = Some(false)),
+          testOrganisationDetails.copy(registeredAddressCorrespondence = Some(YesNoAnswer.No)),
           None
         )
-      result shouldBe AddAnotherAddressController.onPageLoad(NormalMode)
+      result shouldBe AddAnotherAddressController.onPageLoad(NormalMode, None)
     }
 
     "route to RegisteredAddressCorrespondencePage if no answer is present for registeredAddressCorrespondence" in {
@@ -320,7 +474,7 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad(None)
     }
 
     "route from AddAnotherAddressPage if multiple addresses are persisted in user answers to the SelectAddressPage" in {
@@ -350,7 +504,223 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe ChooseAddressController.onPageLoad(NormalMode)
+      result shouldBe ChooseAddressController.onPageLoad(NormalMode, None)
+    }
+
+    "route AddAnotherAddressPage to TaskList when no addresses are present" in {
+      val result: Call =
+        navigator.normalRoutes(
+          AddAnotherAddressPage,
+          testOrganisationDetails.copy(
+            addAnotherAddress = Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq.empty,
+                selectedAddress = None
+              )
+            )
+          ),
+          None
+        )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route AddAnotherAddressPage to ConfirmCorrespondenceAddressController with returnTo param when one address exists" in {
+      val result: Call =
+        navigator.normalRoutes(
+          AddAnotherAddressPage,
+          testOrganisationDetails.copy(
+            addAnotherAddress = Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = None
+              )
+            )
+          ),
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad(
+        Some(OrganisationDetailsCya)
+      )
+    }
+
+    "route AddAnotherAddressPage to ChooseAddressController with returnTo param when multiple addresses exist" in {
+      val result: Call =
+        navigator.normalRoutes(
+          AddAnotherAddressPage,
+          testOrganisationDetails.copy(
+            addAnotherAddress = Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  ),
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = None
+              )
+            )
+          ),
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe ChooseAddressController.onPageLoad(
+        NormalMode,
+        Some(OrganisationDetailsCya)
+      )
+    }
+
+    "route ChooseAddressPage to TaskList when no address selection is present" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(
+            addAnotherAddress = Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = None
+              )
+            )
+          ),
+          None
+        )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route ChooseAddressPage to EnterYourOrganisationAddressController with returnTo param when manual entry selected" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(
+            addAnotherAddress = Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(ManualEntry)
+              )
+            )
+          ),
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe EnterYourOrganisationAddressController.onPageLoad(
+        NormalMode,
+        Some(OrganisationDetailsCya)
+      )
+    }
+
+    "route ChooseAddressPage to ConfirmCorrespondenceAddressController with returnTo param when address selected" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ChooseAddressPage,
+          testOrganisationDetails.copy(
+            addAnotherAddress = Some(
+              AddAnotherAddress(
+                postcode = testString,
+                filter = Some(testString),
+                addresses = Seq(
+                  LookupAddress(
+                    addressLine1 = Some(testString),
+                    addressLine2 = Some(testString),
+                    postCode = Some(testString)
+                  )
+                ),
+                selectedAddress = Some(SelectedCorrespondenceAddress.Address(0))
+              )
+            )
+          ),
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad(
+        Some(OrganisationDetailsCya)
+      )
+    }
+
+    "route ConfirmAddressPage to OrganisationDetails CYA when returnTo is OrganisationDetailsCya" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ConfirmAddressPage,
+          testOrganisationDetails,
+          Some(OrganisationDetailsCya)
+        )
+
+      result shouldBe OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route ConfirmAddressPage to OrganisationTelephoneNumberController when no returnTo present" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ConfirmAddressPage,
+          testOrganisationDetails,
+          None
+        )
+
+      result shouldBe OrganisationTelephoneNumberController.onPageLoad(
+        NormalMode
+      )
+    }
+
+    "route ProductsManagedByThirdPartyPage to TaskList when no answer present" in {
+      val result: Call =
+        navigator.normalRoutes(
+          ProductsManagedByThirdPartyPage,
+          ThirdPartyOrganisations(None),
+          None
+        )
+
+      result shouldBe TaskListController.onPageLoad()
+    }
+
+    "route InvestorFundsUsedByThirdPartyPage to TaskList when third party id not found" in {
+      val result: Call =
+        navigator.normalRoutes(
+          InvestorFundsUsedByThirdPartyPage(testString),
+          ThirdPartyOrganisations(
+            Some(YesNoAnswer.Yes),
+            Seq(
+              ThirdParty("different-id")
+            )
+          ),
+          None
+        )
+
+      result shouldBe TaskListController.onPageLoad()
     }
 
     "route to ManualAddressEntryPage if none is selected and persisted in user answers" in {
@@ -381,7 +751,7 @@ class NavigatorSpec extends SpecBase {
           returnTo = None
         )
 
-      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode)
+      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode, None)
     }
 
     "route to ConfirmAddressPage if an address is selected and persisted in user answers" in {
@@ -411,7 +781,7 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad(None)
     }
 
     "ChooseAddressPage route to ManualAddressEntryPage if none is selected and persisted in user answers" in {
@@ -442,7 +812,7 @@ class NavigatorSpec extends SpecBase {
           returnTo = None
         )
 
-      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode)
+      result shouldBe EnterYourOrganisationAddressController.onPageLoad(NormalMode, None)
     }
 
     "ChooseAddressPage route to ConfirmAddressPage if an address is selected and persisted in user answers" in {
@@ -472,7 +842,7 @@ class NavigatorSpec extends SpecBase {
           ),
           returnTo = None
         )
-      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad()
+      result shouldBe ConfirmCorrespondenceAddressController.onPageLoad(None)
     }
 
     "route FcaArticlesPage to ISA products CYA" in {
@@ -734,7 +1104,7 @@ class NavigatorSpec extends SpecBase {
 
     "route RegisteredAddressCorrespondencePage to COA CYA" in {
       navigator.checkRouteMap(RegisteredAddressCorrespondencePage, None) shouldBe
-        IndexController.onPageLoad()
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
     }
 
     "route OrganisationEmailAddressPage to Org email CYA" in {

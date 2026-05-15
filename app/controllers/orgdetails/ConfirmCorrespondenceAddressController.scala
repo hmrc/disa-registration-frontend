@@ -17,7 +17,10 @@
 package controllers.orgdetails
 
 import controllers.actions.*
+import models.{NormalMode, ReturnTo}
 import models.journeydata.CorrespondenceAddress
+import navigation.Navigator
+import pages.organisationdetails.ConfirmAddressPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -29,12 +32,13 @@ class ConfirmCorrespondenceAddressController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  navigator: Navigator,
   val controllerComponents: MessagesControllerComponents,
   view: ConfirmCorrespondenceAddressView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] =
+  def onPageLoad(returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData) { implicit request =>
       val address =
         for {
@@ -45,9 +49,19 @@ class ConfirmCorrespondenceAddressController @Inject() (
 
       address match {
         case Some(correspondenceAddress) =>
-          Ok(view(correspondenceAddress))
+          Ok(view(correspondenceAddress, returnTo))
         case None                        =>
           Redirect(controllers.routes.TaskListController.onPageLoad())
       }
+    }
+
+  def onSubmit(returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData) { implicit request =>
+      Redirect(
+        request.journeyData
+          .flatMap(_.organisationDetails)
+          .map(org => navigator.nextPage(ConfirmAddressPage, org, NormalMode, returnTo))
+          .getOrElse(controllers.routes.TaskListController.onPageLoad())
+      )
     }
 }

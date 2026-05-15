@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.orgDetails
 
 import controllers.orgdetails.routes
 import models.CheckMode
+import models.ReturnTo.OrganisationDetailsCya
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -32,7 +33,10 @@ object TradingUsingDifferentNameSummary {
         key = "tradingUsingDifferentName.checkYourAnswersLabel",
         value = ValueViewModel(s"site.$answer"),
         actions = Seq(
-          ActionItemViewModel("site.change", routes.TradingUsingDifferentNameController.onPageLoad(CheckMode).url)
+          ActionItemViewModel(
+            "site.change",
+            routes.TradingUsingDifferentNameController.onPageLoad(CheckMode, Some(OrganisationDetailsCya)).url
+          )
             .withVisuallyHiddenText(messages("tradingUsingDifferentName.change.hidden"))
         )
       )

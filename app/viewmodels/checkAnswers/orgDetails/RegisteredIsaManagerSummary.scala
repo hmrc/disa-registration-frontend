@@ -18,6 +18,7 @@ package viewmodels.checkAnswers.orgDetails
 
 import controllers.orgdetails.routes.RegisteredIsaManagerController
 import models.CheckMode
+import models.ReturnTo.OrganisationDetailsCya
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -32,7 +33,10 @@ object RegisteredIsaManagerSummary {
         key = "registeredIsaManager.checkYourAnswersLabel",
         value = ValueViewModel(s"site.$answer"),
         actions = Seq(
-          ActionItemViewModel("site.change", RegisteredIsaManagerController.onPageLoad(CheckMode).url)
+          ActionItemViewModel(
+            "site.change",
+            RegisteredIsaManagerController.onPageLoad(CheckMode, returnTo = Some(OrganisationDetailsCya)).url
+          )
             .withVisuallyHiddenText(messages("registeredIsaManager.change.hidden"))
         )
       )

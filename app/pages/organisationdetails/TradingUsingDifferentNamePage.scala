@@ -19,9 +19,7 @@ package pages.organisationdetails
 import models.YesNoAnswer
 import models.YesNoAnswer.Yes
 import models.journeydata.OrganisationDetails
-import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.No
-import models.journeydata.thirdparty.ThirdPartyOrganisations
-import pages.{ClearablePage, PageWithDependents, PageWithoutDependents}
+import pages.{ClearablePage, PageWithDependents}
 
 case object TradingUsingDifferentNamePage extends PageWithDependents[OrganisationDetails] {
 
@@ -31,10 +29,10 @@ case object TradingUsingDifferentNamePage extends PageWithDependents[Organisatio
     answers.copy(tradingUsingDifferentName = None)
 
   override def pagesToClear(
-                             currentAnswers: OrganisationDetails
-                           ): List[ClearablePage[OrganisationDetails]] = {
+    currentAnswers: OrganisationDetails
+  ): List[ClearablePage[OrganisationDetails]] = {
     val shouldClear =
-      currentAnswers.tradingUsingDifferentName.contains(Yes) &&
+      currentAnswers.tradingUsingDifferentName.contains(YesNoAnswer.No) &&
         currentAnswers.tradingName.nonEmpty
 
     if (shouldClear) {
@@ -50,8 +48,9 @@ case object TradingUsingDifferentNamePage extends PageWithDependents[Organisatio
   }
 
   def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean = {
-    val yesAnswerWithNoDetails = currentAnswers.tradingUsingDifferentName.contains(Yes) && currentAnswers.tradingName.isEmpty
-    val noOrMissingAnswer = currentAnswers.tradingUsingDifferentName.fold(false)(_ == YesNoAnswer.No)
+    val yesAnswerWithNoDetails =
+      currentAnswers.tradingUsingDifferentName.contains(Yes) && currentAnswers.tradingName.isEmpty
+    val noOrMissingAnswer      = currentAnswers.tradingUsingDifferentName.fold(false)(_ == YesNoAnswer.No)
     yesAnswerWithNoDetails || noOrMissingAnswer
   }
 }

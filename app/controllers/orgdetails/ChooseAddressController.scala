@@ -20,7 +20,7 @@ import config.Constants.noneRadioValue
 import controllers.actions.*
 import forms.ChooseAddressFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.addresslookup.LookupAddress
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress
@@ -57,7 +57,7 @@ class ChooseAddressController @Inject() (
 
   private val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
 
       val organisationDetails = request.journeyData.organisationDetails
@@ -67,10 +67,10 @@ class ChooseAddressController @Inject() (
         preselectedValue(organisationDetails)
           .fold(form)(form.fill)
 
-      Ok(view(preparedForm, addresses, mode))
+      Ok(view(preparedForm, addresses, mode, returnTo))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       val organisationDetails = request.journeyData.organisationDetails
       val addresses           = extractAddresses(organisationDetails)
@@ -79,7 +79,7 @@ class ChooseAddressController @Inject() (
         .fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(formWithErrors, addresses, mode))
+              BadRequest(view(formWithErrors, addresses, mode, returnTo))
             ),
           answer => {
             val selectedAddress =
@@ -112,7 +112,7 @@ class ChooseAddressController @Inject() (
                 request.credentials.providerId
               )
               .map { persistedSection =>
-                Redirect(navigator.nextPage(ChooseAddressPage, persistedSection, mode, None))
+                Redirect(navigator.nextPage(ChooseAddressPage, persistedSection, mode, returnTo))
               }
               .recoverWith { case NonFatal(e) =>
                 logger.warn(

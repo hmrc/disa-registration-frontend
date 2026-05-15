@@ -17,10 +17,11 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import forms.{RegisteredIsaManagerFormProvider, YesNoAnswerFormProvider}
+import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
-import models.{Mode, YesNoAnswer}
+import handlers.JourneyHandler.clearStalePages
 import models.journeydata.OrganisationDetails
+import models.{Mode, ReturnTo, YesNoAnswer}
 import navigation.Navigator
 import pages.*
 import pages.organisationdetails.RegisteredIsaManagerPage
@@ -37,54 +38,62 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
 class RegisteredIsaManagerController @Inject() (
-                                                 override val messagesApi: MessagesApi,
-                                                 navigator: Navigator,
-                                                 identify: IdentifierAction,
-                                                 getData: DataRetrievalAction,
-                                                 formProvider: YesNoAnswerFormProvider,
-                                                 journeyAnswersService: JourneyAnswersService,
-                                                 errorHandler: ErrorHandler,
-                                                 val controllerComponents: MessagesControllerComponents,
-                                                 view: RegisteredIsaManagerView
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  formProvider: YesNoAnswerFormProvider,
+  journeyAnswersService: JourneyAnswersService,
+  errorHandler: ErrorHandler,
+  val controllerComponents: MessagesControllerComponents,
+  view: RegisteredIsaManagerView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   val form: Form[YesNoAnswer] = formProvider("registeredIsaManager.error.required")
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.registeredToManageIsa match {
-      case None        => form
-      case Some(value) => form.fill(value)
-    }))
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
+    implicit request =>
+      val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.registeredToManageIsa match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }))
 
-    Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, returnTo))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val updatedSection =
-            request.journeyData.flatMap(_.organisationDetails) match {
-              case Some(existing) => existing.copy(registeredToManageIsa = Some(answer))
-              case None           => OrganisationDetails(registeredToManageIsa = Some(answer))
-            }
-
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(navigator.nextPage(RegisteredIsaManagerPage, updatedSection, mode, None))
-            }
-            .recoverWith { case NonFatal(e) =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
-  }
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData).async { implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
+          answer => {
+            val existing: Option[OrganisationDetails] =
+              request.journeyData.flatMap(_.organisationDetails)
+            val updatedSection: OrganisationDetails   =
+              existing match {
+                case Some(org) =>
+                  clearStalePages(RegisteredIsaManagerPage, org.copy(registeredToManageIsa = Some(answer)))
+                case None      =>
+                  OrganisationDetails(registeredToManageIsa = Some(answer))
+              }
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { _ =>
+                Redirect(
+                  navigator.nextPage(RegisteredIsaManagerPage, existing, updatedSection, mode, returnTo)
+                )
+              }
+              .recoverWith { case NonFatal(e) =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] " +
+                    s"for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
+    }
 }

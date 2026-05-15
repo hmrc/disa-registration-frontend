@@ -55,9 +55,9 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       isaProducts = Some(IsaProducts(Some(IsaProduct.values), Some(testString), Some(testString))),
       organisationDetails = Some(
         OrganisationDetails(
-          registeredToManageIsa = Some(true),
+          registeredToManageIsa = Some(YesNoAnswer.Yes),
           zRefNumber = Some("Z1"),
-          tradingUsingDifferentName = Some(true),
+          tradingUsingDifferentName = Some(YesNoAnswer.Yes),
           tradingName = Some(testString),
           fcaNumber = Some(testString),
           correspondenceAddress = None,
@@ -116,9 +116,9 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "businessPartnerId":"test"
       },
       "organisationDetails": {
-        "registeredToManageIsa": true,
+        "registeredToManageIsa": "yes",
         "zRefNumber": "Z1",
-        "tradingUsingDifferentName": true,
+        "tradingUsingDifferentName": "yes",
         "tradingName": "test",
         "fcaNumber": "test"
       },
@@ -173,9 +173,9 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
     "enrolmentId": "$testEnrolmentId",
     "status": "Active",
     "organisationDetails": {
-      "registeredToManageIsa": true,
+      "registeredToManageIsa": "yes",
       "zRefNumber": "Z1",
-      "tradingUsingDifferentName": true,
+      "tradingUsingDifferentName": "yes",
       "tradingName": "test",
       "fcaNumber": "test"
     },

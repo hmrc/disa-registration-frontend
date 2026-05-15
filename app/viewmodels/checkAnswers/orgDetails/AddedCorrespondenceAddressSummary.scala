@@ -16,8 +16,9 @@
 
 package viewmodels.checkAnswers.orgDetails
 
-import controllers.orgdetails.routes.{EnterYourOrganisationAddressController, FirmReferenceNumberController}
+import controllers.orgdetails.routes.EnterYourOrganisationAddressController
 import models.CheckMode
+import models.ReturnTo.OrganisationDetailsCya
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -36,8 +37,10 @@ object AddedCorrespondenceAddressSummary {
         address.addressLine2,
         address.addressLine3,
         address.postCode
-      ).flatten.filter(_.nonEmpty)
-        .map(HtmlFormat.escape).mkString("<br>")
+      ).flatten
+        .filter(_.nonEmpty)
+        .map(HtmlFormat.escape)
+        .mkString("<br>")
 
       SummaryListRowViewModel(
         key = "enterYourOrganisationAddress.checkYourAnswersLabel",
@@ -45,7 +48,7 @@ object AddedCorrespondenceAddressSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            EnterYourOrganisationAddressController.onPageLoad(CheckMode).url
+            EnterYourOrganisationAddressController.onPageLoad(CheckMode, Some(OrganisationDetailsCya)).url
           ).withVisuallyHiddenText(
             messages("enterYourOrganisationAddress.change.hidden")
           )

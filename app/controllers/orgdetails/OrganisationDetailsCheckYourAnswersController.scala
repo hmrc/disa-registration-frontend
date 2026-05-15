@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package controllers.orgdetails
 
 import controllers.actions.*
+import models.YesNoAnswer
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -28,19 +29,24 @@ import views.html.orgdetails.OrganisationDetailsCheckYourAnswersView
 
 import javax.inject.Inject
 
-class OrganisationDetailsCheckYourAnswersController @Inject()(
+class OrganisationDetailsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: OrganisationDetailsCheckYourAnswersView
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val summaryListRows =
-      request.journeyData.toSeq.flatMap { jd =>
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+
+      val jd         = request.journeyData
+      val orgDetails = jd.organisationDetails
+
+      val summaryListRows =
         Seq(
           RegisteredIsaManagerSummary.row(jd),
           ZReferenceNumberSummary.row(jd),
@@ -48,12 +54,12 @@ class OrganisationDetailsCheckYourAnswersController @Inject()(
           TradingNameSummary.row(jd),
           FirmReferenceNumberSummary.row(jd),
           RegisteredAddressCorrespondenceSummary.row(jd),
-          AddedCorrespondenceAddressSummary.row(jd),
+          AddedCorrespondenceAddressSummary
+            .row(jd)
+            .filter(_ => !orgDetails.flatMap(_.registeredAddressCorrespondence).contains(YesNoAnswer.Yes)),
           OrganisationTelephoneNumberSummary.row(jd)
-        )
-      }.flatten
+        ).flatten
 
-    Ok(view(SummaryListViewModel(summaryListRows)))
-  }
-
+      Ok(view(SummaryListViewModel(summaryListRows)))
+    }
 }
