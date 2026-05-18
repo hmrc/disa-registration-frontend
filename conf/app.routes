@@ -84,6 +84,8 @@ POST       /choose-address                               controllers.orgdetails.
 GET        /change-choose-address                        controllers.orgdetails.ChooseAddressController.onPageLoad(mode: Mode = CheckMode)
 POST       /change-choose-address                        controllers.orgdetails.ChooseAddressController.onSubmit(mode: Mode = CheckMode)
 
+GET        /confirm-correspondence-address               controllers.orgdetails.ConfirmCorrespondenceAddressController.onPageLoad()
+
 ## Organisation Email
 
 GET        /organisation-email-address                   controllers.orgemail.OrganisationEmailAddressController.onPageLoad(mode: Mode = NormalMode)

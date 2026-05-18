@@ -101,10 +101,9 @@ class Navigator @Inject() () {
     case FcaArticlesPage                           => CoaCheckYourAnswersController.onPageLoad()
     case FinancialOrganisationPage                 => CoaCheckYourAnswersController.onPageLoad()
     case RegisteredAddressCorrespondencePage       => registeredAddressCorrespondenceNextPage(answers)
-    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
     case ChooseAddressPage                         => chooseAddressNextPage(answers)
-    case EnterYourOrganisationAddressPage          =>
-      TaskListController.onPageLoad() // TODO hook to review and confim page in DFI-934
+    case AddAnotherAddressPage                     => addAnotherAddressRouting(answers)
+    case EnterYourOrganisationAddressPage          => ConfirmCorrespondenceAddressController.onPageLoad()
     case OrganisationEmailAddressPage              => EmailVerificationCodeController.onPageLoad()
     case OrganisationEmailVerificationCodePage     => OrganisationEmailCyaController.onPageLoad()
     case LiaisonOfficerNamePage(id)                => LiaisonOfficerEmailController.onPageLoad(id, NormalMode)
@@ -249,7 +248,7 @@ class Navigator @Inject() () {
 
     count match {
       case 1          =>
-        TaskListController.onPageLoad()
+        ConfirmCorrespondenceAddressController.onPageLoad()
       case n if n > 1 =>
         ChooseAddressController.onPageLoad(NormalMode)
       case _          =>
@@ -276,7 +275,7 @@ class Navigator @Inject() () {
       case Some(SelectedCorrespondenceAddress.ManualEntry) =>
         EnterYourOrganisationAddressController.onPageLoad(NormalMode)
       case Some(SelectedCorrespondenceAddress.Address(_))  =>
-        TaskListController.onPageLoad()
+        ConfirmCorrespondenceAddressController.onPageLoad()
       case None                                            =>
         TaskListController.onPageLoad()
     }
