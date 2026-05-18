@@ -77,16 +77,16 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
     )
 
   lazy val routeUrl: String =
-    EnterYourOrganisationAddressController.onPageLoad(NormalMode).url
+    EnterYourOrganisationAddressController.onPageLoad(NormalMode, None).url
 
   lazy val checkRouteUrl: String =
-    EnterYourOrganisationAddressController.onPageLoad(CheckMode).url
+    EnterYourOrganisationAddressController.onPageLoad(CheckMode, None).url
 
   lazy val submitUrl: String =
-    EnterYourOrganisationAddressController.onSubmit(NormalMode).url
+    EnterYourOrganisationAddressController.onSubmit(NormalMode, None).url
 
   lazy val checkSubmitUrl: String =
-    EnterYourOrganisationAddressController.onSubmit(CheckMode).url
+    EnterYourOrganisationAddressController.onSubmit(CheckMode, None).url
 
   val formProvider: EnterYourOrganisationAddressFormProvider =
     new EnterYourOrganisationAddressFormProvider()
@@ -109,7 +109,7 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[EnterYourOrganisationAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(
+        contentAsString(result) mustEqual view(form, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -129,7 +129,7 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[EnterYourOrganisationAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(existingAddress), CheckMode)(
+        contentAsString(result) mustEqual view(form.fill(existingAddress), CheckMode, None)(
           request,
           messages(application)
         ).toString
@@ -260,7 +260,7 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
           .update(any[OrganisationDetails], any[String], any[String])(any[Writes[OrganisationDetails]], any)
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None)(
           request,
           messages(application)
         ).toString

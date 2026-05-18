@@ -14,27 +14,30 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.orgDetails
 
-import controllers.orgdetails.routes.TradingNameController
-import models.journeydata.JourneyData
+import controllers.orgdetails.routes.RegisteredAddressCorrespondenceController
 import models.CheckMode
+import models.ReturnTo.OrganisationDetailsCya
+import models.journeydata.JourneyData
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object TradingNameSummary {
+object RegisteredAddressCorrespondenceSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.organisationDetails.flatMap(_.tradingName).map { answer =>
+    answers.organisationDetails.flatMap(_.registeredAddressCorrespondence).map { answer =>
       SummaryListRowViewModel(
-        key = "tradingName.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = "registeredAddressCorrespondence.checkYourAnswersLabel",
+        value = ValueViewModel(s"site.$answer"),
         actions = Seq(
-          ActionItemViewModel("site.change", TradingNameController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("tradingName.change.hidden"))
+          ActionItemViewModel(
+            "site.change",
+            RegisteredAddressCorrespondenceController.onPageLoad(CheckMode, Some(OrganisationDetailsCya)).url
+          )
+            .withVisuallyHiddenText(messages("registeredAddressCorrespondence.change.hidden"))
         )
       )
     }

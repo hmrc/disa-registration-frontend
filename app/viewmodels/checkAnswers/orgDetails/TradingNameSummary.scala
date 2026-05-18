@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.orgDetails
 
-import controllers.orgdetails.routes.FirmReferenceNumberController
+import controllers.orgdetails.routes.TradingNameController
 import models.CheckMode
+import models.ReturnTo.OrganisationDetailsCya
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -25,16 +26,19 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object FirmReferenceNumberSummary {
+object TradingNameSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.organisationDetails.flatMap(_.fcaNumber).map { answer =>
+    answers.organisationDetails.flatMap(_.tradingName).map { answer =>
       SummaryListRowViewModel(
-        key = "firmReferenceNumber.checkYourAnswersLabel",
+        key = "tradingName.checkYourAnswersLabel",
         value = ValueViewModel(HtmlFormat.escape(answer).toString),
         actions = Seq(
-          ActionItemViewModel("site.change", FirmReferenceNumberController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("firmReferenceNumber.change.hidden"))
+          ActionItemViewModel(
+            "site.change",
+            TradingNameController.onPageLoad(CheckMode, Some(OrganisationDetailsCya)).url
+          )
+            .withVisuallyHiddenText(messages("tradingName.change.hidden"))
         )
       )
     }

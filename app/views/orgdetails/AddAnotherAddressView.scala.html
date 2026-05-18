@@ -31,7 +31,7 @@
         govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @inputsHtml = {
 @govukInput(
@@ -77,7 +77,7 @@
     )
 ) {
 
-    @formHelper(action = AddAnotherAddressController.onSubmit(mode)) {
+    @formHelper(action = AddAnotherAddressController.onSubmit(mode, returnTo)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -86,7 +86,8 @@
         @govukFieldset(fieldset)
 
         <p class="govuk-body">
-            <a class="govuk-link" href="@EnterYourOrganisationAddressController.onPageLoad(NormalMode).url">
+            <a class="govuk-link"
+            href="@AddAnotherAddressController.clearCorrespondenceAddressAndRedirect().url">
             @messages("AddAnotherAddress.link.text")
             </a>
         </p>

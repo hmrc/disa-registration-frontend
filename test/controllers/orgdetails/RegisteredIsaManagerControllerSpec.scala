@@ -18,9 +18,10 @@ package controllers.orgdetails
 
 import base.SpecBase
 import controllers.orgdetails
-import forms.RegisteredIsaManagerFormProvider
-import models.NormalMode
+import forms.YesNoAnswerFormProvider
+import models.YesNoAnswer.{No, Yes}
 import models.journeydata.{JourneyData, OrganisationDetails}
+import models.{NormalMode, YesNoAnswer}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, argThat}
 import org.mockito.Mockito.{verify, when}
@@ -38,11 +39,11 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider        = new RegisteredIsaManagerFormProvider()
-  val form: Form[Boolean] = formProvider()
+  val formProvider            = new YesNoAnswerFormProvider()
+  val form: Form[YesNoAnswer] = formProvider("registeredIsaManager.error.required")
 
   lazy val routePath: String =
-    orgdetails.routes.RegisteredIsaManagerController.onPageLoad(NormalMode).url
+    orgdetails.routes.RegisteredIsaManagerController.onPageLoad(NormalMode, None).url
 
   "onPageLoad" - {
 
@@ -58,7 +59,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(form, NormalMode)(request, messages(app)).toString
+          view(form, NormalMode, None)(request, messages(app)).toString
       }
     }
 
@@ -82,7 +83,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(form, NormalMode)(request, messages(app)).toString
+          view(form, NormalMode, None)(request, messages(app)).toString
       }
     }
 
@@ -92,7 +93,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         groupId = testGroupId,
         enrolmentId = testString,
         organisationDetails = Some(
-          OrganisationDetails(registeredToManageIsa = Some(true))
+          OrganisationDetails(registeredToManageIsa = Some(Yes))
         )
       )
 
@@ -106,19 +107,19 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(form.fill(true), NormalMode)(request, messages(app)).toString
+          view(form.fill(Yes), NormalMode, None)(request, messages(app)).toString
       }
     }
   }
 
   "onSubmit" - {
 
-    "must create OrganisationDetails when none exists (true)" in {
+    "must create OrganisationDetails when none exists (Yes)" in {
 
       when(
         mockJourneyAnswersService
           .update(any[OrganisationDetails], any[String], any[String])(any(), any)
-      ).thenReturn(Future.successful(OrganisationDetails(Some(true))))
+      ).thenReturn(Future.successful(OrganisationDetails(Some(Yes))))
 
       val jd = JourneyData(
         groupId = testGroupId,
@@ -134,7 +135,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       running(app) {
         val request =
           FakeRequest(POST, routePath)
-            .withFormUrlEncodedBody("value" -> "true")
+            .withFormUrlEncodedBody("value" -> Yes.toString)
 
         val result = route(app, request).value
 
@@ -142,7 +143,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
 
         verify(mockJourneyAnswersService).update(
-          argThat[OrganisationDetails](_.registeredToManageIsa.contains(true)),
+          argThat[OrganisationDetails](_.registeredToManageIsa.contains(Yes)),
           any[String],
           any[String]
         )(any(), any())
@@ -154,7 +155,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       when(
         mockJourneyAnswersService
           .update(any[OrganisationDetails], any[String], any[String])(any(), any)
-      ).thenReturn(Future.successful(OrganisationDetails(Some(false))))
+      ).thenReturn(Future.successful(OrganisationDetails(Some(No))))
 
       val jd = JourneyData(
         groupId = testGroupId,
@@ -170,7 +171,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       running(app) {
         val request =
           FakeRequest(POST, routePath)
-            .withFormUrlEncodedBody("value" -> "false")
+            .withFormUrlEncodedBody("value" -> No.toString)
 
         val result = route(app, request).value
 
@@ -178,7 +179,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
 
         verify(mockJourneyAnswersService).update(
-          argThat[OrganisationDetails](_.registeredToManageIsa.contains(false)),
+          argThat[OrganisationDetails](_.registeredToManageIsa.contains(No)),
           any[String],
           any[String]
         )(any(), any())
@@ -188,7 +189,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
     "must update existing OrganisationDetails and preserve fields" in {
 
       val existing = OrganisationDetails(
-        registeredToManageIsa = Some(false),
+        registeredToManageIsa = Some(No),
         tradingName = Some("keep-me")
       )
 
@@ -201,7 +202,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       when(
         mockJourneyAnswersService
           .update(any[OrganisationDetails], any[String], any[String])(any(), any)
-      ).thenReturn(Future.successful(existing.copy(registeredToManageIsa = Some(true))))
+      ).thenReturn(Future.successful(existing.copy(registeredToManageIsa = Some(Yes))))
 
       val app =
         applicationBuilder(journeyData = Some(jd))
@@ -211,7 +212,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       running(app) {
         val request =
           FakeRequest(POST, routePath)
-            .withFormUrlEncodedBody("value" -> "true")
+            .withFormUrlEncodedBody("value" -> Yes.toString)
 
         val result = route(app, request).value
 
@@ -220,7 +221,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
         verify(mockJourneyAnswersService).update(
           argThat[OrganisationDetails](od =>
-            od.registeredToManageIsa.contains(true) &&
+            od.registeredToManageIsa.contains(Yes) &&
               od.tradingName.contains("keep-me")
           ),
           any[String],
@@ -247,7 +248,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         status(result) mustEqual BAD_REQUEST
 
         contentAsString(result) mustEqual
-          view(boundForm, NormalMode)(request, messages(app)).toString
+          view(boundForm, NormalMode, None)(request, messages(app)).toString
       }
     }
 
@@ -266,7 +267,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       running(app) {
         val request =
           FakeRequest(POST, routePath)
-            .withFormUrlEncodedBody("value" -> "true")
+            .withFormUrlEncodedBody("value" -> Yes.toString)
 
         await(route(app, request).value)
 

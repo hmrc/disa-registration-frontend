@@ -17,9 +17,10 @@
 package controllers.orgdetails
 
 import base.SpecBase
-import forms.TradingUsingDifferentNameFormProvider
-import models.NormalMode
+import forms.YesNoAnswerFormProvider
+import models.YesNoAnswer.Yes
 import models.journeydata.{JourneyData, OrganisationDetails}
+import models.{NormalMode, YesNoAnswer}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -38,18 +39,18 @@ class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar
 
   def onwardRoute: Call = Call("GET", "/foo")
 
-  val formProvider        = new TradingUsingDifferentNameFormProvider()
-  val form: Form[Boolean] = formProvider()
+  val formProvider            = new YesNoAnswerFormProvider()
+  val form: Form[YesNoAnswer] = formProvider("tradingUsingDifferentName.error.required")
 
   val journeyData: JourneyData =
     JourneyData(
       groupId = testGroupId,
       enrolmentId = testString,
-      organisationDetails = Some(OrganisationDetails(tradingUsingDifferentName = Some(true)))
+      organisationDetails = Some(OrganisationDetails(tradingUsingDifferentName = Some(Yes)))
     )
 
   lazy val tradingUsingDifferentNameRoute: String =
-    routes.TradingUsingDifferentNameController.onPageLoad(NormalMode).url
+    routes.TradingUsingDifferentNameController.onPageLoad(NormalMode, None).url
 
   "TradingUsingDifferentName Controller" - {
 
@@ -65,7 +66,7 @@ class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar
         val view = application.injector.instanceOf[TradingUsingDifferentNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, None)(request, messages(application)).toString
       }
     }
 
@@ -81,13 +82,16 @@ class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(Yes), NormalMode, None)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
     "must redirect to the next page when valid data is submitted" in {
 
-      val expectedJourneyData = OrganisationDetails(tradingUsingDifferentName = Some(true))
+      val expectedJourneyData = OrganisationDetails(tradingUsingDifferentName = Some(Yes))
 
       when(
         mockJourneyAnswersService
@@ -102,7 +106,7 @@ class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar
       running(application) {
         val request =
           FakeRequest(POST, tradingUsingDifferentNameRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody(("value", "yes"))
 
         val result = route(application, request).value
 
@@ -127,7 +131,7 @@ class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None)(request, messages(application)).toString
       }
     }
 
@@ -148,7 +152,7 @@ class TradingUsingDifferentNameControllerSpec extends SpecBase with MockitoSugar
       running(application) {
         val request =
           FakeRequest(POST, tradingUsingDifferentNameRoute)
-            .withFormUrlEncodedBody(("value", "true"))
+            .withFormUrlEncodedBody(("value", Yes.toString))
 
         await(route(application, request).value)
 

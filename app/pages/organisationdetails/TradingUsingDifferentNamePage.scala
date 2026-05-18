@@ -16,13 +16,41 @@
 
 package pages.organisationdetails
 
+import models.YesNoAnswer
+import models.YesNoAnswer.Yes
 import models.journeydata.OrganisationDetails
-import pages.PageWithoutDependents
+import pages.{ClearablePage, PageWithDependents}
 
-case object TradingUsingDifferentNamePage extends PageWithoutDependents[OrganisationDetails] {
+case object TradingUsingDifferentNamePage extends PageWithDependents[OrganisationDetails] {
 
   override def toString: String = "tradingUsingDifferentName"
 
   def clearAnswer(answers: OrganisationDetails): OrganisationDetails =
     answers.copy(tradingUsingDifferentName = None)
+
+  override def pagesToClear(
+    currentAnswers: OrganisationDetails
+  ): List[ClearablePage[OrganisationDetails]] = {
+    val shouldClear =
+      currentAnswers.tradingUsingDifferentName.contains(YesNoAnswer.No) &&
+        currentAnswers.tradingName.nonEmpty
+
+    if (shouldClear) {
+      List(
+        new ClearablePage[OrganisationDetails] {
+          override def clearAnswer(section: OrganisationDetails): OrganisationDetails =
+            section.copy(tradingName = None)
+        }
+      )
+    } else {
+      Nil
+    }
+  }
+
+  def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean = {
+    val yesAnswerWithNoDetails =
+      currentAnswers.tradingUsingDifferentName.contains(Yes) && currentAnswers.tradingName.isEmpty
+    val noOrMissingAnswer      = currentAnswers.tradingUsingDifferentName.fold(false)(_ == YesNoAnswer.No)
+    yesAnswerWithNoDetails || noOrMissingAnswer
+  }
 }

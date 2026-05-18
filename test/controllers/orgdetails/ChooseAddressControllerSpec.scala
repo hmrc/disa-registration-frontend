@@ -81,10 +81,10 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
     )
 
   lazy val routeUrl =
-    ChooseAddressController.onPageLoad(NormalMode).url
+    ChooseAddressController.onPageLoad(NormalMode, None).url
 
   lazy val submitUrl =
-    ChooseAddressController.onSubmit(NormalMode).url
+    ChooseAddressController.onSubmit(NormalMode, None).url
 
   "ChooseAddressController" - {
 
@@ -106,7 +106,8 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         contentAsString(result) mustEqual view(
           form,
           addresses,
-          NormalMode
+          NormalMode,
+          None
         )(request, messages(application)).toString
       }
     }
@@ -234,7 +235,7 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual EnterYourOrganisationAddressController.onPageLoad(NormalMode).url
+        redirectLocation(result).value mustEqual EnterYourOrganisationAddressController.onPageLoad(NormalMode, None).url
       }
     }
 

@@ -97,6 +97,8 @@ section.caption.hidden = This section is
 registeredIsaManager.title = Is your organisation registered to manage ISAs with HMRC?
 registeredIsaManager.heading = Is your organisation registered to manage ISAs with HMRC?
 registeredIsaManager.error.required = You must select either yes or no.  For example select yes, if you are registered as an ISA manager with HMRC
+registeredIsaManager.change.hidden = if you are registered to manage ISAs
+registeredIsaManager.checkYourAnswersLabel = Registered to manage ISAs
 
 zReferenceNumber.title = What is your organisation’s Z-reference number?
 zReferenceNumber.heading = What is your organisation’s Z-reference number?
@@ -108,16 +110,18 @@ zReferenceNumber.error.required = If you are a registered ISA Manager you must t
 zReferenceNumber.error.invalid = Z-reference number must only include a Z followed by 4 numbers
 zReferenceNumber.error.tooShort = The Z-reference number you have given is too short. The number is a Z followed by 4 numbers
 zReferenceNumber.error.tooLong = The Z-reference number you have given is too long. The number is a Z followed by 4 numbers
+zReferenceNumber.change.hidden = Z-reference
+zReferenceNumber.checkYourAnswersLabel = Z-reference
 
 tradingUsingDifferentName.title = Does your organisation trade using a different name?
 tradingUsingDifferentName.heading = Does your organisation trade using a different name?
-tradingUsingDifferentName.checkYourAnswersLabel = Does your organisation trade using a different name?
+tradingUsingDifferentName.checkYourAnswersLabel = Different trading name
 tradingUsingDifferentName.error.required = You must select either yes or no. For example select yes, if your organisation trades using a different name
 tradingUsingDifferentName.change.hidden = trading using different a name
 
 tradingName.title = What is your organisation’s trading name?
 tradingName.heading = What is your organisation’s trading name?
-tradingName.checkYourAnswersLabel = tradingName
+tradingName.checkYourAnswersLabel = Trading name
 tradingName.error.required = You must tell us what your organisation’s trading name is
 tradingName.change.hidden = trading name
 
@@ -149,6 +153,8 @@ organisationTelephoneNumber.change.hidden = organisation telephone number
 registeredAddressCorrespondence.title = Do you want us to use the registered address to send you letters?
 registeredAddressCorrespondence.heading = Do you want us to use the registered address to send you letters?
 registeredAddressCorrespondence.error.required = Select yes if you want HMRC to use this address to send you letters
+registeredAddressCorrespondence.change.hidden = registered correspondence address
+registeredAddressCorrespondence.checkYourAnswersLabel = Registered address for correspondence
 
 AddAnotherAddress.title = Add another address for your organisation
 AddAnotherAddress.heading = Add another address for your organisation
@@ -193,6 +199,9 @@ enterYourOrganisationAddress.change.hidden = added address
 confirmCorrespondenceAddress.title = Review and confirm
 confirmCorrespondenceAddress.heading = Review and confirm
 confirmCorrespondenceAddress.edit.address.link = Edit address
+
+organisationDetailsCya.title = Check your organisation details
+organisationDetailsCya.heading = Check your organisation details
 
 ### Organisation Email
 

@@ -17,6 +17,7 @@
 package pages
 
 import base.SpecBase
+import models.YesNoAnswer.Yes
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
 import pages.organisationdetails.RegisteredAddressCorrespondencePage
 
@@ -33,12 +34,12 @@ class RegisteredAddressCorrespondencePageSpec extends SpecBase {
       "must clear registeredAddressCorrespondence when it is set" in {
 
         val original = OrganisationDetails(
-          registeredToManageIsa = Some(true),
+          registeredToManageIsa = Some(Yes),
           zRefNumber = Some("Z1"),
-          tradingUsingDifferentName = Some(true),
+          tradingUsingDifferentName = Some(Yes),
           tradingName = Some("Test Ltd"),
           fcaNumber = Some("FCA123"),
-          registeredAddressCorrespondence = Some(true),
+          registeredAddressCorrespondence = Some(Yes),
           correspondenceAddress = Some(
             CorrespondenceAddress(
               addressLine1 = Some("line1"),
@@ -54,12 +55,12 @@ class RegisteredAddressCorrespondencePageSpec extends SpecBase {
 
         result.registeredAddressCorrespondence mustBe None
 
-        result.copy(registeredAddressCorrespondence = Some(true)) mustBe original
+        result.copy(registeredAddressCorrespondence = Some(Yes)) mustBe original
       }
 
       "must remain None if registeredAddressCorrespondence is already None" in {
         val original = OrganisationDetails(
-          registeredToManageIsa = Some(true),
+          registeredToManageIsa = Some(Yes),
           registeredAddressCorrespondence = None
         )
         val result   = RegisteredAddressCorrespondencePage.clearAnswer(original)

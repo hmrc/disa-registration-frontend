@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,30 @@
  * limitations under the License.
  */
 
-package viewmodels.checkAnswers
+package viewmodels.checkAnswers.orgDetails
 
-import controllers.orgdetails.routes.OrganisationTelephoneNumberController
+import controllers.orgdetails.routes.RegisteredIsaManagerController
 import models.CheckMode
+import models.ReturnTo.OrganisationDetailsCya
 import models.journeydata.JourneyData
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
-object OrganisationTelephoneNumberSummary {
+object RegisteredIsaManagerSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.organisationDetails.flatMap(_.orgTelephoneNumber).map { answer =>
+    answers.organisationDetails.flatMap(_.registeredToManageIsa).map { answer =>
       SummaryListRowViewModel(
-        key = "organisationTelephoneNumber.checkYourAnswersLabel",
-        value = ValueViewModel(HtmlFormat.escape(answer).toString),
+        key = "registeredIsaManager.checkYourAnswersLabel",
+        value = ValueViewModel(s"site.$answer"),
         actions = Seq(
-          ActionItemViewModel("site.change", OrganisationTelephoneNumberController.onPageLoad(CheckMode).url)
-            .withVisuallyHiddenText(messages("organisationTelephoneNumber.change.hidden"))
+          ActionItemViewModel(
+            "site.change",
+            RegisteredIsaManagerController.onPageLoad(CheckMode, returnTo = Some(OrganisationDetailsCya)).url
+          )
+            .withVisuallyHiddenText(messages("registeredIsaManager.change.hidden"))
         )
       )
     }

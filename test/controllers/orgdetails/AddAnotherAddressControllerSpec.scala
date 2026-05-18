@@ -67,14 +67,14 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, routes.AddAnotherAddressController.onPageLoad(mode).url)
+          FakeRequest(GET, routes.AddAnotherAddressController.onPageLoad(mode, None).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[AddAnotherAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, mode)(
+        contentAsString(result) mustEqual view(form, mode, None)(
           request,
           messages(application)
         ).toString
@@ -95,7 +95,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, routes.AddAnotherAddressController.onPageLoad(mode).url)
+          FakeRequest(GET, routes.AddAnotherAddressController.onPageLoad(mode, None).url)
 
         val result = route(application, request).value
 
@@ -104,7 +104,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         val expectedForm = form.fill(baseAnswer)
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(expectedForm, mode)(
+        contentAsString(result) mustEqual view(expectedForm, mode, None)(
           request,
           messages(application)
         ).toString
@@ -122,7 +122,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode).url)
+          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode, None).url)
             .withFormUrlEncodedBody(
               "postcode" -> "",
               "filter"   -> "x"
@@ -157,7 +157,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode).url)
+          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode, None).url)
             .withFormUrlEncodedBody(
               "postcode" -> "AA1 1AA",
               "filter"   -> "Test"
@@ -187,7 +187,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode).url)
+          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode, None).url)
             .withFormUrlEncodedBody(
               "postcode" -> "AA1 1AA",
               "filter"   -> "Test"
@@ -216,7 +216,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode).url)
+          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode, None).url)
             .withFormUrlEncodedBody(
               "postcode" -> "AA1 1AA",
               "filter"   -> "Test"
@@ -268,7 +268,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       running(application) {
 
         val request =
-          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode).url)
+          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode, None).url)
             .withFormUrlEncodedBody(
               "postcode" -> "AA1 1AA",
               "filter"   -> "Test"
@@ -280,6 +280,140 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
         verify(mockJourneyAnswersService, atMostOnce)
           .update(eqTo(expectedSection), any[String], any[String])(any(), any)
+      }
+    }
+  }
+
+  "AddAnotherAddressController clearCorrespondenceAddressAndRedirect" - {
+
+    "must clear correspondenceAddress and addAnotherAddress and redirect" in {
+
+      val existingDetails =
+        OrganisationDetails(
+          correspondenceAddress = Some(mock[models.journeydata.CorrespondenceAddress]),
+          addAnotherAddress = Some(baseAnswer)
+        )
+
+      val updatedSection =
+        existingDetails.copy(
+          correspondenceAddress = None,
+          addAnotherAddress = None
+        )
+
+      val journeyData =
+        emptyJourneyData.copy(
+          organisationDetails = Some(existingDetails)
+        )
+
+      when(
+        mockJourneyAnswersService.update(
+          eqTo(updatedSection),
+          any[String],
+          any[String]
+        )(any[Writes[OrganisationDetails]], any())
+      ).thenReturn(Future.successful(updatedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.AddAnotherAddressController
+              .clearCorrespondenceAddressAndRedirect()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.orgdetails.routes.EnterYourOrganisationAddressController
+            .onPageLoad(NormalMode, None)
+            .url
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(updatedSection), any[String], any[String])(any(), any)
+      }
+    }
+
+    "must redirect to tasklist when no OrganisationDetails exists in journey answers" in {
+
+      when(
+        mockJourneyAnswersService.update(
+          eqTo(OrganisationDetails()),
+          any[String],
+          any[String]
+        )(any[Writes[OrganisationDetails]], any())
+      ).thenReturn(Future.successful(OrganisationDetails()))
+
+      val application =
+        applicationBuilder(
+          journeyData = Some(
+            emptyJourneyData.copy(organisationDetails = None)
+          )
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.AddAnotherAddressController
+              .clearCorrespondenceAddressAndRedirect()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.TaskListController
+            .onPageLoad()
+            .url
+      }
+    }
+
+    "must return INTERNAL_SERVER_ERROR when update fails" in {
+
+      when(
+        mockJourneyAnswersService.update(
+          any(),
+          any[String],
+          any[String]
+        )(any[Writes[OrganisationDetails]], any())
+      ).thenReturn(Future.failed(new Exception("DB failure")))
+
+      when(mockErrorHandler.internalServerError(any[RequestHeader]))
+        .thenReturn(Future.successful(InternalServerError))
+
+      val application =
+        applicationBuilder(
+          journeyData = Some(
+            emptyJourneyData.copy(
+              organisationDetails = Some(journeyDetails)
+            )
+          )
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.AddAnotherAddressController
+              .clearCorrespondenceAddressAndRedirect()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual INTERNAL_SERVER_ERROR
       }
     }
   }

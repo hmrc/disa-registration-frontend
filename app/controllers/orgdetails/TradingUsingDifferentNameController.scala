@@ -17,10 +17,11 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import forms.TradingUsingDifferentNameFormProvider
+import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import handlers.JourneyHandler.clearStalePages
 import models.journeydata.OrganisationDetails
+import models.{Mode, ReturnTo, YesNoAnswer}
 import navigation.Navigator
 import pages.organisationdetails.TradingUsingDifferentNamePage
 import play.api.Logging
@@ -29,7 +30,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormPreparationHelper.prepareForm
 import views.html.orgdetails.TradingUsingDifferentNameView
 
 import javax.inject.Inject
@@ -41,7 +41,8 @@ class TradingUsingDifferentNameController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  formProvider: TradingUsingDifferentNameFormProvider,
+  requireData: DataRequiredAction,
+  formProvider: YesNoAnswerFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
   val controllerComponents: MessagesControllerComponents,
@@ -51,36 +52,43 @@ class TradingUsingDifferentNameController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form: Form[Boolean] = formProvider()
+  val form: Form[YesNoAnswer] = formProvider("tradingUsingDifferentName.error.required")
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = prepareForm(form)(_.organisationDetails.flatMap(_.tradingUsingDifferentName))(identity)
-    Ok(view(preparedForm, mode))
-  }
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val preparedForm = request.journeyData.organisationDetails
+        .flatMap(_.tradingUsingDifferentName)
+        .fold(form)(form.fill)
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val updatedSection =
-            request.journeyData.flatMap(_.organisationDetails) match {
-              case Some(existing) => existing.copy(tradingUsingDifferentName = Some(answer))
+      Ok(view(preparedForm, mode, returnTo))
+    }
+
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
+          answer => {
+            val existing: Option[OrganisationDetails] =
+              request.journeyData.flatMap(_.organisationDetails)
+            val updatedSection                        = existing match {
+              case Some(existing) =>
+                clearStalePages(TradingUsingDifferentNamePage, existing.copy(tradingUsingDifferentName = Some(answer)))
               case None           => OrganisationDetails(tradingUsingDifferentName = Some(answer))
             }
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(navigator.nextPage(TradingUsingDifferentNamePage, updatedSection, mode, None))
-            }
-            .recoverWith { case NonFatal(e) =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { updatedSection =>
+                Redirect(navigator.nextPage(TradingUsingDifferentNamePage, existing, updatedSection, mode, returnTo))
+              }
+              .recoverWith { case NonFatal(e) =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
   }
 }

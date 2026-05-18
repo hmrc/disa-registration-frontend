@@ -19,10 +19,10 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.AddAnotherAddressFormProvider
 import handlers.ErrorHandler
-import models.Mode
 import models.addresslookup.LookupAddress
-import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
 import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
+import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
+import models.{Mode, NormalMode, ReturnTo}
 import navigation.Navigator
 import pages.organisationdetails.AddAnotherAddressPage
 import play.api.Logging
@@ -56,7 +56,7 @@ class AddAnotherAddressController @Inject() (
 
   private val form: Form[AddAnotherAddress] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       val preparedForm =
         request.journeyData.organisationDetails
@@ -64,15 +64,15 @@ class AddAnotherAddressController @Inject() (
           .map(form.fill)
           .getOrElse(form)
 
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, returnTo))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer =>
             addressLookupService.lookup(answer.postcode, answer.filter).flatMap { results =>
               val enrichedAnswer = answer.copy(addresses = results)
@@ -94,9 +94,9 @@ class AddAnotherAddressController @Inject() (
                           "postcode",
                           "AddAnotherAddress.postcode.error.not.found"
                         )
-                    BadRequest(view(formWithError, mode))
+                    BadRequest(view(formWithError, mode, returnTo))
                   } else {
-                    Redirect(navigator.nextPage(AddAnotherAddressPage, updatedSection, mode, None))
+                    Redirect(navigator.nextPage(AddAnotherAddressPage, updatedSection, mode, returnTo))
                   }
                 }
                 .recoverWith { case NonFatal(e) =>
@@ -108,6 +108,47 @@ class AddAnotherAddressController @Inject() (
                 }
             }
         )
+    }
+
+  def clearCorrespondenceAddressAndRedirect(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      request.journeyData.organisationDetails match {
+
+        case Some(existing) =>
+          val updatedSection =
+            existing.copy(
+              correspondenceAddress = None,
+              addAnotherAddress = None
+            )
+
+          journeyAnswersService
+            .update(
+              updatedSection,
+              request.groupId,
+              request.credentials.providerId
+            )
+            .map { _ =>
+              Redirect(
+                controllers.orgdetails.routes.EnterYourOrganisationAddressController
+                  .onPageLoad(NormalMode, None)
+              )
+            }
+            .recoverWith { case NonFatal(e) =>
+              logger.warn(
+                s"Failed clearing correspondence address for groupId [${request.groupId}] with error: [$e]"
+              )
+              errorHandler.internalServerError
+            }
+
+        case None =>
+          logger.warn(
+            s"OrganisationDetails missing when clearing correspondence address for groupId [${request.groupId}]"
+          )
+
+          Future.successful(
+            Redirect(controllers.routes.TaskListController.onPageLoad())
+          )
+      }
     }
 
   private def buildUpdatedSection(
