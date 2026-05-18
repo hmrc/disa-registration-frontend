@@ -17,8 +17,8 @@
 package controllers.orgdetails
 
 import controllers.actions.*
-import models.{NormalMode, ReturnTo}
 import models.journeydata.CorrespondenceAddress
+import models.{NormalMode, ReturnTo}
 import navigation.Navigator
 import pages.organisationdetails.ConfirmAddressPage
 import play.api.i18n.{I18nSupport, MessagesApi}

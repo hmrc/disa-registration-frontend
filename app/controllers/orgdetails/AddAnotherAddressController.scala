@@ -19,10 +19,10 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.AddAnotherAddressFormProvider
 import handlers.ErrorHandler
-import models.{Mode, NormalMode, ReturnTo}
 import models.addresslookup.LookupAddress
-import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
 import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
+import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
+import models.{Mode, NormalMode, ReturnTo}
 import navigation.Navigator
 import pages.organisationdetails.AddAnotherAddressPage
 import play.api.Logging
@@ -112,35 +112,43 @@ class AddAnotherAddressController @Inject() (
 
   def clearCorrespondenceAddressAndRedirect(): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      val updatedSection =
-        request.journeyData.organisationDetails match {
-          case Some(existing) =>
+      request.journeyData.organisationDetails match {
+
+        case Some(existing) =>
+          val updatedSection =
             existing.copy(
               correspondenceAddress = None,
               addAnotherAddress = None
             )
-          case None           =>
-            OrganisationDetails()
-        }
 
-      journeyAnswersService
-        .update(
-          updatedSection,
-          request.groupId,
-          request.credentials.providerId
-        )
-        .map { _ =>
-          Redirect(
-            controllers.orgdetails.routes.EnterYourOrganisationAddressController
-              .onPageLoad(NormalMode, None)
-          )
-        }
-        .recoverWith { case NonFatal(e) =>
+          journeyAnswersService
+            .update(
+              updatedSection,
+              request.groupId,
+              request.credentials.providerId
+            )
+            .map { _ =>
+              Redirect(
+                controllers.orgdetails.routes.EnterYourOrganisationAddressController
+                  .onPageLoad(NormalMode, None)
+              )
+            }
+            .recoverWith { case NonFatal(e) =>
+              logger.warn(
+                s"Failed clearing correspondence address for groupId [${request.groupId}] with error: [$e]"
+              )
+              errorHandler.internalServerError
+            }
+
+        case None =>
           logger.warn(
-            s"Failed clearing correspondence address for groupId [${request.groupId}] with error: [$e]"
+            s"OrganisationDetails missing when clearing correspondence address for groupId [${request.groupId}]"
           )
-          errorHandler.internalServerError
-        }
+
+          Future.successful(
+            Redirect(controllers.routes.TaskListController.onPageLoad())
+          )
+      }
     }
 
   private def buildUpdatedSection(

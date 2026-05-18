@@ -341,7 +341,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       }
     }
 
-    "must create empty OrganisationDetails when none exists" in {
+    "must redirect to tasklist when no OrganisationDetails exists in journey answers" in {
 
       when(
         mockJourneyAnswersService.update(
@@ -373,8 +373,8 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.orgdetails.routes.EnterYourOrganisationAddressController
-            .onPageLoad(NormalMode, None)
+          controllers.routes.TaskListController
+            .onPageLoad()
             .url
       }
     }
