@@ -86,7 +86,8 @@
         @govukFieldset(fieldset)
 
         <p class="govuk-body">
-            <a class="govuk-link" href="@EnterYourOrganisationAddressController.onPageLoad(NormalMode, returnTo).url">
+            <a class="govuk-link"
+            href="@AddAnotherAddressController.clearCorrespondenceAddressAndRedirect().url">
             @messages("AddAnotherAddress.link.text")
             </a>
         </p>

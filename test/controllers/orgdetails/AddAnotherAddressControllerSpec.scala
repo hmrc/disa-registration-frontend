@@ -283,4 +283,138 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       }
     }
   }
+
+  "AddAnotherAddressController clearCorrespondenceAddressAndRedirect" - {
+
+    "must clear correspondenceAddress and addAnotherAddress and redirect" in {
+
+      val existingDetails =
+        OrganisationDetails(
+          correspondenceAddress = Some(mock[models.journeydata.CorrespondenceAddress]),
+          addAnotherAddress = Some(baseAnswer)
+        )
+
+      val updatedSection =
+        existingDetails.copy(
+          correspondenceAddress = None,
+          addAnotherAddress = None
+        )
+
+      val journeyData =
+        emptyJourneyData.copy(
+          organisationDetails = Some(existingDetails)
+        )
+
+      when(
+        mockJourneyAnswersService.update(
+          eqTo(updatedSection),
+          any[String],
+          any[String]
+        )(any[Writes[OrganisationDetails]], any())
+      ).thenReturn(Future.successful(updatedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.AddAnotherAddressController
+              .clearCorrespondenceAddressAndRedirect()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.orgdetails.routes.EnterYourOrganisationAddressController
+            .onPageLoad(NormalMode, None)
+            .url
+
+        verify(mockJourneyAnswersService, atMostOnce)
+          .update(eqTo(updatedSection), any[String], any[String])(any(), any)
+      }
+    }
+
+    "must create empty OrganisationDetails when none exists" in {
+
+      when(
+        mockJourneyAnswersService.update(
+          eqTo(OrganisationDetails()),
+          any[String],
+          any[String]
+        )(any[Writes[OrganisationDetails]], any())
+      ).thenReturn(Future.successful(OrganisationDetails()))
+
+      val application =
+        applicationBuilder(
+          journeyData = Some(
+            emptyJourneyData.copy(organisationDetails = None)
+          )
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.AddAnotherAddressController
+              .clearCorrespondenceAddressAndRedirect()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.orgdetails.routes.EnterYourOrganisationAddressController
+            .onPageLoad(NormalMode, None)
+            .url
+      }
+    }
+
+    "must return INTERNAL_SERVER_ERROR when update fails" in {
+
+      when(
+        mockJourneyAnswersService.update(
+          any(),
+          any[String],
+          any[String]
+        )(any[Writes[OrganisationDetails]], any())
+      ).thenReturn(Future.failed(new Exception("DB failure")))
+
+      when(mockErrorHandler.internalServerError(any[RequestHeader]))
+        .thenReturn(Future.successful(InternalServerError))
+
+      val application =
+        applicationBuilder(
+          journeyData = Some(
+            emptyJourneyData.copy(
+              organisationDetails = Some(journeyDetails)
+            )
+          )
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.AddAnotherAddressController
+              .clearCorrespondenceAddressAndRedirect()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual INTERNAL_SERVER_ERROR
+      }
+    }
+  }
 }

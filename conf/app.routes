@@ -82,6 +82,8 @@ POST       /change-choose-address                        controllers.orgdetails.
 GET        /confirm-correspondence-address               controllers.orgdetails.ConfirmCorrespondenceAddressController.onPageLoad(returnTo: Option[ReturnTo])
 POST       /confirm-correspondence-address               controllers.orgdetails.ConfirmCorrespondenceAddressController.onSubmit(returnTo: Option[ReturnTo])
 
+GET        /add-address-manually                         controllers.orgdetails.AddAnotherAddressController.clearCorrespondenceAddressAndRedirect()
+
 GET        /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = NormalMode)
 POST       /organisation-telephone-number                controllers.orgdetails.OrganisationTelephoneNumberController.onSubmit(mode: Mode = NormalMode)
 GET        /change-organisation-telephone-number         controllers.orgdetails.OrganisationTelephoneNumberController.onPageLoad(mode: Mode = CheckMode)

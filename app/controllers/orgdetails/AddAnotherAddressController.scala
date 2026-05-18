@@ -19,7 +19,7 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.AddAnotherAddressFormProvider
 import handlers.ErrorHandler
-import models.{Mode, ReturnTo}
+import models.{Mode, NormalMode, ReturnTo}
 import models.addresslookup.LookupAddress
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
 import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
@@ -108,6 +108,39 @@ class AddAnotherAddressController @Inject() (
                 }
             }
         )
+    }
+
+  def clearCorrespondenceAddressAndRedirect(): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      val updatedSection =
+        request.journeyData.organisationDetails match {
+          case Some(existing) =>
+            existing.copy(
+              correspondenceAddress = None,
+              addAnotherAddress = None
+            )
+          case None           =>
+            OrganisationDetails()
+        }
+
+      journeyAnswersService
+        .update(
+          updatedSection,
+          request.groupId,
+          request.credentials.providerId
+        )
+        .map { _ =>
+          Redirect(
+            controllers.orgdetails.routes.EnterYourOrganisationAddressController
+              .onPageLoad(NormalMode, None)
+          )
+        }
+        .recoverWith { case NonFatal(e) =>
+          logger.warn(
+            s"Failed clearing correspondence address for groupId [${request.groupId}] with error: [$e]"
+          )
+          errorHandler.internalServerError
+        }
     }
 
   private def buildUpdatedSection(
