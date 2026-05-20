@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes.*
 import forms.ThirdPartyConnectedOrganisationsFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.thirdparty.*
 import models.journeydata.thirdparty.ConnectedThirdPartySelection.noneAreConnectedFormValue
 import navigation.Navigator
@@ -32,6 +32,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.thirdparty.ThirdPartyConnectedOrganisationsView
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
@@ -54,16 +55,16 @@ class ThirdPartyConnectedOrganisationsController @Inject() (
 
   private val form: Form[Seq[String]] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       request.journeyData.thirdPartyOrganisations.fold {
         Redirect(TaskListController.onPageLoad())
       } { section =>
-        Ok(view(section.thirdParties, form.fill(section.connectedOrganisations), mode))
+        Ok(view(section.thirdParties, form.fill(section.connectedOrganisations), mode, returnTo))
       }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       request.journeyData.thirdPartyOrganisations.fold {
         Future.successful(Redirect(TaskListController.onPageLoad()))
@@ -74,7 +75,7 @@ class ThirdPartyConnectedOrganisationsController @Inject() (
           .fold(
             formWithErrors =>
               Future.successful(
-                BadRequest(view(thirdParties, formWithErrors, mode))
+                BadRequest(view(thirdParties, formWithErrors, mode, returnTo))
               ),
             values => {
               val updatedSection =
@@ -89,7 +90,7 @@ class ThirdPartyConnectedOrganisationsController @Inject() (
                       ThirdPartyConnectedOrganisationsPage,
                       savedSection,
                       mode,
-                      None
+                      returnTo
                     )
                   )
                 }

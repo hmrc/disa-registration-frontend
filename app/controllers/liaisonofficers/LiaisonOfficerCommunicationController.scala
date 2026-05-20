@@ -22,7 +22,7 @@ import forms.LiaisonOfficerCommunicationFormProvider
 import handlers.ErrorHandler
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication, LiaisonOfficers}
 import models.requests.DataRequest
-import models.Mode
+import models.{Mode, ReturnTo}
 import navigation.Navigator
 import pages.liaisonofficers.LiaisonOfficerCommunicationPage
 import play.api.Logging
@@ -54,17 +54,17 @@ class LiaisonOfficerCommunicationController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(id: String, mode: Mode): Action[AnyContent] =
+  def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       findLiaisonOfficerWithDetails(id).fold {
         Redirect(IndexController.onPageLoad())
       } { case (liaisonOfficer, name, communication) =>
         val preparedForm = form.fill(communication)
-        Ok(view(id, name, preparedForm, mode))
+        Ok(view(id, name, preparedForm, mode, returnTo))
       }
     }
 
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] =
+  def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
@@ -73,7 +73,7 @@ class LiaisonOfficerCommunicationController @Inject() (
             findLiaisonOfficerWithDetails(id).fold {
               Future.successful(Redirect(IndexController.onPageLoad()))
             } { case (_, name, _) =>
-              Future.successful(BadRequest(view(id, name, formWithErrors, mode)))
+              Future.successful(BadRequest(view(id, name, formWithErrors, mode, returnTo)))
             },
           answer =>
             updatedSectionWithCommunication(id, answer).fold {
@@ -87,7 +87,7 @@ class LiaisonOfficerCommunicationController @Inject() (
                       LiaisonOfficerCommunicationPage(id),
                       savedSection,
                       mode,
-                      None
+                      returnTo
                     )
                   )
                 }

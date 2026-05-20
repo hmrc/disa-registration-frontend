@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.IsaProductsFormProvider
 import handlers.JourneyHandler.clearStalePages
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import navigation.Navigator
 import pages.isaproducts.IsaProductsPage
@@ -56,7 +56,7 @@ class IsaProductsController @Inject() (
 
   val form: Form[Set[IsaProduct]] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getOrCreateJourneyDataAction andThen auditContinuation(IsaProducts.sectionName)) {
       implicit request =>
         val preparedForm = (for {
@@ -64,43 +64,44 @@ class IsaProductsController @Inject() (
           values   <- products.isaProducts
         } yield form.fill(values.toSet)).getOrElse(form)
 
-        Ok(view(preparedForm, mode))
+        Ok(view(preparedForm, mode, returnTo))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val existingSection = request.journeyData.flatMap(_.isaProducts)
-          val updatedSection  =
-            existingSection match {
-              case Some(existing) =>
-                clearStalePages(IsaProductsPage, existing.copy(isaProducts = Some(answer.toSeq)))
-              case None           => IsaProducts(isaProducts = Some(answer.toSeq))
-            }
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
+          answer => {
+            val existingSection = request.journeyData.flatMap(_.isaProducts)
+            val updatedSection  =
+              existingSection match {
+                case Some(existing) =>
+                  clearStalePages(IsaProductsPage, existing.copy(isaProducts = Some(answer.toSeq)))
+                case None           => IsaProducts(isaProducts = Some(answer.toSeq))
+              }
 
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(
-                navigator.nextPage(
-                  IsaProductsPage,
-                  existingSection,
-                  updatedSection,
-                  mode,
-                  None
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { updatedSection =>
+                Redirect(
+                  navigator.nextPage(
+                    IsaProductsPage,
+                    existingSection,
+                    updatedSection,
+                    mode,
+                    returnTo
+                  )
                 )
-              )
-            }
-            .recoverWith { case NonFatal(e) =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
+              }
+              .recoverWith { case NonFatal(e) =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
   }
 }

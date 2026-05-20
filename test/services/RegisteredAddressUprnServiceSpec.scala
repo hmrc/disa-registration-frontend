@@ -58,6 +58,7 @@ class RegisteredAddressUprnServiceSpec extends SpecBase {
       ctUtr = Some("123"),
       registeredAddress = address,
       companyName = Some("Company name"),
+      companyNumber = Some("Company number"),
       businessPartnerId = Some(testString)
     )
 

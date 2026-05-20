@@ -79,7 +79,8 @@ class StartControllerSpec extends SpecBase {
                 addressLine3 = Some("address line 3"),
                 postCode = Some("postcode")
               )
-            )
+            ),
+            companyNumber = Some(testString)
           )
         )
       )
@@ -119,7 +120,8 @@ class StartControllerSpec extends SpecBase {
                 addressLine3 = Some("address line 3"),
                 postCode = Some("postcode")
               )
-            )
+            ),
+            companyNumber = Some(testString)
           )
         )
       )

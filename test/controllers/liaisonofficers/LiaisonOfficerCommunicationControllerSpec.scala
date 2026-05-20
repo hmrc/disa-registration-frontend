@@ -80,7 +80,7 @@ class LiaisonOfficerCommunicationControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerCommunicationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form.fill(Set.empty), NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form.fill(Set.empty), NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -113,7 +113,13 @@ class LiaisonOfficerCommunicationControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerCommunicationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingCommunication), NormalMode)(
+        contentAsString(result) mustEqual view(
+          existingId,
+          existingName,
+          form.fill(existingCommunication),
+          NormalMode,
+          None
+        )(
           request,
           messages(application)
         ).toString
@@ -203,7 +209,7 @@ class LiaisonOfficerCommunicationControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(existingId, existingName, boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, boundForm, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -399,7 +405,13 @@ class LiaisonOfficerCommunicationControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerCommunicationView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingCommunication), CheckMode)(
+        contentAsString(result) mustEqual view(
+          existingId,
+          existingName,
+          form.fill(existingCommunication),
+          CheckMode,
+          None
+        )(
           request,
           messages(application)
         ).toString

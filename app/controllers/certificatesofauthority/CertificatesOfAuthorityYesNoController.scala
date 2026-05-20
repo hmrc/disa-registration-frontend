@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.CertificatesOfAuthorityYesNoFormProvider
 import handlers.ErrorHandler
 import handlers.JourneyHandler.clearStalePages
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, CertificatesOfAuthorityYesNo}
 import navigation.Navigator
 import pages.certificatesofauthority.CertificatesOfAuthorityYesNoPage
@@ -54,22 +54,23 @@ class CertificatesOfAuthorityYesNoController @Inject() (
 
   val form: Form[CertificatesOfAuthorityYesNo] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.journeyData.certificatesOfAuthority.flatMap(_.certificatesYesNo) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      val preparedForm = request.journeyData.certificatesOfAuthority.flatMap(_.certificatesYesNo) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode, returnTo))
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
             val existingSection = request.journeyData.certificatesOfAuthority
             val updatedSection  = existingSection match {
@@ -86,7 +87,7 @@ class CertificatesOfAuthorityYesNoController @Inject() (
                     existingSection,
                     updatedSection,
                     mode,
-                    None
+                    returnTo
                   )
                 )
               }
@@ -98,5 +99,5 @@ class CertificatesOfAuthorityYesNoController @Inject() (
               }
           }
         )
-  }
+    }
 }

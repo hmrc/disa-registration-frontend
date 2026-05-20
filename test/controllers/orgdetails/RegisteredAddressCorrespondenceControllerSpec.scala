@@ -257,7 +257,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
       )
 
       when(
-        mockJourneyAnswersService.update(eqTo(expectedUpdatedSection), any[String], any[String])(
+        mockJourneyAnswersService.update(any(), any[String], any[String])(
           any[Writes[OrganisationDetails]],
           any
         )

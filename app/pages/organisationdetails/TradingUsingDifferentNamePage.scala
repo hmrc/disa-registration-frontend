@@ -36,21 +36,12 @@ case object TradingUsingDifferentNamePage extends PageWithDependents[Organisatio
         currentAnswers.tradingName.nonEmpty
 
     if (shouldClear) {
-      List(
-        new ClearablePage[OrganisationDetails] {
-          override def clearAnswer(section: OrganisationDetails): OrganisationDetails =
-            section.copy(tradingName = None)
-        }
-      )
+      List(TradingNamePage)
     } else {
       Nil
     }
   }
 
-  def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean = {
-    val yesAnswerWithNoDetails =
-      currentAnswers.tradingUsingDifferentName.contains(Yes) && currentAnswers.tradingName.isEmpty
-    val noOrMissingAnswer      = currentAnswers.tradingUsingDifferentName.fold(false)(_ == YesNoAnswer.No)
-    yesAnswerWithNoDetails || noOrMissingAnswer
-  }
+  def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean =
+    currentAnswers.tradingUsingDifferentName.contains(Yes) && currentAnswers.tradingName.isEmpty
 }

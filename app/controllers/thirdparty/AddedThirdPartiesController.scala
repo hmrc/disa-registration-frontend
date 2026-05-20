@@ -20,10 +20,10 @@ import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes.*
-import controllers.thirdparty.routes.*
 import forms.YesNoAnswerFormProvider
 import models.requests.DataRequest
-import models.{Mode, NormalMode, ReturnTo, YesNoAnswer}
+import models.{Mode, ReturnTo, YesNoAnswer}
+import navigation.Navigator
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -39,7 +39,8 @@ class AddedThirdPartiesController @Inject() (
   formProvider: YesNoAnswerFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: AddedThirdPartiesView,
-  appConfig: FrontendAppConfig
+  appConfig: FrontendAppConfig,
+  navigator: Navigator
 ) extends FrontendBaseController
     with I18nSupport {
 
@@ -61,41 +62,45 @@ class AddedThirdPartiesController @Inject() (
           view(
             preparedForm,
             AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
-            mode
+            mode,
+            returnTo
           )
         )
       }
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getInProgressAndCompleteThirdParty.fold {
-      Redirect(TaskListController.onPageLoad())
-    } { case (inProgress, complete) =>
-      val count = inProgress.size + complete.size
-      if (count == appConfig.maxThirdParties) {
-        Redirect(ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode))
-      } else {
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              BadRequest(
-                view(formWithErrors, AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties), mode)
-              ),
-            {
-              case YesNoAnswer.No if count > 1 =>
-                val route =
-                  if (mode == NormalMode) ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode)
-                  else ThirdPartiesCheckYourAnswersController.onPageLoad()
-                Redirect(route)
-              case YesNoAnswer.No              => Redirect(TaskListController.onPageLoad())
-              case _                           =>
-                Redirect(ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode, None))
-            }
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      getInProgressAndCompleteThirdParty.fold {
+        Redirect(TaskListController.onPageLoad())
+      } { case (inProgress, complete) =>
+        val count                  = inProgress.size + complete.size
+        val connectedOrganisations =
+          request.journeyData.thirdPartyOrganisations.map(_.connectedOrganisations).fold(Nil)(identity)
+
+        if (count == appConfig.maxThirdParties) {
+          Redirect(
+            navigator.nextPageFromAddedThirdParties(YesNoAnswer.No, count, connectedOrganisations, mode, returnTo)
           )
+        } else {
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
+                    mode,
+                    returnTo
+                  )
+                ),
+              answer =>
+                Redirect(navigator.nextPageFromAddedThirdParties(answer, count, connectedOrganisations, mode, returnTo))
+            )
+        }
       }
     }
-  }
 
   private def getInProgressAndCompleteThirdParty(implicit request: DataRequest[_]) =
     request.journeyData.thirdPartyOrganisations

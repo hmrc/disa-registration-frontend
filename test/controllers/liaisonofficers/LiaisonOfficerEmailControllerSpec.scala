@@ -79,7 +79,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerEmailView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form, NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -112,7 +112,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerEmailView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingEmail), NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingEmail), NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -202,7 +202,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(existingId, existingName, boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, boundForm, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -386,7 +386,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerEmailView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingEmail), CheckMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingEmail), CheckMode, None)(
           request,
           messages(application)
         ).toString

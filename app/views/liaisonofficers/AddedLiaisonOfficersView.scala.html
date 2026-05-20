@@ -22,22 +22,23 @@
 @import viewmodels.govuk.all._
 @import viewmodels.checkAnswers.liaisonofficers.{AddedLiaisonOfficerSummary, AddedLiaisonOfficersViewModel}
 @import controllers.liaisonofficers.routes.AddedLiaisonOfficersController
+@import models.ReturnTo
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukButton: GovukButton,
-    hmrcPageHeading: HmrcPageHeading,
-    addedLiaisonOfficersViewModel: AddedLiaisonOfficersViewModel,
-    appConfig: FrontendAppConfig
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        hmrcPageHeading: HmrcPageHeading,
+        addedLiaisonOfficersViewModel: AddedLiaisonOfficersViewModel,
+        appConfig: FrontendAppConfig
 )
 
-@(form: Form[_], summary: AddedLiaisonOfficerSummary)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], summary: AddedLiaisonOfficerSummary, mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("addedLiaisonOfficers.title", summary.titleSuffix), Some(messages("sectionTitle.liaisonOfficers")))) {
 
-    @formHelper(action = AddedLiaisonOfficersController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = AddedLiaisonOfficersController.onSubmit(mode, returnTo), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form,  errorLinkOverrides = Map("value" -> "value_0")))
