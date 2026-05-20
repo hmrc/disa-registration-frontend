@@ -28,11 +28,11 @@
     hmrcPageHeading: HmrcPageHeading
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("financialOrganisation.title"), Some(messages("sectionTitle.certificatesOfAuthority")))) {
 
-    @formHelper(action = FinancialOrganisationController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = FinancialOrganisationController.onSubmit(mode, returnTo), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))

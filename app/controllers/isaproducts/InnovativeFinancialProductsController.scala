@@ -20,7 +20,7 @@ import controllers.actions.*
 import forms.InnovativeFinancialProductsFormProvider
 import handlers.ErrorHandler
 import handlers.JourneyHandler.clearStalePages
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProducts}
 import navigation.Navigator
 import pages.isaproducts.InnovativeFinancialProductsPage
@@ -54,47 +54,48 @@ class InnovativeFinancialProductsController @Inject() (
 
   val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData) { implicit request =>
       val preparedForm = prepareForm(form)(_.isaProducts.flatMap(_.innovativeFinancialProducts))(_.toSet)
-      Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, returnTo))
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val existingSection = request.journeyData.flatMap(_.isaProducts)
-          val updatedSection  =
-            existingSection match {
-              case Some(existing) =>
-                val withUpdate = existing.copy(innovativeFinancialProducts = Some(answer.toSeq))
-                clearStalePages(InnovativeFinancialProductsPage, withUpdate)
-              case None           => IsaProducts(isaProducts = None, innovativeFinancialProducts = Some(answer.toSeq))
-            }
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
+          answer => {
+            val existingSection = request.journeyData.flatMap(_.isaProducts)
+            val updatedSection  =
+              existingSection match {
+                case Some(existing) =>
+                  val withUpdate = existing.copy(innovativeFinancialProducts = Some(answer.toSeq))
+                  clearStalePages(InnovativeFinancialProductsPage, withUpdate)
+                case None           => IsaProducts(isaProducts = None, innovativeFinancialProducts = Some(answer.toSeq))
+              }
 
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(
-                navigator.nextPage(
-                  InnovativeFinancialProductsPage,
-                  existingSection,
-                  updatedSection,
-                  mode,
-                  None
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { updatedSection =>
+                Redirect(
+                  navigator.nextPage(
+                    InnovativeFinancialProductsPage,
+                    existingSection,
+                    updatedSection,
+                    mode,
+                    returnTo
+                  )
                 )
-              )
-            }
-            .recoverWith { case NonFatal(e) =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
+              }
+              .recoverWith { case NonFatal(e) =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
   }
 }

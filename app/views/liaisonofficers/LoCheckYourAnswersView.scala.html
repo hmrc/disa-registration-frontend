@@ -17,30 +17,30 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.pageheading.PageHeading
 @import controllers.liaisonofficers.routes.AddedLiaisonOfficersController
+@import models.{NormalMode, ReturnTo}
 
 @this(
-  layout: templates.Layout,
-  hmrcPageHeading: HmrcPageHeading,
-  formHelper: FormWithCSRF,
-  govukButton: GovukButton,
-  govukSummaryList: GovukSummaryList
+        layout: templates.Layout,
+        hmrcPageHeading: HmrcPageHeading,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("liaisonOfficerCya.title"))) {
 
-  @hmrcPageHeading(PageHeading(
-    text = messages("liaisonOfficerCya.heading"),
-    headingClasses = Some("govuk-heading-l"),
-  ))
-
-  @formHelper(action = AddedLiaisonOfficersController.onPageLoad(), Symbol("autoComplete") -> "off") {
+    @hmrcPageHeading(PageHeading(
+        text = messages("liaisonOfficerCya.heading"),
+        headingClasses = Some("govuk-heading-l"),
+    ))
 
     @govukSummaryList(list)
 
     @govukButton(
-      ButtonViewModel(messages("site.saveAndContinue")).preventingDoubleClick()
+        Button(
+            href = Some(AddedLiaisonOfficersController.onPageLoad(NormalMode, returnTo).url),
+            content = Text(messages("site.saveAndContinue"))
+        )
     )
-  }
 }

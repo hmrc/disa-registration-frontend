@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.signatories
 
 import controllers.signatories.routes.SignatoryJobTitleController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.signatories.Signatory
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -27,7 +27,9 @@ import viewmodels.implicits.*
 
 object SignatoryJobTitleSummary {
 
-  def row(signatory: Signatory)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(signatory: Signatory, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     signatory.jobTitle.map { answer =>
       SummaryListRowViewModel(
         key = "signatoryJobTitle.checkYourAnswersLabel",
@@ -35,7 +37,7 @@ object SignatoryJobTitleSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            SignatoryJobTitleController.onPageLoad(signatory.id, CheckMode).url
+            SignatoryJobTitleController.onPageLoad(signatory.id, CheckMode, returnTo).url
           )
             .withVisuallyHiddenText(messages("signatoryJobTitle.change.hidden"))
         )

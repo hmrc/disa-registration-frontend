@@ -23,18 +23,18 @@
 
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukCheckboxes: GovukCheckboxes,
-    govukButton: GovukButton,
-    hmrcPageHeading: HmrcPageHeading)
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukCheckboxes: GovukCheckboxes,
+        govukButton: GovukButton,
+        hmrcPageHeading: HmrcPageHeading)
 
-@(thirdParties: Seq[ThirdParty], form: Form[Seq[String]], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(thirdParties: Seq[ThirdParty], form: Form[Seq[String]], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("thirdPartyConnectedOrganisations.title"), Some(messages("sectionTitle.thirdParty")))) {
 
-    @formHelper(action = ThirdPartyConnectedOrganisationsController.onSubmit(mode)) {
+    @formHelper(action = ThirdPartyConnectedOrganisationsController.onSubmit(mode, returnTo)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

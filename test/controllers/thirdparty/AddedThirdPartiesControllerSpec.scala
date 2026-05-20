@@ -20,6 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import controllers.routes.TaskListController
 import controllers.thirdparty.routes.*
+import models.ReturnTo.MultipleThirdPartiesCya
 import models.YesNoAnswer.Yes
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.{NormalMode, YesNoAnswer}
@@ -69,7 +70,8 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
         contentAsString(result) mustEqual view(
           form = new forms.YesNoAnswerFormProvider()("addedThirdParties.error.required"),
           AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
-          NormalMode
+          NormalMode,
+          None
         )(request, messages(application)).toString
       }
     }
@@ -80,7 +82,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
         AddedThirdPartiesController
           .onPageLoad(
             mode = NormalMode,
-            returnTo = Some(models.ReturnTo.FinalCya)
+            returnTo = Some(MultipleThirdPartiesCya)
           )
           .url
 
@@ -103,7 +105,8 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
           form = new forms.YesNoAnswerFormProvider()("addedThirdParties.error.required")
             .fill(YesNoAnswer.No),
           AddedThirdPartiesSummary(inProgress, complete, appConfig.maxThirdParties),
-          NormalMode
+          NormalMode,
+          Some(MultipleThirdPartiesCya)
         )(request, messages(application)).toString
       }
     }

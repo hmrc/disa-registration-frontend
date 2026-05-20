@@ -38,7 +38,7 @@ class AddASignatoryControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[AddASignatoryView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(None)(request, messages(application)).toString
       }
     }
   }

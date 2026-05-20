@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes.IndexController
 import forms.TelephoneNumberFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.requests.DataRequest
 import navigation.Navigator
@@ -54,17 +54,17 @@ class LiaisonOfficerPhoneNumberController @Inject() (
 
   val form = formProvider("liaisonOfficerPhoneNumber")
 
-  def onPageLoad(id: String, mode: Mode): Action[AnyContent] =
+  def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       findLiaisonOfficerWithDetails(id).fold {
         Redirect(IndexController.onPageLoad())
       } { case (liaisonOfficer, name, number) =>
         val preparedForm = number.fold(form)(form.fill)
-        Ok(view(id, name, preparedForm, mode))
+        Ok(view(id, name, preparedForm, mode, returnTo))
       }
     }
 
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] =
+  def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
@@ -73,7 +73,7 @@ class LiaisonOfficerPhoneNumberController @Inject() (
             findLiaisonOfficerWithDetails(id).fold {
               Future.successful(Redirect(IndexController.onPageLoad()))
             } { case (_, name, _) =>
-              Future.successful(BadRequest(view(id, name, formWithErrors, mode)))
+              Future.successful(BadRequest(view(id, name, formWithErrors, mode, returnTo)))
             },
           answer =>
             updatedSectionWithPhoneNumber(id, answer).fold {
@@ -87,7 +87,7 @@ class LiaisonOfficerPhoneNumberController @Inject() (
                       LiaisonOfficerPhoneNumberPage(id),
                       savedSection,
                       mode,
-                      None
+                      returnTo
                     )
                   )
                 }

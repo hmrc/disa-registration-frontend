@@ -30,7 +30,7 @@ class PeerToPeerPlatformNumberViewSpec extends ViewSpecBase {
 
   private def formInvalid(value: String): Document = {
     val invalid = form.bind(Map("value" -> value))
-    Jsoup.parse(view(invalid, testString, NormalMode).body)
+    Jsoup.parse(view(invalid, testString, NormalMode, None).body)
   }
 
   "PeerToPeerPlatformNumberView" should {

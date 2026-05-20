@@ -17,6 +17,7 @@
 package controllers.thirdparty
 
 import controllers.actions.*
+import models.ReturnTo
 import models.journeydata.thirdparty.ThirdParty
 import models.requests.DataRequest
 import play.api.Logging
@@ -42,25 +43,28 @@ class ThirdPartyCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(id: String): Action[AnyContent] =
+  def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       findThirdParty(id) match {
         case Some(thirdParty) if !thirdParty.inProgress =>
-          Ok(view(SummaryListViewModel(buildSummaryRows(id))))
+          Ok(view(SummaryListViewModel(buildSummaryRows(id, returnTo)), returnTo))
         case _                                          =>
           Redirect(controllers.routes.TaskListController.onPageLoad())
       }
     }
 
-  private def buildSummaryRows(id: String)(implicit request: DataRequest[_], messages: Messages) =
+  private def buildSummaryRows(id: String, returnTo: Option[ReturnTo])(implicit
+    request: DataRequest[_],
+    messages: Messages
+  ) =
     request.journeyData.thirdPartyOrganisations.toSeq.flatMap { section =>
       section.thirdParties.zipWithIndex.find { case (tp, _) => tp.id == id }.toSeq.flatMap { case (thirdParty, idx) =>
         val displayIndex = idx + 1
         Seq(
-          ThirdPartyOrgDetailsSummary.row(thirdParty, displayIndex),
-          ThirdPartyManagingReturnsSummary.row(thirdParty),
-          InvestorFundsUsedByThirdPartySummary.row(thirdParty),
-          ThirdPartyInvestorFundsPercentageSummary.row(thirdParty)
+          ThirdPartyOrgDetailsSummary.row(thirdParty, displayIndex, returnTo),
+          ThirdPartyManagingReturnsSummary.row(thirdParty, returnTo),
+          InvestorFundsUsedByThirdPartySummary.row(thirdParty, returnTo),
+          ThirdPartyInvestorFundsPercentageSummary.row(thirdParty, returnTo)
         ).flatten
       }
     }

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.liaisonofficers
 
 import controllers.liaisonofficers.routes.LiaisonOfficerNameController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.liaisonofficers.LiaisonOfficer
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -27,7 +27,9 @@ import viewmodels.implicits.*
 
 object LiaisonOfficerNameSummary {
 
-  def row(liaisonOfficer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(liaisonOfficer: LiaisonOfficer, returnTo: Option[ReturnTo])(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     liaisonOfficer.fullName.map { answer =>
       SummaryListRowViewModel(
         key = "liaisonOfficerName.checkYourAnswersLabel",
@@ -35,7 +37,7 @@ object LiaisonOfficerNameSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            LiaisonOfficerNameController.onPageLoad(Some(liaisonOfficer.id), CheckMode).url
+            LiaisonOfficerNameController.onPageLoad(Some(liaisonOfficer.id), CheckMode, returnTo).url
           )
             .withVisuallyHiddenText(messages("liaisonOfficerName.change.hidden"))
         )

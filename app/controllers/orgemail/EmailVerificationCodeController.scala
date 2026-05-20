@@ -24,7 +24,7 @@ import handlers.ErrorHandler
 import models.emailverification.VerifyEmailCodeResult
 import models.journeydata.OrganisationEmail
 import models.requests.DataRequest
-import models.{Mode, NormalMode}
+import models.{Mode, ReturnTo}
 import navigation.Navigator
 import pages.orgemail.OrganisationEmailVerificationCodePage
 import play.api.Logging
@@ -58,23 +58,23 @@ class EmailVerificationCodeController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] =
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      organisationEmailOrRedirect(mode).fold(
+      organisationEmailOrRedirect(mode, returnTo).fold(
         redirect => redirect,
-        email => Ok(view(form, mode, email))
+        email => Ok(view(form, mode, returnTo, email))
       )
     }
 
-  def onSubmit(mode: Mode): Action[AnyContent] =
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      organisationEmailOrRedirect(mode).fold(
+      organisationEmailOrRedirect(mode, returnTo).fold(
         redirect => Future.successful(redirect),
         email =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, email))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo, email))),
               code =>
                 emailVerificationConnector
                   .verifyCode(email, code)
@@ -96,7 +96,7 @@ class EmailVerificationCodeController @Inject() (
                               OrganisationEmailVerificationCodePage,
                               savedSection,
                               mode,
-                              None
+                              returnTo
                             )
                           )
                         }
@@ -110,6 +110,7 @@ class EmailVerificationCodeController @Inject() (
                               "emailVerificationCode.error.invalid"
                             ),
                             mode,
+                            returnTo,
                             email
                           )
                         )
@@ -125,15 +126,15 @@ class EmailVerificationCodeController @Inject() (
       )
     }
 
-  def requestNewCode(): Action[AnyContent] =
+  def requestNewCode(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
-      organisationEmailOrRedirect(NormalMode).fold(
+      organisationEmailOrRedirect(mode, returnTo).fold(
         redirect => Future.successful(redirect),
         email =>
           emailVerificationConnector
             .sendCode(email)
             .map { _ =>
-              Redirect(EmailVerificationCodeController.onPageLoad())
+              Redirect(EmailVerificationCodeController.onPageLoad(mode, returnTo))
             }
             .recoverWith { case NonFatal(e) =>
               logger.warn(
@@ -144,8 +145,10 @@ class EmailVerificationCodeController @Inject() (
       )
     }
 
-  private def organisationEmailOrRedirect(mode: Mode)(implicit request: DataRequest[_]): Either[Result, String] =
+  private def organisationEmailOrRedirect(mode: Mode, returnTo: Option[ReturnTo])(implicit
+    request: DataRequest[_]
+  ): Either[Result, String] =
     request.journeyData.organisationEmail
       .flatMap(_.organisationEmail)
-      .toRight(Redirect(routes.OrganisationEmailAddressController.onPageLoad(mode)))
+      .toRight(Redirect(routes.OrganisationEmailAddressController.onPageLoad(mode, returnTo)))
 }

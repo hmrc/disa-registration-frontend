@@ -22,11 +22,11 @@ import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
 import controllers.orgemail.routes.*
-import controllers.routes.{IndexController, TaskListController}
+import controllers.routes.{IndexController, SubmissionCyaController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
-import models.{YesNoAnswer, *}
-import models.ReturnTo.{FinalCya, OrganisationDetailsCya}
+import models.*
+import models.ReturnTo.{MultipleThirdPartiesCya, MultipleThirdPartiesCyaViaAddedThirdParties, OrganisationDetailsCya, SubmissionCya, SubmissionCyaViaAddedThirdParties}
 import models.addresslookup.LookupAddress
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
@@ -857,7 +857,7 @@ class NavigatorSpec extends SpecBase {
 
     "route OrganisationEmailAddressPage to OrganisationEmailVerificationCodePage" in {
       val result: Call = navigator.normalRoutes(OrganisationEmailAddressPage, OrganisationEmail(Some(testString)), None)
-      result shouldBe EmailVerificationCodeController.onPageLoad()
+      result shouldBe EmailVerificationCodeController.onPageLoad(NormalMode, None)
     }
 
     "route OrganisationEmailVerificationCodePage to OrganisationEmail CYA" in {
@@ -872,7 +872,7 @@ class NavigatorSpec extends SpecBase {
 
     "route RemoveSignatoryPage to AddedSignatoryController when signatory exists in journeyAnswers" in {
       val result: Call = navigator.normalRoutes(RemoveSignatoryPage(signatoryId), signatoriesAnswers, None)
-      result shouldBe AddedSignatoryController.onPageLoad()
+      result shouldBe AddedSignatoryController.onPageLoad(NormalMode, None)
     }
 
     "route RemoveSignatoryPage to AddedSignatoryController when a signatory doesn't exists in journeyAnswers" in {
@@ -924,7 +924,7 @@ class NavigatorSpec extends SpecBase {
     "route RemoveLiaisonOfficerPage to AddedLiaisonOfficersController when liaison officers remain" in {
       val result: Call = navigator.normalRoutes(RemoveLiaisonOfficerPage, liaisonOfficersAnswers, None)
 
-      result shouldBe AddedLiaisonOfficersController.onPageLoad()
+      result shouldBe AddedLiaisonOfficersController.onPageLoad(NormalMode, None)
     }
 
     "route ProductsManagedByThirdParty to TaskList when answer is no" in {
@@ -1065,9 +1065,113 @@ class NavigatorSpec extends SpecBase {
         navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers, None)
       }
     }
+
+    "route ThirdPartyInvestorFundsPercentagePage to ThirdParty CYA with returnTo when SubmissionCyaViaAddedThirdParties" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          Some(SubmissionCyaViaAddedThirdParties)
+        )
+
+      result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(
+        testString,
+        Some(SubmissionCyaViaAddedThirdParties)
+      )
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to ThirdParty CYA with returnTo when MultipleThirdPartiesCyaViaAddedThirdParties" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          Some(MultipleThirdPartiesCyaViaAddedThirdParties)
+        )
+
+      result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(
+        testString,
+        Some(MultipleThirdPartiesCyaViaAddedThirdParties)
+      )
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to Submission CYA when returnTo = SubmissionCya" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          Some(SubmissionCya)
+        )
+
+      result shouldBe SubmissionCyaController.onPageLoad()
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to Third Parties CYA when returnTo = MultipleThirdPartiesCya" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          Some(MultipleThirdPartiesCya)
+        )
+
+      result shouldBe ThirdPartiesCheckYourAnswersController.onPageLoad()
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to default ThirdParty CYA when no returnTo provided" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          None
+        )
+
+      result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(
+        testString,
+        None
+      )
+    }
   }
 
   "Navigator.checkRouteMap" - {
+
+    "route RegisteredIsaManagerPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(RegisteredIsaManagerPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route ZReferenceNumberPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(ZReferenceNumberPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route TradingUsingDifferentNamePage to Organisation Details CYA" in {
+      navigator.checkRouteMap(TradingUsingDifferentNamePage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route TradingNamePage to Organisation Details CYA" in {
+      navigator.checkRouteMap(TradingNamePage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route FirmReferenceNumberPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(FirmReferenceNumberPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route EnterYourOrganisationAddressPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(EnterYourOrganisationAddressPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route OrganisationTelephoneNumberPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(OrganisationTelephoneNumberPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
 
     "route IsaProductsPage to ISA products CYA" in {
       navigator.checkRouteMap(IsaProductsPage, None) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
@@ -1148,7 +1252,7 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route ThirdPartyOrgDetailsPage to Final Third Party CYA if ReturnTo param passed" in {
-      navigator.checkRouteMap(ThirdPartyOrgDetailsPage(testString), Some(FinalCya)) shouldBe
+      navigator.checkRouteMap(ThirdPartyOrgDetailsPage(testString), Some(MultipleThirdPartiesCya)) shouldBe
         ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
@@ -1163,7 +1267,7 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route ThirdPartyManagingReturnsPage to Final Third Party CYA if ReturnTo param passed" in {
-      navigator.checkRouteMap(ThirdPartyManagingReturnsPage(testString), Some(FinalCya)) shouldBe
+      navigator.checkRouteMap(ThirdPartyManagingReturnsPage(testString), Some(MultipleThirdPartiesCya)) shouldBe
         ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
@@ -1173,7 +1277,7 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route InvestorFundsUsedByThirdPartyPage to Final Third Party CYA if ReturnTo param passed" in {
-      navigator.checkRouteMap(InvestorFundsUsedByThirdPartyPage(testString), Some(FinalCya)) shouldBe
+      navigator.checkRouteMap(InvestorFundsUsedByThirdPartyPage(testString), Some(MultipleThirdPartiesCya)) shouldBe
         ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
@@ -1183,7 +1287,7 @@ class NavigatorSpec extends SpecBase {
     }
 
     "route ThirdPartyInvestorFundsPercentagePage to Final Third Party CYA if ReturnTo param passed" in {
-      navigator.checkRouteMap(ThirdPartyInvestorFundsPercentagePage(testString), Some(FinalCya)) shouldBe
+      navigator.checkRouteMap(ThirdPartyInvestorFundsPercentagePage(testString), Some(MultipleThirdPartiesCya)) shouldBe
         ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
@@ -1200,6 +1304,298 @@ class NavigatorSpec extends SpecBase {
       assertThrows[NotImplementedError] {
         navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers, None)
       }
+    }
+  }
+
+  "liaisonOfficerCheckRoute" - {
+
+    val id = "test-id"
+
+    "must go to LO check answers when no returnTo is provided" in {
+      val result =
+        navigator.nextPageFromAddedLiaisonOfficers(YesNoAnswer.Yes, NormalMode, None)
+
+      result mustEqual LiaisonOfficerNameController.onPageLoad(None, NormalMode, None)
+    }
+
+    "must return to Submission CYA when returnTo = SubmissionCya" in {
+      val result =
+        navigator.nextPageFromAddedLiaisonOfficers(YesNoAnswer.No, NormalMode, Some(SubmissionCya))
+
+      result mustEqual SubmissionCyaController.onPageLoad()
+    }
+
+    "must return to Organisation Details CYA when returnTo = OrganisationDetailsCya" in {
+      val result =
+        navigator.nextPageFromAddedLiaisonOfficers(YesNoAnswer.No, NormalMode, Some(OrganisationDetailsCya))
+
+      result mustEqual OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+  }
+
+  "signatoryCheckRoute" - {
+
+    "must go to Signatory check answers when no returnTo is provided" in {
+      val result =
+        navigator.nextPageFromAddedSignatories(YesNoAnswer.Yes, NormalMode, None)
+
+      result mustEqual SignatoryNameController.onPageLoad(None, NormalMode, None)
+    }
+
+    "must return to Submission CYA when returnTo = SubmissionCya" in {
+      val result =
+        navigator.nextPageFromAddedSignatories(YesNoAnswer.No, NormalMode, Some(SubmissionCya))
+
+      result mustEqual SubmissionCyaController.onPageLoad()
+    }
+
+    "must return to Organisation Details CYA when returnTo = OrganisationDetailsCya" in {
+      val result =
+        navigator.nextPageFromAddedSignatories(YesNoAnswer.No, NormalMode, Some(OrganisationDetailsCya))
+
+      result mustEqual OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+  }
+
+  "thirdPartyCheckModeRoute" - {
+
+    val id = "tp-1"
+
+    "must go to Third Party check answers when no returnTo is provided" in {
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          YesNoAnswer.Yes,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = None
+        )
+
+      result mustEqual ThirdPartyOrgDetailsController.onPageLoad(id = None, mode = NormalMode, returnTo = None)
+    }
+
+    "must return to Submission CYA when returnTo = SubmissionCya" in {
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          YesNoAnswer.No,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = Some(SubmissionCya)
+        )
+
+      result mustEqual SubmissionCyaController.onPageLoad()
+    }
+
+    "must return to Organisation Details CYA when returnTo = OrganisationDetailsCya" in {
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          YesNoAnswer.No,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = Some(OrganisationDetailsCya)
+        )
+
+      result mustEqual OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+  }
+
+  "returnToRoute" - {
+
+    "must redirect to Submission CYA when returnTo = SubmissionCyaViaAddedThirdParties" in {
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          YesNoAnswer.No,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = Some(SubmissionCyaViaAddedThirdParties)
+        )
+
+      result mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(
+        NormalMode,
+        Some(SubmissionCyaViaAddedThirdParties)
+      )
+    }
+
+    "must redirect to Submission CYA when returnTo = SubmissionCya" in {
+      val result =
+        navigator.nextPageFromAddedSignatories(
+          YesNoAnswer.No,
+          NormalMode,
+          Some(SubmissionCya)
+        )
+
+      result mustEqual SubmissionCyaController.onPageLoad()
+    }
+
+    "must redirect to Third Parties CYA when returnTo = MultipleThirdPartiesCya" in {
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          YesNoAnswer.No,
+          count = 2,
+          connectedOrganisations = Seq(testString, testString),
+          mode = NormalMode,
+          returnTo = Some(MultipleThirdPartiesCya)
+        )
+
+      result mustEqual ThirdPartiesCheckYourAnswersController.onPageLoad()
+    }
+
+    "must redirect to Organisation Details CYA when returnTo = OrganisationDetailsCya" in {
+      val result =
+        navigator.nextPageFromAddedLiaisonOfficers(
+          YesNoAnswer.No,
+          NormalMode,
+          Some(OrganisationDetailsCya)
+        )
+
+      result mustEqual OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "must fall back to default route when returnTo is None" in {
+      val result =
+        navigator.nextPageFromAddedLiaisonOfficers(
+          YesNoAnswer.No,
+          NormalMode,
+          None
+        )
+
+      result mustEqual TaskListController.onPageLoad()
+    }
+  }
+
+  "nextPageFromAddedThirdParties" - {
+
+    "must route to Submission CYA when returnTo = SubmissionCya" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          YesNoAnswer.No,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = Some(SubmissionCya)
+        )
+
+      result mustEqual SubmissionCyaController.onPageLoad()
+    }
+
+    "must route to Third Parties CYA when returnTo = MultipleThirdPartiesCya" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          YesNoAnswer.No,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = Some(MultipleThirdPartiesCya)
+        )
+
+      result mustEqual ThirdPartiesCheckYourAnswersController.onPageLoad()
+    }
+  }
+
+  "addedThirdPartiesNextPage" - {
+
+    "must go to ThirdPartyConnectedOrganisations when No and count > 1 and no connected organisations" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          answer = YesNoAnswer.No,
+          count = 2,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = None
+        )
+
+      result mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode, None)
+    }
+
+    "must go to ThirdPartyConnectedOrganisations when No and returnTo = SubmissionCyaViaAddedThirdParties" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          answer = YesNoAnswer.No,
+          count = 2,
+          connectedOrganisations = Seq(testString, testString),
+          mode = NormalMode,
+          returnTo = Some(SubmissionCyaViaAddedThirdParties)
+        )
+
+      result mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(
+        NormalMode,
+        Some(SubmissionCyaViaAddedThirdParties)
+      )
+    }
+
+    "must use default NO routing when No and no special conditions apply" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          answer = YesNoAnswer.No,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = None
+        )
+
+      result mustEqual TaskListController.onPageLoad()
+    }
+
+    "must go to Third Party Org Details with SubmissionCya context when Yes and returnTo = SubmissionCya" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          answer = YesNoAnswer.Yes,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = Some(SubmissionCya)
+        )
+
+      result mustEqual ThirdPartyOrgDetailsController.onPageLoad(
+        id = None,
+        mode = NormalMode,
+        Some(SubmissionCyaViaAddedThirdParties)
+      )
+    }
+
+    "must go to Third Party Org Details with MultipleThirdPartiesCya context when Yes and returnTo = MultipleThirdPartiesCya" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          answer = YesNoAnswer.Yes,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = Some(MultipleThirdPartiesCya)
+        )
+
+      result mustEqual ThirdPartyOrgDetailsController.onPageLoad(
+        id = None,
+        mode = NormalMode,
+        Some(MultipleThirdPartiesCyaViaAddedThirdParties)
+      )
+    }
+
+    "must go to Third Party Org Details with original returnTo when Yes and no special returnTo" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          answer = YesNoAnswer.Yes,
+          count = 1,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = None
+        )
+
+      result mustEqual ThirdPartyOrgDetailsController.onPageLoad(
+        id = None,
+        mode = NormalMode,
+        None
+      )
     }
   }
 }

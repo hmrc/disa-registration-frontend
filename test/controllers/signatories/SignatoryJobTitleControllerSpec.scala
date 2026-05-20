@@ -77,7 +77,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[SignatoryJobTitleView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form, NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -110,7 +110,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[SignatoryJobTitleView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingJobTitle), NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingJobTitle), NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -200,7 +200,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(existingId, existingName, boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, boundForm, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -380,7 +380,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[SignatoryJobTitleView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingJobTitle), CheckMode)(
+        contentAsString(result) mustEqual view(existingId, existingName, form.fill(existingJobTitle), CheckMode, None)(
           request,
           messages(application)
         ).toString

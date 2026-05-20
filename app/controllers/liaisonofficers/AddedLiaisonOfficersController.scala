@@ -18,11 +18,11 @@ package controllers.liaisonofficers
 
 import config.FrontendAppConfig
 import controllers.actions.*
-import controllers.liaisonofficers.routes.LiaisonOfficerNameController
 import controllers.routes.TaskListController
 import forms.YesNoAnswerFormProvider
 import models.requests.DataRequest
-import models.{NormalMode, YesNoAnswer}
+import models.{Mode, ReturnTo, YesNoAnswer}
+import navigation.Navigator
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -38,6 +38,7 @@ class AddedLiaisonOfficersController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
+  navigator: Navigator,
   appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: AddedLiaisonOfficersView
@@ -46,40 +47,37 @@ class AddedLiaisonOfficersController @Inject() (
 
   val form: Form[YesNoAnswer] = formProvider("addedLiaisonOfficers.error.required")
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getInProgressAndCompleteLiaisonOfficers.fold {
-      Redirect(TaskListController.onPageLoad())
-    } { case (inProgress, complete) =>
-      Ok(view(form, AddedLiaisonOfficerSummary(inProgress, complete)))
-    }
-  }
-
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    getInProgressAndCompleteLiaisonOfficers.fold {
-      Redirect(TaskListController.onPageLoad())
-    } { case (inProgress, complete) =>
-      val count = inProgress.size + complete.size
-
-      if (count >= appConfig.maxLiaisonOfficers) {
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      getInProgressAndCompleteLiaisonOfficers.fold {
         Redirect(TaskListController.onPageLoad())
-      } else {
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              BadRequest(
-                view(formWithErrors, AddedLiaisonOfficerSummary(inProgress, complete))
-              ),
-            {
-              case YesNoAnswer.Yes =>
-                Redirect(LiaisonOfficerNameController.onPageLoad(None, NormalMode))
-              case _               =>
-                Redirect(TaskListController.onPageLoad())
-            }
-          )
+      } { case (inProgress, complete) =>
+        Ok(view(form, AddedLiaisonOfficerSummary(inProgress, complete), mode, returnTo))
       }
     }
-  }
+
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      getInProgressAndCompleteLiaisonOfficers.fold {
+        Redirect(TaskListController.onPageLoad())
+      } { case (inProgress, complete) =>
+        val count = inProgress.size + complete.size
+
+        if (count >= appConfig.maxLiaisonOfficers) {
+          Redirect(navigator.nextPageFromAddedLiaisonOfficers(YesNoAnswer.No, mode, returnTo))
+        } else {
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                BadRequest(
+                  view(formWithErrors, AddedLiaisonOfficerSummary(inProgress, complete), mode, returnTo)
+                ),
+              answer => Redirect(navigator.nextPageFromAddedLiaisonOfficers(answer, mode, returnTo))
+            )
+        }
+      }
+    }
 
   private def getInProgressAndCompleteLiaisonOfficers(implicit request: DataRequest[_]) =
     request.journeyData.liaisonOfficers

@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes.*
 import forms.SignatoryJobTitleFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.requests.DataRequest
 import navigation.Navigator
@@ -53,17 +53,17 @@ class SignatoryJobTitleController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(id: String, mode: Mode): Action[AnyContent] =
+  def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       findSignatoryWithDetails(id).fold {
         Redirect(IndexController.onPageLoad())
       } { case (signatory, name, jobTitle) =>
         val preparedForm = jobTitle.fold(form)(form.fill)
-        Ok(view(id, name, preparedForm, mode))
+        Ok(view(id, name, preparedForm, mode, returnTo))
       }
     }
 
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] =
+  def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
@@ -72,7 +72,7 @@ class SignatoryJobTitleController @Inject() (
             findSignatoryWithDetails(id).fold {
               Future.successful(Redirect(IndexController.onPageLoad()))
             } { case (_, name, _) =>
-              Future.successful(BadRequest(view(id, name, formWithErrors, mode)))
+              Future.successful(BadRequest(view(id, name, formWithErrors, mode, returnTo)))
             },
           answer =>
             updatedSectionWithJobTitle(id, answer).fold {
@@ -86,7 +86,7 @@ class SignatoryJobTitleController @Inject() (
                       SignatoryJobTitlePage(id),
                       savedSection,
                       mode,
-                      None
+                      returnTo
                     )
                   )
                 }
