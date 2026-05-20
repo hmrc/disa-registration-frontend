@@ -53,7 +53,7 @@
 
         <p class="govuk-body">@HtmlFormat.raw(messages("addedLiaisonOfficers.guidance", appConfig.maxLiaisonOfficers.toString))</p>
 
-        @addedLiaisonOfficersViewModel(form, summary)
+        @addedLiaisonOfficersViewModel(form, summary, returnTo)
 
         @govukButton(
             ButtonViewModel(messages("site.saveAndContinue"))

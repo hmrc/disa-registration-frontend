@@ -45,17 +45,20 @@ class SignatoryCheckYourAnswersController @Inject() (
     (identify andThen getData andThen requireData) { implicit request =>
       findSignatory(id) match {
         case Some(signatory) if isValid(signatory) =>
-          Ok(view(SummaryListViewModel(buildSummaryRows(id)), returnTo))
+          Ok(view(SummaryListViewModel(buildSummaryRows(id, returnTo)), returnTo))
         case _                                     =>
           Redirect(controllers.routes.TaskListController.onPageLoad())
       }
     }
 
-  private def buildSummaryRows(id: String)(implicit request: DataRequest[_], messages: Messages) =
+  private def buildSummaryRows(id: String, returnTo: Option[ReturnTo])(implicit
+    request: DataRequest[_],
+    messages: Messages
+  ) =
     findSignatory(id).toSeq.flatMap { signatory =>
       Seq(
-        SignatoryNameSummary.row(signatory),
-        SignatoryJobTitleSummary.row(signatory)
+        SignatoryNameSummary.row(signatory, returnTo),
+        SignatoryJobTitleSummary.row(signatory, returnTo)
       ).flatten
     }
 

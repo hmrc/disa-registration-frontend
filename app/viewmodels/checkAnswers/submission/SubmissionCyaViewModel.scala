@@ -38,15 +38,15 @@ import viewmodels.govuk.summarylist.*
 import viewmodels.implicits.*
 
 case class SubmissionCyaSection(
-                                 heading: String,
-                                 rows: Seq[SummaryListRow],
-                                 headingLevel: Int = 2,
-                                 renderWhenEmpty: Boolean = false
-                               )
+  heading: String,
+  rows: Seq[SummaryListRow],
+  headingLevel: Int = 2,
+  renderWhenEmpty: Boolean = false
+)
 
 case class SubmissionCyaViewModel(
-                                   sections: Seq[SubmissionCyaSection]
-                                 )
+  sections: Seq[SubmissionCyaSection]
+)
 
 object SubmissionCyaViewModel {
 
@@ -76,9 +76,11 @@ object SubmissionCyaViewModel {
     )
   }
 
-  private def organisationInformationRows(answers: JourneyData, returnTo: Option[ReturnTo])(implicit messages: Messages): Seq[SummaryListRow] = {
-    val businessVerification = answers.businessVerification
-    val organisationDetails  = answers.organisationDetails
+  private def organisationInformationRows(answers: JourneyData, returnTo: Option[ReturnTo])(implicit
+    messages: Messages
+  ): Seq[SummaryListRow] = {
+    val businessVerification                      = answers.businessVerification
+    val organisationDetails                       = answers.organisationDetails
     val correspondenceRow: Option[SummaryListRow] =
       organisationDetails.flatMap(_.registeredAddressCorrespondence) match {
         case Some(No) =>
@@ -87,8 +89,10 @@ object SubmissionCyaViewModel {
               key = "submissionCya.correspondenceAddress.label",
               address = address,
               href = Some(EnterYourOrganisationAddressController.onPageLoad(CheckMode, returnTo).url),
-              hidden = Some("registeredAddressCorrespondence.change.hidden"))}
-        case _ =>
+              hidden = Some("registeredAddressCorrespondence.change.hidden")
+            )
+          }
+        case _        =>
           None
       }
 
@@ -158,7 +162,7 @@ object SubmissionCyaViewModel {
   }
 
   private def organisationEmailRows(answers: JourneyData, returnTo: Option[ReturnTo])(implicit
-                                                                                      messages: Messages
+    messages: Messages
   ): Seq[SummaryListRow] =
     answers.organisationEmail
       .flatMap(_.organisationEmail)
@@ -173,7 +177,7 @@ object SubmissionCyaViewModel {
       .toSeq
 
   private def productsAndCertificatesRows(answers: JourneyData, returnTo: Option[ReturnTo])(implicit
-                                                                                            messages: Messages
+    messages: Messages
   ): Seq[SummaryListRow] = {
     val isaProducts             = answers.isaProducts
     val certificatesOfAuthority = answers.certificatesOfAuthority
@@ -239,12 +243,12 @@ object SubmissionCyaViewModel {
   }
 
   private def authorisedUsersSections(answers: JourneyData, returnTo: Option[ReturnTo])(implicit
-                                                                                        messages: Messages
+    messages: Messages
   ): Seq[SubmissionCyaSection] =
     liaisonOfficerSections(answers, returnTo) ++ signatorySections(answers, returnTo)
 
   private def liaisonOfficerSections(answers: JourneyData, returnTo: Option[ReturnTo])(implicit
-                                                                                       messages: Messages
+    messages: Messages
   ): Seq[SubmissionCyaSection] = {
     val liaisonOfficers = answers.liaisonOfficers.toSeq.flatMap(_.liaisonOfficers.filterNot(_.inProgress))
 
@@ -278,7 +282,7 @@ object SubmissionCyaViewModel {
   }
 
   private def signatorySections(answers: JourneyData, returnTo: Option[ReturnTo])(implicit
-                                                                                  messages: Messages
+    messages: Messages
   ): Seq[SubmissionCyaSection] = {
     val signatories = answers.signatories.toSeq.flatMap(_.signatories.filterNot(_.inProgress))
 
@@ -310,7 +314,7 @@ object SubmissionCyaViewModel {
   }
 
   private def thirdPartyOrganisationSections(answers: JourneyData, returnTo: Option[ReturnTo])(implicit
-                                                                                               messages: Messages
+    messages: Messages
   ): Seq[SubmissionCyaSection] =
     answers.thirdPartyOrganisations.toSeq.flatMap { section =>
       val topRows = ProductsManagedByThirdPartySummary.row(section, returnTo).toSeq
@@ -353,7 +357,7 @@ object SubmissionCyaViewModel {
     }
 
   private def thirdPartyRows(thirdParty: ThirdParty, index: Int, returnTo: Option[ReturnTo])(implicit
-                                                                                             messages: Messages
+    messages: Messages
   ): Seq[SummaryListRow] =
     Seq(
       ThirdPartyOrgDetailsSummary.row(thirdParty, index, returnTo),
@@ -377,7 +381,7 @@ object SubmissionCyaViewModel {
     )
 
   private def changeRow(key: String, value: Value, href: String, hidden: String)(implicit
-                                                                                 messages: Messages
+    messages: Messages
   ): SummaryListRow =
     SummaryListRowViewModel(
       key = Key(Text(messages(key))),
@@ -414,11 +418,11 @@ object SubmissionCyaViewModel {
     }
 
   private def addressRow(
-                          key: String,
-                          address: CorrespondenceAddress,
-                          href: Option[String],
-                          hidden: Option[String]
-                        )(implicit messages: Messages): Option[SummaryListRow] =
+    key: String,
+    address: CorrespondenceAddress,
+    href: Option[String],
+    hidden: Option[String]
+  )(implicit messages: Messages): Option[SummaryListRow] =
     addressLines(address).map { lines =>
       href.zip(hidden).headOption match {
         case Some((url, hiddenMessage)) =>

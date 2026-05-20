@@ -51,7 +51,7 @@
 
         <p class="govuk-body">@HtmlFormat.raw(messages("addedSignatory.p", summary.maxSignatories))</p>
 
-        @addedSignatoriesViewModel(form, summary.inProgress, summary.complete)
+        @addedSignatoriesViewModel(form, summary.inProgress, summary.complete, returnTo)
 
         @govukButton(
             ButtonViewModel(messages("site.saveAndContinue"))

@@ -1065,9 +1065,113 @@ class NavigatorSpec extends SpecBase {
         navigator.normalRoutes(UnknownPage, emptyIsaProductsAnswers, None)
       }
     }
+
+    "route ThirdPartyInvestorFundsPercentagePage to ThirdParty CYA with returnTo when SubmissionCyaViaAddedThirdParties" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          Some(SubmissionCyaViaAddedThirdParties)
+        )
+
+      result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(
+        testString,
+        Some(SubmissionCyaViaAddedThirdParties)
+      )
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to ThirdParty CYA with returnTo when MultipleThirdPartiesCyaViaAddedThirdParties" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          Some(MultipleThirdPartiesCyaViaAddedThirdParties)
+        )
+
+      result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(
+        testString,
+        Some(MultipleThirdPartiesCyaViaAddedThirdParties)
+      )
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to Submission CYA when returnTo = SubmissionCya" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          Some(SubmissionCya)
+        )
+
+      result shouldBe SubmissionCyaController.onPageLoad()
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to Third Parties CYA when returnTo = MultipleThirdPartiesCya" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          Some(MultipleThirdPartiesCya)
+        )
+
+      result shouldBe ThirdPartiesCheckYourAnswersController.onPageLoad()
+    }
+
+    "route ThirdPartyInvestorFundsPercentagePage to default ThirdParty CYA when no returnTo provided" in {
+
+      val result: Call =
+        navigator.normalRoutes(
+          ThirdPartyInvestorFundsPercentagePage(testString),
+          ThirdPartyOrganisations(),
+          None
+        )
+
+      result shouldBe ThirdPartyCheckYourAnswersController.onPageLoad(
+        testString,
+        None
+      )
+    }
   }
 
   "Navigator.checkRouteMap" - {
+
+    "route RegisteredIsaManagerPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(RegisteredIsaManagerPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route ZReferenceNumberPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(ZReferenceNumberPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route TradingUsingDifferentNamePage to Organisation Details CYA" in {
+      navigator.checkRouteMap(TradingUsingDifferentNamePage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route TradingNamePage to Organisation Details CYA" in {
+      navigator.checkRouteMap(TradingNamePage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route FirmReferenceNumberPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(FirmReferenceNumberPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route EnterYourOrganisationAddressPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(EnterYourOrganisationAddressPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
+
+    "route OrganisationTelephoneNumberPage to Organisation Details CYA" in {
+      navigator.checkRouteMap(OrganisationTelephoneNumberPage, None) shouldBe
+        OrganisationDetailsCheckYourAnswersController.onPageLoad()
+    }
 
     "route IsaProductsPage to ISA products CYA" in {
       navigator.checkRouteMap(IsaProductsPage, None) shouldBe IsaProductsCheckYourAnswersController.onPageLoad()

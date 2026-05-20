@@ -18,7 +18,7 @@ package viewmodels.checkAnswers.thirdparty
 
 import config.FrontendAppConfig
 import controllers.thirdparty.routes.*
-import models.ReturnTo.{MultipleThirdPartiesCya, MultipleThirdPartiesCyaViaAddedThirdParties, SubmissionCya, SubmissionCyaViaAddedThirdParties}
+import models.ReturnTo._
 import models.journeydata.thirdparty.ThirdParty
 import models.{NormalMode, ReturnTo, YesNoAnswer}
 import play.api.data.Form
@@ -130,7 +130,6 @@ class AddedThirdPartiesViewModel @Inject() (
         case Some(MultipleThirdPartiesCya) => Some(MultipleThirdPartiesCyaViaAddedThirdParties)
         case _                             => returnTo
       }
-      if (returnTo.contains(SubmissionCya)) Some(SubmissionCyaViaAddedThirdParties) else returnTo
       ThirdPartyCheckYourAnswersController.onPageLoad(thirdParty.id, calculatedReturnTo).url
     }
     thirdParty.thirdPartyName.map { name =>
