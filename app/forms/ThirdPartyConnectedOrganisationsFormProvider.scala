@@ -48,14 +48,4 @@ class ThirdPartyConnectedOrganisationsFormProvider @Inject {
             }
           )
     )
-
-//  def apply(): Form[Seq[String]] =
-//    Form(
-//      "value" ->
-//        seq(nonEmptyText)
-//          .verifying(
-//            "thirdPartyConnectedOrganisations.error.required",
-//            _.nonEmpty
-//          )
-//    )
 }
