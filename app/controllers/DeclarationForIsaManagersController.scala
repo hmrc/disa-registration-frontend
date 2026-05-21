@@ -63,7 +63,7 @@ class DeclarationForIsaManagersController @Inject() (
       .declareAndSubmit(request.credentials, request.credentialRole, request.journeyData)
       .map { formBundleId =>
         logger.info(
-          s"Successful submission by IM with groupId [${request.groupId}] returned subscriberId [$formBundleId]"
+          s"Successful submission by IM with groupId [${request.groupId}] returned formBundleId [$formBundleId]"
         )
         Redirect(ConfirmationController.onPageLoad())
       }
