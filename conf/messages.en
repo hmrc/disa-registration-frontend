@@ -582,7 +582,7 @@ declarationForIsaManagers.p2 = By continuing, I confirm that I have understood a
 declarationForIsaManagers.action = I agree, submit
 
 ## Confirmation
-registrationSubmitted.panel.subscriptionId = Your reference number
+registrationSubmitted.panel.formBundleId = Your reference number
 
 registrationSubmitted.whatHappensNext.heading = What happens next?
 

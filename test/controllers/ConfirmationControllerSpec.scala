@@ -25,14 +25,12 @@ import views.html.ConfirmationView
 
 class ConfirmationControllerSpec extends SpecBase {
 
-  private val subscriptionId = "XEIS1234567890"
-
   "Confirmation Controller" - {
 
     "must return OK and the correct view for a GET when submission data is available" in {
 
       val journeyData = emptyJourneyData.copy(
-        subscriptionId = Some(subscriptionId)
+        formBundleId = Some(testFormBundleId)
       )
 
       val application = applicationBuilder(
@@ -59,7 +57,7 @@ class ConfirmationControllerSpec extends SpecBase {
     "must redirect to the task list when submission data is missing" in {
 
       val journeyData = emptyJourneyData.copy(
-        subscriptionId = None
+        formBundleId = None
       )
 
       val application = applicationBuilder(

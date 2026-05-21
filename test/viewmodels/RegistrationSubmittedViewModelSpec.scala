@@ -22,7 +22,6 @@ import org.mockito.Mockito.when
 
 class RegistrationSubmittedViewModelSpec extends SpecBase {
 
-  private val subscriptionId        = "XEIS1234567890"
   private val businessTaxAccountUrl = "/business-tax-account"
   private val guidanceUrl           = "/isa-guidance"
   private val feedbackUrl           = "/feedback"
@@ -39,9 +38,9 @@ class RegistrationSubmittedViewModelSpec extends SpecBase {
 
     ".from" - {
 
-      "must return None when subscriptionId is missing" in {
+      "must return None when formBundleId is missing" in {
 
-        val journeyData = emptyJourneyData.copy(subscriptionId = None)
+        val journeyData = emptyJourneyData.copy(formBundleId = None)
 
         val result = RegistrationSubmittedViewModel.from(journeyData, mockAppConfig)
 
@@ -51,13 +50,13 @@ class RegistrationSubmittedViewModelSpec extends SpecBase {
       "must return a view model for a new ISA manager application" in {
 
         val journeyData = emptyJourneyData.copy(
-          subscriptionId = Some(subscriptionId),
+          formBundleId = Some(testFormBundleId),
           organisationDetails = None
         )
 
         val result = RegistrationSubmittedViewModel.from(journeyData, mockAppConfig).value
 
-        result.subscriptionId mustEqual subscriptionId
+        result.formBundleId mustEqual testFormBundleId
         result.contentKey mustEqual "new"
         result.bulletKeys mustEqual Seq(
           "registrationSubmitted.new.bullet.1",
@@ -88,13 +87,13 @@ class RegistrationSubmittedViewModelSpec extends SpecBase {
         when(organisationDetails.zRefNumber).thenReturn(Some(testZRef))
 
         val journeyData = emptyJourneyData.copy(
-          subscriptionId = Some(subscriptionId),
+          formBundleId = Some(testFormBundleId),
           organisationDetails = Some(organisationDetails)
         )
 
         val result = RegistrationSubmittedViewModel.from(journeyData, mockAppConfig).value
 
-        result.subscriptionId mustEqual subscriptionId
+        result.formBundleId mustEqual testFormBundleId
         result.contentKey mustEqual "existing"
         result.bulletKeys mustEqual Seq(
           "registrationSubmitted.existing.bullet.1",

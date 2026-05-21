@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import models.journeydata.JourneyData
 
 final case class RegistrationSubmittedViewModel(
-  subscriptionId: String,
+  formBundleId: String,
   contentKey: String,
   bulletKeys: Seq[String],
   showManageAccount: Boolean,
@@ -69,13 +69,13 @@ object RegistrationSubmittedViewModel {
     journeyData: JourneyData,
     appConfig: FrontendAppConfig
   ): Option[RegistrationSubmittedViewModel] =
-    journeyData.subscriptionId.map { subscriptionId =>
+    journeyData.formBundleId.map { formBundleId =>
       val existingIsaManager = isExistingIsaManager(journeyData)
       val contentKey         = if (existingIsaManager) Existing else New
       val bulletCount        = if (existingIsaManager) 2 else 3
 
       RegistrationSubmittedViewModel(
-        subscriptionId = subscriptionId,
+        formBundleId = formBundleId,
         contentKey = contentKey,
         bulletKeys = bulletKeys(contentKey, bulletCount),
         showManageAccount = existingIsaManager,
