@@ -32,11 +32,14 @@ import views.html.thirdparty.AddedThirdPartiesView
 
 class AddedThirdPartiesControllerSpec extends SpecBase {
 
-  private val routeUrl  = AddedThirdPartiesController.onPageLoad(NormalMode, None).url
-  private val submitUrl = AddedThirdPartiesController.onSubmit(NormalMode).url
+  private def routeUrl: String  = AddedThirdPartiesController.onPageLoad(NormalMode, None).url
+  private def submitUrl: String = AddedThirdPartiesController.onSubmit(NormalMode).url
 
   private val tp1 = ThirdParty("1", Some("Org 1"))
   private val tp2 = ThirdParty("2", Some("Org 2"))
+
+  private val completeTp1 = completeThirdParty("1", "Org 1")
+  private val completeTp2 = completeThirdParty("2", "Org 2")
 
   private def journeyData(thirdParties: Seq[ThirdParty]) =
     testJourneyData.copy(
@@ -142,7 +145,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
 
       val maxList =
         (1 to mockAppConfig.maxThirdParties)
-          .map(i => ThirdParty(i.toString, Some(s"Org $i")))
+          .map(i => completeThirdParty(i.toString, s"Org $i"))
 
       val application =
         applicationBuilder(journeyData = Some(journeyData(maxList))).build()
@@ -193,7 +196,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
     "must redirect to 'Connected Third Parties' page when NO selected and more than one third party exists" in {
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq(tp1, tp2)))).build()
+        applicationBuilder(journeyData = Some(journeyData(Seq(completeTp1, completeTp2)))).build()
 
       running(application) {
         val request =
@@ -204,6 +207,23 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode).url
+      }
+    }
+
+    "must redirect to task list when NO selected and any third party is in progress" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData(Seq(completeTp1, tp2)))).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody("value" -> YesNoAnswer.No.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
@@ -259,4 +279,12 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
       }
     }
   }
+
+  private def completeThirdParty(id: String, name: String): ThirdParty =
+    ThirdParty(
+      id = id,
+      thirdPartyName = Some(name),
+      managingIsaReturns = Some(YesNoAnswer.No),
+      usingInvestorFunds = Some(YesNoAnswer.No)
+    )
 }

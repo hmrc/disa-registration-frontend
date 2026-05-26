@@ -1513,6 +1513,21 @@ class NavigatorSpec extends SpecBase {
       result mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode, None)
     }
 
+    "must go to TaskList when No and any third party is in progress" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          answer = YesNoAnswer.No,
+          count = 2,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = None,
+          hasInProgressItems = true
+        )
+
+      result mustEqual TaskListController.onPageLoad()
+    }
+
     "must go to ThirdPartyConnectedOrganisations when No and returnTo = SubmissionCyaViaAddedThirdParties" in {
 
       val result =
