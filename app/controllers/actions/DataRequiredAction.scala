@@ -30,7 +30,7 @@ class DataRequiredActionImpl @Inject() (implicit val executionContext: Execution
   override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] =
     request.journeyData match {
       case None       =>
-        Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
+        Future.successful(Left(Redirect(routes.StartController.onPageLoad())))
       case Some(data) =>
         Future.successful(
           Right(DataRequest(request.request, request.groupId, request.credentials, request.credentialRole, data))

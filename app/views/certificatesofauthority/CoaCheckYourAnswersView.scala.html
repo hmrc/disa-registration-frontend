@@ -34,7 +34,7 @@
         headingClasses = Some("govuk-heading-l"),
     ))
 
-    @formHelper(action = routes.IndexController.onPageLoad(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.TaskListController.onPageLoad(), Symbol("autoComplete") -> "off") {
 
         @govukSummaryList(list)
         @govukButton(

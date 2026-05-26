@@ -47,7 +47,7 @@ class OrganisationDetailsCheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+    "must redirect to Start for a GET if no existing data is found" in {
 
       val application =
         applicationBuilder(journeyData = None).build()
@@ -62,7 +62,7 @@ class OrganisationDetailsCheckYourAnswersControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.JourneyRecoveryController.onPageLoad().url
+          controllers.routes.StartController.onPageLoad().url
       }
     }
   }
