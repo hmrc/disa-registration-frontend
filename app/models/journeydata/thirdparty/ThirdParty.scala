@@ -27,8 +27,15 @@ case class ThirdParty(
   usingInvestorFunds: Option[YesNoAnswer] = None,
   investorFundsPercentage: Option[String] = None
 ) {
-  def inProgress: Boolean =
-    List(thirdPartyName, managingIsaReturns, usingInvestorFunds).exists(_.iterator.isEmpty)
+  def inProgress: Boolean = {
+    val missingRequiredAnswers =
+      List(thirdPartyName, managingIsaReturns, usingInvestorFunds).exists(_.iterator.isEmpty)
+
+    val missingInvestorFundsPercentage =
+      usingInvestorFunds.contains(YesNoAnswer.Yes) && investorFundsPercentage.isEmpty
+
+    missingRequiredAnswers || missingInvestorFundsPercentage
+  }
 }
 
 object ThirdParty {
