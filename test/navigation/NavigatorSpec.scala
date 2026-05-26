@@ -1309,8 +1309,6 @@ class NavigatorSpec extends SpecBase {
 
   "liaisonOfficerCheckRoute" - {
 
-    val id = "test-id"
-
     "must go to LO check answers when no returnTo is provided" in {
       val result =
         navigator.nextPageFromAddedLiaisonOfficers(YesNoAnswer.Yes, NormalMode, None)
@@ -1358,8 +1356,6 @@ class NavigatorSpec extends SpecBase {
   }
 
   "thirdPartyCheckModeRoute" - {
-
-    val id = "tp-1"
 
     "must go to Third Party check answers when no returnTo is provided" in {
       val result =

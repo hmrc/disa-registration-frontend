@@ -17,17 +17,6 @@
 package viewmodels.tasklist
 
 import base.SpecBase
-import models.YesNoAnswer
-import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Yes as CertificatesYes
-import models.journeydata.certificatesofauthority.FcaArticles.Article14
-import models.journeydata.isaproducts.IsaProduct.CashIsas
-import models.journeydata.isaproducts.IsaProducts
-import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.ByEmail
-import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
-import models.journeydata.signatories.{Signatories, Signatory}
-import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
-import models.journeydata.{JourneyData, OrganisationDetails, OrganisationEmail}
 import uk.gov.hmrc.auth.core.{Assistant, User}
 
 class TaskListViewModelSpec extends SpecBase {
@@ -35,7 +24,7 @@ class TaskListViewModelSpec extends SpecBase {
   "TaskListViewModel" - {
 
     "must lock all tasks except organisation information until organisation information is complete" in {
-      val viewModel = TaskListViewModel(emptyJourneyDataWithBv, User)
+      val viewModel = TaskListViewModel(emptyJourneyDataWithBusinessVerification, User)
 
       task(viewModel, "taskList.organisationInformation.add").href.value mustBe
         controllers.orgdetails.routes.RegisteredIsaManagerController.onPageLoad(models.NormalMode).url
@@ -61,8 +50,8 @@ class TaskListViewModelSpec extends SpecBase {
     }
 
     "must show organisation information in progress while keeping remaining tasks locked" in {
-      val journeyData = emptyJourneyDataWithBv.copy(
-        organisationDetails = Some(OrganisationDetails(registeredToManageIsa = Some(YesNoAnswer.Yes)))
+      val journeyData = emptyJourneyDataWithBusinessVerification.copy(
+        organisationDetails = Some(inProgressTaskListOrganisationDetails)
       )
 
       val viewModel = TaskListViewModel(journeyData, User)
@@ -77,7 +66,12 @@ class TaskListViewModelSpec extends SpecBase {
 
     "must unlock remaining tasks once organisation information is complete" in {
       val viewModel =
-        TaskListViewModel(emptyJourneyDataWithBv.copy(organisationDetails = Some(completeOrgDetails)), User)
+        TaskListViewModel(
+          emptyJourneyDataWithBusinessVerification.copy(organisationDetails =
+            Some(completeTaskListOrganisationDetails)
+          ),
+          User
+        )
 
       task(viewModel, "taskList.organisationInformation.change").status.content mustBe messages(
         "taskList.status.completed"
@@ -101,9 +95,9 @@ class TaskListViewModelSpec extends SpecBase {
 
     "must show not verified for an unverified organisation email" in {
       val viewModel = TaskListViewModel(
-        emptyJourneyDataWithBv.copy(
-          organisationDetails = Some(completeOrgDetails),
-          organisationEmail = Some(OrganisationEmail(Some("test@example.com"), Some(false)))
+        emptyJourneyDataWithBusinessVerification.copy(
+          organisationDetails = Some(completeTaskListOrganisationDetails),
+          organisationEmail = Some(unverifiedTaskListOrganisationEmail)
         ),
         User
       )
@@ -116,7 +110,12 @@ class TaskListViewModelSpec extends SpecBase {
 
     "must route empty multi-item tasks to the first question" in {
       val viewModel =
-        TaskListViewModel(emptyJourneyDataWithBv.copy(organisationDetails = Some(completeOrgDetails)), User)
+        TaskListViewModel(
+          emptyJourneyDataWithBusinessVerification.copy(organisationDetails =
+            Some(completeTaskListOrganisationDetails)
+          ),
+          User
+        )
 
       task(viewModel, "taskList.liaisonOfficers.add").href.value mustBe
         controllers.liaisonofficers.routes.LiaisonOfficerNameController
@@ -134,16 +133,12 @@ class TaskListViewModelSpec extends SpecBase {
 
     "must route multi-item tasks with existing items to their multiple item CYA pages" in {
       val viewModel = TaskListViewModel(
-        emptyJourneyDataWithBv.copy(
-          organisationDetails = Some(completeOrgDetails),
-          liaisonOfficers = Some(LiaisonOfficers(Seq(LiaisonOfficer("lo-1", fullName = Some("Started"))))),
-          signatories = Some(Signatories(Seq(Signatory("sig-1", fullName = Some("Started"))))),
-          thirdPartyOrganisations = Some(
-            ThirdPartyOrganisations(
-              managedByThirdParty = Some(YesNoAnswer.Yes),
-              thirdParties = Seq(ThirdParty("third-party-1", thirdPartyName = Some("Started")))
-            )
-          )
+        emptyJourneyDataWithBusinessVerification.copy(
+          organisationDetails = Some(completeTaskListOrganisationDetails),
+          liaisonOfficers = Some(liaisonOfficersWith(inProgressTaskListLiaisonOfficer("lo-1"))),
+          signatories = Some(signatoriesWith(inProgressTaskListSignatory("sig-1"))),
+          thirdPartyOrganisations =
+            Some(testThirdPartyOrganisations(Seq(inProgressTaskListThirdParty("third-party-1"))))
         ),
         User
       )
@@ -158,12 +153,11 @@ class TaskListViewModelSpec extends SpecBase {
 
     "must route multiple completed third party organisations to the section final CYA" in {
       val viewModel = TaskListViewModel(
-        emptyJourneyDataWithBv.copy(
-          organisationDetails = Some(completeOrgDetails),
+        emptyJourneyDataWithBusinessVerification.copy(
+          organisationDetails = Some(completeTaskListOrganisationDetails),
           thirdPartyOrganisations = Some(
-            ThirdPartyOrganisations(
-              managedByThirdParty = Some(YesNoAnswer.Yes),
-              thirdParties = Seq(completeThirdParty("third-party-1"), completeThirdParty("third-party-2"))
+            testThirdPartyOrganisations(
+              Seq(completeTaskListThirdParty("third-party-1"), completeTaskListThirdParty("third-party-2"))
             )
           )
         ),
@@ -176,30 +170,22 @@ class TaskListViewModelSpec extends SpecBase {
 
     "must show in progress when authorised users or third parties include incomplete records" in {
       val viewModel = TaskListViewModel(
-        emptyJourneyDataWithBv.copy(
-          organisationDetails = Some(completeOrgDetails),
+        emptyJourneyDataWithBusinessVerification.copy(
+          organisationDetails = Some(completeTaskListOrganisationDetails),
           liaisonOfficers = Some(
-            LiaisonOfficers(
-              Seq(
-                LiaisonOfficer("lo-1", fullName = Some("Started")),
-                completeLiaisonOfficer("lo-2")
-              )
+            liaisonOfficersWith(
+              inProgressTaskListLiaisonOfficer("lo-1"),
+              completeTaskListLiaisonOfficer("lo-2")
             )
           ),
           signatories = Some(
-            Signatories(
-              Seq(
-                Signatory("sig-1", fullName = Some("Started")),
-                completeSignatory("sig-2")
-              )
+            signatoriesWith(
+              inProgressTaskListSignatory("sig-1"),
+              completeTaskListSignatory("sig-2")
             )
           ),
-          thirdPartyOrganisations = Some(
-            ThirdPartyOrganisations(
-              managedByThirdParty = Some(YesNoAnswer.Yes),
-              thirdParties = Seq(ThirdParty("third-party-1", thirdPartyName = Some("Started")))
-            )
-          )
+          thirdPartyOrganisations =
+            Some(testThirdPartyOrganisations(Seq(inProgressTaskListThirdParty("third-party-1"))))
         ),
         User
       )
@@ -218,14 +204,15 @@ class TaskListViewModelSpec extends SpecBase {
 
     "must count authorised users and third parties when all records are complete" in {
       val viewModel = TaskListViewModel(
-        emptyJourneyDataWithBv.copy(
-          organisationDetails = Some(completeOrgDetails),
-          liaisonOfficers = Some(LiaisonOfficers(Seq(completeLiaisonOfficer("lo-1"), completeLiaisonOfficer("lo-2")))),
-          signatories = Some(Signatories(Seq(completeSignatory("sig-1"), completeSignatory("sig-2")))),
+        emptyJourneyDataWithBusinessVerification.copy(
+          organisationDetails = Some(completeTaskListOrganisationDetails),
+          liaisonOfficers = Some(
+            liaisonOfficersWith(completeTaskListLiaisonOfficer("lo-1"), completeTaskListLiaisonOfficer("lo-2"))
+          ),
+          signatories = Some(signatoriesWith(completeTaskListSignatory("sig-1"), completeTaskListSignatory("sig-2"))),
           thirdPartyOrganisations = Some(
-            ThirdPartyOrganisations(
-              managedByThirdParty = Some(YesNoAnswer.Yes),
-              thirdParties = Seq(completeThirdParty("third-party-1"), completeThirdParty("third-party-2"))
+            testThirdPartyOrganisations(
+              Seq(completeTaskListThirdParty("third-party-1"), completeTaskListThirdParty("third-party-2"))
             )
           )
         ),
@@ -242,9 +229,9 @@ class TaskListViewModelSpec extends SpecBase {
 
     "must mark third party organisations complete without a count when the answer is no" in {
       val viewModel = TaskListViewModel(
-        emptyJourneyDataWithBv.copy(
-          organisationDetails = Some(completeOrgDetails),
-          thirdPartyOrganisations = Some(ThirdPartyOrganisations(managedByThirdParty = Some(YesNoAnswer.No)))
+        emptyJourneyDataWithBusinessVerification.copy(
+          organisationDetails = Some(completeTaskListOrganisationDetails),
+          thirdPartyOrganisations = Some(thirdPartyOrganisationsNotUsed)
         ),
         User
       )
@@ -255,7 +242,7 @@ class TaskListViewModelSpec extends SpecBase {
     }
 
     "must allow administrators to submit only when all required tasks are complete" in {
-      val journeyData = completeJourneyData
+      val journeyData = completeTaskListJourneyData
       val viewModel   = TaskListViewModel(journeyData, User)
 
       viewModel.canSubmitAnswers mustBe true
@@ -268,74 +255,23 @@ class TaskListViewModelSpec extends SpecBase {
     }
 
     "must prevent assistants from submitting final answers" in {
-      val viewModel = TaskListViewModel(completeJourneyData, Assistant)
+      val viewModel = TaskListViewModel(completeTaskListJourneyData, Assistant)
 
       viewModel.canSubmitAnswers mustBe false
       val row = task(viewModel, "taskList.submit.assistantCannotSubmit")
 
       row.href mustBe None
       row.status.toGovuk mustBe uk.gov.hmrc.govukfrontend.views.viewmodels.tasklist.TaskListItemStatus()
-      TaskListViewModel.canSubmitAnswers(completeJourneyData, Assistant) mustBe false
+      TaskListViewModel.canSubmitAnswers(completeTaskListJourneyData, Assistant) mustBe false
     }
 
     "must require successful business verification before the task list can be accessed" in {
       TaskListViewModel.canAccessTaskList(emptyJourneyData) mustBe false
-      TaskListViewModel.canAccessTaskList(emptyJourneyDataWithBv) mustBe true
-      TaskListViewModel.canAccessTaskList(
-        emptyJourneyDataWithBv.copy(businessVerification = Some(testBV.copy(businessVerificationPassed = Some(false))))
-      ) mustBe false
+      TaskListViewModel.canAccessTaskList(emptyJourneyDataWithBusinessVerification) mustBe true
+      TaskListViewModel.canAccessTaskList(emptyJourneyDataWithFailedBusinessVerification) mustBe false
     }
   }
 
   private def task(viewModel: TaskListViewModel, titleMessageKey: String): TaskListTaskViewModel =
     viewModel.sections.flatMap(_.tasks).find(_.title == messages(titleMessageKey)).value
-
-  private def emptyJourneyDataWithBv: JourneyData =
-    emptyJourneyData.copy(businessVerification = Some(testBV))
-
-  private def completeJourneyData: JourneyData =
-    emptyJourneyDataWithBv.copy(
-      organisationDetails = Some(completeOrgDetails),
-      organisationEmail = Some(OrganisationEmail(Some("test@example.com"), Some(true))),
-      isaProducts = Some(IsaProducts(isaProducts = Some(Seq(CashIsas)))),
-      certificatesOfAuthority = Some(
-        CertificatesOfAuthority(certificatesYesNo = Some(CertificatesYes), fcaArticles = Some(Seq(Article14)))
-      ),
-      liaisonOfficers = Some(LiaisonOfficers(Seq(completeLiaisonOfficer("lo-1")))),
-      signatories = Some(Signatories(Seq(completeSignatory("sig-1")))),
-      thirdPartyOrganisations = Some(ThirdPartyOrganisations(managedByThirdParty = Some(YesNoAnswer.No)))
-    )
-
-  private val completeOrgDetails: OrganisationDetails =
-    OrganisationDetails(
-      registeredToManageIsa = Some(YesNoAnswer.No),
-      tradingUsingDifferentName = Some(YesNoAnswer.No),
-      fcaNumber = Some("123456"),
-      registeredAddressCorrespondence = Some(YesNoAnswer.Yes),
-      orgTelephoneNumber = Some("01234567890")
-    )
-
-  private def completeLiaisonOfficer(id: String): LiaisonOfficer =
-    LiaisonOfficer(
-      id = id,
-      fullName = Some("Complete Liaison Officer"),
-      phoneNumber = Some("01234567890"),
-      communication = Set(ByEmail),
-      email = Some("liaison@example.com")
-    )
-
-  private def completeSignatory(id: String): Signatory =
-    Signatory(
-      id = id,
-      fullName = Some("Complete Signatory"),
-      jobTitle = Some("Director")
-    )
-
-  private def completeThirdParty(id: String): ThirdParty =
-    ThirdParty(
-      id = id,
-      thirdPartyName = Some("Complete Third Party"),
-      managingIsaReturns = Some(YesNoAnswer.No),
-      usingInvestorFunds = Some(YesNoAnswer.No)
-    )
 }
