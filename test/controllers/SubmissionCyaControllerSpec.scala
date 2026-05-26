@@ -17,6 +17,18 @@
 package controllers
 
 import base.SpecBase
+import models.YesNoAnswer
+import models.journeydata.OrganisationDetails
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.Yes as CertificatesYes
+import models.journeydata.certificatesofauthority.FcaArticles.Article14
+import models.journeydata.isaproducts.IsaProduct.CashIsas
+import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.ByEmail
+import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
+import models.journeydata.signatories.{Signatories, Signatory}
+import models.journeydata.thirdparty.ThirdPartyOrganisations
+import models.journeydata.{JourneyData, OrganisationEmail}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.Assistant
@@ -28,7 +40,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
   "Submission CYA Controller" - {
 
     "must return OK and the correct view for a GET when the user can submit" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(completeJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.SubmissionCyaController.onPageLoad().url)
@@ -36,7 +48,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view      = application.injector.instanceOf[SubmissionCyaView]
-        val viewModel = SubmissionCyaViewModel(emptyJourneyData)(messages(application))
+        val viewModel = SubmissionCyaViewModel(completeJourneyData)(messages(application))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -44,7 +56,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
     }
 
     "must redirect to TaskList for a GET if user is assistant" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData), credentialRole = Assistant).build()
+      val application = applicationBuilder(journeyData = Some(completeJourneyData), credentialRole = Assistant).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.SubmissionCyaController.onPageLoad().url)
@@ -56,7 +68,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to JourneyRecoveryController for a GET if no existing data is found" in {
+    "must redirect to StartController for a GET if no existing data is found" in {
       val application = applicationBuilder(journeyData = None).build()
 
       running(application) {
@@ -65,12 +77,25 @@ class SubmissionCyaControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.StartController.onPageLoad().url
+      }
+    }
+
+    "must redirect to TaskList for a GET if required tasks are incomplete" in {
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubmissionCyaController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.TaskListController.onPageLoad().url
       }
     }
 
     "must redirect to the declaration page for a POST when the user can submit" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(completeJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)
@@ -83,7 +108,20 @@ class SubmissionCyaControllerSpec extends SpecBase {
     }
 
     "must redirect back to task list for a POST when the user is assistant" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData), credentialRole = Assistant).build()
+      val application = applicationBuilder(journeyData = Some(completeJourneyData), credentialRole = Assistant).build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect back to task list for a POST when required tasks are incomplete" in {
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)
@@ -95,4 +133,38 @@ class SubmissionCyaControllerSpec extends SpecBase {
       }
     }
   }
+
+  private def completeJourneyData: JourneyData =
+    emptyJourneyData.copy(
+      businessVerification = Some(testBV),
+      organisationDetails = Some(
+        OrganisationDetails(
+          registeredToManageIsa = Some(YesNoAnswer.No),
+          tradingUsingDifferentName = Some(YesNoAnswer.No),
+          fcaNumber = Some("123456"),
+          registeredAddressCorrespondence = Some(YesNoAnswer.Yes),
+          orgTelephoneNumber = Some("01234567890")
+        )
+      ),
+      organisationEmail = Some(OrganisationEmail(Some("test@example.com"), Some(true))),
+      isaProducts = Some(IsaProducts(isaProducts = Some(Seq(CashIsas)))),
+      certificatesOfAuthority = Some(
+        CertificatesOfAuthority(certificatesYesNo = Some(CertificatesYes), fcaArticles = Some(Seq(Article14)))
+      ),
+      liaisonOfficers = Some(
+        LiaisonOfficers(
+          Seq(
+            LiaisonOfficer(
+              id = "lo-1",
+              fullName = Some("Complete Liaison Officer"),
+              phoneNumber = Some("01234567890"),
+              communication = Set(ByEmail),
+              email = Some("liaison@example.com")
+            )
+          )
+        )
+      ),
+      signatories = Some(Signatories(Seq(Signatory("sig-1", Some("Complete Signatory"), Some("Director"))))),
+      thirdPartyOrganisations = Some(ThirdPartyOrganisations(managedByThirdParty = Some(YesNoAnswer.No)))
+    )
 }

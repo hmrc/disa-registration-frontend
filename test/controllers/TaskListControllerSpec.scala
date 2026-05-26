@@ -21,6 +21,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import viewmodels.tasklist.TaskListViewModel
 import views.html.TaskListView
 
 import scala.concurrent.Future
@@ -33,8 +34,9 @@ class TaskListControllerSpec extends SpecBase {
       when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
         .thenReturn(Future.successful(()))
 
+      val journeyData = emptyJourneyData.copy(businessVerification = Some(testBV))
       val application = applicationBuilder(
-        journeyData = Some(emptyJourneyData)
+        journeyData = Some(journeyData)
       ).build()
 
       running(application) {
@@ -50,7 +52,10 @@ class TaskListControllerSpec extends SpecBase {
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view()(request, messages(application)).toString
+          view(TaskListViewModel(journeyData, testCredentialRoleUser)(messages(application)))(
+            request,
+            messages(application)
+          ).toString
       }
     }
 
@@ -58,8 +63,9 @@ class TaskListControllerSpec extends SpecBase {
       when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
+      val journeyData = emptyJourneyData.copy(businessVerification = Some(testBV))
       val application = applicationBuilder(
-        journeyData = Some(emptyJourneyData)
+        journeyData = Some(journeyData)
       ).build()
 
       running(application) {
@@ -71,6 +77,51 @@ class TaskListControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual OK
+      }
+    }
+
+    "must redirect to Start when no journey data exists" in {
+      when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
+        .thenReturn(Future.successful(()))
+
+      val application = applicationBuilder(
+        journeyData = None
+      ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.TaskListController.onPageLoad().url)
+            .withSession("authToken" -> "mock-bearer-token")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.StartController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Start when business verification has not succeeded" in {
+      when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
+        .thenReturn(Future.successful(()))
+
+      val journeyData = emptyJourneyData.copy(
+        businessVerification = Some(testBV.copy(businessVerificationPassed = Some(false)))
+      )
+      val application = applicationBuilder(
+        journeyData = Some(journeyData)
+      ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.TaskListController.onPageLoad().url)
+            .withSession("authToken" -> "mock-bearer-token")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.StartController.onPageLoad().url
       }
     }
   }
