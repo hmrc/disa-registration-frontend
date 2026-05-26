@@ -17,11 +17,14 @@
 package forms
 
 import forms.behaviours.StringFieldBehaviours
+import models.journeydata.thirdparty.ConnectedThirdPartySelection.noneAreConnectedFormValue
 import play.api.data.FormError
 
 class ThirdPartyConnectedOrganisationsFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "thirdPartyConnectedOrganisations.error.required"
+  val requiredKey                    = "thirdPartyConnectedOrganisations.error.required"
+  val singleOrganisationKey          = "thirdPartyConnectedOrganisations.error.singleOrganisation"
+  val noneAndOrganisationSelectedKey = "thirdPartyConnectedOrganisations.error.noneAndOrganisationSelected"
 
   val form = new ThirdPartyConnectedOrganisationsFormProvider()()
 
@@ -41,8 +44,9 @@ class ThirdPartyConnectedOrganisationsFormProviderSpec extends StringFieldBehavi
             )
           )
 
-        result.errors mustBe empty
-        result.value.value must contain(value)
+        result.errors must contain(
+          FormError(fieldName, singleOrganisationKey)
+        )
       }
     }
 
@@ -56,7 +60,21 @@ class ThirdPartyConnectedOrganisationsFormProviderSpec extends StringFieldBehavi
           )
         )
 
+      result.errors mustBe empty
       result.value.value mustEqual Seq("1", "2")
+    }
+
+    "must bind when only none selected" in {
+
+      val result =
+        form.bind(
+          Map(
+            "value[0]" -> noneAreConnectedFormValue
+          )
+        )
+
+      result.errors mustBe empty
+      result.value.value mustEqual Seq(noneAreConnectedFormValue)
     }
 
     "must fail when no values are provided" in {
@@ -94,6 +112,35 @@ class ThirdPartyConnectedOrganisationsFormProviderSpec extends StringFieldBehavi
 
       result.errors must contain(
         FormError(fieldName, requiredKey)
+      )
+    }
+
+    "must fail when only one organisation is selected" in {
+
+      val result =
+        form.bind(
+          Map(
+            "value[0]" -> "1"
+          )
+        )
+
+      result.errors must contain(
+        FormError(fieldName, singleOrganisationKey)
+      )
+    }
+
+    "must fail when none selected and organisation selected together" in {
+
+      val result =
+        form.bind(
+          Map(
+            "value[0]" -> "1",
+            "value[1]" -> noneAreConnectedFormValue
+          )
+        )
+
+      result.errors must contain(
+        FormError(fieldName, noneAndOrganisationSelectedKey)
       )
     }
 
