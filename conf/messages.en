@@ -551,8 +551,41 @@ CoaCheckYourAnswers.heading = Check your certificates of authority
 
 
 ### Task List
-taskList.title = Task List
-taskList.heading = Task List
+taskList.title = Manage ISAs
+taskList.heading = Manage ISAs
+taskList.section.organisationInformation = Organisation information
+taskList.section.eligibility = Eligibility
+taskList.section.authorisedUsers = Authorised users
+taskList.section.thirdPartyOrganisations = Third party organisations
+taskList.section.submit = Submit answers
+taskList.organisationInformation.add = Add organisation information
+taskList.organisationInformation.change = Change organisation information
+taskList.organisationEmail.add = Add organisation email
+taskList.organisationEmail.change = Change organisation email
+taskList.isaProducts.add = ISA products you manage
+taskList.isaProducts.change = Change ISA products you manage
+taskList.certificatesOfAuthority.add = Which certificates of authority apply to your organisation
+taskList.certificatesOfAuthority.change = Change which certificates of authority apply to your organisation
+taskList.liaisonOfficers.add = Add liaison officers
+taskList.liaisonOfficers.change = Change liaison officers
+taskList.signatories.add = Add signatories
+taskList.signatories.change = Change signatories
+taskList.thirdPartyOrganisations.add = Add organisations you outsource to
+taskList.thirdPartyOrganisations.change = Change organisations you outsource to
+taskList.submit.checkAnswers = Check answers and submit
+taskList.submit.assistantCannotSubmit = Only Administrators can submit the final answers
+taskList.status.notYetStarted = Not yet started
+taskList.status.inProgress = In progress
+taskList.status.completed = Completed
+taskList.status.cannotStartYet = Cannot start yet
+taskList.status.verified = Verified
+taskList.status.notVerified = Not verified
+taskList.count.liaisonOfficer.one = {0} liaison officer
+taskList.count.liaisonOfficer.other = {0} liaison officers
+taskList.count.signatory.one = {0} signatory
+taskList.count.signatory.other = {0} signatories
+taskList.count.thirdParty.one = {0} third party
+taskList.count.thirdParty.other = {0} third parties
 
 
 ### Business Verification Lockout
