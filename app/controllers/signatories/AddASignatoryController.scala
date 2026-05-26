@@ -17,6 +17,7 @@
 package controllers.signatories
 
 import controllers.actions.*
+import models.ReturnTo
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -32,7 +33,7 @@ class AddASignatoryController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (Action andThen identify) { implicit request =>
-    Ok(view())
+  def onPageLoad(returnTo: Option[ReturnTo]): Action[AnyContent] = (Action andThen identify) { implicit request =>
+    Ok(view(returnTo))
   }
 }

@@ -39,7 +39,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
   val onwardRoute = "/obligations/enrolment/isa/certificates-of-authority-check-your-answers"
 
-  lazy val fcaArticlesRoute = routes.FcaArticlesController.onPageLoad(NormalMode).url
+  lazy val fcaArticlesRoute: String = routes.FcaArticlesController.onPageLoad(NormalMode).url
 
   val formProvider                 = new FcaArticlesFormProvider()
   val form: Form[Set[FcaArticles]] = formProvider()
@@ -59,7 +59,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, None)(request, messages(application)).toString
       }
     }
 
@@ -82,7 +82,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(FcaArticles.values.toSet), NormalMode)(
+        contentAsString(result) mustEqual view(form.fill(FcaArticles.values.toSet), NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -248,7 +248,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None)(request, messages(application)).toString
       }
     }
 

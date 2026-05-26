@@ -105,7 +105,8 @@ class GrsController @Inject() (
           ctUtr = grs.ctutr,
           registeredAddress = grs.registeredAddress,
           companyName = grs.companyName,
-          businessPartnerId = grs.bpSafeId
+          businessPartnerId = grs.bpSafeId,
+          companyNumber = Some(grs.companyNumber)
         )
       )
       .getOrElse(
@@ -115,7 +116,8 @@ class GrsController @Inject() (
           ctUtr = grs.ctutr,
           registeredAddress = grs.registeredAddress,
           companyName = grs.companyName,
-          businessPartnerId = grs.bpSafeId
+          businessPartnerId = grs.bpSafeId,
+          companyNumber = Some(grs.companyNumber)
         )
       )
   }

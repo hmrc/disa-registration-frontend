@@ -17,6 +17,8 @@
 package pages.organisationdetails
 
 import models.journeydata.OrganisationDetails
-import pages.Page
+import pages.ClearablePage
 
-case object ChooseAddressPage extends Page[OrganisationDetails]
+case object ChooseAddressPage extends ClearablePage[OrganisationDetails] {
+  def clearAnswer(answers: OrganisationDetails): OrganisationDetails = answers.copy(correspondenceAddress = None)
+}

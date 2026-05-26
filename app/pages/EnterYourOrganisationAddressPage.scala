@@ -18,6 +18,6 @@ package pages
 
 import models.journeydata.OrganisationDetails
 
-case object EnterYourOrganisationAddressPage extends PageWithoutDependents[OrganisationDetails] {
+case object EnterYourOrganisationAddressPage extends ClearablePage[OrganisationDetails] {
   def clearAnswer(answers: OrganisationDetails): OrganisationDetails = answers.copy(correspondenceAddress = None)
 }

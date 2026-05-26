@@ -17,8 +17,8 @@
 package viewmodels.checkAnswers.thirdparty.finalcya
 
 import controllers.thirdparty.routes.AddedThirdPartiesController
-import models.CheckMode
-import models.ReturnTo.FinalCya
+import models.{CheckMode, ReturnTo}
+import models.ReturnTo.MultipleThirdPartiesCya
 import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -29,7 +29,10 @@ import viewmodels.implicits.*
 
 object AddAnotherThirdPartySummary {
 
-  def row(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit messages: Messages): SummaryListRow =
+  def row(
+    thirdPartyOrganisations: ThirdPartyOrganisations,
+    returnTo: Option[ReturnTo] = Some(MultipleThirdPartiesCya)
+  )(implicit messages: Messages): SummaryListRow =
     SummaryListRowViewModel(
       key = Key(Text(messages("thirdPartiesCheckYourAnswers.addAnother.label"))),
       value = ValueViewModel(
@@ -40,7 +43,7 @@ object AddAnotherThirdPartySummary {
       actions = Seq(
         ActionItemViewModel(
           "site.change",
-          AddedThirdPartiesController.onPageLoad(CheckMode, Some(FinalCya)).url
+          AddedThirdPartiesController.onPageLoad(CheckMode, returnTo).url
         )
           .withVisuallyHiddenText(messages("productsManagedByThirdParty.change.hidden"))
       )

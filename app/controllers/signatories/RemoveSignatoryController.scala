@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes.IndexController
 import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
-import models.NormalMode
+import models.{NormalMode, ReturnTo}
 import models.YesNoAnswer.{No, Yes}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.requests.DataRequest
@@ -54,20 +54,20 @@ class RemoveSignatoryController @Inject() (
 
   val form = formProvider("removeSignatory.error.required")
 
-  def onPageLoad(id: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      providingName(id, name => Future.successful(Ok(view(id, name, form))))
-  }
+  def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
+      providingName(id, name => Future.successful(Ok(view(id, name, form, returnTo))))
+    }
 
-  def onSubmit(id: String): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       providingName(
         id,
         name =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(id, name, formWithErrors))),
+              formWithErrors => Future.successful(BadRequest(view(id, name, formWithErrors, returnTo))),
               value => {
                 val updatedSection = value match {
                   case Yes => updatedSectionWithSignatoryRemoved(id)
@@ -75,12 +75,12 @@ class RemoveSignatoryController @Inject() (
                 }
 
                 updatedSection.fold(Future.successful(Redirect(IndexController.onPageLoad())))(section =>
-                  updateAnswersAndRedirect(id, section)
+                  updateAnswersAndRedirect(id, section, returnTo)
                 )
               }
             )
       )
-  }
+    }
 
   private def providingName(id: String, block: String => Future[Result])(implicit request: DataRequest[_]) =
     (for {
@@ -91,12 +91,13 @@ class RemoveSignatoryController @Inject() (
 
   private def updateAnswersAndRedirect(
     id: String,
-    updatedSection: Signatories
+    updatedSection: Signatories,
+    returnTo: Option[ReturnTo]
   )(implicit request: DataRequest[_], executionContext: ExecutionContext) =
     journeyAnswersService
       .update(updatedSection, request.groupId, request.credentials.providerId)
       .map { updatedSection =>
-        Redirect(navigator.nextPage(RemoveSignatoryPage(id = id), updatedSection, NormalMode, None))
+        Redirect(navigator.nextPage(RemoveSignatoryPage(id = id), updatedSection, NormalMode, returnTo))
       }
       .recoverWith { case NonFatal(e) =>
         logger.warn(

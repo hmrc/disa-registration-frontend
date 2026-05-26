@@ -55,13 +55,13 @@ class OrganisationEmailCyaController @Inject() (
 
     email match {
       case None =>
-        Left(Redirect(OrganisationEmailAddressController.onPageLoad(NormalMode)))
+        Left(Redirect(OrganisationEmailAddressController.onPageLoad(NormalMode, None)))
 
       case Some(value) if verified.contains(true) =>
         Right(value)
 
       case Some(_) =>
-        Left(Redirect(EmailVerificationCodeController.onPageLoad()))
+        Left(Redirect(EmailVerificationCodeController.onPageLoad(NormalMode, None)))
     }
   }
 }

@@ -88,7 +88,8 @@ class GrsControllerSpec extends SpecBase {
                     addressLine3 = Some("address line 3"),
                     postCode = Some("postcode")
                   )
-                )
+                ),
+                companyNumber = Some(testString)
               )
             )
           )
@@ -171,7 +172,8 @@ class GrsControllerSpec extends SpecBase {
                     addressLine3 = Some("address line 3"),
                     postCode = Some("postcode")
                   )
-                )
+                ),
+                companyNumber = Some(testString)
               )
             )
           )
@@ -207,7 +209,8 @@ class GrsControllerSpec extends SpecBase {
                     addressLine3 = Some("address line 3"),
                     postCode = Some("postcode")
                   )
-                )
+                ),
+                companyNumber = Some(testString)
               )
             )
           )

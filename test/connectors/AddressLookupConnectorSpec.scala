@@ -34,9 +34,11 @@ class AddressLookupConnectorSpec extends SpecBase {
 
     val connector: AddressLookupConnector =
       applicationBuilder(
-        None,
-        inject.bind[HttpClientV2].toInstance(mockHttpClient),
-        inject.bind[FrontendAppConfig].toInstance(mockAppConfig)
+        journeyData = None,
+        overrides = Seq(
+          inject.bind[HttpClientV2].toInstance(mockHttpClient),
+          inject.bind[FrontendAppConfig].toInstance(mockAppConfig)
+        )
       ).build().injector.instanceOf[AddressLookupConnector]
 
     val testUrl: String =

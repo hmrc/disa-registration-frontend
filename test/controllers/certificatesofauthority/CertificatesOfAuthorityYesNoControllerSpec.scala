@@ -60,7 +60,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[CertificatesOfAuthorityYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, None)(request, messages(application)).toString
       }
     }
 
@@ -83,7 +83,10 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[CertificatesOfAuthorityYesNoView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(Yes), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(Yes), NormalMode, None)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -102,7 +105,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None)(request, messages(application)).toString
       }
     }
 

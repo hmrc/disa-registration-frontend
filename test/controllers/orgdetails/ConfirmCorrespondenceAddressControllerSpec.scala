@@ -19,6 +19,7 @@ package controllers.orgdetails
 import base.SpecBase
 import controllers.orgdetails.routes.*
 import controllers.routes.*
+import models.NormalMode
 import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
@@ -57,7 +58,11 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
       )
     )
 
-  private val routeUrl = ConfirmCorrespondenceAddressController.onPageLoad(None).url
+  private val routeUrl =
+    ConfirmCorrespondenceAddressController.onPageLoad(None).url
+
+  private val submitUrl =
+    ConfirmCorrespondenceAddressController.onSubmit(None).url
 
   "ConfirmCorrespondenceAddressController" - {
 
@@ -107,6 +112,44 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
       running(application) {
 
         val request = FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect to the next page on submit when organisation details exist" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyDataWithAddress)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, submitUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          OrganisationTelephoneNumberController.onPageLoad(NormalMode, None).url
+      }
+    }
+
+    "must redirect to TaskList on submit when organisation details are missing" in {
+
+      val application =
+        applicationBuilder(journeyData = None).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, submitUrl)
 
         val result = route(application, request).value
 

@@ -19,7 +19,7 @@ package controllers.orgdetails
 import controllers.actions.*
 import forms.TelephoneNumberFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.organisationdetails.OrganisationTelephoneNumberPage
@@ -52,22 +52,23 @@ class OrganisationTelephoneNumberController @Inject() (
 
   val form = formProvider("organisationTelephoneNumber")
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.journeyData.organisationDetails.flatMap(_.orgTelephoneNumber) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      val preparedForm = request.journeyData.organisationDetails.flatMap(_.orgTelephoneNumber) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode, returnTo))
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
             val existingSection = request.journeyData.organisationDetails
             val updatedSection  =
@@ -84,7 +85,7 @@ class OrganisationTelephoneNumberController @Inject() (
                     OrganisationTelephoneNumberPage,
                     updatedSection,
                     mode,
-                    None
+                    returnTo
                   )
                 )
               }
@@ -96,5 +97,5 @@ class OrganisationTelephoneNumberController @Inject() (
               }
           }
         )
-  }
+    }
 }

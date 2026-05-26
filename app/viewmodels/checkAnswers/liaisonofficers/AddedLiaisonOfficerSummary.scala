@@ -18,8 +18,9 @@ package viewmodels.checkAnswers.liaisonofficers
 
 import config.FrontendAppConfig
 import controllers.liaisonofficers.routes.{LiaisonOfficerNameController, LoCheckYourAnswersController, RemoveLiaisonOfficerController}
+import models.ReturnTo.{SubmissionCya, SubmissionCyaViaAddedLiaisonOfficers}
 import models.journeydata.liaisonofficers.LiaisonOfficer
-import models.{NormalMode, YesNoAnswer}
+import models.{NormalMode, ReturnTo, YesNoAnswer}
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
@@ -48,7 +49,8 @@ class AddedLiaisonOfficersViewModel @Inject() (
 
   def apply(
     form: Form[_],
-    summary: AddedLiaisonOfficerSummary
+    summary: AddedLiaisonOfficerSummary,
+    returnTo: Option[ReturnTo]
   )(implicit messages: Messages): Html =
     HtmlFormat.fill(
       Seq(
@@ -62,7 +64,7 @@ class AddedLiaisonOfficersViewModel @Inject() (
                     )}</h2>""")
                 }
                 .getOrElse(HtmlFormat.empty),
-              govukSummaryList(SummaryListViewModel(rows = summary.complete.flatMap(row)))
+              govukSummaryList(SummaryListViewModel(rows = summary.complete.flatMap(lo => row(lo, returnTo))))
             )
           )
         },
@@ -72,7 +74,7 @@ class AddedLiaisonOfficersViewModel @Inject() (
               Html(s"""<h2 class="govuk-heading-m">${HtmlFormat.escape(
                   messages("addedLiaisonOfficers.inProgress")
                 )}</h2>"""),
-              govukSummaryList(SummaryListViewModel(rows = summary.inProgress.flatMap(row)))
+              govukSummaryList(SummaryListViewModel(rows = summary.inProgress.flatMap(lo => row(lo, returnTo))))
             )
           )
         },
@@ -89,10 +91,18 @@ class AddedLiaisonOfficersViewModel @Inject() (
       ).flatten
     )
 
-  private def row(liaisonOfficer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] = {
+  private def row(liaisonOfficer: LiaisonOfficer, returnTo: Option[ReturnTo])(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
     val changeLink =
       if (liaisonOfficer.inProgress) LiaisonOfficerNameController.onPageLoad(Some(liaisonOfficer.id), NormalMode).url
-      else LoCheckYourAnswersController.onPageLoad(liaisonOfficer.id).url
+      else {
+        val calculatedReturnTo = returnTo match {
+          case Some(SubmissionCya) => Some(SubmissionCyaViaAddedLiaisonOfficers)
+          case _                   => returnTo
+        }
+        LoCheckYourAnswersController.onPageLoad(liaisonOfficer.id, calculatedReturnTo).url
+      }
 
     liaisonOfficer.fullName.map { answer =>
       SummaryListRowViewModel(
@@ -107,7 +117,7 @@ class AddedLiaisonOfficersViewModel @Inject() (
           ).withVisuallyHiddenText(messages("addedLiaisonOfficers.summary.action.hidden", answer)),
           ActionItemViewModel(
             content = messages("site.remove"),
-            href = RemoveLiaisonOfficerController.onPageLoad(liaisonOfficer.id).url
+            href = RemoveLiaisonOfficerController.onPageLoad(liaisonOfficer.id, returnTo).url
           ).withVisuallyHiddenText(messages("addedLiaisonOfficers.summary.action.hidden", answer))
         )
       )

@@ -21,7 +21,7 @@ import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
 import handlers.JourneyHandler.clearStalePages
 import models.journeydata.thirdparty.ThirdPartyOrganisations
-import models.{Mode, YesNoAnswer}
+import models.{Mode, ReturnTo, YesNoAnswer}
 import navigation.Navigator
 import pages.thirdparty.ProductsManagedByThirdPartyPage
 import play.api.Logging
@@ -54,22 +54,23 @@ class ProductsManagedByThirdPartyController @Inject() (
 
   val form: Form[YesNoAnswer] = formProvider("productsManagedByThirdParty.error.required")
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
 
-    val preparedForm = request.journeyData.thirdPartyOrganisations.flatMap(_.managedByThirdParty) match {
-      case None        => form
-      case Some(value) => form.fill(value)
+      val preparedForm = request.journeyData.thirdPartyOrganisations.flatMap(_.managedByThirdParty) match {
+        case None        => form
+        case Some(value) => form.fill(value)
+      }
+
+      Ok(view(preparedForm, mode, returnTo))
     }
 
-    Ok(view(preparedForm, mode))
-  }
-
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
             val existingSection = request.journeyData.thirdPartyOrganisations
             val updatedSection  =
@@ -87,7 +88,7 @@ class ProductsManagedByThirdPartyController @Inject() (
                     existingSection,
                     updatedSection,
                     mode,
-                    None
+                    returnTo
                   )
                 )
               }
@@ -99,5 +100,5 @@ class ProductsManagedByThirdPartyController @Inject() (
               }
           }
         )
-  }
+    }
 }

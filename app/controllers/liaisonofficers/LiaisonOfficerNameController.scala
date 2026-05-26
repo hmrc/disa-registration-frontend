@@ -21,7 +21,7 @@ import controllers.routes.TaskListController
 import controllers.actions.*
 import forms.LiaisonOfficerNameFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.requests.DataRequest
 import navigation.Navigator
@@ -60,23 +60,23 @@ class LiaisonOfficerNameController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(id: Option[String], mode: Mode): Action[AnyContent] =
+  def onPageLoad(id: Option[String], mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData andThen auditContinuation(LiaisonOfficers.sectionName)) {
       implicit request =>
         existingOfficer(id) match {
-          case Some(officer) => Ok(view(officer.id, form.fill(officer.fullName.getOrElse("")), mode))
+          case Some(officer) => Ok(view(officer.id, form.fill(officer.fullName.getOrElse("")), mode, returnTo))
           case None          =>
-            if (canAddAnother(appConfig)) Ok(view(uuidGenerator.generate(), form, mode))
+            if (canAddAnother(appConfig)) Ok(view(uuidGenerator.generate(), form, mode, returnTo))
             else Redirect(TaskListController.onPageLoad())
         }
     }
 
-  def onSubmit(id: String, mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
+  def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode))),
+          formWithErrors => Future.successful(BadRequest(view(id, formWithErrors, mode, returnTo))),
           answer => {
             val updatedSection =
               request.journeyData.liaisonOfficers
@@ -96,7 +96,7 @@ class LiaisonOfficerNameController @Inject() (
                         LiaisonOfficerNamePage(id),
                         updatedSection,
                         mode,
-                        None
+                        returnTo
                       )
                     )
                   }
@@ -109,7 +109,7 @@ class LiaisonOfficerNameController @Inject() (
             }
           }
         )
-  }
+    }
 
   private def existingOfficer(id: Option[String])(implicit request: DataRequest[_]): Option[LiaisonOfficer] =
     for {

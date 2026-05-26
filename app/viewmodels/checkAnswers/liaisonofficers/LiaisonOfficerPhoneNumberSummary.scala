@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.liaisonofficers
 
 import controllers.liaisonofficers.routes.LiaisonOfficerPhoneNumberController
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.liaisonofficers.LiaisonOfficer
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -27,7 +27,9 @@ import viewmodels.implicits.*
 
 object LiaisonOfficerPhoneNumberSummary {
 
-  def row(liaisonOfficer: LiaisonOfficer)(implicit messages: Messages): Option[SummaryListRow] =
+  def row(liaisonOfficer: LiaisonOfficer, returnTo: Option[ReturnTo])(implicit
+    messages: Messages
+  ): Option[SummaryListRow] =
     liaisonOfficer.phoneNumber.map { answer =>
       SummaryListRowViewModel(
         key = "liaisonOfficerPhoneNumber.checkYourAnswersLabel",
@@ -35,7 +37,7 @@ object LiaisonOfficerPhoneNumberSummary {
         actions = Seq(
           ActionItemViewModel(
             "site.change",
-            LiaisonOfficerPhoneNumberController.onPageLoad(liaisonOfficer.id, CheckMode).url
+            LiaisonOfficerPhoneNumberController.onPageLoad(liaisonOfficer.id, CheckMode, returnTo).url
           )
             .withVisuallyHiddenText(messages("liaisonOfficerPhoneNumber.change.hidden"))
         )

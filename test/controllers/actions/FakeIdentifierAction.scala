@@ -18,15 +18,18 @@ package controllers.actions
 
 import models.requests.IdentifierRequest
 import play.api.mvc.*
+import uk.gov.hmrc.auth.core.CredentialRole
 import utils.TestData
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject() (bodyParsers: PlayBodyParsers) extends IdentifierAction with TestData {
+class FakeIdentifierAction @Inject() (role: CredentialRole, bodyParsers: PlayBodyParsers)
+    extends IdentifierAction
+    with TestData {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(IdentifierRequest(request, testGroupId, testCredentials, testCredentialRoleUser))
+    block(IdentifierRequest(request, testGroupId, testCredentials, role))
 
   override def parser: BodyParser[AnyContent] =
     bodyParsers.default

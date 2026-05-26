@@ -41,8 +41,10 @@ class AuditServiceSpec extends SpecBase {
 
   private val service = applicationBuilder(
     Some(emptyJourneyData),
-    inject.bind[AuditConnector].toInstance(mockAuditConnector),
-    inject.bind[FrontendAppConfig].toInstance(mockAppConfig)
+    overrides = Seq(
+      inject.bind[AuditConnector].toInstance(mockAuditConnector),
+      inject.bind[FrontendAppConfig].toInstance(mockAppConfig)
+    )
   )
     .configure(Map("auditing.enabled" -> "true"))
     .build()

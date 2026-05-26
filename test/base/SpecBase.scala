@@ -36,9 +36,11 @@ import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.mvc.RequestHeader
 import play.api.mvc.Results.{BadRequest, InternalServerError}
 import play.api.test.FakeRequest
+import play.api.test.Helpers.stubControllerComponents
 import play.api.{Application, inject}
 import repositories.{BusinessVerificationLockoutRepository, SessionRepository}
 import services.*
+import uk.gov.hmrc.auth.core.{CredentialRole, User}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -117,28 +119,34 @@ trait SpecBase
 
   protected def applicationBuilder(
     journeyData: Option[JourneyData],
-    overrides: GuiceableModule*
-  ): GuiceApplicationBuilder =
+    credentialRole: CredentialRole = User,
+    overrides: Seq[GuiceableModule] = Nil
+  ): GuiceApplicationBuilder = {
+
+    val bodyParsers = stubControllerComponents().parsers
+
+    val defaultOverrides: Seq[GuiceableModule] = Seq(
+      inject.bind[DataRequiredAction].to[DataRequiredActionImpl],
+      inject.bind[IdentifierAction].toInstance(new FakeIdentifierAction(credentialRole, bodyParsers)),
+      inject
+        .bind[GetOrCreateJourneyDataAction]
+        .toInstance(new FakeGetOrCreateJourneyDataAction(journeyData.getOrElse(emptyJourneyData))),
+      inject.bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
+      inject
+        .bind[AuditContinuationAction]
+        .toInstance(new FakeAuditContinuationAction(journeyData.getOrElse(emptyJourneyData))),
+      inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
+      inject.bind[GrsService].toInstance(mockGrsService),
+      inject.bind[ErrorHandler].toInstance(mockErrorHandler),
+      inject.bind[RegisteredAddressUprnService].toInstance(mockRegisteredAddressUprnService),
+      inject.bind[AddressLookupService].toInstance(mockAddressLookupService),
+      inject.bind[BusinessVerificationLockoutService].toInstance(mockBvLockoutService),
+      inject.bind[BusinessVerificationLockoutRepository].toInstance(mockBvLockoutRepository)
+    )
+
     new GuiceApplicationBuilder()
-      .overrides(
-        inject.bind[DataRequiredAction].to[DataRequiredActionImpl],
-        inject.bind[IdentifierAction].to[FakeIdentifierAction],
-        inject
-          .bind[GetOrCreateJourneyDataAction]
-          .toInstance(new FakeGetOrCreateJourneyDataAction(journeyData.getOrElse(emptyJourneyData))),
-        inject.bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
-        inject
-          .bind[AuditContinuationAction]
-          .toInstance(new FakeAuditContinuationAction(journeyData.getOrElse(emptyJourneyData))),
-        inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
-        inject.bind[GrsService].toInstance(mockGrsService),
-        inject.bind[ErrorHandler].toInstance(mockErrorHandler),
-        inject.bind[RegisteredAddressUprnService].toInstance(mockRegisteredAddressUprnService),
-        inject.bind[AddressLookupService].toInstance(mockAddressLookupService),
-        inject.bind[BusinessVerificationLockoutService].toInstance(mockBvLockoutService),
-        inject.bind[BusinessVerificationLockoutRepository].toInstance(mockBvLockoutRepository)
-      )
-      .overrides(overrides: _*)
+      .overrides((defaultOverrides ++ overrides).distinct: _*)
+  }
 
   def injector: Injector = app.injector
 }

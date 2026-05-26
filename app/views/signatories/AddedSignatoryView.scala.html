@@ -15,25 +15,26 @@
  *@
 
 @import controllers.signatories.routes.{AddedSignatoryController, RemoveSignatoryController}
+@import models.ReturnTo
 @import models.journeydata.signatories.*
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import viewmodels.checkAnswers.signatories.*
 @import viewmodels.LegendSize.Large
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukButton: GovukButton,
-    hmrcPageHeading: HmrcPageHeading,
-    addedSignatoriesViewModel: AddedSignatoriesViewModel
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        hmrcPageHeading: HmrcPageHeading,
+        addedSignatoriesViewModel: AddedSignatoriesViewModel
 )
 
-@(form: Form[_], summary: AddedSignatoriesSummary)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], summary: AddedSignatoriesSummary, mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages(summary.title, summary.count), Some(messages("sectionTitle.signatories")))) {
 
-    @formHelper(action = AddedSignatoryController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = AddedSignatoryController.onSubmit(mode, returnTo), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(
@@ -50,7 +51,7 @@
 
         <p class="govuk-body">@HtmlFormat.raw(messages("addedSignatory.p", summary.maxSignatories))</p>
 
-        @addedSignatoriesViewModel(form, summary.inProgress, summary.complete)
+        @addedSignatoriesViewModel(form, summary.inProgress, summary.complete, returnTo)
 
         @govukButton(
             ButtonViewModel(messages("site.saveAndContinue"))

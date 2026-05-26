@@ -76,14 +76,14 @@ class LoCheckYourAnswersControllerSpec extends SpecBase {
 
         val expectedRows =
           Seq(
-            LiaisonOfficerNameSummary.row(liaisonOfficer),
-            LiaisonOfficerEmailSummary.row(liaisonOfficer),
-            LiaisonOfficerPhoneNumberSummary.row(liaisonOfficer),
-            LiaisonOfficerCommunicationSummary.row(liaisonOfficer)
+            LiaisonOfficerNameSummary.row(liaisonOfficer, None),
+            LiaisonOfficerEmailSummary.row(liaisonOfficer, None),
+            LiaisonOfficerPhoneNumberSummary.row(liaisonOfficer, None),
+            LiaisonOfficerCommunicationSummary.row(liaisonOfficer, None)
           ).flatten
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(SummaryListViewModel(expectedRows))(
+        contentAsString(result) mustEqual view(SummaryListViewModel(expectedRows), None)(
           request,
           messages(application)
         ).toString
