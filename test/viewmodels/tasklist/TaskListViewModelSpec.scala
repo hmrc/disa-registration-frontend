@@ -23,7 +23,7 @@ class TaskListViewModelSpec extends SpecBase {
 
   "TaskListViewModel" - {
 
-    "must lock all tasks except organisation information until organisation information is complete" in {
+    "must unlock all task sections except submit after successful business verification" in {
       val viewModel = TaskListViewModel(emptyJourneyDataWithBusinessVerification, User)
 
       task(viewModel, "taskList.organisationInformation.add").href.value mustBe
@@ -39,17 +39,21 @@ class TaskListViewModelSpec extends SpecBase {
         "taskList.certificatesOfAuthority.add",
         "taskList.liaisonOfficers.add",
         "taskList.signatories.add",
-        "taskList.thirdPartyOrganisations.add",
-        "taskList.submit.checkAnswers"
+        "taskList.thirdPartyOrganisations.add"
       ).foreach { messageKey =>
         val row = task(viewModel, messageKey)
 
-        row.href mustBe None
-        row.status.content mustBe messages("taskList.status.cannotStartYet")
+        row.href must not be empty
+        row.status.content mustBe messages("taskList.status.notYetStarted")
+        row.status.tagClass mustBe Some("govuk-tag--blue")
       }
+
+      val submitRow = task(viewModel, "taskList.submit.checkAnswers")
+      submitRow.href mustBe None
+      submitRow.status.content mustBe messages("taskList.status.cannotStartYet")
     }
 
-    "must show organisation information in progress while keeping remaining tasks locked" in {
+    "must show organisation information in progress while keeping remaining task sections accessible" in {
       val journeyData = emptyJourneyDataWithBusinessVerification.copy(
         organisationDetails = Some(inProgressTaskListOrganisationDetails)
       )
@@ -60,11 +64,11 @@ class TaskListViewModelSpec extends SpecBase {
         "taskList.status.inProgress"
       )
       task(viewModel, "taskList.organisationInformation.add").status.tagClass mustBe Some("govuk-tag--blue")
-      task(viewModel, "taskList.organisationEmail.add").href mustBe None
-      task(viewModel, "taskList.organisationEmail.add").status.content mustBe messages("taskList.status.cannotStartYet")
+      task(viewModel, "taskList.organisationEmail.add").href must not be empty
+      task(viewModel, "taskList.organisationEmail.add").status.content mustBe messages("taskList.status.notYetStarted")
     }
 
-    "must unlock remaining tasks once organisation information is complete" in {
+    "must mark organisation information complete while keeping other incomplete sections accessible" in {
       val viewModel =
         TaskListViewModel(
           emptyJourneyDataWithBusinessVerification.copy(organisationDetails =

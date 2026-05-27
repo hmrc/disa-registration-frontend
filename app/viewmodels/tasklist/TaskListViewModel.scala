@@ -82,9 +82,8 @@ object TaskListViewModel {
   def apply(journeyData: JourneyData, credentialRole: CredentialRole)(implicit
     messages: Messages
   ): TaskListViewModel = {
-    val organisationInformationCompleted = isOrganisationInformationComplete(journeyData)
-    val remainingTasksUnlocked           = organisationInformationCompleted
-    val submitAnswersAvailable           = canSubmitAnswers(journeyData, credentialRole)
+    val remainingTasksUnlocked = canAccessTaskList(journeyData)
+    val submitAnswersAvailable = canSubmitAnswers(journeyData, credentialRole)
 
     TaskListViewModel(
       sections = Seq(
