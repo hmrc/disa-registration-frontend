@@ -18,6 +18,7 @@ package forms
 
 import forms.EmailVerificationCodeFormProvider.emailVerificationCodePattern
 import forms.behaviours.StringFieldBehaviours
+import org.scalacheck.Gen.alphaChar
 import play.api.data.FormError
 
 class EmailVerificationCodeFormProviderSpec extends StringFieldBehaviours {
@@ -45,14 +46,16 @@ class EmailVerificationCodeFormProviderSpec extends StringFieldBehaviours {
       form,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, tooLongKey, Seq(maxLength))
+      lengthError = FormError(fieldName, tooLongKey, Seq(maxLength)),
+      charType = alphaChar
     )
 
     behave like fieldWithMinLength(
       form,
       fieldName,
       minLength = minLength,
-      lengthError = FormError(fieldName, tooShortKey, Seq(minLength))
+      lengthError = FormError(fieldName, tooShortKey, Seq(minLength)),
+      charType = alphaChar
     )
 
     behave like fieldWithPattern(
