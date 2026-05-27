@@ -86,7 +86,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[OrganisationEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(
+        contentAsString(result) mustEqual view(form, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -120,7 +120,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[OrganisationEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(oldEmail), NormalMode)(
+        contentAsString(result) mustEqual view(form.fill(oldEmail), NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -233,7 +233,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -261,7 +261,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(
+        contentAsString(result) mustEqual view(boundForm, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -448,7 +448,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[OrganisationEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(oldEmail), CheckMode)(
+        contentAsString(result) mustEqual view(form.fill(oldEmail), CheckMode, None)(
           request,
           messages(application)
         ).toString

@@ -86,7 +86,10 @@ class DeclarationForIsaManagersControllerSpec extends SpecBase {
 
         val jd          = emptyJourneyData.withIsaProducts(CashIsas)
         val application =
-          applicationBuilder(journeyData = Some(jd), bind[SubmissionService].toInstance(mockSubmissionService)).build()
+          applicationBuilder(
+            journeyData = Some(jd),
+            overrides = Seq(bind[SubmissionService].toInstance(mockSubmissionService))
+          ).build()
 
         when(mockSubmissionService.declareAndSubmit(any(), any(), eqTo(jd))(any(), any()))
           .thenReturn(Future.successful(testFormBundleId))

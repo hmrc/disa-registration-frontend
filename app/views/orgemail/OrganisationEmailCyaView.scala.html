@@ -17,27 +17,27 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukButton: GovukButton,
-    govukSummaryList: GovukSummaryList,
-    hmrcPageHeading: HmrcPageHeading
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList,
+        hmrcPageHeading: HmrcPageHeading
 )
 
 @(list: SummaryList)(implicit request: Request[_], messages: Messages)
 
-    @layout(pageTitle = titleNoForm(messages("organisationEmailCya.title"))) {
-        @hmrcPageHeading(PageHeading(
-            text = messages("organisationEmailCya.heading"),
-            headingClasses = Some("govuk-heading-l")
-        ))
+@layout(pageTitle = titleNoForm(messages("organisationEmailCya.title"))) {
+    @hmrcPageHeading(PageHeading(
+        text = messages("organisationEmailCya.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
-        @formHelper(action = routes.TaskListController.onPageLoad(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.TaskListController.onPageLoad(), Symbol("autoComplete") -> "off") {
 
-            @govukSummaryList(list)
+        @govukSummaryList(list)
 
-            @govukButton(
-                ButtonViewModel(messages("site.confirmAndSave")).preventingDoubleClick()
-            )
-        }
+        @govukButton(
+            ButtonViewModel(messages("site.confirmAndSave")).preventingDoubleClick()
+        )
     }
+}

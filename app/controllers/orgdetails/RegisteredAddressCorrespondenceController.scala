@@ -42,6 +42,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
@@ -74,32 +75,30 @@ class RegisteredAddressCorrespondenceController @Inject() (
   }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData).async { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
+
       val registeredAddress =
         for {
-          jd   <- request.journeyData
-          bv   <- jd.businessVerification
+          bv   <- request.journeyData.businessVerification
           addr <- bv.registeredAddress
         } yield addr
 
       registeredAddress match {
-        case None       =>
+        case None                    =>
           Future.successful(Redirect(controllers.routes.StartController.onPageLoad()))
-        case Some(addr) =>
+        case Some(registeredAddress) =>
           form
             .bindFromRequest()
             .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, addr, returnTo))),
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, registeredAddress, returnTo))),
               answer => {
-                val existing                   = request.journeyData.flatMap(_.organisationDetails)
-                val updatedOrganisationDetails = buildOrganisationDetails(existing, answer, addr)
-                val finalOrganisationDetails   =
-                  (existing.flatMap(_.registeredAddressCorrespondence), answer) match {
+                val existingSection            = request.journeyData.organisationDetails
+                val updatedOrganisationDetails = buildOrganisationDetails(existingSection, answer, registeredAddress)
+
+                val finalOrganisationDetails =
+                  (existingSection.flatMap(_.registeredAddressCorrespondence), answer) match {
                     case (Some(No), Yes) if updatedOrganisationDetails.addAnotherAddress.nonEmpty =>
-                      clearStalePages(
-                        RegisteredAddressCorrespondencePage,
-                        updatedOrganisationDetails
-                      )
+                      clearStalePages(RegisteredAddressCorrespondencePage, updatedOrganisationDetails)
                     case _                                                                        =>
                       updatedOrganisationDetails
                   }
@@ -110,7 +109,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
                     Redirect(
                       navigator.nextPage(
                         RegisteredAddressCorrespondencePage,
-                        existing,
+                        existingSection,
                         finalOrganisationDetails,
                         mode,
                         returnTo
@@ -119,7 +118,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
                   }
                   .recoverWith { case NonFatal(e) =>
                     logger.warn(
-                      s"Failed updating answers for section [${finalOrganisationDetails.sectionName}] " +
+                      s"Failed updating answers for section [${updatedOrganisationDetails.sectionName}] " +
                         s"for groupId [${request.groupId}] with error: [$e]"
                     )
                     errorHandler.internalServerError

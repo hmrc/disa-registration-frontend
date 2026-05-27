@@ -19,7 +19,7 @@ package controllers.isaproducts
 import controllers.actions.*
 import forms.PeerToPeerPlatformFormProvider
 import handlers.ErrorHandler
-import models.Mode
+import models.{Mode, ReturnTo}
 import models.journeydata.isaproducts.IsaProducts
 import navigation.Navigator
 import pages.isaproducts.PeerToPeerPlatformPage
@@ -52,40 +52,42 @@ class PeerToPeerPlatformController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = (for {
-      journeyData <- request.journeyData
-      section     <- journeyData.isaProducts
-      name        <- section.p2pPlatform
-    } yield form.fill(name)).getOrElse(form)
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
+    implicit request =>
+      val preparedForm = (for {
+        journeyData <- request.journeyData
+        section     <- journeyData.isaProducts
+        name        <- section.p2pPlatform
+      } yield form.fill(name)).getOrElse(form)
 
-    Ok(view(preparedForm, mode))
+      Ok(view(preparedForm, mode, returnTo))
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        answer => {
-          val updatedSection =
-            request.journeyData.flatMap(_.isaProducts) match {
-              case Some(existing) => existing.copy(p2pPlatform = Some(answer))
-              case None           => IsaProducts(p2pPlatform = Some(answer))
-            }
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
+          answer => {
+            val updatedSection =
+              request.journeyData.flatMap(_.isaProducts) match {
+                case Some(existing) => existing.copy(p2pPlatform = Some(answer))
+                case None           => IsaProducts(p2pPlatform = Some(answer))
+              }
 
-          journeyAnswersService
-            .update(updatedSection, request.groupId, request.credentials.providerId)
-            .map { updatedSection =>
-              Redirect(navigator.nextPage(PeerToPeerPlatformPage, updatedSection, mode, None))
-            }
-            .recoverWith { case NonFatal(e) =>
-              logger.warn(
-                s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
-              )
-              errorHandler.internalServerError
-            }
-        }
-      )
+            journeyAnswersService
+              .update(updatedSection, request.groupId, request.credentials.providerId)
+              .map { updatedSection =>
+                Redirect(navigator.nextPage(PeerToPeerPlatformPage, updatedSection, mode, returnTo))
+              }
+              .recoverWith { case NonFatal(e) =>
+                logger.warn(
+                  s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                )
+                errorHandler.internalServerError
+              }
+          }
+        )
   }
 }

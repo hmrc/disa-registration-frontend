@@ -206,6 +206,59 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
+    "must create OrganisationDetails when none exists and successfully submit address" in {
+
+      val journeyDataNoOrgDetails =
+        journeyData.copy(
+          organisationDetails = Some(
+            OrganisationDetails(
+              addAnotherAddress = Some(
+                addAnotherAddress.copy(
+                  addresses = addresses
+                )
+              )
+            )
+          )
+        )
+
+      val expectedSection =
+        OrganisationDetails(
+          correspondenceAddress = Some(
+            CorrespondenceAddress.fromLookup(address1)
+          ),
+          addAnotherAddress = Some(
+            AddAnotherAddress(
+              postcode = testString,
+              filter = None,
+              addresses = addresses,
+              selectedAddress = Some(SelectedCorrespondenceAddress.Address(0))
+            )
+          )
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(
+            any[Writes[OrganisationDetails]],
+            any
+          )
+      ).thenReturn(Future.successful(expectedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyDataNoOrgDetails)).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody("value" -> "0")
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+      }
+    }
+
     "must redirect when none of these selected" in {
 
       val expected =

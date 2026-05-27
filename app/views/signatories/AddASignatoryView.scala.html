@@ -17,36 +17,37 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 @import controllers.signatories.routes.*
 @import controllers.routes.*
+@import models.ReturnTo
 
 @this(
-  layout: templates.Layout,
-  govukDetails: GovukDetails,
-  govukButton: GovukButton,
-  hmrcPageHeading: HmrcPageHeading
+        layout: templates.Layout,
+        govukDetails: GovukDetails,
+        govukButton: GovukButton,
+        hmrcPageHeading: HmrcPageHeading
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("addASignatory.title"), Some(messages("sectionTitle.signatories")))) {
 
     @hmrcPageHeading(PageHeading(
-      text = messages("addASignatory.heading"),
-      section = Some(messages("sectionTitle.signatories")),
-      headingClasses = Some("govuk-heading-l"),
-      captionClasses = Some("govuk-caption-l")
+        text = messages("addASignatory.heading"),
+        section = Some(messages("sectionTitle.signatories")),
+        headingClasses = Some("govuk-heading-l"),
+        captionClasses = Some("govuk-caption-l")
     ))
 
     <p class="govuk-body">@messages("addASignatory.p1")</p>
 
     @govukDetails(Details(
-      summary = Text(messages("addASignatory.details.summary")),
-      content = Text(messages("addASignatory.details.content"))
+        summary = Text(messages("addASignatory.details.summary")),
+        content = Text(messages("addASignatory.details.content"))
     ))
 
     <div class="govuk-button-group">
         @govukButton(
             ButtonViewModel(messages("addASignatory.details.button"))
-            .asLink(SignatoryNameController.onPageLoad(id = None, mode = NormalMode).url)
+            .asLink(SignatoryNameController.onPageLoad(id = None, mode = NormalMode, returnTo = returnTo).url)
         )
         <p class="govuk-body">
             <a href="@controllers.routes.TaskListController.onPageLoad().url" class="govuk-link" target="_blank" rel="noreferrer noopener">@messages("addASignatory.details.link")</a>

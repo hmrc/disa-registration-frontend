@@ -33,8 +33,10 @@ class SubmissionServiceSpec extends SpecBase {
 
   private val service = applicationBuilder(
     Some(emptyJourneyData),
-    inject.bind[DisaRegistrationConnector].toInstance(mockDisaRegistrationConnector),
-    inject.bind[AuditService].toInstance(mockAuditService)
+    overrides = Seq(
+      inject.bind[DisaRegistrationConnector].toInstance(mockDisaRegistrationConnector),
+      inject.bind[AuditService].toInstance(mockAuditService)
+    )
   ).build().injector.instanceOf[SubmissionService]
 
   private val credentials    = Credentials(testString, testString)

@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.thirdparty.finalcya
 
 import controllers.thirdparty.routes.*
-import models.CheckMode
+import models.{CheckMode, ReturnTo}
 import models.journeydata.thirdparty.ThirdPartyOrganisations
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
@@ -28,7 +28,9 @@ import viewmodels.implicits.*
 
 object ThirdPartyConnectedOrganisationsControllerSummary {
 
-  def row(thirdPartyOrganisations: ThirdPartyOrganisations)(implicit messages: Messages): Option[SummaryListRow] = {
+  def row(thirdPartyOrganisations: ThirdPartyOrganisations, returnTo: Option[ReturnTo] = None)(implicit
+    messages: Messages
+  ): Option[SummaryListRow] = {
 
     val connectedOrgs = thirdPartyOrganisations.connectedOrganisations
 
@@ -55,7 +57,7 @@ object ThirdPartyConnectedOrganisationsControllerSummary {
           ActionItemViewModel(
             "site.change",
             ThirdPartyConnectedOrganisationsController
-              .onPageLoad(CheckMode)
+              .onPageLoad(CheckMode, returnTo)
               .url
           ).withVisuallyHiddenText(
             messages("connectedOrganisations.change.hidden")

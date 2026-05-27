@@ -21,35 +21,35 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukErrorSummary: GovukErrorSummary,
-    govukInput: GovukInput,
-    govukButton: GovukButton,
-    hmrcPageHeading: HmrcPageHeading
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukInput: GovukInput,
+        govukButton: GovukButton,
+        hmrcPageHeading: HmrcPageHeading
 )
 
-@(form: Form[_], mode: Mode, email: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, returnTo: Option[ReturnTo], email: String)(implicit request: Request[_], messages: Messages)
 
 @changeEmailLink = @{
-  HtmlFormat.raw(
-    s"""<a class="govuk-link govuk-body" href="${OrganisationEmailAddressController.onPageLoad(mode).url}">${messages("emailVerificationCode.p2.link")}</a>"""
-  )
+    HtmlFormat.raw(
+        s"""<a class="govuk-link govuk-body" href="${OrganisationEmailAddressController.onPageLoad(mode, returnTo).url}">${messages("emailVerificationCode.p2.link")}</a>"""
+    )
 }
 
 @layout(pageTitle = title(form, messages("emailVerificationCode.title"), Some(messages("sectionTitle.organisationEmail")))) {
 
-    @formHelper(action = EmailVerificationCodeController.onSubmit()) {
+    @formHelper(action = EmailVerificationCodeController.onSubmit(mode, returnTo)) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
         @hmrcPageHeading(PageHeading(
-          text = messages("emailVerificationCode.heading"),
-          section = Some(messages("sectionTitle.organisationEmail")),
-          headingClasses = Some("govuk-heading-l"),
-          captionClasses = Some("govuk-caption-l")
+            text = messages("emailVerificationCode.heading"),
+            section = Some(messages("sectionTitle.organisationEmail")),
+            headingClasses = Some("govuk-heading-l"),
+            captionClasses = Some("govuk-caption-l")
         ))
 
         <p class="govuk-body">@HtmlFormat.raw(messages("emailVerificationCode.p1", email))</p>
@@ -69,15 +69,15 @@
                 ButtonViewModel(messages("site.saveAndContinue"))
             )
             @govukButton(
-              Button(
-                preventDoubleClick = Some(true),
-                classes = "govuk-button--secondary",
-                attributes = Map(
-                  "formaction" -> controllers.orgemail.routes.EmailVerificationCodeController.requestNewCode().url,
-                  "formmethod" -> "post"
-                ),
-                content = Text(messages("emailVerificationCode.link"))
-              )
+                Button(
+                    preventDoubleClick = Some(true),
+                    classes = "govuk-button--secondary",
+                    attributes = Map(
+                        "formaction" -> controllers.orgemail.routes.EmailVerificationCodeController.requestNewCode(mode, returnTo).url,
+                        "formmethod" -> "post"
+                    ),
+                    content = Text(messages("emailVerificationCode.link"))
+                )
             )
         </div>
     }

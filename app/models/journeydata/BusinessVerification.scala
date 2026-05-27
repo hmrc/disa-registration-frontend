@@ -24,7 +24,8 @@ case class BusinessVerification(
   ctUtr: Option[String],
   registeredAddress: Option[RegisteredAddress],
   companyName: Option[String],
-  businessPartnerId: Option[String]
+  businessPartnerId: Option[String],
+  companyNumber: Option[String]
 ) extends TaskListSection {
   override def sectionName: String = "businessVerification"
 }

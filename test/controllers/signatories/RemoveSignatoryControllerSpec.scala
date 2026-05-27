@@ -84,7 +84,10 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[RemoveSignatoryView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(existingId, existingName, form, None)(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
@@ -146,7 +149,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(existingId, existingName, boundForm)(
+        contentAsString(result) mustEqual view(existingId, existingName, boundForm, None)(
           request,
           messages(application)
         ).toString

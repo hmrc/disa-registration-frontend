@@ -102,6 +102,7 @@ trait TestData extends Generators {
     ctUtr = Some("1234567890"),
     registeredAddress = Some(testRegisteredAddress),
     companyName = Some(testString),
+    companyNumber = Some(testString),
     businessPartnerId = Some(testString)
   )
 }

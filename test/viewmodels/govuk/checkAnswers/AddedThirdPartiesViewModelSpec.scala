@@ -56,7 +56,7 @@ class AddedThirdPartiesViewModelSpec extends SpecBase {
       val vm   = app.injector.instanceOf[AddedThirdPartiesViewModel]
       val form = new YesNoAnswerFormProvider()("error.required")
 
-      val html = vm(form, Nil, Seq(tp1))
+      val html = vm(form, Nil, Seq(tp1), None)
 
       html.toString must not include (messages("addedThirdParties.complete"))
       html.toString must include("Org 1")
@@ -67,7 +67,7 @@ class AddedThirdPartiesViewModelSpec extends SpecBase {
       val vm   = app.injector.instanceOf[AddedThirdPartiesViewModel]
       val form = new YesNoAnswerFormProvider()("error.required")
 
-      val html = vm(form, Seq(tp1), Nil)
+      val html = vm(form, Seq(tp1), Nil, None)
 
       html.toString must include(messages("addedThirdParties.inProgress"))
     }
@@ -77,7 +77,7 @@ class AddedThirdPartiesViewModelSpec extends SpecBase {
       val vm   = app.injector.instanceOf[AddedThirdPartiesViewModel]
       val form = new YesNoAnswerFormProvider()("error.required")
 
-      val html = vm(form, Seq(tp1), Nil)
+      val html = vm(form, Seq(tp1), Nil, None)
       html.toString must include(messages("addedThirdParties.addAnother"))
     }
 
@@ -89,7 +89,7 @@ class AddedThirdPartiesViewModelSpec extends SpecBase {
       val max   = app.injector.instanceOf[FrontendAppConfig].maxThirdParties
       val items = (1 to max).map(i => ThirdParty(i.toString, Some(s"Org $i")))
 
-      val html = vm(form, items, Nil)
+      val html = vm(form, items, Nil, None)
       html.toString must not include (messages("addedThirdParties.addAnother"))
     }
 
@@ -98,7 +98,7 @@ class AddedThirdPartiesViewModelSpec extends SpecBase {
       val vm   = app.injector.instanceOf[AddedThirdPartiesViewModel]
       val form = new YesNoAnswerFormProvider()("error.required")
 
-      val html = vm(form, Seq(tp1), Nil)
+      val html = vm(form, Seq(tp1), Nil, None)
 
       html.toString must include(
         ThirdPartyOrgDetailsController.onPageLoad(Some("1"), NormalMode, None).url
@@ -110,7 +110,7 @@ class AddedThirdPartiesViewModelSpec extends SpecBase {
       val vm   = app.injector.instanceOf[AddedThirdPartiesViewModel]
       val form = new YesNoAnswerFormProvider()("error.required")
 
-      val html = vm(form, Nil, Seq(tp1))
+      val html = vm(form, Nil, Seq(tp1), None)
 
       html.toString must include(
         ThirdPartyCheckYourAnswersController.onPageLoad("1").url

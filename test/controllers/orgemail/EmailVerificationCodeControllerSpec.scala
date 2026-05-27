@@ -55,13 +55,13 @@ class EmailVerificationCodeControllerSpec extends SpecBase {
   }
 
   lazy val routeUrl: String =
-    EmailVerificationCodeController.onPageLoad().url
+    EmailVerificationCodeController.onPageLoad(NormalMode, None).url
 
   lazy val submitUrl: String =
-    EmailVerificationCodeController.onSubmit().url
+    EmailVerificationCodeController.onSubmit(NormalMode, None).url
 
   lazy val requestNewCodeUrl: String =
-    EmailVerificationCodeController.requestNewCode().url
+    EmailVerificationCodeController.requestNewCode(NormalMode).url
 
   val formProvider: EmailVerificationCodeFormProvider =
     new EmailVerificationCodeFormProvider()
@@ -98,7 +98,7 @@ class EmailVerificationCodeControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[EmailVerificationCodeView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, email)(
+        contentAsString(result) mustEqual view(form, NormalMode, None, email)(
           request,
           messages(application)
         ).toString
@@ -200,7 +200,7 @@ class EmailVerificationCodeControllerSpec extends SpecBase {
           .update(any[OrganisationEmail], any[String], any[String])(any[Writes[OrganisationEmail]], any)
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(expectedForm, NormalMode, email)(
+        contentAsString(result) mustEqual view(expectedForm, NormalMode, None, email)(
           request,
           messages(application)
         ).toString
@@ -315,7 +315,7 @@ class EmailVerificationCodeControllerSpec extends SpecBase {
           .sendCode(eqTo(email))(any[HeaderCarrier])
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual EmailVerificationCodeController.onPageLoad().url
+        redirectLocation(result).value mustEqual EmailVerificationCodeController.onPageLoad(NormalMode).url
       }
     }
 

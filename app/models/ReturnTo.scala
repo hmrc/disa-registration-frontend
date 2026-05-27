@@ -22,8 +22,13 @@ sealed trait ReturnTo
 
 object ReturnTo {
 
-  case object FinalCya extends ReturnTo
+  case object MultipleThirdPartiesCya extends ReturnTo
   case object OrganisationDetailsCya extends ReturnTo
+  case object SubmissionCya extends ReturnTo
+  case object SubmissionCyaViaAddedThirdParties extends ReturnTo
+  case object MultipleThirdPartiesCyaViaAddedThirdParties extends ReturnTo
+  case object SubmissionCyaViaAddedLiaisonOfficers extends ReturnTo
+  case object SubmissionCyaViaAddedSignatories extends ReturnTo
 
   implicit val queryStringBindable: QueryStringBindable[ReturnTo] =
     new QueryStringBindable[ReturnTo] {
@@ -33,15 +38,25 @@ object ReturnTo {
         params: Map[String, Seq[String]]
       ): Option[Either[String, ReturnTo]] =
         params.get(key).flatMap(_.headOption).map {
-          case "FinalCya"               => Right(FinalCya)
-          case "OrganisationDetailsCya" => Right(OrganisationDetailsCya)
-          case other                    => Left(s"Unknown returnTo value: $other")
+          case "MultipleThirdPartiesCya"                     => Right(MultipleThirdPartiesCya)
+          case "OrganisationDetailsCya"                      => Right(OrganisationDetailsCya)
+          case "SubmissionCya"                               => Right(SubmissionCya)
+          case "SubmissionCyaViaAddedThirdParties"           => Right(SubmissionCyaViaAddedThirdParties)
+          case "MultipleThirdPartiesCyaViaAddedThirdParties" => Right(MultipleThirdPartiesCyaViaAddedThirdParties)
+          case "SubmissionCyaViaAddedLiaisonOfficers"        => Right(SubmissionCyaViaAddedLiaisonOfficers)
+          case "SubmissionCyaViaAddedSignatories"            => Right(SubmissionCyaViaAddedSignatories)
+          case other                                         => Left(s"Unknown returnTo value: $other")
         }
 
       override def unbind(key: String, value: ReturnTo): String =
         value match {
-          case FinalCya               => s"$key=FinalCya"
-          case OrganisationDetailsCya => s"$key=OrganisationDetailsCya"
+          case MultipleThirdPartiesCya                     => s"$key=MultipleThirdPartiesCya"
+          case OrganisationDetailsCya                      => s"$key=OrganisationDetailsCya"
+          case SubmissionCya                               => s"$key=SubmissionCya"
+          case SubmissionCyaViaAddedThirdParties           => s"$key=SubmissionCyaViaAddedThirdParties"
+          case MultipleThirdPartiesCyaViaAddedThirdParties => s"$key=MultipleThirdPartiesCyaViaAddedThirdParties"
+          case SubmissionCyaViaAddedLiaisonOfficers        => s"$key=SubmissionCyaViaAddedLiaisonOfficers"
+          case SubmissionCyaViaAddedSignatories            => s"$key=SubmissionCyaViaAddedSignatories"
         }
     }
 }

@@ -35,22 +35,13 @@ object RegisteredIsaManagerPage extends PageWithDependents[OrganisationDetails] 
         currentAnswers.zRefNumber.nonEmpty
 
     if (shouldClear) {
-      List(
-        new ClearablePage[OrganisationDetails] {
-          override def clearAnswer(section: OrganisationDetails): OrganisationDetails =
-            section.copy(zRefNumber = None)
-        }
-      )
+      List(ZReferenceNumberPage)
     } else {
       Nil
     }
   }
 
   def resumeNormalMode(currentAnswers: OrganisationDetails): Boolean =
-    currentAnswers.registeredToManageIsa match {
-      case Some(Yes) if currentAnswers.zRefNumber.isEmpty => true
-      case Some(No)                                       => true
-      case None                                           => true
-      case _                                              => false
-    }
+    currentAnswers.registeredToManageIsa.contains(Yes) && currentAnswers.zRefNumber.isEmpty
+
 }
