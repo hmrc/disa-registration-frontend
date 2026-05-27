@@ -30,7 +30,8 @@ trait AuthTestSupport extends TestData {
     groupId: Option[String] = Some(testGroupId),
     affinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Organisation),
     credentials: Option[Credentials] = Some(testCredentials),
-    credentialRole: Option[CredentialRole] = Some(testCredentialRoleUser)
+    credentialRole: Option[CredentialRole] = Some(testCredentialRoleUser),
+    allEnrolments: Enrolments = Enrolments(Set.empty)
   ): AuthConnector =
     new AuthConnector {
 
@@ -39,8 +40,8 @@ trait AuthTestSupport extends TestData {
         retrieval: Retrieval[A]
       )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[A] = {
 
-        val result: Option[String] ~ Option[AffinityGroup] ~ Option[Credentials] ~ Option[CredentialRole] =
-          new ~(new ~(new ~(groupId, affinityGroup), credentials), credentialRole)
+        val result: Option[String] ~ Option[AffinityGroup] ~ Option[Credentials] ~ Option[CredentialRole] ~ Enrolments =
+          new ~(new ~(new ~(new ~(groupId, affinityGroup), credentials), credentialRole), allEnrolments)
 
         Future.successful(result.asInstanceOf[A])
       }

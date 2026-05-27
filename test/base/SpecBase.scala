@@ -115,6 +115,7 @@ trait SpecBase
     )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))
+    when(mockSessionRepository.keepAlive(any[String])).thenReturn(Future.successful(()))
   }
 
   protected def applicationBuilder(

@@ -79,6 +79,8 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
 
   lazy val accessibilityStatementUrl = "/accessibility-statement/disa-registration-frontend"
 
+  lazy val manageIsaEnrolmentKey: String = getString("enrolments.manageIsa")
+
   lazy val maxLiaisonOfficers: Int = getInt("maxLiaisonOfficers")
   lazy val maxSignatories: Int     = getInt("max-signatories")
   lazy val maxThirdParties: Int    = getInt("max-third-parties")

@@ -610,6 +610,12 @@ registrationSubmitted.guidance.linkText = read the guidance in the ISA managersâ
 
 registrationSubmitted.feedback.linkText = What did you think of this service?
 
+## Organisation is enrolled
+organisationIsEnrolled.title = Your organisation has enrolled on the Manage ISAs service
+organisationIsEnrolled.heading = Your organisation has enrolled on the Manage ISAs service
+organisationIsEnrolled.p1 = You can access a service through your organisationâ€™s {0}.
+organisationIsEnrolled.businessTaxAccount.linkText = business tax account
+
 ### Submission Check Your Answers
 submissionCya.title = Check your answers
 submissionCya.heading = Check your answers
