@@ -61,9 +61,9 @@ class DeclarationForIsaManagersController @Inject() (
   def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     submissionService
       .declareAndSubmit(request.credentials, request.credentialRole, request.journeyData)
-      .map { subscriptionId =>
+      .map { formBundleId =>
         logger.info(
-          s"Successful submission by IM with groupId [${request.groupId}] returned subscriberId [$subscriptionId]"
+          s"Successful submission by IM with groupId [${request.groupId}] returned formBundleId [$formBundleId]"
         )
         Redirect(ConfirmationController.onPageLoad())
       }

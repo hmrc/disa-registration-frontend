@@ -202,7 +202,7 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
     "return EnrolmentSubmissionResponse when backend returns 200 OK" in {
       val responseBody =
         s"""
-           | {"subscriptionId": "$testString"}
+           | {"formBundleId": "$testString"}
            | """.stripMargin
       stubPost(declareAndSubmitUrl, OK, responseBody)
 

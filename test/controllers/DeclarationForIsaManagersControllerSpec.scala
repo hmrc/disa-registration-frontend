@@ -91,10 +91,8 @@ class DeclarationForIsaManagersControllerSpec extends SpecBase {
             overrides = Seq(bind[SubmissionService].toInstance(mockSubmissionService))
           ).build()
 
-        val subscriptionId = "receipt-123"
-
         when(mockSubmissionService.declareAndSubmit(any(), any(), eqTo(jd))(any(), any()))
-          .thenReturn(Future.successful(subscriptionId))
+          .thenReturn(Future.successful(testFormBundleId))
 
         running(application) {
           val request = FakeRequest(POST, routes.DeclarationForIsaManagersController.onSubmit().url)

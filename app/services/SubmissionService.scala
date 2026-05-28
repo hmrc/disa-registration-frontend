@@ -35,9 +35,9 @@ class SubmissionService @Inject() (connector: DisaRegistrationConnector, auditSe
   ): Future[String] =
     connector
       .declareAndSubmit(journeyData.groupId)
-      .map { case EnrolmentSubmissionResponse(receiptId) =>
+      .map { case EnrolmentSubmissionResponse(formBundleId) =>
         auditService.auditEnrolmentSubmission(Success, credentials, credentialRole, journeyData, None)
-        receiptId
+        formBundleId
       }
       .recoverWith { case e: Throwable =>
         auditService.auditEnrolmentSubmission(Failure, credentials, credentialRole, journeyData, Some(e.getMessage))
