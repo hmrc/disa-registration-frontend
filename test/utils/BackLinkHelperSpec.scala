@@ -16,14 +16,27 @@
 
 package utils
 
-import models.{CheckMode, Mode, NormalMode}
+import models.{CheckMode, NormalMode}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import play.api.mvc.Call
 
-object BackLinkHelper {
+class BackLinkHelperSpec extends AnyWordSpec with Matchers {
 
-  def backLinkHref(call: Call, mode: Mode): Option[String] =
-    mode match {
-      case NormalMode => Some(call.url)
-      case CheckMode  => None
+  private val testCall = Call("GET", "/previous-page")
+
+  "BackLinkHelper.backLinkHref" should {
+
+    "return Some(call.url) when in NormalMode" in {
+      val result = BackLinkHelper.backLinkHref(testCall, NormalMode)
+
+      result shouldBe Some("/previous-page")
     }
+
+    "return None when in CheckMode" in {
+      val result = BackLinkHelper.backLinkHref(testCall, CheckMode)
+
+      result shouldBe None
+    }
+  }
 }

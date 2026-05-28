@@ -115,7 +115,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val request = FakeRequest(GET, SignatoryJobTitleController.onPageLoad(existingId, CheckMode).url)
 
         val result = route(application, request).value
-        val html = contentAsString(result)
+        val html   = contentAsString(result)
 
         status(result) mustEqual OK
 

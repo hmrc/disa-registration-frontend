@@ -111,7 +111,6 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
             )
           )
 
-
         val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
         running(application) {
@@ -119,7 +118,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           val request = FakeRequest(GET, ThirdPartyManagingReturnsController.onPageLoad(existingId, CheckMode).url)
 
           val result = route(application, request).value
-          val html = contentAsString(result)
+          val html   = contentAsString(result)
 
           status(result) mustEqual OK
 
