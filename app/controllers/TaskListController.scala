@@ -31,6 +31,7 @@ class TaskListController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   getUprn: EnrichRegisteredAddressUprnAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: TaskListView
 ) extends FrontendBaseController
@@ -38,9 +39,9 @@ class TaskListController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen getUprn) { implicit request =>
+    (identify andThen getData andThen getUprn andThen requireData) { implicit request =>
       request.journeyData match {
-        case Some(journeyData) if TaskListViewModel.canAccessTaskList(journeyData) =>
+        case journeyData if TaskListViewModel.canAccessTaskList(journeyData) =>
           Ok(view(TaskListViewModel(journeyData, request.credentialRole)))
 
         case _ =>

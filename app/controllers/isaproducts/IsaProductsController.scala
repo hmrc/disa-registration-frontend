@@ -41,8 +41,7 @@ class IsaProductsController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  // TODO Replace getOrCreateAction with DataRetrievalAction when ATs begin from /start page DFI-1709
-  getOrCreateJourneyDataAction: GetOrCreateJourneyDataAction,
+  requireData: DataRequiredAction,
   auditContinuation: AuditContinuationAction,
   formProvider: IsaProductsFormProvider,
   journeyAnswersService: JourneyAnswersService,
@@ -57,7 +56,7 @@ class IsaProductsController @Inject() (
   val form: Form[Set[IsaProduct]] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getOrCreateJourneyDataAction andThen auditContinuation(IsaProducts.sectionName)) {
+    (identify andThen getData andThen requireData andThen auditContinuation(IsaProducts.sectionName)) {
       implicit request =>
         val preparedForm = (for {
           products <- request.journeyData.isaProducts

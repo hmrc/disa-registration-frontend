@@ -18,6 +18,7 @@ package controllers.isaproducts
 
 import base.SpecBase
 import controllers.isaproducts.routes.IsaProductsController
+import controllers.routes.StartController
 import forms.IsaProductsFormProvider
 import models.NormalMode
 import models.journeydata.JourneyData
@@ -51,22 +52,6 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
     "must return OK and the correct view for a GET" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, isaProductsRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[IsaProductsView]
-
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(form, NormalMode, None)(request, messages(application)).toString
-      }
-    }
-
-    "must return OK and the correct view for a GET if no existing journey data found" in {
-      val application = applicationBuilder(journeyData = None).build()
 
       running(application) {
         val request = FakeRequest(GET, isaProductsRoute)
@@ -156,6 +141,19 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "must redirect to StartController if missing required data" in {
+      val application = applicationBuilder(journeyData = None).build()
+
+      running(application) {
+        val request = FakeRequest(GET, isaProductsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual StartController.onPageLoad().url
       }
     }
 
