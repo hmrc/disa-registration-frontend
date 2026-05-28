@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
 
 @this(
     appConfig: FrontendAppConfig,
@@ -29,7 +30,7 @@
     hmrcStandardPage: HmrcStandardPage
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, showHmrcBanner: Boolean = false, backLinkHref: Option[String] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @head = {
 
@@ -63,7 +64,18 @@
         phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
     ),
     isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
-    backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None,
+    backLink =
+        if (showBackLink) {
+            Some(
+                backLinkHref match {
+                    case Some(href) =>
+                        BackLink.withDefaultText(href)
+
+                    case None =>
+                        BackLink.mimicsBrowserBackButtonViaJavaScript
+                }
+            )
+        } else None,
     serviceNavigation = Some(ServiceNavigation(
         serviceName = Some(messages("service.name")),
         serviceUrl = Some(routes.IndexController.onPageLoad().url)

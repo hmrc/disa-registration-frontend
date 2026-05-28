@@ -17,13 +17,14 @@
 package controllers.liaisonofficers
 
 import base.SpecBase
-import controllers.liaisonofficers.routes.LiaisonOfficerEmailController
+import controllers.liaisonofficers.routes._
 import controllers.routes.IndexController
 import forms.LiaisonOfficerEmailFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
+import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
@@ -79,10 +80,56 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerEmailView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form, NormalMode, None)(
+        val contentString = contentAsString(result)
+
+        contentString mustEqual view(existingId, existingName, form, NormalMode, None)(
           request,
           messages(application)
         ).toString
+
+        val doc      = Jsoup.parse(contentString)
+        val backLink = doc.select("a.govuk-back-link")
+        backLink.attr("href") must include(
+          LiaisonOfficerNameController
+            .onPageLoad(Some(existingId), NormalMode, None)
+            .url
+        )
+      }
+    }
+
+    "must render JS back link in CheckMode" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          liaisonOfficers = Some(
+            LiaisonOfficers(
+              Seq(
+                LiaisonOfficer(existingId, Some(existingName), email = Some(existingEmail))
+              )
+            )
+          )
+        )
+
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, LiaisonOfficerEmailController.onPageLoad(existingId, CheckMode).url)
+
+        val result = route(application, request).value
+        val html   = contentAsString(result)
+
+        status(result) mustEqual OK
+
+        val doc = Jsoup.parse(html)
+
+        val backLink = doc.select("a.govuk-back-link")
+
+        backLink.size() mustEqual 1
+        backLink.attr("href") mustEqual "#"
+        backLink.attr("data-module") mustEqual "hmrc-back-link"
       }
     }
 

@@ -16,7 +16,9 @@
 
 @import viewmodels.InputWidth._
 @import controllers.liaisonofficers.routes.LiaisonOfficerEmailController
+@import controllers.liaisonofficers.routes.LiaisonOfficerNameController
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import utils.BackLinkHelper
 
 @this(
     layout: templates.Layout,
@@ -28,7 +30,7 @@
 
 @(id: String, name: String, form: Form[_], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("liaisonOfficerEmail.title", name), Some(messages("sectionTitle.liaisonOfficers")))) {
+@layout(pageTitle = title(form, messages("liaisonOfficerEmail.title", name), Some(messages("sectionTitle.liaisonOfficers"))), backLinkHref = BackLinkHelper.backLinkHref(LiaisonOfficerNameController.onPageLoad(Some(id), mode, returnTo), mode)) {
 
     @formHelper(action = LiaisonOfficerEmailController.onSubmit(id, mode, returnTo)) {
 

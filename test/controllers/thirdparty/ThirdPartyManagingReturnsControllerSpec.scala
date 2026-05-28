@@ -18,12 +18,13 @@ package controllers.thirdparty
 
 import base.SpecBase
 import controllers.routes.IndexController
-import controllers.thirdparty.routes._
+import controllers.thirdparty.routes.*
 import forms.YesNoAnswerFormProvider
 import models.YesNoAnswer
 import models.journeydata.JourneyData
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.{CheckMode, NormalMode}
+import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
@@ -76,14 +77,59 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
         running(application) {
           val request = FakeRequest(GET, routeUrl)
 
-          val result = route(application, request).value
-          val view   = application.injector.instanceOf[ThirdPartyManagingReturnsView]
+          val result        = route(application, request).value
+          val view          = application.injector.instanceOf[ThirdPartyManagingReturnsView]
+          val contentString = contentAsString(result)
 
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(existingId, name, form, NormalMode, None)(
+          contentString mustEqual view(existingId, name, form, NormalMode, None)(
             request,
             messages(application)
           ).toString
+
+          val doc      = Jsoup.parse(contentString)
+          val backLink = doc.select("a.govuk-back-link")
+          backLink.attr("href") must include(
+            ThirdPartyOrgDetailsController
+              .onPageLoad(Some(existingId), NormalMode, None)
+              .url
+          )
+        }
+      }
+
+      "must render JS back link in CheckMode" in {
+
+        val journeyData =
+          JourneyData(
+            groupId = testGroupId,
+            enrolmentId = testString,
+            thirdPartyOrganisations = Some(
+              ThirdPartyOrganisations(
+                None,
+                Seq(ThirdParty(existingId, Some(name))),
+                Seq.empty
+              )
+            )
+          )
+
+
+        val application = applicationBuilder(journeyData = Some(journeyData)).build()
+
+        running(application) {
+
+          val request = FakeRequest(GET, ThirdPartyManagingReturnsController.onPageLoad(existingId, CheckMode).url)
+
+          val result = route(application, request).value
+          val html = contentAsString(result)
+
+          status(result) mustEqual OK
+
+          val doc = Jsoup.parse(html)
+
+          val backLink = doc.select("a.govuk-back-link")
+
+          backLink.size() mustEqual 1
+          backLink.attr("href") mustEqual "#"
+          backLink.attr("data-module") mustEqual "hmrc-back-link"
         }
       }
 

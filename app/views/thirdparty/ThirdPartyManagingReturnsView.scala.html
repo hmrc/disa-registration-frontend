@@ -15,7 +15,9 @@
  *@
 
 @import controllers.thirdparty.routes.ThirdPartyManagingReturnsController
+@import controllers.thirdparty.routes.ThirdPartyOrgDetailsController
 @import viewmodels.LegendSize.Large
+@import utils.BackLinkHelper
 
 @this(
     layout: templates.Layout,
@@ -27,7 +29,7 @@
 
 @(id: String, name: String, form: Form[_], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("returnsManagedByThirdParty.title", name), Some(messages("sectionTitle.thirdParty")))) {
+@layout(pageTitle = title(form, messages("returnsManagedByThirdParty.title", name), Some(messages("sectionTitle.thirdParty"))), backLinkHref = BackLinkHelper.backLinkHref(ThirdPartyOrgDetailsController.onPageLoad(Some(id), mode, returnTo), mode)) {
 
     @formHelper(action = ThirdPartyManagingReturnsController.onSubmit(id, mode, returnTo), Symbol("autoComplete") -> "off") {
 

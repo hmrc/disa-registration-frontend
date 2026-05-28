@@ -16,7 +16,9 @@
 
 @import viewmodels.InputWidth._
 @import controllers.signatories.routes.SignatoryJobTitleController
+@import controllers.signatories.routes.SignatoryNameController
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import utils.BackLinkHelper
 
 @this(
     layout: templates.Layout,
@@ -28,7 +30,7 @@
 
 @(id: String, name: String, form: Form[_], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("signatoryJobTitle.title", name), Some(messages("sectionTitle.signatories")))) {
+@layout(pageTitle = title(form, messages("signatoryJobTitle.title", name), Some(messages("sectionTitle.signatories"))), backLinkHref = BackLinkHelper.backLinkHref(SignatoryNameController.onPageLoad(Some(id), mode, returnTo), mode)) {
 
     @formHelper(action = SignatoryJobTitleController.onSubmit(id, mode, returnTo)) {
 

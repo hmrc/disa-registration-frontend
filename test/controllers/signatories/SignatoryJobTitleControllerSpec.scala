@@ -18,11 +18,12 @@ package controllers.signatories
 
 import base.SpecBase
 import controllers.routes.IndexController
-import controllers.signatories.routes.SignatoryJobTitleController
+import controllers.signatories.routes._
 import forms.SignatoryJobTitleFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.{CheckMode, NormalMode}
+import org.jsoup.Jsoup
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
@@ -74,13 +75,57 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SignatoryJobTitleView]
-
+        val view          = application.injector.instanceOf[SignatoryJobTitleView]
+        val contentString = contentAsString(result)
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(existingId, existingName, form, NormalMode, None)(
+        contentString mustEqual view(existingId, existingName, form, NormalMode, None)(
           request,
           messages(application)
         ).toString
+
+        val doc      = Jsoup.parse(contentString)
+        val backLink = doc.select("a.govuk-back-link")
+        backLink.attr("href") must include(
+          SignatoryNameController
+            .onPageLoad(Some(existingId), NormalMode, None)
+            .url
+        )
+      }
+    }
+
+    "must render JS back link in CheckMode" in {
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          signatories = Some(
+            Signatories(
+              Seq(
+                Signatory(existingId, Some(existingName), jobTitle = None)
+              )
+            )
+          )
+        )
+
+      val application = applicationBuilder(journeyData = Some(journeyData)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, SignatoryJobTitleController.onPageLoad(existingId, CheckMode).url)
+
+        val result = route(application, request).value
+        val html = contentAsString(result)
+
+        status(result) mustEqual OK
+
+        val doc = Jsoup.parse(html)
+
+        val backLink = doc.select("a.govuk-back-link")
+
+        backLink.size() mustEqual 1
+        backLink.attr("href") mustEqual "#"
+        backLink.attr("data-module") mustEqual "hmrc-back-link"
       }
     }
 
