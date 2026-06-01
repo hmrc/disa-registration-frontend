@@ -49,6 +49,37 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
 
   "GET /start" should {
 
+    "redirect to the organisation is enrolled page when Tax Enrolments has a pending subscription" in {
+      val subscriptions =
+        s"""
+           |[
+           |  {
+           |    "created": 1482329348256,
+           |    "lastModified": 1482329348256,
+           |    "serviceName": "HMRC-DISA-ORG",
+           |    "identifiers": [],
+           |    "callback": "url passed in by the subscriber service",
+           |    "state": "PENDING",
+           |    "groupIdentifier": "$testGroupId"
+           |  }
+           |]
+           |""".stripMargin
+
+      stubAuth()
+      stubTaxEnrolmentSubscriptions(responseBody = subscriptions)
+
+      val request =
+        FakeRequest(GET, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+
+      val result = route(app, request).get
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some(
+        routes.OrganisationIsEnrolledController.onPageLoad(enrolmentInProgress = true).url
+      )
+    }
+
     "redirect to TaskList when business verification has passed" in {
 
       val response =

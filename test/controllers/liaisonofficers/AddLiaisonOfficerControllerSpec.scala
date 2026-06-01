@@ -45,13 +45,15 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
         when(mockSessionRepository.keepAlive(any)).thenReturn(Future.unit)
 
         val authAction = new AuthenticatedIdentifierAction(
-          successfulAuthConnector(
+          authConnector = successfulAuthConnector(
             groupId = Some(testGroupId),
             affinityGroup = Some(AffinityGroup.Organisation)
           ),
-          application.injector.instanceOf[config.FrontendAppConfig],
-          mockSessionRepository,
-          bodyParsers
+          config = application.injector.instanceOf[config.FrontendAppConfig],
+          taxEnrolmentsService = mockTaxEnrolmentsService,
+          errorHandler = mockErrorHandler,
+          sessionRepository = mockSessionRepository,
+          parser = bodyParsers
         )
 
         val controller = new AddLiaisonOfficerController(
@@ -77,13 +79,15 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
         val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
 
         val authAction = new AuthenticatedIdentifierAction(
-          successfulAuthConnector(
+          authConnector = successfulAuthConnector(
             groupId = Some(testGroupId),
             affinityGroup = Some(AffinityGroup.Agent)
           ),
-          application.injector.instanceOf[config.FrontendAppConfig],
-          mockSessionRepository,
-          bodyParsers
+          config = application.injector.instanceOf[config.FrontendAppConfig],
+          taxEnrolmentsService = mockTaxEnrolmentsService,
+          errorHandler = mockErrorHandler,
+          sessionRepository = mockSessionRepository,
+          parser = bodyParsers
         )
 
         val controller = new AddLiaisonOfficerController(

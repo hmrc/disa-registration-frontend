@@ -17,7 +17,7 @@
 package utils
 
 import play.api.http.Status.{OK, UNAUTHORIZED}
-import utils.WiremockHelper.stubPost
+import utils.WiremockHelper.{stubGet, stubPost}
 
 trait CommonStubs extends TestData {
 
@@ -32,9 +32,17 @@ trait CommonStubs extends TestData {
          | }""".stripMargin
 
     stubPost("/auth/authorise", status = OK, responseBody = body)
+    stubTaxEnrolmentSubscriptions()
   }
 
   def stubAuthFail(): Unit = stubPost(url = "/auth/authorise", status = UNAUTHORIZED, responseBody = "{}")
+
+  def stubTaxEnrolmentSubscriptions(
+    groupId: String = testGroupId,
+    status: Int = OK,
+    responseBody: String = "[]"
+  ): Unit =
+    stubGet(s"/tax-enrolments/groups/$groupId/subscriptions", status = status, body = responseBody)
 
   val testHeaders: Seq[(String, String)] = Seq("Authorization" -> "Bearer mock-bearer-token")
 
