@@ -27,7 +27,8 @@ trait CommonStubs extends TestData {
          | "groupIdentifier": "$testGroupId",
          | "affinityGroup": "Organisation",
          | "optionalCredentials": {"providerId": "id", "providerType": "GovernmentGateway"},
-          |"credentialRole": "user"
+         | "credentialRole": "user",
+         | "allEnrolments": []
          | }""".stripMargin
 
     stubPost("/auth/authorise", status = OK, responseBody = body)

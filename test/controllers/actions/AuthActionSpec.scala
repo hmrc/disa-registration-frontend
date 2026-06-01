@@ -345,6 +345,129 @@ class AuthActionSpec extends SpecBase {
       }
     }
 
+    "the user has already enrolled for Manage ISA" - {
+
+      "must redirect to the organisation is enrolled page" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            authConnector = successfulAuthConnector(
+              affinityGroup = Some(Organisation),
+              groupId = Some(testGroupId),
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser),
+              allEnrolments = Enrolments(Set(Enrolment(appConfig.manageIsaEnrolmentKey)))
+            ),
+            config = appConfig,
+            sessionRepository = mockSessionRepository,
+            parser = bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest(GET, routes.TaskListController.onPageLoad().url))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.OrganisationIsEnrolledController.onPageLoad().url)
+        }
+      }
+
+      "must allow the organisation is enrolled page to render" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            authConnector = successfulAuthConnector(
+              affinityGroup = Some(Organisation),
+              groupId = Some(testGroupId),
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser),
+              allEnrolments = Enrolments(Set(Enrolment(appConfig.manageIsaEnrolmentKey)))
+            ),
+            config = appConfig,
+            sessionRepository = mockSessionRepository,
+            parser = bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     =
+            controller.onPageLoad()(FakeRequest(GET, routes.OrganisationIsEnrolledController.onPageLoad().url))
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must allow the confirmation page to render" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            authConnector = successfulAuthConnector(
+              affinityGroup = Some(Organisation),
+              groupId = Some(testGroupId),
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser),
+              allEnrolments = Enrolments(Set(Enrolment(appConfig.manageIsaEnrolmentKey)))
+            ),
+            config = appConfig,
+            sessionRepository = mockSessionRepository,
+            parser = bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest(GET, routes.ConfirmationController.onPageLoad().url))
+
+          status(result) mustBe OK
+        }
+      }
+
+      "must not redirect when the Manage ISA enrolment is not activated" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val inactiveEnrolment = Enrolment(
+            key = appConfig.manageIsaEnrolmentKey,
+            identifiers = Seq.empty,
+            state = "NotYetActivated"
+          )
+
+          val authAction = new AuthenticatedIdentifierAction(
+            authConnector = successfulAuthConnector(
+              affinityGroup = Some(Organisation),
+              groupId = Some(testGroupId),
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser),
+              allEnrolments = Enrolments(Set(inactiveEnrolment))
+            ),
+            config = appConfig,
+            sessionRepository = mockSessionRepository,
+            parser = bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest(GET, routes.TaskListController.onPageLoad().url))
+
+          status(result) mustBe OK
+        }
+      }
+    }
+
     "the auth response does not match any expected pattern" - {
 
       "must redirect to the unauthorised page (default case)" in {

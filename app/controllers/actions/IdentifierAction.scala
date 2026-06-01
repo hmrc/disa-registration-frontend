@@ -53,22 +53,28 @@ class AuthenticatedIdentifierAction @Inject() (
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised().retrieve(groupIdentifier and affinityGroup and credentials and credentialRole) {
-      case Some(groupId) ~ Some(Organisation) ~ Some(credentials) ~ Some(role) =>
+    authorised().retrieve(groupIdentifier and affinityGroup and credentials and credentialRole and allEnrolments) {
+      case Some(groupId) ~ Some(Organisation) ~ Some(credentials) ~ Some(role) ~ enrolments =>
         sessionRepository
           .keepAlive(credentials.providerId)
           .recover { case NonFatal(e) =>
             logger.warn(s"Failed to keep session alive for userId: [${credentials.providerId}]", e)
           }
-          .flatMap(_ => block(IdentifierRequest(request, groupId, credentials, role)))
-      case _ ~ _ ~ None ~ _ | _ ~ _ ~ _ ~ None                                 =>
+          .flatMap { _ =>
+            if (isAlreadyEnrolled(enrolments) && !isAlreadyEnrolledRedirectExempt(request.path)) {
+              Future.successful(Redirect(routes.OrganisationIsEnrolledController.onPageLoad()))
+            } else {
+              block(IdentifierRequest(request, groupId, credentials, role))
+            }
+          }
+      case _ ~ _ ~ None ~ _ ~ _ | _ ~ _ ~ _ ~ None ~ _                                      =>
         logger.warn(s"Authorisation failed due to missing credentials or credentialRole")
         Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
-      case Some(_) ~ Some(affinity) ~ _ ~ _                                    =>
+      case Some(_) ~ Some(affinity) ~ _ ~ _ ~ _                                             =>
         Future.successful(
           Redirect(routes.UnsupportedAffinityGroupController.onPageLoad(affinityGroup = affinity.toString))
         )
-      case _                                                                   =>
+      case _                                                                                =>
         Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     }
   } recover {
@@ -77,4 +83,15 @@ class AuthenticatedIdentifierAction @Inject() (
     case _: AuthorisationException =>
       Redirect(routes.UnauthorisedController.onPageLoad())
   }
+
+  private def isAlreadyEnrolled(enrolments: Enrolments): Boolean =
+    enrolments
+      .getEnrolment(config.manageIsaEnrolmentKey)
+      .exists(_.isActivated)
+
+  private def isAlreadyEnrolledRedirectExempt(path: String): Boolean =
+    Seq(
+      routes.ConfirmationController.onPageLoad().url,
+      routes.OrganisationIsEnrolledController.onPageLoad().url
+    ).exists(route => path == route || path.endsWith(route))
 }

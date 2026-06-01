@@ -44,6 +44,7 @@ class FrontendAppConfigSpec extends SpecBase {
     "https://www.gov.uk/government/collections/isa-managers-guidance"
 
   private val businessTaxAccountUrl = "https://businesstaxaccount.co.uk"
+  private val manageIsaEnrolmentKey = "HMRC-DISA-ORG"
 
   private val configuration: Configuration = Configuration.from(
     Map(
@@ -58,6 +59,7 @@ class FrontendAppConfigSpec extends SpecBase {
       "urls.external.p2pLoansInformation"                                          -> p2pLoansInformationUrl,
       "urls.external.isaManagerGuidanceCollection"                                 -> isaManagersGuidanceCollectionUrl,
       "urls.external.businessTaxAccount"                                           -> businessTaxAccountUrl,
+      "enrolments.manageIsa"                                                       -> manageIsaEnrolmentKey,
       "features.welsh-translation"                                                 -> true,
       "timeout-dialog.timeout"                                                     -> 900,
       "timeout-dialog.countdown"                                                   -> 120,
@@ -186,6 +188,10 @@ class FrontendAppConfigSpec extends SpecBase {
 
     "must return isaManagersGuidanceUrl" in {
       appConfig.isaManagersGuidanceUrl mustBe isaManagersGuidanceCollectionUrl
+    }
+
+    "must return manageIsaEnrolmentKey" in {
+      appConfig.manageIsaEnrolmentKey mustBe manageIsaEnrolmentKey
     }
 
     "must generate incorporatedEntityIdentificationHost" in {
