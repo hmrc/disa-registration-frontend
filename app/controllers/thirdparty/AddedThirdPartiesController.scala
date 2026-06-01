@@ -80,7 +80,14 @@ class AddedThirdPartiesController @Inject() (
 
         if (count == appConfig.maxThirdParties) {
           Redirect(
-            navigator.nextPageFromAddedThirdParties(YesNoAnswer.No, count, connectedOrganisations, mode, returnTo)
+            navigator.nextPageFromAddedThirdParties(
+              YesNoAnswer.No,
+              count,
+              connectedOrganisations,
+              mode,
+              returnTo,
+              hasInProgressItems = inProgress.nonEmpty
+            )
           )
         } else {
           form
@@ -96,7 +103,16 @@ class AddedThirdPartiesController @Inject() (
                   )
                 ),
               answer =>
-                Redirect(navigator.nextPageFromAddedThirdParties(answer, count, connectedOrganisations, mode, returnTo))
+                Redirect(
+                  navigator.nextPageFromAddedThirdParties(
+                    answer,
+                    count,
+                    connectedOrganisations,
+                    mode,
+                    returnTo,
+                    hasInProgressItems = inProgress.nonEmpty
+                  )
+                )
             )
         }
       }

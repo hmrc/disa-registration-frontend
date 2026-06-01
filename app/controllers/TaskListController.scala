@@ -21,6 +21,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.tasklist.TaskListViewModel
 import views.html.TaskListView
 
 import javax.inject.Inject
@@ -30,6 +31,7 @@ class TaskListController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   getUprn: EnrichRegisteredAddressUprnAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: TaskListView
 ) extends FrontendBaseController
@@ -37,7 +39,13 @@ class TaskListController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen getUprn) { implicit request =>
-      Ok(view())
+    (identify andThen getData andThen getUprn andThen requireData) { implicit request =>
+      request.journeyData match {
+        case journeyData if TaskListViewModel.canAccessTaskList(journeyData) =>
+          Ok(view(TaskListViewModel(journeyData, request.credentialRole)))
+
+        case _ =>
+          Redirect(routes.StartController.onPageLoad())
+      }
     }
 }

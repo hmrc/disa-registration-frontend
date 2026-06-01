@@ -18,14 +18,17 @@ package utils
 
 import generators.Generators
 import models.YesNoAnswer
-import models.journeydata.{BusinessVerification, CorrespondenceAddress, JourneyData, OrganisationDetails, RegisteredAddress}
+import models.journeydata.{BusinessVerification, CorrespondenceAddress, JourneyData, OrganisationDetails, OrganisationEmail, RegisteredAddress}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
 import models.journeydata.certificatesofauthority.FinancialOrganisation.EuropeanInstitution
+import models.journeydata.isaproducts.IsaProduct.CashIsas
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.ByEmail
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.signatories.{Signatories, Signatory}
+import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -69,6 +72,107 @@ trait TestData extends Generators {
   val testLiaisonOfficers = LiaisonOfficers(Seq(LiaisonOfficer(id = testString, fullName = Some(testString))))
 
   val testSignatories = Signatories(Seq(Signatory(id = testString, fullName = Some(testString))))
+
+  def emptyJourneyDataWithBusinessVerification: JourneyData =
+    emptyJourneyData.copy(businessVerification = Some(testBV))
+
+  def emptyJourneyDataWithFailedBusinessVerification: JourneyData =
+    emptyJourneyDataWithBusinessVerification.copy(
+      businessVerification = Some(testBV.copy(businessVerificationPassed = Some(false)))
+    )
+
+  val completeTaskListOrganisationDetails: OrganisationDetails =
+    OrganisationDetails(
+      registeredToManageIsa = Some(YesNoAnswer.No),
+      tradingUsingDifferentName = Some(YesNoAnswer.No),
+      fcaNumber = Some("123456"),
+      registeredAddressCorrespondence = Some(YesNoAnswer.Yes),
+      orgTelephoneNumber = Some("01234567890")
+    )
+
+  val inProgressTaskListOrganisationDetails: OrganisationDetails =
+    OrganisationDetails(registeredToManageIsa = Some(YesNoAnswer.Yes))
+
+  val completeTaskListOrganisationEmail: OrganisationEmail =
+    OrganisationEmail(Some("test@example.com"), Some(true))
+
+  val unverifiedTaskListOrganisationEmail: OrganisationEmail =
+    OrganisationEmail(Some("test@example.com"), Some(false))
+
+  val completeTaskListIsaProducts: IsaProducts =
+    IsaProducts(isaProducts = Some(Seq(CashIsas)))
+
+  val completeTaskListCertificatesOfAuthority: CertificatesOfAuthority =
+    CertificatesOfAuthority(certificatesYesNo = Some(Yes), fcaArticles = Some(Seq(Article14)))
+
+  def inProgressTaskListLiaisonOfficer(id: String, fullName: String = "Started"): LiaisonOfficer =
+    LiaisonOfficer(id, fullName = Some(fullName))
+
+  def completeTaskListLiaisonOfficer(id: String, fullName: String = "Complete Liaison Officer"): LiaisonOfficer =
+    LiaisonOfficer(
+      id = id,
+      fullName = Some(fullName),
+      phoneNumber = Some("01234567890"),
+      communication = Set(ByEmail),
+      email = Some("liaison@example.com")
+    )
+
+  def liaisonOfficersWith(liaisonOfficers: LiaisonOfficer*): LiaisonOfficers =
+    LiaisonOfficers(liaisonOfficers)
+
+  def inProgressTaskListSignatory(id: String, fullName: String = "Started"): Signatory =
+    Signatory(id, fullName = Some(fullName))
+
+  def completeTaskListSignatory(id: String, fullName: String = "Complete Signatory"): Signatory =
+    Signatory(
+      id = id,
+      fullName = Some(fullName),
+      jobTitle = Some("Director")
+    )
+
+  def signatoriesWith(signatories: Signatory*): Signatories =
+    Signatories(signatories)
+
+  def inProgressTaskListThirdParty(id: String, name: String = "Started"): ThirdParty =
+    ThirdParty(id, thirdPartyName = Some(name))
+
+  def completeTaskListThirdParty(id: String, name: String = "Complete Third Party"): ThirdParty =
+    ThirdParty(
+      id = id,
+      thirdPartyName = Some(name),
+      managingIsaReturns = Some(YesNoAnswer.No),
+      usingInvestorFunds = Some(YesNoAnswer.No)
+    )
+
+  val thirdPartyOrganisationsNotUsed: ThirdPartyOrganisations =
+    ThirdPartyOrganisations(managedByThirdParty = Some(YesNoAnswer.No))
+
+  def testThirdPartyOrganisations(
+    thirdParties: Seq[ThirdParty],
+    managedByThirdParty: YesNoAnswer = YesNoAnswer.Yes,
+    connectedOrganisations: Seq[String] = Seq.empty
+  ): ThirdPartyOrganisations =
+    ThirdPartyOrganisations(
+      managedByThirdParty = Some(managedByThirdParty),
+      thirdParties = thirdParties,
+      connectedOrganisations = connectedOrganisations
+    )
+
+  def journeyDataWithThirdParties(thirdParties: Seq[ThirdParty]): JourneyData =
+    testJourneyData.copy(
+      thirdPartyOrganisations = Some(testThirdPartyOrganisations(thirdParties))
+    )
+
+  def completeTaskListJourneyData: JourneyData =
+    emptyJourneyDataWithBusinessVerification.copy(
+      organisationDetails = Some(completeTaskListOrganisationDetails),
+      organisationEmail = Some(completeTaskListOrganisationEmail),
+      isaProducts = Some(completeTaskListIsaProducts),
+      certificatesOfAuthority = Some(completeTaskListCertificatesOfAuthority),
+      liaisonOfficers = Some(LiaisonOfficers(Seq(completeTaskListLiaisonOfficer("lo-1")))),
+      signatories = Some(Signatories(Seq(completeTaskListSignatory("sig-1")))),
+      thirdPartyOrganisations = Some(thirdPartyOrganisationsNotUsed)
+    )
 
   val testJourneyData: JourneyData =
     JourneyData(

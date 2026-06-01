@@ -28,7 +28,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
   "Submission CYA Controller" - {
 
     "must return OK and the correct view for a GET when the user can submit" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(completeTaskListJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.SubmissionCyaController.onPageLoad().url)
@@ -36,7 +36,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view      = application.injector.instanceOf[SubmissionCyaView]
-        val viewModel = SubmissionCyaViewModel(emptyJourneyData)(messages(application))
+        val viewModel = SubmissionCyaViewModel(completeTaskListJourneyData)(messages(application))
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
@@ -44,7 +44,8 @@ class SubmissionCyaControllerSpec extends SpecBase {
     }
 
     "must redirect to TaskList for a GET if user is assistant" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData), credentialRole = Assistant).build()
+      val application =
+        applicationBuilder(journeyData = Some(completeTaskListJourneyData), credentialRole = Assistant).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.SubmissionCyaController.onPageLoad().url)
@@ -56,7 +57,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to JourneyRecoveryController for a GET if no existing data is found" in {
+    "must redirect to StartController for a GET if no existing data is found" in {
       val application = applicationBuilder(journeyData = None).build()
 
       running(application) {
@@ -65,12 +66,25 @@ class SubmissionCyaControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.StartController.onPageLoad().url
+      }
+    }
+
+    "must redirect to TaskList for a GET if required tasks are incomplete" in {
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.SubmissionCyaController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.TaskListController.onPageLoad().url
       }
     }
 
     "must redirect to the declaration page for a POST when the user can submit" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(completeTaskListJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)
@@ -83,7 +97,21 @@ class SubmissionCyaControllerSpec extends SpecBase {
     }
 
     "must redirect back to task list for a POST when the user is assistant" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData), credentialRole = Assistant).build()
+      val application =
+        applicationBuilder(journeyData = Some(completeTaskListJourneyData), credentialRole = Assistant).build()
+
+      running(application) {
+        val request = FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect back to task list for a POST when required tasks are incomplete" in {
+      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
       running(application) {
         val request = FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)

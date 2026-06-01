@@ -31,29 +31,23 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
   private val controllerEndpoint = "/obligations/enrolment/isa/isa-products"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   private val updateJourneyUrl = s"/disa-registration/store/$testGroupId/isaProducts"
-  private val getOrCreateEnrolmentUrl = s"/disa-registration/journey/$testGroupId"
 
   "GET /isa-products" should {
 
     "fetch data from the correct endpoint" in {
-      val getOrCreateResponse =
+      val journeyDataResponse =
         s"""
           |{
-          |  "isNewEnrolmentJourney": true,
-          |  "journeyData": {
           |    "groupId": "$testGroupId",
           |    "enrolmentId": "$testString",
           |     "isaProducts": {
           |       "isaProducts": ["cashJuniorIsas", "cashIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"]
           |     }
-          |  }
           |}
           |""" .stripMargin
 
       stubAuth()
-      stubPut(getOrCreateEnrolmentUrl, OK, getOrCreateResponse)
-      // TODO Replace PUT call with below line when ATs begin from /start page DFI-1709
-      //stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubGet(getJourneyDataUrl, OK, journeyDataResponse)
 
       val request =
         FakeRequest(GET, controllerEndpoint)

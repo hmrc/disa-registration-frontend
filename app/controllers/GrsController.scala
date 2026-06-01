@@ -90,8 +90,8 @@ class GrsController @Inject() (
   ): BusinessVerification = {
     val verificationPassed: Option[Boolean] =
       grs.businessVerificationStatus.map {
-        case BvPass => true
-        case _      => false
+        case BvPass | CtEnrolled => true
+        case _                   => false
       }
 
     val registrationPassed: Option[Boolean] =

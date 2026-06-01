@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import views.html.helper.CSPNonce
 
 @this(
     appConfig: FrontendAppConfig,
@@ -43,6 +44,10 @@
     }
 }
 
+@additionalScripts= {
+    <script @CSPNonce.attr src='@routes.Assets.versioned("javascript/print-link.js")'></script>
+}
+
 @content = {
     @contentBlock
     <p>
@@ -53,7 +58,8 @@
 @hmrcStandardPage(HmrcStandardPageParams(
     pageTitle = Some(pageTitle),
     templateOverrides = TemplateOverrides(
-        additionalHeadBlock = Some(head)
+        additionalHeadBlock = Some(head),
+        additionalScriptsBlock = Some(additionalScripts)
     ),
     serviceURLs = ServiceURLs(
         signOutUrl = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None
@@ -66,6 +72,6 @@
     backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None,
     serviceNavigation = Some(ServiceNavigation(
         serviceName = Some(messages("service.name")),
-        serviceUrl = Some(routes.IndexController.onPageLoad().url)
+        serviceUrl = Some(routes.TaskListController.onPageLoad().url)
       ))
 ))(content)

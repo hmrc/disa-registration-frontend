@@ -14,28 +14,27 @@
  * limitations under the License.
  *@
 
-@import models.NormalMode
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTaskList
+@import viewmodels.tasklist.TaskListViewModel
 
 @this(
   layout: templates.Layout,
-  hmrcPageHeading: HmrcPageHeading
+  hmrcPageHeading: HmrcPageHeading,
+  govukTaskList: GovukTaskList
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(viewModel: TaskListViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("taskList.title"))) {
+@layout(pageTitle = titleNoForm(messages("taskList.title")), showBackLink = false) {
 
-    <div class="govuk-body">
-        @hmrcPageHeading(PageHeading(
-            text = messages("taskList.heading"),
-            headingClasses = Some("govuk-heading-l")
-        ))
-        <a class="govuk-link govuk-body" href="@controllers.isaproducts.routes.IsaProductsController.onPageLoad(NormalMode).url">
-            ISA Products</a>
-        <br>
-        <a class="govuk-link govuk-body" href="@controllers.signatories.routes.SignatoryNameController.onPageLoad(id = None, mode = NormalMode).url">
-            Signatories</a>
+    @hmrcPageHeading(PageHeading(
+        text = messages("taskList.heading"),
+        headingClasses = Some("govuk-heading-l")
+    ))
 
-    </div>
+    @for(section <- viewModel.sections) {
+        <h2 class="govuk-heading-m">@section.heading</h2>
+        @govukTaskList(section.toGovuk)
+    }
 }

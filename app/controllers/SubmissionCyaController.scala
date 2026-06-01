@@ -20,9 +20,9 @@ import controllers.actions.*
 import controllers.routes.TaskListController
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.submission.SubmissionCyaViewModel
+import viewmodels.tasklist.TaskListViewModel
 import views.html.SubmissionCyaView
 
 import javax.inject.Inject
@@ -39,7 +39,7 @@ class SubmissionCyaController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      val canSubmit = request.credentialRole == User
+      val canSubmit = TaskListViewModel.canSubmitAnswers(request.journeyData, request.credentialRole)
 
       if (canSubmit) Ok(view(SubmissionCyaViewModel(request.journeyData)))
       else Redirect(TaskListController.onPageLoad())
@@ -47,7 +47,7 @@ class SubmissionCyaController @Inject() (
 
   def onSubmit(): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      if (request.credentialRole == User) {
+      if (TaskListViewModel.canSubmitAnswers(request.journeyData, request.credentialRole)) {
         Redirect(routes.DeclarationForIsaManagersController.onPageLoad())
       } else {
         Redirect(TaskListController.onPageLoad())

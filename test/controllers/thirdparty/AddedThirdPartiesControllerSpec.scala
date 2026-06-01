@@ -21,8 +21,6 @@ import config.FrontendAppConfig
 import controllers.routes.TaskListController
 import controllers.thirdparty.routes.*
 import models.ReturnTo.MultipleThirdPartiesCya
-import models.YesNoAnswer.Yes
-import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.{NormalMode, YesNoAnswer}
 import org.mockito.Mockito.when
 import play.api.test.FakeRequest
@@ -32,29 +30,21 @@ import views.html.thirdparty.AddedThirdPartiesView
 
 class AddedThirdPartiesControllerSpec extends SpecBase {
 
-  private val routeUrl  = AddedThirdPartiesController.onPageLoad(NormalMode, None).url
-  private val submitUrl = AddedThirdPartiesController.onSubmit(NormalMode).url
+  private def routeUrl: String  = AddedThirdPartiesController.onPageLoad(NormalMode, None).url
+  private def submitUrl: String = AddedThirdPartiesController.onSubmit(NormalMode).url
 
-  private val tp1 = ThirdParty("1", Some("Org 1"))
-  private val tp2 = ThirdParty("2", Some("Org 2"))
+  private val tp1 = inProgressTaskListThirdParty("1", "Org 1")
+  private val tp2 = inProgressTaskListThirdParty("2", "Org 2")
 
-  private def journeyData(thirdParties: Seq[ThirdParty]) =
-    testJourneyData.copy(
-      thirdPartyOrganisations = Some(
-        ThirdPartyOrganisations(
-          managedByThirdParty = Some(Yes),
-          thirdParties = thirdParties,
-          connectedOrganisations = Seq.empty
-        )
-      )
-    )
+  private val completeTp1 = completeTaskListThirdParty("1", "Org 1")
+  private val completeTp2 = completeTaskListThirdParty("2", "Org 2")
 
   "AddedThirdPartiesController" - {
 
     "must return OK on GET when third parties exist" in {
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq(tp1, tp2)))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq(tp1, tp2)))).build()
 
       val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
@@ -87,7 +77,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
           .url
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq(tp1, tp2)))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq(tp1, tp2)))).build()
 
       val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
@@ -127,7 +117,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
     "must redirect to task list when third parties empty" in {
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq.empty))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq.empty))).build()
 
       running(application) {
         val result = route(application, FakeRequest(GET, routeUrl)).value
@@ -142,10 +132,10 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
 
       val maxList =
         (1 to mockAppConfig.maxThirdParties)
-          .map(i => ThirdParty(i.toString, Some(s"Org $i")))
+          .map(i => completeTaskListThirdParty(i.toString, s"Org $i"))
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(maxList))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(maxList))).build()
 
       running(application) {
         val request =
@@ -162,7 +152,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
     "must redirect to ThirdPartiesCheckYourAnswerController when NO selected" in {
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq(tp1)))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq(tp1)))).build()
 
       running(application) {
         val request =
@@ -179,7 +169,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
     "must return BAD_REQUEST when invalid form and below max" in {
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq(tp1)))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq(tp1)))).build()
 
       running(application) {
         val request = FakeRequest(POST, submitUrl)
@@ -193,7 +183,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
     "must redirect to 'Connected Third Parties' page when NO selected and more than one third party exists" in {
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq(tp1, tp2)))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq(completeTp1, completeTp2)))).build()
 
       running(application) {
         val request =
@@ -207,10 +197,27 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
       }
     }
 
+    "must redirect to task list when NO selected and any third party is in progress" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq(completeTp1, tp2)))).build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody("value" -> YesNoAnswer.No.toString)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
     "must redirect to task list when NO selected and only one third party exists" in {
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq(tp1)))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq(tp1)))).build()
 
       running(application) {
         val request =
@@ -227,7 +234,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
     "must redirect to add page when YES selected and multiple but below max" in {
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq(tp1, tp2)))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq(tp1, tp2)))).build()
 
       running(application) {
         val request =
@@ -245,7 +252,7 @@ class AddedThirdPartiesControllerSpec extends SpecBase {
     "must redirect to task list when section exists but no third parties after filtering" in {
 
       val application =
-        applicationBuilder(journeyData = Some(journeyData(Seq.empty))).build()
+        applicationBuilder(journeyData = Some(journeyDataWithThirdParties(Seq.empty))).build()
 
       running(application) {
         val request =

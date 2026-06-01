@@ -1309,8 +1309,6 @@ class NavigatorSpec extends SpecBase {
 
   "liaisonOfficerCheckRoute" - {
 
-    val id = "test-id"
-
     "must go to LO check answers when no returnTo is provided" in {
       val result =
         navigator.nextPageFromAddedLiaisonOfficers(YesNoAnswer.Yes, NormalMode, None)
@@ -1358,8 +1356,6 @@ class NavigatorSpec extends SpecBase {
   }
 
   "thirdPartyCheckModeRoute" - {
-
-    val id = "tp-1"
 
     "must go to Third Party check answers when no returnTo is provided" in {
       val result =
@@ -1511,6 +1507,21 @@ class NavigatorSpec extends SpecBase {
         )
 
       result mustEqual ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode, None)
+    }
+
+    "must go to TaskList when No and any third party is in progress" in {
+
+      val result =
+        navigator.nextPageFromAddedThirdParties(
+          answer = YesNoAnswer.No,
+          count = 2,
+          connectedOrganisations = Nil,
+          mode = NormalMode,
+          returnTo = None,
+          hasInProgressItems = true
+        )
+
+      result mustEqual TaskListController.onPageLoad()
     }
 
     "must go to ThirdPartyConnectedOrganisations when No and returnTo = SubmissionCyaViaAddedThirdParties" in {

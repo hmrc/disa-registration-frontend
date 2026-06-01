@@ -101,9 +101,10 @@ class Navigator @Inject() () {
     count: Int,
     connectedOrganisations: Seq[String] = Nil,
     mode: Mode,
-    returnTo: Option[ReturnTo]
+    returnTo: Option[ReturnTo],
+    hasInProgressItems: Boolean = false
   ): Call =
-    addedThirdPartiesNextPage(answer, count, connectedOrganisations, mode, returnTo)
+    addedThirdPartiesNextPage(answer, count, connectedOrganisations, mode, returnTo, hasInProgressItems)
 
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](
@@ -285,9 +286,12 @@ class Navigator @Inject() () {
     count: Int,
     connectedOrganisations: Seq[String],
     mode: Mode,
-    returnTo: Option[ReturnTo]
+    returnTo: Option[ReturnTo],
+    hasInProgressItems: Boolean
   ): Call =
     (answer, returnTo) match {
+      case (YesNoAnswer.No, _) if hasInProgressItems                          =>
+        TaskListController.onPageLoad()
       case (YesNoAnswer.No, _) if count > 1 && connectedOrganisations.isEmpty =>
         ThirdPartyConnectedOrganisationsController.onPageLoad(NormalMode, returnTo)
       case (YesNoAnswer.No, Some(SubmissionCyaViaAddedThirdParties))          =>
