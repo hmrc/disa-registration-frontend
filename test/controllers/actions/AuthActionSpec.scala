@@ -19,6 +19,7 @@ package controllers.actions
 import base.SpecBase
 import config.FrontendAppConfig
 import controllers.routes
+import org.mockito.ArgumentMatchers.{any => anyArg}
 import org.mockito.Mockito.{times, verify, when}
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
@@ -26,6 +27,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -36,6 +38,20 @@ class AuthActionSpec extends SpecBase {
   }
 
   val config: FrontendAppConfig = injector.instanceOf[FrontendAppConfig]
+
+  private def authenticatedIdentifierAction(
+    authConnector: AuthConnector,
+    appConfig: FrontendAppConfig,
+    bodyParsers: BodyParsers.Default
+  ): AuthenticatedIdentifierAction =
+    new AuthenticatedIdentifierAction(
+      authConnector = authConnector,
+      config = appConfig,
+      taxEnrolmentsService = mockTaxEnrolmentsService,
+      errorHandler = mockErrorHandler,
+      sessionRepository = mockSessionRepository,
+      parser = bodyParsers
+    )
 
   "Auth Action" - {
 
@@ -49,10 +65,9 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             failingAuthConnector(new MissingBearerToken),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -75,10 +90,9 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             failingAuthConnector(new BearerTokenExpired),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -101,10 +115,9 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             failingAuthConnector(new InsufficientEnrolments),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -127,10 +140,9 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             failingAuthConnector(new InsufficientConfidenceLevel),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -153,10 +165,9 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             failingAuthConnector(new UnsupportedAuthProvider),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -179,7 +190,7 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             successfulAuthConnector(
               affinityGroup = Some(AffinityGroup.Agent),
               groupId = Some(testGroupId),
@@ -187,7 +198,6 @@ class AuthActionSpec extends SpecBase {
               credentialRole = Some(testCredentialRoleUser)
             ),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -214,13 +224,12 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             successfulAuthConnector(
               affinityGroup = Some(AffinityGroup.Individual),
               groupId = Some("group-id-123")
             ),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -247,10 +256,9 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             failingAuthConnector(new UnsupportedCredentialRole),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -273,10 +281,9 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             successfulAuthConnector(Some(testGroupId), Some(Organisation), Some(Credentials("", "")), None),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -299,10 +306,9 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             successfulAuthConnector(Some(testGroupId), Some(Organisation), None, Some(User)),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 
@@ -325,16 +331,15 @@ class AuthActionSpec extends SpecBase {
         when(mockSessionRepository.keepAlive(testCredentials.providerId))
           .thenReturn(Future.failed(new RuntimeException("fubar")))
 
-        val authAction = new AuthenticatedIdentifierAction(
-          authConnector = successfulAuthConnector(
+        val authAction = authenticatedIdentifierAction(
+          successfulAuthConnector(
             affinityGroup = Some(Organisation),
             groupId = Some(testGroupId),
             credentials = Some(testCredentials),
             credentialRole = Some(testCredentialRoleUser)
           ),
-          config = appConfig,
-          parser = bodyParsers,
-          sessionRepository = mockSessionRepository
+          appConfig,
+          bodyParsers
         )
 
         val controller = new Harness(authAction)
@@ -355,17 +360,16 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
-            authConnector = successfulAuthConnector(
+          val authAction = authenticatedIdentifierAction(
+            successfulAuthConnector(
               affinityGroup = Some(Organisation),
               groupId = Some(testGroupId),
               credentials = Some(testCredentials),
               credentialRole = Some(testCredentialRoleUser),
               allEnrolments = Enrolments(Set(Enrolment(appConfig.manageIsaEnrolmentKey)))
             ),
-            config = appConfig,
-            sessionRepository = mockSessionRepository,
-            parser = bodyParsers
+            appConfig,
+            bodyParsers
           )
 
           val controller = new Harness(authAction)
@@ -384,17 +388,16 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
-            authConnector = successfulAuthConnector(
+          val authAction = authenticatedIdentifierAction(
+            successfulAuthConnector(
               affinityGroup = Some(Organisation),
               groupId = Some(testGroupId),
               credentials = Some(testCredentials),
               credentialRole = Some(testCredentialRoleUser),
               allEnrolments = Enrolments(Set(Enrolment(appConfig.manageIsaEnrolmentKey)))
             ),
-            config = appConfig,
-            sessionRepository = mockSessionRepository,
-            parser = bodyParsers
+            appConfig,
+            bodyParsers
           )
 
           val controller = new Harness(authAction)
@@ -413,17 +416,16 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
-            authConnector = successfulAuthConnector(
+          val authAction = authenticatedIdentifierAction(
+            successfulAuthConnector(
               affinityGroup = Some(Organisation),
               groupId = Some(testGroupId),
               credentials = Some(testCredentials),
               credentialRole = Some(testCredentialRoleUser),
               allEnrolments = Enrolments(Set(Enrolment(appConfig.manageIsaEnrolmentKey)))
             ),
-            config = appConfig,
-            sessionRepository = mockSessionRepository,
-            parser = bodyParsers
+            appConfig,
+            bodyParsers
           )
 
           val controller = new Harness(authAction)
@@ -447,23 +449,141 @@ class AuthActionSpec extends SpecBase {
             state = "NotYetActivated"
           )
 
-          val authAction = new AuthenticatedIdentifierAction(
-            authConnector = successfulAuthConnector(
+          val authAction = authenticatedIdentifierAction(
+            successfulAuthConnector(
               affinityGroup = Some(Organisation),
               groupId = Some(testGroupId),
               credentials = Some(testCredentials),
               credentialRole = Some(testCredentialRoleUser),
               allEnrolments = Enrolments(Set(inactiveEnrolment))
             ),
-            config = appConfig,
-            sessionRepository = mockSessionRepository,
-            parser = bodyParsers
+            appConfig,
+            bodyParsers
           )
 
           val controller = new Harness(authAction)
           val result     = controller.onPageLoad()(FakeRequest(GET, routes.TaskListController.onPageLoad().url))
 
           status(result) mustBe OK
+        }
+      }
+
+      "must allow sign out when the Manage ISA enrolment is activated" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = authenticatedIdentifierAction(
+            successfulAuthConnector(
+              affinityGroup = Some(Organisation),
+              groupId = Some(testGroupId),
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser),
+              allEnrolments = Enrolments(Set(Enrolment(appConfig.manageIsaEnrolmentKey)))
+            ),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest(GET, controllers.auth.routes.AuthController.signOut().url))
+
+          status(result) mustBe OK
+        }
+      }
+    }
+
+    "the user has a Manage ISA subscription in progress in Tax Enrolments" - {
+
+      "must redirect to the in-progress organisation is enrolled page" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          when(mockTaxEnrolmentsService.hasManageIsaSubscriptionInProgress(anyArg[String])(anyArg[HeaderCarrier]))
+            .thenReturn(Future.successful(true))
+
+          val authAction = authenticatedIdentifierAction(
+            successfulAuthConnector(
+              affinityGroup = Some(Organisation),
+              groupId = Some(testGroupId),
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser)
+            ),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest(GET, routes.TaskListController.onPageLoad().url))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(
+            routes.OrganisationIsEnrolledController.onPageLoad(enrolmentInProgress = true).url
+          )
+        }
+      }
+
+      "must allow sign out without redirecting" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = authenticatedIdentifierAction(
+            successfulAuthConnector(
+              affinityGroup = Some(Organisation),
+              groupId = Some(testGroupId),
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser)
+            ),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest(GET, controllers.auth.routes.AuthController.signOut().url))
+
+          status(result) mustBe OK
+          verify(mockTaxEnrolmentsService, times(0))
+            .hasManageIsaSubscriptionInProgress(anyArg[String])(anyArg[HeaderCarrier])
+        }
+      }
+
+      "must return internal server error when the Tax Enrolments check fails" in {
+
+        val application = applicationBuilder(journeyData = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          when(mockTaxEnrolmentsService.hasManageIsaSubscriptionInProgress(anyArg[String])(anyArg[HeaderCarrier]))
+            .thenReturn(Future.failed(new RuntimeException("Tax Enrolments failed")))
+
+          val authAction = authenticatedIdentifierAction(
+            successfulAuthConnector(
+              affinityGroup = Some(Organisation),
+              groupId = Some(testGroupId),
+              credentials = Some(testCredentials),
+              credentialRole = Some(testCredentialRoleUser)
+            ),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest(GET, routes.TaskListController.onPageLoad().url))
+
+          status(result) mustBe INTERNAL_SERVER_ERROR
         }
       }
     }
@@ -479,7 +599,7 @@ class AuthActionSpec extends SpecBase {
           val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
-          val authAction = new AuthenticatedIdentifierAction(
+          val authAction = authenticatedIdentifierAction(
             successfulAuthConnector(
               groupId = None,
               affinityGroup = None,
@@ -487,7 +607,6 @@ class AuthActionSpec extends SpecBase {
               credentialRole = Some(testCredentialRoleUser)
             ),
             appConfig,
-            mockSessionRepository,
             bodyParsers
           )
 

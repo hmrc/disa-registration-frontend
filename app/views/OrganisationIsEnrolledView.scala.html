@@ -20,7 +20,7 @@
   layout: templates.Layout
 )
 
-@(businessTaxAccountUrl: String)(implicit request: Request[_], messages: Messages)
+@(businessTaxAccountUrl: String, enrolmentInProgress: Boolean)(implicit request: Request[_], messages: Messages)
 
 @businessTaxAccountLink = {
   <a class="govuk-link" href="@businessTaxAccountUrl">@messages("organisationIsEnrolled.businessTaxAccount.linkText")</a>
@@ -34,6 +34,10 @@
   <h1 class="govuk-heading-l">@messages("organisationIsEnrolled.heading")</h1>
 
   <p class="govuk-body">
-    @HtmlContent(messages("organisationIsEnrolled.p1", businessTaxAccountLink)).asHtml
+    @if(enrolmentInProgress) {
+      @messages("organisationIsEnrolled.inProgress.p1")
+    } else {
+      @HtmlContent(messages("organisationIsEnrolled.p1", businessTaxAccountLink)).asHtml
+    }
   </p>
 }

@@ -74,6 +74,9 @@ class FrontendAppConfigSpec extends SpecBase {
       "microservice.services.disa-registration.protocol"                           -> "http",
       "microservice.services.disa-registration.host"                               -> "localhost",
       "microservice.services.disa-registration.port"                               -> 1201,
+      "microservice.services.tax-enrolments.protocol"                              -> "http",
+      "microservice.services.tax-enrolments.host"                                  -> "localhost",
+      "microservice.services.tax-enrolments.port"                                  -> 1204,
       "microservice.services.address-lookup.protocol"                              -> "http",
       "microservice.services.address-lookup.host"                                  -> "localhost",
       "microservice.services.address-lookup.port"                                  -> 1202,
@@ -136,6 +139,10 @@ class FrontendAppConfigSpec extends SpecBase {
 
     "must generate DISA backend URL" in {
       appConfig.disaRegistrationBaseUrl mustBe "http://localhost:1201"
+    }
+
+    "must generate Tax Enrolments URL" in {
+      appConfig.taxEnrolmentsBaseUrl mustBe "http://localhost:1204"
     }
 
     "must generate address lookup URL" in {

@@ -19,11 +19,13 @@ package controllers.actions
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
+import handlers.ErrorHandler
 import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.mvc.*
 import play.api.mvc.Results.*
 import repositories.SessionRepository
+import services.TaxEnrolmentsService
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -42,6 +44,8 @@ trait IdentifierAction
 class AuthenticatedIdentifierAction @Inject() (
   override val authConnector: AuthConnector,
   config: FrontendAppConfig,
+  taxEnrolmentsService: TaxEnrolmentsService,
+  errorHandler: ErrorHandler,
   sessionRepository: SessionRepository,
   val parser: BodyParsers.Default
 )(implicit val executionContext: ExecutionContext)
@@ -61,10 +65,25 @@ class AuthenticatedIdentifierAction @Inject() (
             logger.warn(s"Failed to keep session alive for userId: [${credentials.providerId}]", e)
           }
           .flatMap { _ =>
-            if (isAlreadyEnrolled(enrolments) && !isAlreadyEnrolledRedirectExempt(request.path)) {
+            if (isAlreadyEnrolled(enrolments) && !isExemptFromRedirectToOrganisationIsEnrolledPage(request.path)) {
               Future.successful(Redirect(routes.OrganisationIsEnrolledController.onPageLoad()))
-            } else {
+            } else if (isExemptFromRedirectToOrganisationIsEnrolledPage(request.path)) {
               block(IdentifierRequest(request, groupId, credentials, role))
+            } else {
+              taxEnrolmentsService
+                .hasManageIsaSubscriptionInProgress(groupId)
+                .flatMap {
+                  case true  =>
+                    Future.successful(
+                      Redirect(routes.OrganisationIsEnrolledController.onPageLoad(enrolmentInProgress = true))
+                    )
+                  case false =>
+                    block(IdentifierRequest(request, groupId, credentials, role))
+                }
+                .recoverWith { case NonFatal(e) =>
+                  logger.error(s"Failed to check Tax Enrolments subscriptions for groupId: [$groupId]", e)
+                  errorHandler.internalServerError(request)
+                }
             }
           }
       case _ ~ _ ~ None ~ _ ~ _ | _ ~ _ ~ _ ~ None ~ _                                      =>
@@ -89,9 +108,10 @@ class AuthenticatedIdentifierAction @Inject() (
       .getEnrolment(config.manageIsaEnrolmentKey)
       .exists(_.isActivated)
 
-  private def isAlreadyEnrolledRedirectExempt(path: String): Boolean =
+  private def isExemptFromRedirectToOrganisationIsEnrolledPage(path: String): Boolean =
     Seq(
       routes.ConfirmationController.onPageLoad().url,
-      routes.OrganisationIsEnrolledController.onPageLoad().url
+      routes.OrganisationIsEnrolledController.onPageLoad().url,
+      controllers.auth.routes.AuthController.signOut().url
     ).exists(route => path == route || path.endsWith(route))
 }

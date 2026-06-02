@@ -17,7 +17,7 @@
 package base
 
 import config.FrontendAppConfig
-import connectors.{AddressLookupConnector, DisaRegistrationConnector, EmailVerificationConnector}
+import connectors.{AddressLookupConnector, DisaRegistrationConnector, EmailVerificationConnector, TaxEnrolmentsConnector}
 import controllers.actions.*
 import handlers.ErrorHandler
 import models.journeydata.JourneyData
@@ -91,6 +91,8 @@ trait SpecBase
   protected val mockBvLockoutService: BusinessVerificationLockoutService       = mock[BusinessVerificationLockoutService]
   protected val mockUuidGenerator: UuidGenerator                               = mock[UuidGenerator]
   protected val mockEmailVerificationConnector: EmailVerificationConnector     = mock[EmailVerificationConnector]
+  protected val mockTaxEnrolmentsConnector: TaxEnrolmentsConnector             = mock[TaxEnrolmentsConnector]
+  protected val mockTaxEnrolmentsService: TaxEnrolmentsService                 = mock[TaxEnrolmentsService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -111,11 +113,15 @@ trait SpecBase
       mockUuidGenerator,
       mockBvLockoutService,
       mockBvLockoutRepository,
-      mockEmailVerificationConnector
+      mockEmailVerificationConnector,
+      mockTaxEnrolmentsConnector,
+      mockTaxEnrolmentsService
     )
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))
     when(mockSessionRepository.keepAlive(any[String])).thenReturn(Future.successful(()))
+    when(mockTaxEnrolmentsService.hasManageIsaSubscriptionInProgress(any[String])(any[HeaderCarrier]))
+      .thenReturn(Future.successful(false))
   }
 
   protected def applicationBuilder(

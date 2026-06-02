@@ -39,7 +39,33 @@ class OrganisationIsEnrolledControllerSpec extends SpecBase {
         val config = application.injector.instanceOf[FrontendAppConfig]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(config.businessTaxAccountUrl)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(
+          config.businessTaxAccountUrl,
+          enrolmentInProgress = false
+        )(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the in-progress view for a GET with enrolmentInProgress" in {
+
+      val application = applicationBuilder(journeyData = None).build()
+
+      running(application) {
+        val request = FakeRequest(
+          GET,
+          routes.OrganisationIsEnrolledController.onPageLoad(enrolmentInProgress = true).url
+        )
+
+        val result = route(application, request).value
+
+        val view   = application.injector.instanceOf[OrganisationIsEnrolledView]
+        val config = application.injector.instanceOf[FrontendAppConfig]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(
+          config.businessTaxAccountUrl,
+          enrolmentInProgress = true
+        )(request, messages(application)).toString
       }
     }
   }
