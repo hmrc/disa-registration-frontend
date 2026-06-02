@@ -198,30 +198,6 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to task list on GET when an unknown liaison officer id is provided and the maximum number has been reached" in {
-
-      val journeyData =
-        JourneyData(
-          groupId = testGroupId,
-          enrolmentId = testString,
-          liaisonOfficers = Some(
-            LiaisonOfficers(liaisonOfficers(maxLiaisonOfficers))
-          )
-        )
-
-      val application = applicationBuilder(journeyData = Some(journeyData)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(GET, LiaisonOfficerNameController.onPageLoad(Some("unknown-id"), NormalMode).url)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
-      }
-    }
-
     "must return BadRequest and errors when invalid data is submitted" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()

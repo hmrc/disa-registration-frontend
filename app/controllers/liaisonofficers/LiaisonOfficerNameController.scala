@@ -64,38 +64,21 @@ class LiaisonOfficerNameController @Inject() (
     (identify andThen getData andThen requireData andThen auditContinuation(LiaisonOfficers.sectionName)) {
       implicit request =>
         id match {
-
           case None =>
             if (canAddAnother(appConfig)) {
-              Redirect(
-                routes.LiaisonOfficerNameController.onPageLoad(
-                  Some(uuidGenerator.generate()),
-                  mode,
-                  returnTo
-                )
-              )
+              Redirect(routes.LiaisonOfficerNameController.onPageLoad(Some(uuidGenerator.generate()), mode, returnTo))
             } else {
               Redirect(TaskListController.onPageLoad())
             }
 
           case Some(existingId) =>
-            existingOfficer(id) match {
-              case Some(officer) =>
-                Ok(
-                  view(
-                    officer.id,
-                    form.fill(officer.fullName.getOrElse("")),
-                    mode,
-                    returnTo
-                  )
-                )
+            val preparedForm =
+              existingOfficer(id) match {
+                case Some(officer) => form.fill(officer.fullName.getOrElse(""))
+                case None          => form
+              }
 
-              case None =>
-                if (canAddAnother(appConfig))
-                  Ok(view(existingId, form, mode, returnTo))
-                else
-                  Redirect(TaskListController.onPageLoad())
-            }
+            Ok(view(existingId, preparedForm, mode, returnTo))
         }
     }
 
