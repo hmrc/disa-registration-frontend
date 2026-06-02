@@ -647,6 +647,7 @@ registrationSubmitted.feedback.linkText = What did you think of this service?
 organisationIsEnrolled.title = Your organisation has enrolled on the Manage ISAs service
 organisationIsEnrolled.heading = Your organisation has enrolled on the Manage ISAs service
 organisationIsEnrolled.p1 = You can access a service through your organisation’s {0}.
+organisationIsEnrolled.inProgress.p1 = You will be notified by letter if your enrolment is successful.
 organisationIsEnrolled.businessTaxAccount.linkText = business tax account
 
 ### Submission Check Your Answers

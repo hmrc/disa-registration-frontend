@@ -261,4 +261,4 @@ POST       /declaration-for-isa-managers                 controllers.Declaration
 ### Confirmation
 GET        /confirmation                                 controllers.ConfirmationController.onPageLoad()
 
-GET        /organisation-is-enrolled                     controllers.OrganisationIsEnrolledController.onPageLoad()
+GET        /organisation-is-enrolled                     controllers.OrganisationIsEnrolledController.onPageLoad(enrolmentInProgress: Boolean ?= false)
