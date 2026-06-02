@@ -64,7 +64,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
       running(application) {
         val request =
-          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(Some(existingId), NormalMode, None).url)
+          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(Some(generatedId), NormalMode, None).url)
 
         val result = route(application, request).value
 
@@ -75,6 +75,47 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to canonical URL when no id is provided and below max third parties" in {
+
+      val generatedId = "generated-id-123"
+      val max         = 2
+
+      val journeyData =
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          thirdPartyOrganisations = Some(
+            ThirdPartyOrganisations(
+              None,
+              Seq(
+                ThirdParty("id-1", Some("Old Name"), thirdPartyFrn = Some("123456"))
+              ),
+              Seq.empty
+            )
+          )
+        )
+
+      when(mockUuidGenerator.generate()).thenReturn(generatedId)
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .overrides(bind[UuidGenerator].toInstance(mockUuidGenerator))
+          .configure("max-third-parties" -> max)
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(None, NormalMode, None).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          ThirdPartyOrgDetailsController.onPageLoad(Some(generatedId), NormalMode, None).url
       }
     }
 
@@ -331,12 +372,8 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
     }
 
     "must render CheckMode view" in {
-
-      when(mockUuidGenerator.generate()).thenReturn(generatedId)
-
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
-          .overrides(bind[UuidGenerator].toInstance(mockUuidGenerator))
           .build()
 
       running(application) {
@@ -348,7 +385,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[ThirdPartyOrgDetailsView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, CheckMode, None)(
+        contentAsString(result) mustEqual view(existingId, form, CheckMode, None)(
           request,
           messages(application)
         ).toString
