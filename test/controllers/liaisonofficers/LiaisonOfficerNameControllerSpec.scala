@@ -62,21 +62,20 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET when an id is provided and no existing answer is found" in {
 
-      when(mockUuidGenerator.generate()).thenReturn(generatedId)
-
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData))
-        .overrides(bind[UuidGenerator].toInstance(mockUuidGenerator))
-        .build()
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData))
+          .build()
 
       running(application) {
-        val request = FakeRequest(GET, LiaisonOfficerNameController.onPageLoad(Some(existingId), NormalMode).url)
+        val request =
+          FakeRequest(GET, LiaisonOfficerNameController.onPageLoad(Some(existingId), NormalMode).url)
 
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[LiaisonOfficerNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, NormalMode, None)(
+        contentAsString(result) mustEqual view(existingId, form, NormalMode, None)(
           request,
           messages(application)
         ).toString
@@ -116,7 +115,7 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
       }
     }
 
-    "must return OK and the correct view for a GET when no id is provided" in {
+    "must redirect to canonical URL when no id is provided" in {
 
       when(mockUuidGenerator.generate()).thenReturn(generatedId)
 
@@ -126,17 +125,20 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, LiaisonOfficerNameController.onPageLoad(None, NormalMode).url)
+        val request =
+          FakeRequest(
+            GET,
+            LiaisonOfficerNameController.onPageLoad(None, NormalMode).url
+          )
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[LiaisonOfficerNameView]
+        status(result) mustEqual SEE_OTHER
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, NormalMode, None)(
-          request,
-          messages(application)
-        ).toString
+        redirectLocation(result).value mustEqual
+          LiaisonOfficerNameController
+            .onPageLoad(Some(generatedId), NormalMode)
+            .url
       }
     }
 
@@ -188,30 +190,6 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
       running(application) {
         val request =
           FakeRequest(GET, LiaisonOfficerNameController.onPageLoad(None, NormalMode).url)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
-      }
-    }
-
-    "must redirect to task list on GET when an unknown liaison officer id is provided and the maximum number has been reached" in {
-
-      val journeyData =
-        JourneyData(
-          groupId = testGroupId,
-          enrolmentId = testString,
-          liaisonOfficers = Some(
-            LiaisonOfficers(liaisonOfficers(maxLiaisonOfficers))
-          )
-        )
-
-      val application = applicationBuilder(journeyData = Some(journeyData)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(GET, LiaisonOfficerNameController.onPageLoad(Some("unknown-id"), NormalMode).url)
 
         val result = route(application, request).value
 
@@ -638,10 +616,7 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
     }
 
     "must render view with CheckMode on a GET" in {
-      when(mockUuidGenerator.generate()).thenReturn(generatedId)
-
       val application = applicationBuilder(journeyData = Some(emptyJourneyData))
-        .overrides(bind[UuidGenerator].toInstance(mockUuidGenerator))
         .build()
 
       running(application) {
@@ -652,7 +627,7 @@ class LiaisonOfficerNameControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[LiaisonOfficerNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, CheckMode, None)(
+        contentAsString(result) mustEqual view(existingId, form, CheckMode, None)(
           request,
           messages(application)
         ).toString

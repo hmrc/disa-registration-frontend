@@ -61,19 +61,31 @@ class ThirdPartyOrgDetailsController @Inject() (
 
   def onPageLoad(id: Option[String], mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      if (cannotAddAnotherThirdParty(id, request)) {
-        Redirect(TaskListController.onPageLoad())
-      } else {
-        val preparedFormAndId = (for {
-          id           <- id
-          thirdParties <- request.journeyData.thirdPartyOrganisations.map(_.thirdParties)
-          thirdParty   <- thirdParties.find(_.id == id)
-          name         <- thirdParty.thirdPartyName
-          frn           = thirdParty.thirdPartyFrn
-        } yield (form.fill(ThirdPartyOrgDetailsForm(name, frn)), id))
-          .getOrElse((form, uuidGenerator.generate()))
+      id match {
+        case None =>
+          if (cannotAddAnotherThirdParty(None, request)) {
+            Redirect(TaskListController.onPageLoad())
+          } else {
+            Redirect(
+              routes.ThirdPartyOrgDetailsController.onPageLoad(
+                Some(uuidGenerator.generate()),
+                mode,
+                returnTo
+              )
+            )
+          }
 
-        Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode, returnTo))
+        case Some(existingId) =>
+          val preparedForm =
+            (for {
+              thirdParties <- request.journeyData.thirdPartyOrganisations.map(_.thirdParties)
+              thirdParty   <- thirdParties.find(_.id == existingId)
+              name         <- thirdParty.thirdPartyName
+              frn           = thirdParty.thirdPartyFrn
+            } yield form.fill(ThirdPartyOrgDetailsForm(name, frn)))
+              .getOrElse(form)
+
+          Ok(view(existingId, preparedForm, mode, returnTo))
       }
     }
 

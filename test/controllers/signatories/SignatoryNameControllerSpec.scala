@@ -61,7 +61,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         .build()
 
       running(application) {
-        val request = FakeRequest(GET, SignatoryNameController.onPageLoad(Some(existingId), NormalMode).url)
+        val request = FakeRequest(GET, SignatoryNameController.onPageLoad(Some(generatedId), NormalMode).url)
 
         val result = route(application, request).value
 
@@ -108,7 +108,7 @@ class SignatoryNameControllerSpec extends SpecBase {
       }
     }
 
-    "must return OK and the correct view for a GET when no id is provided" in {
+    "must redirect to canonical URL when no id is provided" in {
 
       when(mockUuidGenerator.generate()).thenReturn(generatedId)
 
@@ -118,17 +118,15 @@ class SignatoryNameControllerSpec extends SpecBase {
           .build()
 
       running(application) {
-        val request = FakeRequest(GET, SignatoryNameController.onPageLoad(None, NormalMode).url)
+        val request =
+          FakeRequest(GET, SignatoryNameController.onPageLoad(None, NormalMode, None).url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[SignatoryNameView]
+        status(result) mustEqual SEE_OTHER
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, NormalMode, None)(
-          request,
-          messages(application)
-        ).toString
+        redirectLocation(result).value mustEqual
+          SignatoryNameController.onPageLoad(Some(generatedId), NormalMode, None).url
       }
     }
 
@@ -301,10 +299,7 @@ class SignatoryNameControllerSpec extends SpecBase {
     }
 
     "must render view with CheckMode on a GET" in {
-      when(mockUuidGenerator.generate()).thenReturn(generatedId)
-
       val application = applicationBuilder(journeyData = Some(emptyJourneyData))
-        .overrides(bind[UuidGenerator].toInstance(mockUuidGenerator))
         .build()
 
       running(application) {
@@ -315,7 +310,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[SignatoryNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(generatedId, form, CheckMode, None)(
+        contentAsString(result) mustEqual view(existingId, form, CheckMode, None)(
           request,
           messages(application)
         ).toString
@@ -506,6 +501,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
+
     "must allow access when below max signatories and no id is provided" in {
 
       val max = 3
@@ -535,7 +531,16 @@ class SignatoryNameControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
+        status(result) mustEqual SEE_OTHER
+
+        val redirectUrl = redirectLocation(result).value
+
+        redirectUrl mustEqual
+          SignatoryNameController.onPageLoad(Some(generatedId), NormalMode, None).url
+
+        redirectUrl must not equal TaskListController.onPageLoad().url
+
+        verify(mockUuidGenerator, atMostOnce).generate()
       }
     }
   }
