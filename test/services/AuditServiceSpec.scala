@@ -128,6 +128,29 @@ class AuditServiceSpec extends SpecBase {
       (detail \ EventData.payload.toString \ EventData.groupName.toString).as[String] mustEqual testString
     }
 
+    "must include subscriptionId in the payload when formBundleId is present" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubAuditResult(Success)
+
+      val journeyData =
+        testJourneyData.copy(formBundleId = Some(testFormBundleId))
+
+      service
+        .auditEnrolmentSubmission(
+          status = SubmissionResult.Success,
+          credentials = credentials,
+          credentialRole = credentialRole,
+          journeyData = journeyData,
+          failureReason = None
+        )
+        .futureValue mustEqual ()
+
+      val event  = captureEvent()
+      val detail = event.detail.as[JsObject]
+
+      (detail \ EventData.payload.toString \ "subscriptionId").as[String] mustEqual testFormBundleId
+    }
+
     "must include failureReason when status is Failure and a failure reason is provided" in {
 
       when(mockAppConfig.appName).thenReturn("disa-registration-frontend")

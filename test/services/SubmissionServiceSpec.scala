@@ -46,29 +46,36 @@ class SubmissionServiceSpec extends SpecBase {
 
     "must return formBundleId when connector call succeeds and audit success" in {
 
-      val jd        = testJourneyData
-      val receiptId = testString
+      val jd                       = testJourneyData
+      val formBundleId             = testString
+      val expectedAuditJourneyData = jd.copy(formBundleId = Some(formBundleId))
 
       when(mockDisaRegistrationConnector.declareAndSubmit(eqTo(jd.groupId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(EnrolmentSubmissionResponse(receiptId)))
+        .thenReturn(Future.successful(EnrolmentSubmissionResponse(formBundleId)))
 
       when(
         mockAuditService.auditEnrolmentSubmission(
           eqTo(Success),
           eqTo(credentials),
           eqTo(credentialRole),
-          eqTo(jd),
+          eqTo(expectedAuditJourneyData),
           eqTo(None)
         )(any[HeaderCarrier])
       ).thenReturn(Future.successful(()))
 
       val result = service.declareAndSubmit(credentials, credentialRole, jd)(ec, hc).futureValue
 
-      result mustEqual receiptId
+      result mustEqual formBundleId
 
       verify(mockDisaRegistrationConnector).declareAndSubmit(eqTo(jd.groupId))(any[HeaderCarrier])
       verify(mockAuditService)
-        .auditEnrolmentSubmission(eqTo(Success), eqTo(credentials), eqTo(credentialRole), eqTo(jd), eqTo(None))(
+        .auditEnrolmentSubmission(
+          eqTo(Success),
+          eqTo(credentials),
+          eqTo(credentialRole),
+          eqTo(expectedAuditJourneyData),
+          eqTo(None)
+        )(
           any[HeaderCarrier]
         )
     }
