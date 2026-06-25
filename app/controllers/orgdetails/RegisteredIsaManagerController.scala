@@ -42,6 +42,7 @@ class RegisteredIsaManagerController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
@@ -53,25 +54,25 @@ class RegisteredIsaManagerController @Inject() (
 
   val form: Form[YesNoAnswer] = formProvider("registeredIsaManager.error.required")
 
-  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
-    implicit request =>
-      val preparedForm = request.journeyData.fold(form)(_.organisationDetails.fold(form)(_.registeredToManageIsa match {
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      val preparedForm = request.journeyData.organisationDetails.fold(form)(_.registeredToManageIsa match {
         case None        => form
         case Some(value) => form.fill(value)
-      }))
+      })
 
       Ok(view(preparedForm, mode, returnTo))
-  }
+    }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData).async { implicit request =>
+    (identify andThen getData andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
           answer => {
             val existing: Option[OrganisationDetails] =
-              request.journeyData.flatMap(_.organisationDetails)
+              request.journeyData.organisationDetails
             val updatedSection: OrganisationDetails   =
               existing match {
                 case Some(org) =>

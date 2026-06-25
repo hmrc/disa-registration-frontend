@@ -44,7 +44,6 @@ class SignatoryNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  auditContinuation: AuditContinuationAction,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
   formProvider: SignatoryNameFormProvider,
@@ -61,26 +60,25 @@ class SignatoryNameController @Inject() (
   val form: Form[String] = formProvider()
 
   def onPageLoad(id: Option[String], mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen auditContinuation(Signatories.sectionName)) {
-      implicit request =>
-        id match {
-          case None             =>
-            if (signatoryCount(request) >= appConfig.maxSignatories) {
-              Redirect(TaskListController.onPageLoad())
-            } else {
-              Redirect(routes.SignatoryNameController.onPageLoad(Some(uuidGenerator.generate()), mode, returnTo))
-            }
-          case Some(existingId) =>
-            val preparedFormAndId =
-              (for {
-                signatories <- request.journeyData.signatories.map(_.signatories)
-                signatory   <- signatories.find(_.id == existingId)
-                name        <- signatory.fullName
-              } yield (form.fill(name), existingId))
-                .getOrElse((form, existingId))
+    (identify andThen getData andThen requireData) { implicit request =>
+      id match {
+        case None             =>
+          if (signatoryCount(request) >= appConfig.maxSignatories) {
+            Redirect(TaskListController.onPageLoad())
+          } else {
+            Redirect(routes.SignatoryNameController.onPageLoad(Some(uuidGenerator.generate()), mode, returnTo))
+          }
+        case Some(existingId) =>
+          val preparedFormAndId =
+            (for {
+              signatories <- request.journeyData.signatories.map(_.signatories)
+              signatory   <- signatories.find(_.id == existingId)
+              name        <- signatory.fullName
+            } yield (form.fill(name), existingId))
+              .getOrElse((form, existingId))
 
-            Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode, returnTo))
-        }
+          Ok(view(preparedFormAndId._2, preparedFormAndId._1, mode, returnTo))
+      }
     }
 
   private def signatoryCount(request: DataRequest[_]): Int =

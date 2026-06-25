@@ -17,9 +17,12 @@
 package controllers
 
 import controllers.actions.*
+import models.journeydata.TaskListProgress
+import navigation.TaskListRoutes
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.AuditService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.tasklist.TaskListViewModel
 import views.html.TaskListView
@@ -32,6 +35,7 @@ class TaskListController @Inject() (
   getData: DataRetrievalAction,
   getUprn: EnrichRegisteredAddressUprnAction,
   requireData: DataRequiredAction,
+  auditService: AuditService,
   val controllerComponents: MessagesControllerComponents,
   view: TaskListView
 ) extends FrontendBaseController
@@ -41,11 +45,25 @@ class TaskListController @Inject() (
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getData andThen getUprn andThen requireData) { implicit request =>
       request.journeyData match {
-        case journeyData if TaskListViewModel.canAccessTaskList(journeyData) =>
+        case journeyData if TaskListProgress.canAccessTaskList(journeyData) =>
           Ok(view(TaskListViewModel(journeyData, request.credentialRole)))
 
         case _ =>
           Redirect(routes.StartController.onPageLoad())
+      }
+    }
+
+  def continueTo(section: String): Action[AnyContent] =
+    (identify andThen getData andThen requireData) { implicit request =>
+      if (!TaskListProgress.canAccessTaskList(request.journeyData)) {
+        Redirect(routes.StartController.onPageLoad())
+      } else {
+        TaskListRoutes
+          .destination(section, request.journeyData, request.credentialRole)
+          .fold(Redirect(routes.TaskListController.onPageLoad())) { destination =>
+            auditService.auditContinuation(request, destination.sectionName)
+            Redirect(destination.call)
+          }
       }
     }
 }

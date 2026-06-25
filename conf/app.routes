@@ -15,6 +15,7 @@ GET         /keep-alive                                  controllers.KeepAliveCo
 GET         /start                                       controllers.StartController.onPageLoad()
 
 GET         /task-list                                   controllers.TaskListController.onPageLoad()
+GET         /task-list/:section                          controllers.TaskListController.continueTo(section: String)
 
 GET         /incorporated-identity-callback              controllers.GrsController.grsCallback(journeyId: String)
 

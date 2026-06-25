@@ -18,17 +18,18 @@ package services
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.journeydata.BusinessVerification
+import models.journeydata.JourneyData
 import models.journeydata.isaproducts.IsaProducts
 import models.requests.{DataRequest, IdentifierRequest}
 import models.submission.SubmissionResult
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{never, verify, when}
 import play.api.inject
 import play.api.libs.json.JsObject
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
+import repositories.SessionRepository
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
@@ -43,7 +44,8 @@ class AuditServiceSpec extends SpecBase {
     Some(emptyJourneyData),
     overrides = Seq(
       inject.bind[AuditConnector].toInstance(mockAuditConnector),
-      inject.bind[FrontendAppConfig].toInstance(mockAppConfig)
+      inject.bind[FrontendAppConfig].toInstance(mockAppConfig),
+      inject.bind[SessionRepository].toInstance(mockSessionRepository)
     )
   )
     .configure(Map("auditing.enabled" -> "true"))
@@ -64,6 +66,19 @@ class AuditServiceSpec extends SpecBase {
     verify(mockAuditConnector).sendExtendedEvent(captor.capture())(any, any)
     captor.getValue
   }
+
+  private def stubContinuationCanBeAudited(): Unit =
+    when(mockSessionRepository.upsertAndMarkAuditEventSent(eqTo(credentials.providerId)))
+      .thenReturn(Future.successful(true))
+
+  private def dataRequest(journeyData: JourneyData = testJourneyData): DataRequest[AnyContent] =
+    DataRequest(
+      request = FakeRequest(),
+      groupId = testGroupId,
+      credentials = credentials,
+      credentialRole = credentialRole,
+      journeyData = journeyData
+    )
 
   "AuditService.auditEnrolmentSubmission" - {
 
@@ -235,26 +250,19 @@ class AuditServiceSpec extends SpecBase {
 
     "must send an EnrolmentStarted event with journeyType=continueEnrolment and include continuingSection" in {
       when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubContinuationCanBeAudited()
       stubAuditResult(Success)
 
       val sectionName = IsaProducts.sectionName
 
-      val dataReq: DataRequest[AnyContent] =
-        DataRequest(
-          request = FakeRequest(),
-          groupId = testGroupId,
-          credentials = credentials,
-          credentialRole = credentialRole,
-          journeyData = testJourneyData
-        )
-
       service
         .auditContinuation(
-          request = dataReq,
+          request = dataRequest(),
           sectionName = sectionName
         )
         .futureValue mustEqual ()
 
+      verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(credentials.providerId))
       val event = captureEvent()
 
       event.auditSource mustEqual "disa-registration-frontend"
@@ -275,6 +283,7 @@ class AuditServiceSpec extends SpecBase {
 
     "must send an EnrolmentStarted event with groupName obtained from GRS" in {
       when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubContinuationCanBeAudited()
       stubAuditResult(Success)
 
       val sectionName = IsaProducts.sectionName
@@ -282,24 +291,15 @@ class AuditServiceSpec extends SpecBase {
       val journeyData =
         testJourneyData.copy(businessVerification = Some(testBV))
 
-      val dataReq: DataRequest[AnyContent] =
-        DataRequest(
-          request = FakeRequest(),
-          groupId = testGroupId,
-          credentials = credentials,
-          credentialRole = credentialRole,
-          journeyData = journeyData
-        )
-
       service
         .auditContinuation(
-          request = dataReq,
+          request = dataRequest(journeyData),
           sectionName = sectionName
         )
         .futureValue mustEqual ()
 
-      val event = captureEvent()
-
+      verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(credentials.providerId))
+      val event  = captureEvent()
       val detail = event.detail.as[JsObject]
 
       (detail \ EventData.groupName.toString).as[String] mustEqual testString
@@ -307,48 +307,85 @@ class AuditServiceSpec extends SpecBase {
 
     "must complete successfully even when auditing is Disabled" in {
       when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubContinuationCanBeAudited()
       stubAuditResult(Disabled)
 
       val sectionName = IsaProducts.sectionName
 
-      val dataReq: DataRequest[AnyContent] =
-        DataRequest(
-          request = FakeRequest(),
-          groupId = testGroupId,
-          credentials = credentials,
-          credentialRole = credentialRole,
-          journeyData = testJourneyData
-        )
-
       service
         .auditContinuation(
-          request = dataReq,
+          request = dataRequest(),
           sectionName = sectionName
         )
         .futureValue mustEqual ()
+
+      verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(credentials.providerId))
+      verify(mockAuditConnector).sendExtendedEvent(any[ExtendedDataEvent])(any, any)
     }
 
     "must complete successfully even when auditing returns Failure" in {
       when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubContinuationCanBeAudited()
       stubAuditResult(Failure("fubar", None))
 
       val sectionName = IsaProducts.sectionName
 
-      val dataReq: DataRequest[AnyContent] =
-        DataRequest(
-          request = FakeRequest(),
-          groupId = testGroupId,
-          credentials = credentials,
-          credentialRole = credentialRole,
-          journeyData = testJourneyData
-        )
-
       service
         .auditContinuation(
-          request = dataReq,
+          request = dataRequest(),
           sectionName = sectionName
         )
         .futureValue mustEqual ()
+
+      verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(credentials.providerId))
+      verify(mockAuditConnector).sendExtendedEvent(any[ExtendedDataEvent])(any, any)
+    }
+
+    "must not send an event when the continuation audit has already been sent" in {
+      when(mockSessionRepository.upsertAndMarkAuditEventSent(eqTo(credentials.providerId)))
+        .thenReturn(Future.successful(false))
+
+      service
+        .auditContinuation(
+          request = dataRequest(),
+          sectionName = IsaProducts.sectionName
+        )
+        .futureValue mustEqual ()
+
+      verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(credentials.providerId))
+      verify(mockAuditConnector, never()).sendExtendedEvent(any[ExtendedDataEvent])(any, any)
+    }
+
+    "must recover when the session audit marker fails" in {
+      when(mockSessionRepository.upsertAndMarkAuditEventSent(eqTo(credentials.providerId)))
+        .thenReturn(Future.failed(new RuntimeException("fubar")))
+
+      service
+        .auditContinuation(
+          request = dataRequest(),
+          sectionName = IsaProducts.sectionName
+        )
+        .futureValue mustEqual ()
+
+      verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(credentials.providerId))
+      verify(mockAuditConnector, never()).sendExtendedEvent(any[ExtendedDataEvent])(any, any)
+    }
+
+    "must recover when sending the audit event fails" in {
+      when(mockAppConfig.appName).thenReturn("disa-registration-frontend")
+      stubContinuationCanBeAudited()
+      when(mockAuditConnector.sendExtendedEvent(any[ExtendedDataEvent])(any, any))
+        .thenReturn(Future.failed(new RuntimeException("fubar")))
+
+      service
+        .auditContinuation(
+          request = dataRequest(),
+          sectionName = IsaProducts.sectionName
+        )
+        .futureValue mustEqual ()
+
+      verify(mockSessionRepository).upsertAndMarkAuditEventSent(eqTo(credentials.providerId))
+      verify(mockAuditConnector).sendExtendedEvent(any[ExtendedDataEvent])(any, any)
     }
   }
 

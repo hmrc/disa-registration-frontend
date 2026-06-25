@@ -43,7 +43,6 @@ class OrganisationEmailAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  auditContinuation: AuditContinuationAction,
   formProvider: OrganisationEmailAddressFormProvider,
   journeyAnswersService: JourneyAnswersService,
   emailVerificationConnector: EmailVerificationConnector,
@@ -58,14 +57,13 @@ class OrganisationEmailAddressController @Inject() (
   val form = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen auditContinuation(OrganisationEmail.sectionName)) {
-      implicit request =>
-        val preparedForm =
-          request.journeyData.organisationEmail
-            .flatMap(_.organisationEmail)
-            .fold(form)(form.fill)
+    (identify andThen getData andThen requireData) { implicit request =>
+      val preparedForm =
+        request.journeyData.organisationEmail
+          .flatMap(_.organisationEmail)
+          .fold(form)(form.fill)
 
-        Ok(view(preparedForm, mode, returnTo))
+      Ok(view(preparedForm, mode, returnTo))
     }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
