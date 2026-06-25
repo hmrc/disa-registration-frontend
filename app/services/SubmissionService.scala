@@ -36,7 +36,13 @@ class SubmissionService @Inject() (connector: DisaRegistrationConnector, auditSe
     connector
       .declareAndSubmit(journeyData.groupId)
       .map { case EnrolmentSubmissionResponse(formBundleId) =>
-        auditService.auditEnrolmentSubmission(Success, credentials, credentialRole, journeyData, None)
+        auditService.auditEnrolmentSubmission(
+          Success,
+          credentials,
+          credentialRole,
+          journeyData.copy(formBundleId = Some(formBundleId)),
+          None
+        )
         formBundleId
       }
       .recoverWith { case e: Throwable =>
