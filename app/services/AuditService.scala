@@ -24,6 +24,7 @@ import models.requests.{DataRequest, IdentifierRequest}
 import models.submission.SubmissionResult
 import play.api.Logging
 import play.api.libs.json.*
+import repositories.SessionRepository
 import services.AuditTypes.{Audit, EnrolmentStarted, EnrolmentSubmitted}
 import uk.gov.hmrc.auth.core.CredentialRole
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -32,10 +33,16 @@ import uk.gov.hmrc.play.audit.AuditExtensions
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
-class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppConfig)(implicit ec: ExecutionContext)
+class AuditService @Inject() (
+  connector: AuditConnector,
+  appConfig: FrontendAppConfig,
+  sessionRepository: SessionRepository
+)(implicit ec: ExecutionContext)
     extends Logging {
 
   def auditNewEnrolmentStarted[A](
@@ -55,7 +62,31 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
     connector.sendExtendedEvent(event).map(logResponse(_, EnrolmentStarted.toString))
   }
 
-  def auditContinuation[A](request: DataRequest[A], sectionName: String)(implicit hc: HeaderCarrier): Future[Unit] =
+  def auditContinuation[A](request: DataRequest[A], sectionName: String): Future[Unit] = {
+    implicit val hc: HeaderCarrier =
+      HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+    sessionRepository
+      .upsertAndMarkAuditEventSent(request.credentials.providerId)
+      .flatMap {
+        case true =>
+          sendContinuationAudit(request, sectionName)
+            .recover { case NonFatal(e) =>
+              logger.warn(s"auditContinuation failed for groupId: [${request.groupId}]", e)
+            }
+
+        case false =>
+          Future.successful(())
+      }
+      .recover { case NonFatal(e) =>
+        logger.warn(s"auditContinuation failed for groupId: [${request.groupId}]", e)
+      }
+  }
+
+  private def sendContinuationAudit[A](
+    request: DataRequest[A],
+    sectionName: String
+  )(implicit hc: HeaderCarrier): Future[Unit] = {
     val data = Json.obj(
       EventData.providerType.toString           -> request.credentials.providerType,
       EventData.internalRegistrationId.toString -> request.journeyData.enrolmentId,
@@ -71,6 +102,7 @@ class AuditService @Inject() (connector: AuditConnector, appConfig: FrontendAppC
 
     val event = createAuditEvent(EnrolmentStarted, data)
     connector.sendExtendedEvent(event).map(logResponse(_, EnrolmentStarted.toString))
+  }
 
   def auditEnrolmentSubmission(
     status: SubmissionResult,

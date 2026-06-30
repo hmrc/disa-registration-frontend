@@ -16,19 +16,14 @@
 
 package viewmodels.tasklist
 
-import controllers.certificatesofauthority.routes.{CoaCheckYourAnswersController, EligibilityToManageIsaController}
-import controllers.isaproducts.routes.{IsaProductsCheckYourAnswersController, IsaProductsController}
-import controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerNameController}
-import controllers.orgdetails.routes.{OrganisationDetailsCheckYourAnswersController, RegisteredIsaManagerController}
-import controllers.orgemail.routes.{EmailVerificationCodeController, OrganisationEmailAddressController, OrganisationEmailCyaController}
-import controllers.signatories.routes.{AddedSignatoryController, SignatoryNameController}
-import controllers.thirdparty.routes.{AddedThirdPartiesController, ProductsManagedByThirdPartyController, ThirdPartiesCheckYourAnswersController}
-import controllers.routes.SubmissionCyaController
-import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No as CertificatesNo, Yes as CertificatesYes}
-import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
-import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
-import models.journeydata.JourneyData
-import models.{CheckMode, NormalMode, YesNoAnswer}
+import controllers.routes.TaskListController
+import models.journeydata.{JourneyData, TaskListProgress}
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.liaisonofficers.LiaisonOfficers
+import models.journeydata.signatories.Signatories
+import models.journeydata.thirdparty.ThirdPartyOrganisations
+import models.journeydata.{DeclareAndSubmit, OrganisationDetails, OrganisationEmail}
 import play.api.i18n.Messages
 import uk.gov.hmrc.auth.core.{CredentialRole, User}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Empty, Text}
@@ -82,8 +77,8 @@ object TaskListViewModel {
   def apply(journeyData: JourneyData, credentialRole: CredentialRole)(implicit
     messages: Messages
   ): TaskListViewModel = {
-    val remainingTasksUnlocked = canAccessTaskList(journeyData)
-    val submitAnswersAvailable = canSubmitAnswers(journeyData, credentialRole)
+    val remainingTasksUnlocked = TaskListProgress.canAccessTaskList(journeyData)
+    val submitAnswersAvailable = TaskListProgress.canSubmitAnswers(journeyData, credentialRole)
 
     TaskListViewModel(
       sections = Seq(
@@ -121,28 +116,10 @@ object TaskListViewModel {
     )
   }
 
-  def canAccessTaskList(journeyData: JourneyData): Boolean =
-    journeyData.businessVerification.exists { businessVerification =>
-      businessVerification.businessRegistrationPassed.contains(true) &&
-      businessVerification.businessVerificationPassed.contains(true)
-    }
-
-  def canSubmitAnswers(journeyData: JourneyData, credentialRole: CredentialRole): Boolean =
-    credentialRole == User && canAccessTaskList(journeyData) && allRequiredTasksComplete(journeyData)
-
-  def allRequiredTasksComplete(journeyData: JourneyData): Boolean =
-    isOrganisationInformationComplete(journeyData) &&
-      isOrganisationEmailVerified(journeyData) &&
-      isIsaProductsComplete(journeyData) &&
-      isCertificatesOfAuthorityComplete(journeyData) &&
-      areLiaisonOfficersComplete(journeyData) &&
-      areSignatoriesComplete(journeyData) &&
-      areThirdPartyOrganisationsComplete(journeyData)
-
   private def organisationInformationTask(journeyData: JourneyData)(implicit
     messages: Messages
   ): TaskListTaskViewModel = {
-    val completed = isOrganisationInformationComplete(journeyData)
+    val completed = TaskListProgress.isOrganisationInformationComplete(journeyData)
     val started   = organisationInformationStarted(journeyData)
 
     TaskListTaskViewModel(
@@ -150,8 +127,7 @@ object TaskListViewModel {
         if (completed) messages("taskList.organisationInformation.change")
         else messages("taskList.organisationInformation.add"),
       href = Some(
-        if (completed) OrganisationDetailsCheckYourAnswersController.onPageLoad().url
-        else RegisteredIsaManagerController.onPageLoad(NormalMode).url
+        TaskListController.continueTo(OrganisationDetails.sectionName).url
       ),
       status =
         if (completed) plain("taskList.status.completed")
@@ -164,18 +140,13 @@ object TaskListViewModel {
     messages: Messages
   ): TaskListTaskViewModel = {
     val email    = journeyData.organisationEmail.flatMap(_.organisationEmail)
-    val verified = isOrganisationEmailVerified(journeyData)
+    val verified = TaskListProgress.isOrganisationEmailVerified(journeyData)
 
     TaskListTaskViewModel(
       title =
         if (verified) messages("taskList.organisationEmail.change")
         else messages("taskList.organisationEmail.add"),
-      href = hrefWhen(
-        unlocked,
-        if (verified) OrganisationEmailCyaController.onPageLoad().url
-        else if (email.isDefined) EmailVerificationCodeController.onPageLoad(NormalMode).url
-        else OrganisationEmailAddressController.onPageLoad(NormalMode).url
-      ),
+      href = Option.when(unlocked)(TaskListController.continueTo(OrganisationEmail.sectionName).url),
       status =
         if (!unlocked) plain("taskList.status.cannotStartYet")
         else if (verified) plain("taskList.status.verified")
@@ -189,12 +160,11 @@ object TaskListViewModel {
   ): TaskListTaskViewModel =
     standardTask(
       unlocked = unlocked,
-      complete = isIsaProductsComplete(journeyData),
+      complete = TaskListProgress.isIsaProductsComplete(journeyData),
       started = isaProductsStarted(journeyData),
       addMessage = "taskList.isaProducts.add",
       changeMessage = "taskList.isaProducts.change",
-      addHref = IsaProductsController.onPageLoad(NormalMode).url,
-      changeHref = IsaProductsCheckYourAnswersController.onPageLoad().url
+      href = TaskListController.continueTo(IsaProducts.sectionName).url
     )
 
   private def certificatesOfAuthorityTask(journeyData: JourneyData, unlocked: Boolean)(implicit
@@ -202,12 +172,11 @@ object TaskListViewModel {
   ): TaskListTaskViewModel =
     standardTask(
       unlocked = unlocked,
-      complete = isCertificatesOfAuthorityComplete(journeyData),
+      complete = TaskListProgress.isCertificatesOfAuthorityComplete(journeyData),
       started = certificatesOfAuthorityStarted(journeyData),
       addMessage = "taskList.certificatesOfAuthority.add",
       changeMessage = "taskList.certificatesOfAuthority.change",
-      addHref = EligibilityToManageIsaController.onPageLoad().url,
-      changeHref = CoaCheckYourAnswersController.onPageLoad().url
+      href = TaskListController.continueTo(CertificatesOfAuthority.sectionName).url
     )
 
   private def liaisonOfficersTask(journeyData: JourneyData, unlocked: Boolean)(implicit
@@ -221,8 +190,7 @@ object TaskListViewModel {
       hasIncompleteItems = liaisonOfficers.exists(_.inProgress),
       addMessage = "taskList.liaisonOfficers.add",
       changeMessage = "taskList.liaisonOfficers.change",
-      addHref = LiaisonOfficerNameController.onPageLoad(id = None, mode = NormalMode, returnTo = None).url,
-      changeHref = AddedLiaisonOfficersController.onPageLoad(NormalMode).url,
+      href = TaskListController.continueTo(LiaisonOfficers.sectionName).url,
       singularMessage = "taskList.count.liaisonOfficer.one",
       pluralMessage = "taskList.count.liaisonOfficer.other"
     )
@@ -239,8 +207,7 @@ object TaskListViewModel {
       hasIncompleteItems = signatories.exists(_.inProgress),
       addMessage = "taskList.signatories.add",
       changeMessage = "taskList.signatories.change",
-      addHref = SignatoryNameController.onPageLoad(id = None, mode = NormalMode, returnTo = None).url,
-      changeHref = AddedSignatoryController.onPageLoad(NormalMode).url,
+      href = TaskListController.continueTo(Signatories.sectionName).url,
       singularMessage = "taskList.count.signatory.one",
       pluralMessage = "taskList.count.signatory.other"
     )
@@ -251,7 +218,7 @@ object TaskListViewModel {
   ): TaskListTaskViewModel = {
     val section            = journeyData.thirdPartyOrganisations
     val count              = section.fold(0)(_.thirdParties.size)
-    val complete           = areThirdPartyOrganisationsComplete(journeyData)
+    val complete           = TaskListProgress.areThirdPartyOrganisationsComplete(journeyData)
     val started            = section.flatMap(_.managedByThirdParty).isDefined
     val hasIncompleteItems =
       section.exists(_.thirdParties.exists(_.inProgress))
@@ -260,14 +227,7 @@ object TaskListViewModel {
       title =
         if (complete || count > 0) messages("taskList.thirdPartyOrganisations.change")
         else messages("taskList.thirdPartyOrganisations.add"),
-      href = hrefWhen(
-        unlocked,
-        if (hasIncompleteItems) AddedThirdPartiesController.onPageLoad(NormalMode).url
-        else if (count > 1) ThirdPartiesCheckYourAnswersController.onPageLoad().url
-        else if (count > 0) AddedThirdPartiesController.onPageLoad(NormalMode).url
-        else if (complete) ProductsManagedByThirdPartyController.onPageLoad(CheckMode).url
-        else ProductsManagedByThirdPartyController.onPageLoad(NormalMode).url
-      ),
+      href = Option.when(unlocked)(TaskListController.continueTo(ThirdPartyOrganisations.sectionName).url),
       status =
         if (!unlocked) plain("taskList.status.cannotStartYet")
         else if (complete && count == 0) plain("taskList.status.completed")
@@ -287,7 +247,7 @@ object TaskListViewModel {
       title =
         if (isAdministrator) messages("taskList.submit.checkAnswers")
         else messages("taskList.submit.assistantCannotSubmit"),
-      href = hrefWhen(canSubmit, SubmissionCyaController.onPageLoad().url),
+      href = Option.when(canSubmit)(TaskListController.continueTo(DeclareAndSubmit.sectionName).url),
       status =
         if (!isAdministrator) TaskListStatus.NoStatus
         else if (canSubmit) blueTag("taskList.status.notYetStarted")
@@ -301,12 +261,11 @@ object TaskListViewModel {
     started: Boolean,
     addMessage: String,
     changeMessage: String,
-    addHref: String,
-    changeHref: String
+    href: String
   )(implicit messages: Messages): TaskListTaskViewModel =
     TaskListTaskViewModel(
       title = if (complete) messages(changeMessage) else messages(addMessage),
-      href = hrefWhen(unlocked, if (complete) changeHref else addHref),
+      href = Option.when(unlocked)(href),
       status =
         if (!unlocked) plain("taskList.status.cannotStartYet")
         else if (complete) plain("taskList.status.completed")
@@ -320,23 +279,19 @@ object TaskListViewModel {
     hasIncompleteItems: Boolean,
     addMessage: String,
     changeMessage: String,
-    addHref: String,
-    changeHref: String,
+    href: String,
     singularMessage: String,
     pluralMessage: String
   )(implicit messages: Messages): TaskListTaskViewModel =
     TaskListTaskViewModel(
       title = if (count > 0) messages(changeMessage) else messages(addMessage),
-      href = hrefWhen(unlocked, if (count > 0) changeHref else addHref),
+      href = Option.when(unlocked)(href),
       status =
         if (!unlocked) plain("taskList.status.cannotStartYet")
         else if (hasIncompleteItems) blueTag("taskList.status.inProgress")
         else if (count > 0) countStatus(count, singularMessage, pluralMessage)
         else blueTag("taskList.status.notYetStarted")
     )
-
-  private def hrefWhen(enabled: Boolean, href: String): Option[String] =
-    Option.when(enabled)(href)
 
   private def plain(message: String)(implicit messages: Messages): TaskListStatus =
     TaskListStatus(messages(message))
@@ -351,32 +306,6 @@ object TaskListViewModel {
     messages: Messages
   ): TaskListStatus =
     TaskListStatus(messages(if (count == 1) singularMessage else pluralMessage, count))
-
-  private def isOrganisationInformationComplete(journeyData: JourneyData): Boolean =
-    journeyData.organisationDetails.exists { organisationDetails =>
-      organisationDetails.registeredToManageIsa.exists { registeredToManageIsa =>
-        val zReferenceComplete =
-          registeredToManageIsa == YesNoAnswer.No || organisationDetails.zRefNumber.exists(nonEmpty)
-
-        val tradingNameComplete =
-          organisationDetails.tradingUsingDifferentName.exists {
-            case YesNoAnswer.Yes => organisationDetails.tradingName.exists(nonEmpty)
-            case YesNoAnswer.No  => true
-          }
-
-        val correspondenceAddressComplete =
-          organisationDetails.registeredAddressCorrespondence.exists {
-            case YesNoAnswer.Yes => true
-            case YesNoAnswer.No  => organisationDetails.correspondenceAddress.exists(_.isPopulated)
-          }
-
-        zReferenceComplete &&
-        tradingNameComplete &&
-        organisationDetails.fcaNumber.exists(nonEmpty) &&
-        correspondenceAddressComplete &&
-        organisationDetails.orgTelephoneNumber.exists(nonEmpty)
-      }
-    }
 
   private def organisationInformationStarted(journeyData: JourneyData): Boolean =
     journeyData.organisationDetails.exists { organisationDetails =>
@@ -393,24 +322,6 @@ object TaskListViewModel {
       ).exists(_.isDefined)
     }
 
-  private def isOrganisationEmailVerified(journeyData: JourneyData): Boolean =
-    journeyData.organisationEmail.exists { organisationEmail =>
-      organisationEmail.organisationEmail.exists(nonEmpty) && organisationEmail.verified.contains(true)
-    }
-
-  private def isIsaProductsComplete(journeyData: JourneyData): Boolean =
-    journeyData.isaProducts.exists { isaProducts =>
-      isaProducts.isaProducts.exists(_.nonEmpty) &&
-      (!isaProducts.isaProducts.exists(_.contains(InnovativeFinanceIsas)) ||
-        (
-          isaProducts.innovativeFinancialProducts.exists(_.nonEmpty) &&
-            (!isaProducts.innovativeFinancialProducts.exists(
-              _.contains(PeertopeerLoansUsingAPlatformWith36hPermissions)
-            ) ||
-              (isaProducts.p2pPlatform.exists(nonEmpty) && isaProducts.p2pPlatformNumber.exists(nonEmpty)))
-        ))
-    }
-
   private def isaProductsStarted(journeyData: JourneyData): Boolean =
     journeyData.isaProducts.exists { isaProducts =>
       Seq(
@@ -421,14 +332,6 @@ object TaskListViewModel {
       ).exists(_.isDefined)
     }
 
-  private def isCertificatesOfAuthorityComplete(journeyData: JourneyData): Boolean =
-    journeyData.certificatesOfAuthority.exists { certificatesOfAuthority =>
-      certificatesOfAuthority.certificatesYesNo.exists {
-        case CertificatesYes => certificatesOfAuthority.fcaArticles.exists(_.nonEmpty)
-        case CertificatesNo  => certificatesOfAuthority.financialOrganisation.exists(_.nonEmpty)
-      }
-    }
-
   private def certificatesOfAuthorityStarted(journeyData: JourneyData): Boolean =
     journeyData.certificatesOfAuthority.exists { certificatesOfAuthority =>
       Seq(
@@ -437,26 +340,4 @@ object TaskListViewModel {
         certificatesOfAuthority.financialOrganisation
       ).exists(_.isDefined)
     }
-
-  private def areLiaisonOfficersComplete(journeyData: JourneyData): Boolean =
-    journeyData.liaisonOfficers.exists { liaisonOfficers =>
-      liaisonOfficers.liaisonOfficers.nonEmpty && liaisonOfficers.liaisonOfficers.forall(!_.inProgress)
-    }
-
-  private def areSignatoriesComplete(journeyData: JourneyData): Boolean =
-    journeyData.signatories.exists { signatories =>
-      signatories.signatories.nonEmpty && signatories.signatories.forall(!_.inProgress)
-    }
-
-  private def areThirdPartyOrganisationsComplete(journeyData: JourneyData): Boolean =
-    journeyData.thirdPartyOrganisations.exists { thirdPartyOrganisations =>
-      thirdPartyOrganisations.managedByThirdParty.exists {
-        case YesNoAnswer.No  => true
-        case YesNoAnswer.Yes =>
-          thirdPartyOrganisations.thirdParties.nonEmpty && thirdPartyOrganisations.thirdParties.forall(!_.inProgress)
-      }
-    }
-
-  private def nonEmpty(value: String): Boolean =
-    value.trim.nonEmpty
 }

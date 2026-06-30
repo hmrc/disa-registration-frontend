@@ -42,7 +42,6 @@ class IsaProductsController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  auditContinuation: AuditContinuationAction,
   formProvider: IsaProductsFormProvider,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
@@ -56,14 +55,13 @@ class IsaProductsController @Inject() (
   val form: Form[Set[IsaProduct]] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen auditContinuation(IsaProducts.sectionName)) {
-      implicit request =>
-        val preparedForm = (for {
-          products <- request.journeyData.isaProducts
-          values   <- products.isaProducts
-        } yield form.fill(values.toSet)).getOrElse(form)
+    (identify andThen getData andThen requireData) { implicit request =>
+      val preparedForm = (for {
+        products <- request.journeyData.isaProducts
+        values   <- products.isaProducts
+      } yield form.fill(values.toSet)).getOrElse(form)
 
-        Ok(view(preparedForm, mode, returnTo))
+      Ok(view(preparedForm, mode, returnTo))
     }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {

@@ -44,7 +44,6 @@ class LiaisonOfficerNameController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  auditContinuation: AuditContinuationAction,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
   formProvider: LiaisonOfficerNameFormProvider,
@@ -61,25 +60,24 @@ class LiaisonOfficerNameController @Inject() (
   val form: Form[String] = formProvider()
 
   def onPageLoad(id: Option[String], mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData andThen auditContinuation(LiaisonOfficers.sectionName)) {
-      implicit request =>
-        id match {
-          case None =>
-            if (canAddAnother(appConfig)) {
-              Redirect(routes.LiaisonOfficerNameController.onPageLoad(Some(uuidGenerator.generate()), mode, returnTo))
-            } else {
-              Redirect(TaskListController.onPageLoad())
+    (identify andThen getData andThen requireData) { implicit request =>
+      id match {
+        case None =>
+          if (canAddAnother(appConfig)) {
+            Redirect(routes.LiaisonOfficerNameController.onPageLoad(Some(uuidGenerator.generate()), mode, returnTo))
+          } else {
+            Redirect(TaskListController.onPageLoad())
+          }
+
+        case Some(existingId) =>
+          val preparedForm =
+            existingOfficer(id) match {
+              case Some(officer) => form.fill(officer.fullName.getOrElse(""))
+              case None          => form
             }
 
-          case Some(existingId) =>
-            val preparedForm =
-              existingOfficer(id) match {
-                case Some(officer) => form.fill(officer.fullName.getOrElse(""))
-                case None          => form
-              }
-
-            Ok(view(existingId, preparedForm, mode, returnTo))
-        }
+          Ok(view(existingId, preparedForm, mode, returnTo))
+      }
     }
 
   def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =

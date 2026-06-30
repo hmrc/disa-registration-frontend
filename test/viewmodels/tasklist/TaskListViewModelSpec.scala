@@ -17,6 +17,10 @@
 package viewmodels.tasklist
 
 import base.SpecBase
+import models.journeydata.{DeclareAndSubmit, OrganisationDetails, TaskListProgress}
+import models.journeydata.liaisonofficers.LiaisonOfficers
+import models.journeydata.signatories.Signatories
+import models.journeydata.thirdparty.ThirdPartyOrganisations
 import uk.gov.hmrc.auth.core.{Assistant, User}
 
 class TaskListViewModelSpec extends SpecBase {
@@ -27,7 +31,7 @@ class TaskListViewModelSpec extends SpecBase {
       val viewModel = TaskListViewModel(emptyJourneyDataWithBusinessVerification, User)
 
       task(viewModel, "taskList.organisationInformation.add").href.value mustBe
-        controllers.orgdetails.routes.RegisteredIsaManagerController.onPageLoad(models.NormalMode).url
+        continueUrl(OrganisationDetails.sectionName)
       task(viewModel, "taskList.organisationInformation.add").status.content mustBe messages(
         "taskList.status.notYetStarted"
       )
@@ -112,7 +116,7 @@ class TaskListViewModelSpec extends SpecBase {
       row.status.tagClass mustBe Some("govuk-tag--yellow")
     }
 
-    "must route empty multi-item tasks to the first question" in {
+    "must link empty multi-item tasks through task-list continuation routes" in {
       val viewModel =
         TaskListViewModel(
           emptyJourneyDataWithBusinessVerification.copy(organisationDetails =
@@ -122,20 +126,14 @@ class TaskListViewModelSpec extends SpecBase {
         )
 
       task(viewModel, "taskList.liaisonOfficers.add").href.value mustBe
-        controllers.liaisonofficers.routes.LiaisonOfficerNameController
-          .onPageLoad(id = None, mode = models.NormalMode, returnTo = None)
-          .url
+        continueUrl(LiaisonOfficers.sectionName)
       task(viewModel, "taskList.signatories.add").href.value mustBe
-        controllers.signatories.routes.SignatoryNameController
-          .onPageLoad(id = None, mode = models.NormalMode, returnTo = None)
-          .url
+        continueUrl(Signatories.sectionName)
       task(viewModel, "taskList.thirdPartyOrganisations.add").href.value mustBe
-        controllers.thirdparty.routes.ProductsManagedByThirdPartyController
-          .onPageLoad(models.NormalMode)
-          .url
+        continueUrl(ThirdPartyOrganisations.sectionName)
     }
 
-    "must route multi-item tasks with existing items to their multiple item CYA pages" in {
+    "must link multi-item tasks with existing items through task-list continuation routes" in {
       val viewModel = TaskListViewModel(
         emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = Some(completeTaskListOrganisationDetails),
@@ -148,14 +146,14 @@ class TaskListViewModelSpec extends SpecBase {
       )
 
       task(viewModel, "taskList.liaisonOfficers.change").href.value mustBe
-        controllers.liaisonofficers.routes.AddedLiaisonOfficersController.onPageLoad(models.NormalMode).url
+        continueUrl(LiaisonOfficers.sectionName)
       task(viewModel, "taskList.signatories.change").href.value mustBe
-        controllers.signatories.routes.AddedSignatoryController.onPageLoad(models.NormalMode).url
+        continueUrl(Signatories.sectionName)
       task(viewModel, "taskList.thirdPartyOrganisations.change").href.value mustBe
-        controllers.thirdparty.routes.AddedThirdPartiesController.onPageLoad(models.NormalMode).url
+        continueUrl(ThirdPartyOrganisations.sectionName)
     }
 
-    "must route multiple completed third party organisations to the section final CYA" in {
+    "must link multiple completed third party organisations through the task-list continuation route" in {
       val viewModel = TaskListViewModel(
         emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = Some(completeTaskListOrganisationDetails),
@@ -169,7 +167,7 @@ class TaskListViewModelSpec extends SpecBase {
       )
 
       task(viewModel, "taskList.thirdPartyOrganisations.change").href.value mustBe
-        controllers.thirdparty.routes.ThirdPartiesCheckYourAnswersController.onPageLoad().url
+        continueUrl(ThirdPartyOrganisations.sectionName)
     }
 
     "must show in progress when authorised users or third parties include incomplete records" in {
@@ -250,12 +248,13 @@ class TaskListViewModelSpec extends SpecBase {
       val viewModel   = TaskListViewModel(journeyData, User)
 
       viewModel.canSubmitAnswers mustBe true
-      task(viewModel, "taskList.submit.checkAnswers").href.value mustBe controllers.routes.SubmissionCyaController
-        .onPageLoad()
-        .url
+      task(viewModel, "taskList.submit.checkAnswers").href.value mustBe continueUrl(DeclareAndSubmit.sectionName)
       task(viewModel, "taskList.submit.checkAnswers").status.content mustBe messages("taskList.status.notYetStarted")
-      TaskListViewModel.canSubmitAnswers(journeyData, User) mustBe true
-      TaskListViewModel.canSubmitAnswers(journeyData.copy(businessVerification = None), User) mustBe false
+      TaskListProgress.canSubmitAnswers(journeyData, User) mustBe true
+      TaskListProgress.canSubmitAnswers(
+        journeyData.copy(businessVerification = None),
+        User
+      ) mustBe false
     }
 
     "must prevent assistants from submitting final answers" in {
@@ -266,16 +265,19 @@ class TaskListViewModelSpec extends SpecBase {
 
       row.href mustBe None
       row.status.toGovuk mustBe uk.gov.hmrc.govukfrontend.views.viewmodels.tasklist.TaskListItemStatus()
-      TaskListViewModel.canSubmitAnswers(completeTaskListJourneyData, Assistant) mustBe false
+      TaskListProgress.canSubmitAnswers(completeTaskListJourneyData, Assistant) mustBe false
     }
 
     "must require successful business verification before the task list can be accessed" in {
-      TaskListViewModel.canAccessTaskList(emptyJourneyData) mustBe false
-      TaskListViewModel.canAccessTaskList(emptyJourneyDataWithBusinessVerification) mustBe true
-      TaskListViewModel.canAccessTaskList(emptyJourneyDataWithFailedBusinessVerification) mustBe false
+      TaskListProgress.canAccessTaskList(emptyJourneyData) mustBe false
+      TaskListProgress.canAccessTaskList(emptyJourneyDataWithBusinessVerification) mustBe true
+      TaskListProgress.canAccessTaskList(emptyJourneyDataWithFailedBusinessVerification) mustBe false
     }
   }
 
   private def task(viewModel: TaskListViewModel, titleMessageKey: String): TaskListTaskViewModel =
     viewModel.sections.flatMap(_.tasks).find(_.title == messages(titleMessageKey)).value
+
+  private def continueUrl(sectionName: String): String =
+    controllers.routes.TaskListController.continueTo(sectionName).url
 }

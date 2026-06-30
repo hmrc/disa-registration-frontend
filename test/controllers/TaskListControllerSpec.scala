@@ -17,16 +17,36 @@
 package controllers
 
 import base.SpecBase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import models.journeydata.JourneyData
+import models.journeydata.{OrganisationDetails, OrganisationEmail}
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.liaisonofficers.LiaisonOfficers
+import models.journeydata.signatories.Signatories
+import models.journeydata.thirdparty.ThirdPartyOrganisations
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
+import org.mockito.Mockito.{never, reset, verify, when}
+import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import services.AuditService
+import uk.gov.hmrc.auth.core.{Assistant, CredentialRole, User}
 import viewmodels.tasklist.TaskListViewModel
 import views.html.TaskListView
 
 import scala.concurrent.Future
 
 class TaskListControllerSpec extends SpecBase {
+
+  private def taskListApplicationBuilder(
+    journeyData: Option[JourneyData],
+    credentialRole: CredentialRole = User
+  ) =
+    applicationBuilder(
+      journeyData = journeyData,
+      credentialRole = credentialRole,
+      overrides = Seq(inject.bind[AuditService].toInstance(mockAuditService))
+    )
 
   "TaskListController" - {
 
@@ -35,7 +55,7 @@ class TaskListControllerSpec extends SpecBase {
         .thenReturn(Future.successful(()))
 
       val journeyData = emptyJourneyDataWithBusinessVerification
-      val application = applicationBuilder(
+      val application = taskListApplicationBuilder(
         journeyData = Some(journeyData)
       ).build()
 
@@ -64,7 +84,7 @@ class TaskListControllerSpec extends SpecBase {
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val journeyData = emptyJourneyDataWithBusinessVerification
-      val application = applicationBuilder(
+      val application = taskListApplicationBuilder(
         journeyData = Some(journeyData)
       ).build()
 
@@ -84,7 +104,7 @@ class TaskListControllerSpec extends SpecBase {
       when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
         .thenReturn(Future.successful(()))
 
-      val application = applicationBuilder(
+      val application = taskListApplicationBuilder(
         journeyData = None
       ).build()
 
@@ -106,7 +126,7 @@ class TaskListControllerSpec extends SpecBase {
         .thenReturn(Future.successful(()))
 
       val journeyData = emptyJourneyDataWithFailedBusinessVerification
-      val application = applicationBuilder(
+      val application = taskListApplicationBuilder(
         journeyData = Some(journeyData)
       ).build()
 
@@ -120,6 +140,143 @@ class TaskListControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.StartController.onPageLoad().url
+      }
+    }
+
+    "must redirect from a valid task-list continuation link and emit the section audit" in {
+      val testCases = Seq(
+        (
+          OrganisationDetails.sectionName,
+          emptyJourneyDataWithBusinessVerification,
+          OrganisationDetails.sectionName,
+          controllers.orgdetails.routes.RegisteredIsaManagerController.onPageLoad(models.NormalMode).url
+        ),
+        (
+          OrganisationDetails.sectionName,
+          emptyJourneyDataWithBusinessVerification.copy(organisationDetails =
+            Some(completeTaskListOrganisationDetails)
+          ),
+          OrganisationDetails.sectionName,
+          controllers.orgdetails.routes.OrganisationDetailsCheckYourAnswersController.onPageLoad().url
+        ),
+        (
+          OrganisationEmail.sectionName,
+          completeTaskListJourneyData.copy(organisationEmail = Some(unverifiedTaskListOrganisationEmail)),
+          OrganisationEmail.sectionName,
+          controllers.orgemail.routes.EmailVerificationCodeController.onPageLoad(models.NormalMode).url
+        ),
+        (
+          OrganisationEmail.sectionName,
+          completeTaskListJourneyData,
+          OrganisationEmail.sectionName,
+          controllers.orgemail.routes.OrganisationEmailCyaController.onPageLoad().url
+        ),
+        (
+          IsaProducts.sectionName,
+          completeTaskListJourneyData,
+          IsaProducts.sectionName,
+          controllers.isaproducts.routes.IsaProductsCheckYourAnswersController.onPageLoad().url
+        ),
+        (
+          CertificatesOfAuthority.sectionName,
+          completeTaskListJourneyData,
+          CertificatesOfAuthority.sectionName,
+          controllers.certificatesofauthority.routes.CoaCheckYourAnswersController.onPageLoad().url
+        ),
+        (
+          LiaisonOfficers.sectionName,
+          completeTaskListJourneyData,
+          LiaisonOfficers.sectionName,
+          controllers.liaisonofficers.routes.AddedLiaisonOfficersController.onPageLoad(models.NormalMode).url
+        ),
+        (
+          Signatories.sectionName,
+          completeTaskListJourneyData,
+          Signatories.sectionName,
+          controllers.signatories.routes.AddedSignatoryController.onPageLoad(models.NormalMode).url
+        ),
+        (
+          ThirdPartyOrganisations.sectionName,
+          emptyJourneyDataWithBusinessVerification.copy(organisationDetails =
+            Some(completeTaskListOrganisationDetails)
+          ),
+          ThirdPartyOrganisations.sectionName,
+          controllers.thirdparty.routes.ProductsManagedByThirdPartyController.onPageLoad(models.NormalMode).url
+        ),
+        (
+          ThirdPartyOrganisations.sectionName,
+          emptyJourneyDataWithBusinessVerification.copy(
+            organisationDetails = Some(completeTaskListOrganisationDetails),
+            thirdPartyOrganisations = Some(
+              testThirdPartyOrganisations(Seq(completeTaskListThirdParty("third-party-1")))
+            )
+          ),
+          ThirdPartyOrganisations.sectionName,
+          controllers.thirdparty.routes.AddedThirdPartiesController.onPageLoad(models.NormalMode).url
+        ),
+        (
+          ThirdPartyOrganisations.sectionName,
+          completeTaskListJourneyData,
+          ThirdPartyOrganisations.sectionName,
+          controllers.thirdparty.routes.ProductsManagedByThirdPartyController.onPageLoad(models.CheckMode).url
+        ),
+        (
+          models.journeydata.DeclareAndSubmit.sectionName,
+          completeTaskListJourneyData,
+          models.journeydata.DeclareAndSubmit.sectionName,
+          routes.SubmissionCyaController.onPageLoad().url
+        )
+      )
+
+      testCases.foreach { case (taskListSection, journeyData, sectionName, expectedRedirect) =>
+        reset(mockAuditService)
+
+        val application =
+          taskListApplicationBuilder(journeyData = Some(journeyData)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, routes.TaskListController.continueTo(taskListSection).url)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual expectedRedirect
+          verify(mockAuditService).auditContinuation(any(), eqTo(sectionName))
+        }
+      }
+    }
+
+    "must redirect to TaskList and not audit when a continuation link is unavailable" in {
+      val application =
+        taskListApplicationBuilder(
+          journeyData = Some(completeTaskListJourneyData),
+          credentialRole = Assistant
+        ).build()
+
+      running(application) {
+        val request =
+          FakeRequest(GET, routes.TaskListController.continueTo(models.journeydata.DeclareAndSubmit.sectionName).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.TaskListController.onPageLoad().url
+        verify(mockAuditService, never()).auditContinuation(any(), any())
+      }
+    }
+
+    "must redirect to TaskList and not audit when the continuation section is unknown" in {
+      val application =
+        taskListApplicationBuilder(journeyData = Some(completeTaskListJourneyData)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.TaskListController.continueTo("unknown-section").url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual routes.TaskListController.onPageLoad().url
+        verify(mockAuditService, never()).auditContinuation(any(), any())
       }
     }
   }

@@ -110,6 +110,18 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
           view(form.fill(Yes), NormalMode, None)(request, messages(app)).toString
       }
     }
+
+    "must redirect to Start when no journey data exists" in {
+      val app = applicationBuilder(journeyData = None).build()
+
+      running(app) {
+        val request = FakeRequest(GET, routePath)
+        val result  = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.StartController.onPageLoad().url
+      }
+    }
   }
 
   "onSubmit" - {

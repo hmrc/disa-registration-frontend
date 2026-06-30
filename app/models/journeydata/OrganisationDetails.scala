@@ -31,7 +31,7 @@ case class OrganisationDetails(
   orgTelephoneNumber: Option[String] = None,
   addAnotherAddress: Option[AddAnotherAddress] = None
 ) extends TaskListSection {
-  override def sectionName: String = "organisationDetails"
+  override def sectionName: String = OrganisationDetails.sectionName
 
   def hasSelectedCorrespondenceAddress: Boolean =
     correspondenceAddress.exists(_.isPopulated)
@@ -41,6 +41,8 @@ case class OrganisationDetails(
 }
 
 object OrganisationDetails {
+  val sectionName = "organisationDetails"
+
   implicit val format: OFormat[OrganisationDetails] = Json.format[OrganisationDetails]
 
 }

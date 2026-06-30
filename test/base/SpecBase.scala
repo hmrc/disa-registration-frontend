@@ -139,9 +139,6 @@ trait SpecBase
         .bind[GetOrCreateJourneyDataAction]
         .toInstance(new FakeGetOrCreateJourneyDataAction(journeyData.getOrElse(emptyJourneyData))),
       inject.bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(journeyData)),
-      inject
-        .bind[AuditContinuationAction]
-        .toInstance(new FakeAuditContinuationAction(journeyData.getOrElse(emptyJourneyData))),
       inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
       inject.bind[GrsService].toInstance(mockGrsService),
       inject.bind[ErrorHandler].toInstance(mockErrorHandler),
