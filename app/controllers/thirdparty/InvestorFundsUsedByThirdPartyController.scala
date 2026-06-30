@@ -58,7 +58,7 @@ class InvestorFundsUsedByThirdPartyController @Inject() (
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       findThirdPartyWithDetails(id).fold {
-        Redirect(IndexController.onPageLoad())
+        Redirect(TaskListController.onPageLoad())
       } { case (thirdParty, name, answer) =>
         val preparedForm = answer.fold(form)(form.fill)
         Ok(view(id, name, preparedForm, mode, returnTo))
@@ -72,13 +72,13 @@ class InvestorFundsUsedByThirdPartyController @Inject() (
         .fold(
           formWithErrors =>
             findThirdPartyWithDetails(id).fold {
-              Future.successful(Redirect(IndexController.onPageLoad()))
+              Future.successful(Redirect(TaskListController.onPageLoad()))
             } { case (_, name, _) =>
               Future.successful(BadRequest(view(id, name, formWithErrors, mode, returnTo)))
             },
           answer =>
             updatedSectionWithAnswer(id, answer).fold {
-              Future.successful(Redirect(IndexController.onPageLoad()))
+              Future.successful(Redirect(TaskListController.onPageLoad()))
             } { updatedSection =>
               val existingSection = request.journeyData.thirdPartyOrganisations
               val cleanedSection  =

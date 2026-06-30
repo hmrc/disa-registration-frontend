@@ -17,7 +17,7 @@
 package controllers.signatories
 
 import base.SpecBase
-import controllers.routes.IndexController
+import controllers.routes.TaskListController
 import controllers.signatories.routes.SignatoryJobTitleController
 import forms.SignatoryJobTitleFormProvider
 import models.journeydata.JourneyData
@@ -117,7 +117,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Index on a GET when the signatory does not exist" in {
+    "must redirect to TaskList on a GET when the signatory does not exist" in {
 
       val journeyData =
         JourneyData(
@@ -140,11 +140,11 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
-    "must redirect to Index on a GET when the signatory has no name" in {
+    "must redirect to TaskList on a GET when the signatory has no name" in {
 
       val journeyData =
         JourneyData(
@@ -167,7 +167,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
@@ -207,7 +207,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Index when invalid data is submitted and signatory details cannot be found" in {
+    "must redirect to TaskList when invalid data is submitted and signatory details cannot be found" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
@@ -219,7 +219,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
@@ -271,7 +271,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Index when valid data is submitted and the section is absent" in {
+    "must redirect to TaskList when valid data is submitted and the section is absent" in {
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
@@ -285,11 +285,11 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
-    "must redirect to Index when valid data is submitted and the signatory id is not present in the section" in {
+    "must redirect to TaskList when valid data is submitted and the signatory id is not present in the section" in {
 
       val journeyData =
         JourneyData(
@@ -316,7 +316,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 

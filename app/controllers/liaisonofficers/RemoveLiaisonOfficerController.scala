@@ -17,7 +17,7 @@
 package controllers.liaisonofficers
 
 import controllers.actions.*
-import controllers.routes.IndexController
+import controllers.routes.TaskListController
 import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
 import models.{NormalMode, ReturnTo}
@@ -74,7 +74,7 @@ class RemoveLiaisonOfficerController @Inject() (
                   case No  => request.journeyData.liaisonOfficers
                 }
 
-                updatedSection.fold(Future.successful(Redirect(IndexController.onPageLoad())))(section =>
+                updatedSection.fold(Future.successful(Redirect(TaskListController.onPageLoad())))(section =>
                   updateAnswersAndRedirect(section, returnTo)
                 )
               }
@@ -87,7 +87,7 @@ class RemoveLiaisonOfficerController @Inject() (
       lo   <- findLiaisonOfficer(id)
       name <- lo.fullName
     } yield block(name))
-      .getOrElse(Future.successful(Redirect(IndexController.onPageLoad())))
+      .getOrElse(Future.successful(Redirect(TaskListController.onPageLoad())))
 
   private def updateAnswersAndRedirect(
     updatedSection: LiaisonOfficers,

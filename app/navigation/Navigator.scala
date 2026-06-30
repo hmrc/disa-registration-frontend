@@ -232,14 +232,14 @@ class Navigator @Inject() () {
     }
 
   private def isaProductsNextPage(answers: IsaProducts, returnTo: Option[ReturnTo]): Call =
-    answers.isaProducts.fold(IndexController.onPageLoad()) { isaProducts =>
+    answers.isaProducts.fold(TaskListController.onPageLoad()) { isaProducts =>
       if (isaProducts.contains(InnovativeFinanceIsas))
         InnovativeFinancialProductsController.onPageLoad(NormalMode, returnTo)
       else returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
     }
 
   private def innovativeFinancialProductsNextPage(answers: IsaProducts, returnTo: Option[ReturnTo]): Call =
-    answers.innovativeFinancialProducts.fold(IndexController.onPageLoad()) { ifps =>
+    answers.innovativeFinancialProducts.fold(TaskListController.onPageLoad()) { ifps =>
       if (ifps.contains(PeertopeerLoansUsingAPlatformWith36hPermissions))
         PeerToPeerPlatformController.onPageLoad(NormalMode, returnTo)
       else returnToRoute(returnTo, IsaProductsCheckYourAnswersController.onPageLoad())
@@ -260,7 +260,7 @@ class Navigator @Inject() () {
     answers: OrganisationDetails,
     returnTo: Option[ReturnTo]
   ): Call =
-    answers.registeredAddressCorrespondence.fold(IndexController.onPageLoad()) {
+    answers.registeredAddressCorrespondence.fold(TaskListController.onPageLoad()) {
       case YesNoAnswer.Yes =>
         OrganisationTelephoneNumberController.onPageLoad(NormalMode, returnTo)
       case YesNoAnswer.No  =>

@@ -18,7 +18,7 @@ package controllers.liaisonofficers
 
 import base.SpecBase
 import controllers.liaisonofficers.routes.LiaisonOfficerEmailController
-import controllers.routes.IndexController
+import controllers.routes.TaskListController
 import forms.LiaisonOfficerEmailFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
@@ -119,7 +119,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Index on a GET when the liaison officer does not exist" in {
+    "must redirect to TaskList on a GET when the liaison officer does not exist" in {
 
       val journeyData =
         JourneyData(
@@ -142,11 +142,11 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
-    "must redirect to Index on a GET when the liaison officer has no name" in {
+    "must redirect to TaskList on a GET when the liaison officer has no name" in {
 
       val journeyData =
         JourneyData(
@@ -169,7 +169,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
@@ -209,7 +209,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Index when invalid data is submitted and liaison officer details cannot be found" in {
+    "must redirect to TaskList when invalid data is submitted and liaison officer details cannot be found" in {
 
       val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
@@ -221,7 +221,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
@@ -274,7 +274,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to Index when valid data is submitted and the section is absent" in {
+    "must redirect to TaskList when valid data is submitted and the section is absent" in {
 
       val application =
         applicationBuilder(journeyData = Some(emptyJourneyData))
@@ -289,11 +289,11 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
-    "must redirect to Index when valid data is submitted and the liaison officer id is not present in the section" in {
+    "must redirect to TaskList when valid data is submitted and the liaison officer id is not present in the section" in {
 
       val journeyData =
         JourneyData(
@@ -321,7 +321,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+        redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
       }
     }
 
