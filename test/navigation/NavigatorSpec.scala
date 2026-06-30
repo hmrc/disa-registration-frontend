@@ -22,7 +22,7 @@ import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.*
 import controllers.orgdetails.routes.*
 import controllers.orgemail.routes.*
-import controllers.routes.{IndexController, SubmissionCyaController, TaskListController}
+import controllers.routes.{SubmissionCyaController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
@@ -357,12 +357,12 @@ class NavigatorSpec extends SpecBase {
       result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
-    "route IsaProductsPage to Index when isaProducts is missing" in {
+    "route IsaProductsPage to TaskList when isaProducts is missing" in {
       val answers = emptyIsaProductsAnswers.copy(isaProducts = None)
 
       val result: Call = navigator.normalRoutes(IsaProductsPage, answers, None)
 
-      result shouldBe IndexController.onPageLoad()
+      result shouldBe TaskListController.onPageLoad()
     }
 
     "route InnovativeFinancialProductsPage to P2P platform when 36H selected" in {
@@ -381,12 +381,12 @@ class NavigatorSpec extends SpecBase {
       result shouldBe IsaProductsCheckYourAnswersController.onPageLoad()
     }
 
-    "route InnovativeFinancialProductsPage to Index when innovativeFinancialProducts is missing" in {
+    "route InnovativeFinancialProductsPage to TaskList when innovativeFinancialProducts is missing" in {
       val answers = emptyIsaProductsAnswers.copy(innovativeFinancialProducts = None)
 
       val result: Call = navigator.normalRoutes(InnovativeFinancialProductsPage, answers, None)
 
-      result shouldBe IndexController.onPageLoad()
+      result shouldBe TaskListController.onPageLoad()
     }
 
     "route PeerToPeerPlatformPage to PeerToPeerPlatformNumberPage" in {
@@ -449,7 +449,7 @@ class NavigatorSpec extends SpecBase {
           testOrganisationDetails.copy(registeredAddressCorrespondence = None),
           None
         )
-      result shouldBe IndexController.onPageLoad()
+      result shouldBe TaskListController.onPageLoad()
     }
 
     "route to AddAnotherAddressPage if 1 address is persisted in user answers to the ConfirmAddressPage" in {
@@ -1056,7 +1056,7 @@ class NavigatorSpec extends SpecBase {
       result shouldBe ProductsManagedByThirdPartyController.onPageLoad(NormalMode)
     }
 
-    "route unknown page to Index" in {
+    "route unknown page to TaskList" in {
       case object UnknownPage extends PageWithoutDependents[IsaProducts] {
         override def clearAnswer(answers: IsaProducts): IsaProducts = answers
       }
@@ -1296,7 +1296,7 @@ class NavigatorSpec extends SpecBase {
         ThirdPartiesCheckYourAnswersController.onPageLoad()
     }
 
-    "route unknown page to Index" in {
+    "route unknown page to TaskList" in {
       case object UnknownPage extends PageWithoutDependents[IsaProducts] {
         override def clearAnswer(sectionAnswers: IsaProducts): IsaProducts = sectionAnswers
       }

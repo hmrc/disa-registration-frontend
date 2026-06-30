@@ -56,7 +56,7 @@ class SignatoryJobTitleController @Inject() (
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       findSignatoryWithDetails(id).fold {
-        Redirect(IndexController.onPageLoad())
+        Redirect(TaskListController.onPageLoad())
       } { case (signatory, name, jobTitle) =>
         val preparedForm = jobTitle.fold(form)(form.fill)
         Ok(view(id, name, preparedForm, mode, returnTo))
@@ -70,13 +70,13 @@ class SignatoryJobTitleController @Inject() (
         .fold(
           formWithErrors =>
             findSignatoryWithDetails(id).fold {
-              Future.successful(Redirect(IndexController.onPageLoad()))
+              Future.successful(Redirect(TaskListController.onPageLoad()))
             } { case (_, name, _) =>
               Future.successful(BadRequest(view(id, name, formWithErrors, mode, returnTo)))
             },
           answer =>
             updatedSectionWithJobTitle(id, answer).fold {
-              Future.successful(Redirect(IndexController.onPageLoad()))
+              Future.successful(Redirect(TaskListController.onPageLoad()))
             } { updatedSection =>
               journeyAnswersService
                 .update(updatedSection, request.groupId, request.credentials.providerId)

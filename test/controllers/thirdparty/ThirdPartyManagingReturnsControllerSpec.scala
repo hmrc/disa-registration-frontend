@@ -17,7 +17,7 @@
 package controllers.thirdparty
 
 import base.SpecBase
-import controllers.routes.IndexController
+import controllers.routes.TaskListController
 import controllers.thirdparty.routes._
 import forms.YesNoAnswerFormProvider
 import models.YesNoAnswer
@@ -121,7 +121,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Index when third party does not exist" in {
+      "must redirect to TaskList when third party does not exist" in {
 
         val journeyData =
           JourneyData(
@@ -138,11 +138,11 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           val result = route(application, FakeRequest(GET, routeUrl)).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+          redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
         }
       }
 
-      "must redirect to Index when name is missing" in {
+      "must redirect to TaskList when name is missing" in {
 
         val journeyData =
           JourneyData(
@@ -159,7 +159,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           val result = route(application, FakeRequest(GET, routeUrl)).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+          redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
         }
       }
     }
@@ -197,7 +197,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Index when invalid data and third party not found" in {
+      "must redirect to TaskList when invalid data and third party not found" in {
 
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
@@ -208,7 +208,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+          redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
         }
       }
 
@@ -264,7 +264,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Index when section missing" in {
+      "must redirect to TaskList when section missing" in {
 
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
@@ -276,7 +276,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual IndexController.onPageLoad().url
+          redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
         }
       }
 

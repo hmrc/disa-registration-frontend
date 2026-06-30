@@ -17,7 +17,7 @@
 package controllers.liaisonofficers
 
 import controllers.actions.*
-import controllers.routes.IndexController
+import controllers.routes.TaskListController
 import forms.TelephoneNumberFormProvider
 import handlers.ErrorHandler
 import models.{Mode, ReturnTo}
@@ -57,7 +57,7 @@ class LiaisonOfficerPhoneNumberController @Inject() (
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       findLiaisonOfficerWithDetails(id).fold {
-        Redirect(IndexController.onPageLoad())
+        Redirect(TaskListController.onPageLoad())
       } { case (liaisonOfficer, name, number) =>
         val preparedForm = number.fold(form)(form.fill)
         Ok(view(id, name, preparedForm, mode, returnTo))
@@ -71,13 +71,13 @@ class LiaisonOfficerPhoneNumberController @Inject() (
         .fold(
           formWithErrors =>
             findLiaisonOfficerWithDetails(id).fold {
-              Future.successful(Redirect(IndexController.onPageLoad()))
+              Future.successful(Redirect(TaskListController.onPageLoad()))
             } { case (_, name, _) =>
               Future.successful(BadRequest(view(id, name, formWithErrors, mode, returnTo)))
             },
           answer =>
             updatedSectionWithPhoneNumber(id, answer).fold {
-              Future.successful(Redirect(IndexController.onPageLoad()))
+              Future.successful(Redirect(TaskListController.onPageLoad()))
             } { updatedSection =>
               journeyAnswersService
                 .update(updatedSection, request.groupId, request.credentials.providerId)
