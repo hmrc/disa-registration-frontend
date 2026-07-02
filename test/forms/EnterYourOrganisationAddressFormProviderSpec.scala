@@ -97,10 +97,9 @@ class EnterYourOrganisationAddressFormProviderSpec extends StringFieldBehaviours
 
   ".townOrCity" - {
 
-    val fieldName   = "townOrCity"
-    val requiredKey = "enterYourOrganisationAddress.error.townOrCity.required"
-    val lengthKey   = "enterYourOrganisationAddress.error.townOrCity.length"
-    val maxLength   = 255
+    val fieldName = "townOrCity"
+    val lengthKey = "enterYourOrganisationAddress.error.townOrCity.length"
+    val maxLength = 255
 
     behave like fieldThatBindsValidData(
       form,
@@ -115,11 +114,19 @@ class EnterYourOrganisationAddressFormProviderSpec extends StringFieldBehaviours
       lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
+    "must bind when omitted" in {
+      val result = form.bind(validData - fieldName)
+
+      result.errors mustBe empty
+      result.value.value.addressLine3 mustBe None
+    }
+
+    "must bind when empty" in {
+      val result = form.bind(validData.updated(fieldName, ""))
+
+      result.errors mustBe empty
+      result.value.value.addressLine3 mustBe None
+    }
   }
 
   ".postcode" - {

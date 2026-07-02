@@ -227,6 +227,56 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
       }
     }
 
+    "must update the section and redirect when optional address fields are blank" in {
+
+      val expectedAddress =
+        CorrespondenceAddress(
+          addressLine1 = Some("10 Downing Street"),
+          addressLine2 = None,
+          addressLine3 = None,
+          postCode = Some("SW1A 2AA")
+        )
+
+      val expectedSection =
+        organisationDetails.copy(
+          correspondenceAddress = Some(expectedAddress),
+          addAnotherAddress = Some(
+            addAnotherAddress.copy(
+              selectedAddress = Some(ManualEntry)
+            )
+          )
+        )
+
+      when(
+        mockJourneyAnswersService
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[OrganisationDetails]], any)
+      ).thenReturn(Future.successful(expectedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyDataWithOrganisationDetails))
+          .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, submitUrl)
+            .withFormUrlEncodedBody(
+              "addressLine1" -> "10 Downing Street",
+              "addressLine2" -> "",
+              "townOrCity"   -> "",
+              "postcode"     -> "SW1A 2AA"
+            )
+
+        val result = route(application, request).value
+
+        verify(mockJourneyAnswersService, atMostOnce())
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[OrganisationDetails]], any)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
     "must return BadRequest and the correct view when invalid data is submitted" in {
 
       val application =
