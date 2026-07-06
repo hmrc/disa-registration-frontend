@@ -34,9 +34,11 @@ class EnterYourOrganisationAddressFormProvider @Inject() extends Mappings {
           .transform(_.trim, identity)
           .verifying(maxLength(255, "enterYourOrganisationAddress.error.addressLine2.length"))
       ),
-      "townOrCity"   -> text("enterYourOrganisationAddress.error.townOrCity.required")
-        .transform(_.trim, identity)
-        .verifying(maxLength(255, "enterYourOrganisationAddress.error.townOrCity.length")),
+      "townOrCity"   -> optional(
+        text()
+          .transform(_.trim, identity)
+          .verifying(maxLength(255, "enterYourOrganisationAddress.error.townOrCity.length"))
+      ),
       "postcode"     -> text("enterYourOrganisationAddress.error.postcode.required")
         .transform(_.trim, identity)
         .verifying(minLength(5, "enterYourOrganisationAddress.error.postcode.tooShort"))
@@ -49,7 +51,7 @@ class EnterYourOrganisationAddressFormProvider @Inject() extends Mappings {
       CorrespondenceAddress(
         addressLine1 = Some(addressLine1),
         addressLine2 = addressLine2,
-        addressLine3 = Some(townOrCity),
+        addressLine3 = townOrCity,
         postCode = Some(postcode)
       )
     } { address =>
@@ -57,7 +59,7 @@ class EnterYourOrganisationAddressFormProvider @Inject() extends Mappings {
         (
           address.addressLine1.getOrElse(""),
           address.addressLine2,
-          address.addressLine3.getOrElse(""),
+          address.addressLine3,
           address.postCode.getOrElse("")
         )
       )
