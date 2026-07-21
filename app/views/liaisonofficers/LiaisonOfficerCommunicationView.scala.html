@@ -16,7 +16,6 @@
 
 @import controllers.liaisonofficers.routes.LiaisonOfficerCommunicationController
 @import models.journeydata.liaisonofficers.LiaisonOfficerCommunication
-@import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
@@ -40,7 +39,7 @@
             CheckboxesViewModel(
                 form   = form,
                 name   = "value",
-                legend = HmrcPageHeadingLegend.apply(Text(messages("liaisonOfficerCommunication.heading", name)), HmrcSectionCaption(messages("sectionTitle.liaisonOfficers")), "govuk-fieldset__legend--l").asPageHeading(Large),
+                legend = HmrcPageHeadingLegend.apply(Text(messages("liaisonOfficerCommunication.heading", name)), HmrcSectionCaption(messages("sectionTitle.liaisonOfficers")), "govuk-fieldset__legend--l"),
                 items  = LiaisonOfficerCommunication.checkboxItems,
                 hint = Some(Hint(content = Text(messages("liaisonOfficerCommunication.hint"))))
             )

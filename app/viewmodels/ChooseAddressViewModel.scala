@@ -25,8 +25,7 @@ import uk.gov.hmrc.govukfrontend.views.html.components.GovukRadios
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import uk.gov.hmrc.hmrcfrontend.views.config.{HmrcPageHeadingLegend, HmrcSectionCaption}
-import viewmodels.LegendSize.Large
-import viewmodels.govuk.all.{FluentLegend, RadiosViewModel}
+import viewmodels.govuk.all.RadiosViewModel
 import viewmodels.implicits.*
 
 import javax.inject.Inject
@@ -48,8 +47,7 @@ class ChooseAddressViewModel @Inject() (
                 Text(messages("chooseAddress.heading")),
                 HmrcSectionCaption(messages("sectionTitle.orgDetails")),
                 "govuk-fieldset__legend--l"
-              )
-              .asPageHeading(Large),
+              ),
             items = addressItems(addresses)
           )
         )
