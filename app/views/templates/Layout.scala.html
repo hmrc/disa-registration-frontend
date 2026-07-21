@@ -61,9 +61,7 @@
         additionalHeadBlock = Some(head),
         additionalScriptsBlock = Some(additionalScripts)
     ),
-    serviceURLs = ServiceURLs(
-        signOutUrl = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None
-    ),
+    serviceURLs = ServiceURLs(),
     banners = Banners(
         displayHmrcBanner = showHmrcBanner,
         phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
@@ -72,6 +70,12 @@
     backLink = if (showBackLink) Some(BackLink.mimicsBrowserBackButtonViaJavaScript) else None,
     serviceNavigation = Some(ServiceNavigation(
         serviceName = Some(messages("service.name")),
-        serviceUrl = Some(routes.TaskListController.onPageLoad().url)
+        serviceUrl = Some(routes.TaskListController.onPageLoad().url),
+        navigation = if(showSignOut) Seq(
+          ServiceNavigationItem(
+            content = Text(messages("site.signOut")),
+            href = controllers.auth.routes.AuthController.signOut().url
+          )
+        ) else Seq.empty
       ))
 ))(content)

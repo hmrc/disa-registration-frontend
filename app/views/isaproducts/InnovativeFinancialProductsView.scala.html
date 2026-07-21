@@ -16,7 +16,6 @@
 
 @import models.journeydata.isaproducts.InnovativeFinancialProduct
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
-@import viewmodels.LegendSize.Large
 
 
 @this(
@@ -42,7 +41,7 @@
                 form   = form,
                 name   = "value",
                 hint   = Some(Hint(content = Text(messages("isaProducts.hint")))),
-                legend = HmrcPageHeadingLegend.apply(Text(messages("innovativeFinancialProducts.heading")), HmrcSectionCaption(messages("sectionTitle.isaProducts")), "govuk-fieldset__legend--l").asPageHeading(Large),
+                legend = HmrcPageHeadingLegend.apply(Text(messages("innovativeFinancialProducts.heading")), HmrcSectionCaption(messages("sectionTitle.isaProducts")), "govuk-fieldset__legend--l"),
                 items  = InnovativeFinancialProduct.checkboxItems
             )
         )

@@ -112,7 +112,7 @@ class FrontendAppConfigSpec extends SpecBase {
       implicit val request = FakeRequest("GET", "/some-page?foo=bar")
 
       appConfig.feedbackUrl mustBe
-        "http://localhost:9250/contact/beta-feedback?service=disa-registration-frontend&backUrl=http://localhost:1200/some-page?foo=bar"
+        "http://localhost:9250/contact/beta-feedback?service=disa-registration-frontend&backUrl=http://localhost:1200/some-page?foo=bar&useServiceNavigation"
     }
 
     "must return loginUrl" in {
@@ -154,7 +154,8 @@ class FrontendAppConfigSpec extends SpecBase {
     }
 
     "must generate exit survey URL" in {
-      appConfig.exitSurveyUrl mustBe "http://localhost:9514/feedback/disa-registration-frontend"
+      appConfig.exitSurveyUrl mustBe
+        "http://localhost:9514/feedback/disa-registration-frontend?useServiceNavigation"
     }
 
     "must return whether language translation is enabled" in {
@@ -217,7 +218,8 @@ class FrontendAppConfigSpec extends SpecBase {
     }
 
     "must return accessibility statement URL" in {
-      appConfig.accessibilityStatementUrl mustBe "/accessibility-statement/disa-registration-frontend"
+      appConfig.accessibilityStatementUrl mustBe
+        "/accessibility-statement/disa-registration-frontend?useServiceNavigation"
     }
 
     "must return max liaison officers" in {

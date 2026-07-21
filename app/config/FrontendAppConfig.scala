@@ -35,7 +35,7 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
   private lazy val contactFormServiceIdentifier = "disa-registration-frontend"
 
   def feedbackUrl(implicit request: RequestHeader): String =
-    s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
+    s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}&useServiceNavigation"
 
   val loginUrl: String              = getString("urls.login")
   val loginContinueUrl: String      = getString("urls.loginContinue")
@@ -50,7 +50,7 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
 
   private lazy val exitSurveyBaseUrl: String = baseUrl("feedback-frontend")
 
-  lazy val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/disa-registration-frontend"
+  lazy val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/disa-registration-frontend?useServiceNavigation"
 
   lazy val languageTranslationEnabled: Boolean =
     getBoolean("features.welsh-translation")
@@ -78,7 +78,7 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
 
   lazy val grsCallback: String = "/obligations/enrolment/isa/incorporated-identity-callback"
 
-  lazy val accessibilityStatementUrl = "/accessibility-statement/disa-registration-frontend"
+  lazy val accessibilityStatementUrl = "/accessibility-statement/disa-registration-frontend?useServiceNavigation"
 
   lazy val manageIsaEnrolmentKey: String = getString("enrolments.manageIsa")
 

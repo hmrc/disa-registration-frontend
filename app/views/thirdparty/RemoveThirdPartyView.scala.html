@@ -15,7 +15,6 @@
  *@
 
 @import controllers.thirdparty.routes.RemoveThirdPartyController
-@import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
@@ -38,7 +37,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = HmrcPageHeadingLegend.apply(Text(messages("removeThirdParty.heading", name)), HmrcSectionCaption(messages("sectionTitle.thirdParty")), "govuk-fieldset__legend--l").asPageHeading(Large),
+                legend = HmrcPageHeadingLegend.apply(Text(messages("removeThirdParty.heading", name)), HmrcSectionCaption(messages("sectionTitle.thirdParty")), "govuk-fieldset__legend--l"),
                 items  = YesNoAnswer.options
             ).inline()
         )

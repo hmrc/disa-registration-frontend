@@ -15,7 +15,6 @@
  *@
 
 @import controllers.signatories.routes.RemoveSignatoryController
-@import viewmodels.LegendSize.Large
 
 @this(
     layout: templates.Layout,
@@ -38,7 +37,7 @@
         @govukRadios(
             RadiosViewModel(
                 field  = form("value"),
-                legend = HmrcPageHeadingLegend.apply(Text(messages("removeSignatory.heading", name)), HmrcSectionCaption(messages("sectionTitle.signatories")), "govuk-fieldset__legend--l").asPageHeading(Large),
+                legend = HmrcPageHeadingLegend.apply(Text(messages("removeSignatory.heading", name)), HmrcSectionCaption(messages("sectionTitle.signatories")), "govuk-fieldset__legend--l"),
                 items  = YesNoAnswer.options
             ).inline()
         )
