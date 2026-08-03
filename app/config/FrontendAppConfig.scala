@@ -55,6 +55,25 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
   lazy val languageTranslationEnabled: Boolean =
     getBoolean("features.welsh-translation")
 
+  lazy val europeanInstitutionWithAUkBaseEnabled: Boolean =
+    getBoolean("features.grs.european-institution-with-a-uk-base-enabled")
+  lazy val generalPartnershipEnabled: Boolean             =
+    getBoolean("features.grs.general-partnership-enabled")
+  lazy val incorporatedFriendlySocietyEnabled: Boolean    =
+    getBoolean("features.grs.incorporated-friendly-society-enabled")
+  lazy val limitedCompanyEnabled: Boolean                 =
+    getBoolean("features.grs.limited-company-enabled")
+  lazy val limitedLiabilityPartnershipEnabled: Boolean    =
+    getBoolean("features.grs.limited-liability-partnership-enabled")
+  lazy val limitedPartnershipEnabled: Boolean             =
+    getBoolean("features.grs.limited-partnership-enabled")
+  lazy val registeredFriendlySocietyEnabled: Boolean      =
+    getBoolean("features.grs.registered-friendly-society-enabled")
+  lazy val scottishLimitedPartnershipEnabled: Boolean     =
+    getBoolean("features.grs.scottish-limited-partnership-enabled")
+  lazy val scottishPartnershipEnabled: Boolean            =
+    getBoolean("features.grs.scottish-partnership-enabled")
+
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
