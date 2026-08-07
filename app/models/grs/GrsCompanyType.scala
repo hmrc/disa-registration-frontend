@@ -41,51 +41,49 @@ sealed trait GrsCompanyType {
 object GrsCompanyType extends Enumerable.Implicits {
 
   case object LimitedCompany extends WithName("limitedCompany") with GrsCompanyType {
-    val createJourneyPath    = "limited-company-journey"
+    val createJourneyPath     = "limited-company-journey"
     val identificationService = GrsIdentificationService.IncorporatedEntityIdentification
   }
 
   // Not a distinct GRS journey - maps to the Limited Company journey, since a European
   // Institution with a UK Base has no dedicated business entity type in GRS.
-  case object EuropeanInstitutionWithAUkBase
-      extends WithName("europeanInstitutionWithAUkBase")
-      with GrsCompanyType {
-    val createJourneyPath    = "limited-company-journey"
+  case object EuropeanInstitutionWithAUkBase extends WithName("europeanInstitutionWithAUkBase") with GrsCompanyType {
+    val createJourneyPath     = "limited-company-journey"
     val identificationService = GrsIdentificationService.IncorporatedEntityIdentification
   }
 
   case object IncorporatedFriendlySociety extends WithName("incorporatedFriendlySociety") with GrsCompanyType {
-    val createJourneyPath    = "registered-society-journey"
+    val createJourneyPath     = "registered-society-journey"
     val identificationService = GrsIdentificationService.IncorporatedEntityIdentification
   }
 
   case object RegisteredFriendlySociety extends WithName("registeredFriendlySociety") with GrsCompanyType {
-    val createJourneyPath    = "registered-society-journey"
+    val createJourneyPath     = "registered-society-journey"
     val identificationService = GrsIdentificationService.IncorporatedEntityIdentification
   }
 
   case object GeneralPartnership extends WithName("generalPartnership") with GrsCompanyType {
-    val createJourneyPath    = "general-partnership-journey"
+    val createJourneyPath     = "general-partnership-journey"
     val identificationService = GrsIdentificationService.PartnershipIdentification
   }
 
   case object ScottishPartnership extends WithName("scottishPartnership") with GrsCompanyType {
-    val createJourneyPath    = "scottish-partnership-journey"
+    val createJourneyPath     = "scottish-partnership-journey"
     val identificationService = GrsIdentificationService.PartnershipIdentification
   }
 
   case object ScottishLimitedPartnership extends WithName("scottishLimitedPartnership") with GrsCompanyType {
-    val createJourneyPath    = "scottish-limited-partnership-journey"
+    val createJourneyPath     = "scottish-limited-partnership-journey"
     val identificationService = GrsIdentificationService.PartnershipIdentification
   }
 
   case object LimitedPartnership extends WithName("limitedPartnership") with GrsCompanyType {
-    val createJourneyPath    = "limited-partnership-journey"
+    val createJourneyPath     = "limited-partnership-journey"
     val identificationService = GrsIdentificationService.PartnershipIdentification
   }
 
   case object LimitedLiabilityPartnership extends WithName("limitedLiabilityPartnership") with GrsCompanyType {
-    val createJourneyPath    = "limited-liability-partnership-journey"
+    val createJourneyPath     = "limited-liability-partnership-journey"
     val identificationService = GrsIdentificationService.PartnershipIdentification
   }
 
