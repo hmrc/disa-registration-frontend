@@ -203,7 +203,7 @@ trait TestData extends Generators {
   val testBV: BusinessVerification = BusinessVerification(
     businessRegistrationPassed = Some(true),
     businessVerificationPassed = Some(true),
-    ctUtr = Some("1234567890"),
+    utr = Some("1234567890"),
     registeredAddress = Some(testRegisteredAddress),
     companyName = Some(testString),
     companyNumber = Some(testString),

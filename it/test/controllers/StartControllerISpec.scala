@@ -32,6 +32,7 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
   private val controllerEndpoint = "/obligations/enrolment/isa/start"
   private val getOrCreateEnrolmentUrl = s"/disa-registration/journey/$testGroupId"
   private val grsStartUrl = "/incorporated-entity-identification/api/limited-company-journey"
+  private val businessVerificationStoreUrl = s"/disa-registration/store/$testGroupId/businessVerification"
   
   override lazy val app: Application =
     new GuiceApplicationBuilder()
@@ -164,6 +165,8 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
 
       clearLock()
 
+      stubPost(businessVerificationStoreUrl, NO_CONTENT, "")
+
       stubPost(
         grsStartUrl,
         OK,
@@ -203,6 +206,8 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
 
       clearLock()
 
+      stubPost(businessVerificationStoreUrl, NO_CONTENT, "")
+
       stubPost(
         grsStartUrl,
         OK,
@@ -236,6 +241,8 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
       stubPut(getOrCreateEnrolmentUrl, OK, response)
 
       clearLock()
+
+      stubPost(businessVerificationStoreUrl, NO_CONTENT, "")
 
       stubPost(
         grsStartUrl,

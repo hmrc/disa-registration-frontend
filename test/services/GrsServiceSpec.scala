@@ -41,6 +41,8 @@ class GrsServiceSpec extends SpecBase {
 
   implicit val request: Request[AnyContent] = FakeRequest()
 
+  private val companyType = GrsCompanyType.LimitedCompany
+
   "GrsService" - {
 
     "getGRSJourneyStartUrl" - {
@@ -48,23 +50,23 @@ class GrsServiceSpec extends SpecBase {
       "must return the journeyStartUrl when connector returns CreateJourneyResponse" in {
         val testResponse = CreateJourneyResponse("http://test-url.com")
 
-        when(mockConnector.createJourney(any[GrsCreateJourneyRequest])(any[HeaderCarrier]))
+        when(mockConnector.createJourney(any[GrsCompanyType], any[GrsCreateJourneyRequest])(any[HeaderCarrier]))
           .thenReturn(Future.successful(testResponse))
 
-        val result = service.getGRSJourneyStartUrl.futureValue
+        val result = service.getGRSJourneyStartUrl(companyType).futureValue
 
         result shouldBe "http://test-url.com"
-        verify(mockConnector).createJourney(any[GrsCreateJourneyRequest])(any[HeaderCarrier])
+        verify(mockConnector).createJourney(any[GrsCompanyType], any[GrsCreateJourneyRequest])(any[HeaderCarrier])
       }
 
       "must propagate exception from connector" in {
         val ex              = new Exception("GRS failed")
         val expectedRequest = ArgumentMatchers.any[GrsCreateJourneyRequest]
 
-        when(mockConnector.createJourney(expectedRequest)(any[HeaderCarrier]))
+        when(mockConnector.createJourney(any[GrsCompanyType], expectedRequest)(any[HeaderCarrier]))
           .thenReturn(Future.failed(ex))
 
-        val thrown = service.getGRSJourneyStartUrl.failed.futureValue
+        val thrown = service.getGRSJourneyStartUrl(companyType).failed.futureValue
 
         thrown shouldBe ex
       }
@@ -72,13 +74,11 @@ class GrsServiceSpec extends SpecBase {
 
     "fetchGRSJourneyData" - {
       val testJourneyId   = "testJourneyId"
-      val testGRSResponse = GRSResponse(
-        companyNumber = "01234567",
+      val testGRSResponse = IncorporatedEntityGRSResponse(
+        companyNumber = Some("01234567"),
         companyName = Some("Test Company Ltd"),
         ctutr = Some("1234567890"),
-        chrn = None,
         dateOfIncorporation = Some(java.time.LocalDate.parse("2020-01-01")),
-        countryOfIncorporation = "GB",
         identifiersMatch = true,
         businessRegistrationStatus = RegisteredStatus,
         businessVerificationStatus = Some(BvPass),
@@ -94,22 +94,26 @@ class GrsServiceSpec extends SpecBase {
       )
 
       "must return GRSResponse when connector returns it successfully" in {
-        when(mockConnector.fetchJourneyData(ArgumentMatchers.eq(testJourneyId))(any()))
+        when(
+          mockConnector.fetchJourneyData(ArgumentMatchers.eq(companyType), ArgumentMatchers.eq(testJourneyId))(any())
+        )
           .thenReturn(Future.successful(testGRSResponse))
 
-        val result = service.fetchGRSJourneyData(testJourneyId).futureValue
+        val result = service.fetchGRSJourneyData(companyType, testJourneyId).futureValue
 
         result shouldBe testGRSResponse
-        verify(mockConnector).fetchJourneyData(testJourneyId)
+        verify(mockConnector).fetchJourneyData(companyType, testJourneyId)
       }
 
       "must propagate exception from connector" in {
         val ex = new Exception("Fetch failed")
 
-        when(mockConnector.fetchJourneyData(ArgumentMatchers.eq(testJourneyId))(any()))
+        when(
+          mockConnector.fetchJourneyData(ArgumentMatchers.eq(companyType), ArgumentMatchers.eq(testJourneyId))(any())
+        )
           .thenReturn(Future.failed(ex))
 
-        val thrown = service.fetchGRSJourneyData(testJourneyId).failed.futureValue
+        val thrown = service.fetchGRSJourneyData(companyType, testJourneyId).failed.futureValue
 
         thrown shouldBe ex
       }

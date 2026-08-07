@@ -17,10 +17,12 @@
 package controllers
 
 import controllers.actions.*
+import models.grs.GrsCompanyType
+import models.journeydata.BusinessVerification
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{BusinessVerificationLockoutService, GrsService}
+import services.{BusinessVerificationLockoutService, GrsService, JourneyAnswersService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -33,7 +35,8 @@ class StartController @Inject() (
   getOrCreateJourneyData: GetOrCreateJourneyDataAction,
   val controllerComponents: MessagesControllerComponents,
   genericRegistrationService: GrsService,
-  businessVerificationLockoutService: BusinessVerificationLockoutService
+  businessVerificationLockoutService: BusinessVerificationLockoutService,
+  journeyAnswersService: JourneyAnswersService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
@@ -41,9 +44,9 @@ class StartController @Inject() (
 
   def onPageLoad(): Action[AnyContent] =
     (identify andThen getOrCreateJourneyData).async { implicit request =>
-      request.journeyData.businessVerification
-        .flatMap(_.businessVerificationPassed) match {
+      val businessVerification = request.journeyData.businessVerification
 
+      businessVerification.flatMap(_.businessVerificationPassed) match {
         case Some(true) =>
           Future.successful(
             Redirect(routes.TaskListController.onPageLoad())
@@ -60,13 +63,42 @@ class StartController @Inject() (
               )
 
             case false =>
-              genericRegistrationService.getGRSJourneyStartUrl
-                .map(url => Redirect(url))
-                .recover { case NonFatal(ex) =>
-                  logger.error("Failed to fetch GRS journey URL", ex)
-                  Redirect(routes.InternalServerErrorController.onPageLoad())
-                }
+              // No company type selection page exists yet - defaults to LimitedCompany
+              // until that page is built and starts writing the select company type
+              val companyType = businessVerification.flatMap(_.companyType).getOrElse(GrsCompanyType.LimitedCompany)
+
+              persistCompanyType(businessVerification, companyType).flatMap { _ =>
+                genericRegistrationService
+                  .getGRSJourneyStartUrl(companyType)
+                  .map(url => Redirect(url))
+                  .recover { case NonFatal(ex) =>
+                    logger.error("Failed to fetch GRS journey URL", ex)
+                    Redirect(routes.InternalServerErrorController.onPageLoad())
+                  }
+              }
           }
       }
     }
+
+  private def persistCompanyType(
+    existing: Option[BusinessVerification],
+    companyType: GrsCompanyType
+  )(implicit request: models.requests.DataRequest[?]): Future[BusinessVerification] = {
+    val updated = existing
+      .map(_.copy(companyType = Some(companyType)))
+      .getOrElse(
+        BusinessVerification(
+          businessRegistrationPassed = None,
+          businessVerificationPassed = None,
+          utr = None,
+          registeredAddress = None,
+          companyName = None,
+          businessPartnerId = None,
+          companyNumber = None,
+          companyType = Some(companyType)
+        )
+      )
+
+    journeyAnswersService.update(updated, request.groupId, request.credentials.providerId)
+  }
 }

@@ -45,10 +45,17 @@ class GrsController @Inject() (
 
   def grsCallback(journeyId: String): Action[AnyContent] =
     (identify andThen getData).async { implicit request =>
-      grsService.fetchGRSJourneyData(journeyId).flatMap { grsResponse =>
+      val existingBusinessVerification = request.journeyData.flatMap(_.businessVerification)
+
+      // No company type selection page exists yet - defaults to LimitedCompany, mirroring the
+      // same default StartController falls back to when starting the journey.
+      val companyType =
+        existingBusinessVerification.flatMap(_.companyType).getOrElse(GrsCompanyType.LimitedCompany)
+
+      grsService.fetchGRSJourneyData(companyType, journeyId).flatMap { grsResponse =>
 
         val businessVerification =
-          buildBusinessVerification(grsResponse, request.journeyData.flatMap(_.businessVerification))
+          buildBusinessVerification(grsResponse, companyType, existingBusinessVerification)
 
         val verificationPassed = grsResponse.businessVerificationStatus
         val registrationPassed = grsResponse.businessRegistrationStatus == RegisteredStatus
@@ -63,10 +70,10 @@ class GrsController @Inject() (
               }
 
           case (_, _) if grsResponse.businessVerificationStatus.contains(BvFail) =>
-            grsResponse.ctutr match {
-              case Some(ctutr) =>
+            grsResponse.utr match {
+              case Some(identifier) =>
                 businessVerificationLockoutService
-                  .lockout(request.groupId, ctutr)
+                  .lockout(request.groupId, identifier)
                   .map { _ =>
                     Redirect(routes.BusinessVerificationController.lockout())
                   }
@@ -86,6 +93,7 @@ class GrsController @Inject() (
 
   private def buildBusinessVerification(
     grs: GRSResponse,
+    companyType: GrsCompanyType,
     existing: Option[BusinessVerification]
   ): BusinessVerification = {
     val verificationPassed: Option[Boolean] =
@@ -102,22 +110,24 @@ class GrsController @Inject() (
         ev.copy(
           businessVerificationPassed = verificationPassed,
           businessRegistrationPassed = registrationPassed,
-          ctUtr = grs.ctutr,
+          utr = grs.utr,
           registeredAddress = grs.registeredAddress,
           companyName = grs.companyName,
           businessPartnerId = grs.bpSafeId,
-          companyNumber = Some(grs.companyNumber)
+          companyNumber = grs.companyNumber,
+          companyType = Some(companyType)
         )
       )
       .getOrElse(
         BusinessVerification(
           businessVerificationPassed = verificationPassed,
           businessRegistrationPassed = registrationPassed,
-          ctUtr = grs.ctutr,
+          utr = grs.utr,
           registeredAddress = grs.registeredAddress,
           companyName = grs.companyName,
           businessPartnerId = grs.bpSafeId,
-          companyNumber = Some(grs.companyNumber)
+          companyNumber = grs.companyNumber,
+          companyType = Some(companyType)
         )
       )
   }

@@ -17,7 +17,8 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.grs.{CreateJourneyResponse, GRSResponse, GrsCreateJourneyRequest}
+import models.grs.*
+import models.grs.GrsIdentificationService.{IncorporatedEntityIdentification, PartnershipIdentification}
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
@@ -34,11 +35,11 @@ class GrsConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(
     with Logging {
 
   def createJourney(
+    companyType: GrsCompanyType,
     grsJourneyRequest: GrsCreateJourneyRequest
   )(implicit hc: HeaderCarrier): Future[CreateJourneyResponse] = {
 
-    val url =
-      s"${appConfig.incorporatedEntityIdentificationHost}/incorporated-entity-identification/api/limited-company-journey"
+    val url = appConfig.grsCreateJourneyUrl(companyType)
 
     http
       .post(url"$url")
@@ -53,14 +54,23 @@ class GrsConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(
       }
   }
 
-  def fetchJourneyData(journeyId: String)(implicit hc: HeaderCarrier): Future[GRSResponse] =
-    http
-      .get(url"${appConfig.grsRetrieveResultUrl(journeyId)}")
-      .execute[GRSResponse]
-      .recoverWith { case errResponse: UpstreamErrorResponse =>
-        logger.error(
-          s"Fetch GRS journey data failed - Status: ${errResponse.statusCode}, Body: ${errResponse.message}"
-        )
-        Future.failed(errResponse)
-      }
+  def fetchJourneyData(companyType: GrsCompanyType, journeyId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[GRSResponse] = {
+    val url = url"${appConfig.grsRetrieveResultUrl(companyType, journeyId)}"
+
+    val result: Future[GRSResponse] = companyType.identificationService match {
+      case IncorporatedEntityIdentification =>
+        http.get(url).execute[IncorporatedEntityGRSResponse]
+      case PartnershipIdentification        =>
+        http.get(url).execute[PartnershipGRSResponse]
+    }
+
+    result.recoverWith { case errResponse: UpstreamErrorResponse =>
+      logger.error(
+        s"Fetch GRS journey data failed - Status: ${errResponse.statusCode}, Body: ${errResponse.message}"
+      )
+      Future.failed(errResponse)
+    }
+  }
 }

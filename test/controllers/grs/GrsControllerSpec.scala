@@ -35,18 +35,16 @@ class GrsControllerSpec extends SpecBase {
   private def fakeRequest =
     FakeRequest(GET, controllers.routes.GrsController.grsCallback(journeyId).url)
 
-  private def baseGRSResponse(
+  private def baseIncorporatedEntityGRSResponse(
     businessRegistrationStatus: BusinessRegistrationStatus = RegisteredStatus,
     businessVerificationStatus: Option[BusinessVerificationStatus] = Some(BvPass),
     ctutr: Option[String] = Some("1234567890")
   ) =
-    GRSResponse(
-      companyNumber = "01234567",
+    IncorporatedEntityGRSResponse(
+      companyNumber = Some("01234567"),
       companyName = Some("Test Co"),
       ctutr = ctutr,
-      chrn = None,
       dateOfIncorporation = None,
-      countryOfIncorporation = "GB",
       identifiersMatch = true,
       businessRegistrationStatus = businessRegistrationStatus,
       businessVerificationStatus = businessVerificationStatus,
@@ -61,15 +59,32 @@ class GrsControllerSpec extends SpecBase {
       )
     )
 
+  private def basePartnershipGRSResponse(
+    businessRegistrationStatus: BusinessRegistrationStatus = RegisteredStatus,
+    businessVerificationStatus: Option[BusinessVerificationStatus] = Some(BvPass),
+    sautr: Option[String] = Some("1234567890")
+  ) =
+    PartnershipGRSResponse(
+      sautr = sautr,
+      saPostcode = Some("AA11AA"),
+      companyNumber = None,
+      companyName = None,
+      identifiersMatch = true,
+      businessRegistrationStatus = businessRegistrationStatus,
+      businessVerificationStatus = businessVerificationStatus,
+      bpSafeId = Some("X00000123456789"),
+      registeredAddress = None
+    )
+
   "GrsController" - {
 
     "grsCallback" - {
 
       "must redirect to TaskList when both registration and verification pass" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-        val grsResponse = baseGRSResponse()
+        val grsResponse = baseIncorporatedEntityGRSResponse()
 
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
 
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
@@ -105,9 +120,9 @@ class GrsControllerSpec extends SpecBase {
       "must redirect to BusinessVerificationController when business verification fails and lock the user when UTR is present" in {
 
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-        val grsResponse = baseGRSResponse(businessVerificationStatus = Some(BvFail))
+        val grsResponse = baseIncorporatedEntityGRSResponse(businessVerificationStatus = Some(BvFail))
 
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
 
         when(mockBvLockoutService.lockout(eqTo(testGroupId), eqTo("1234567890")))
@@ -122,17 +137,42 @@ class GrsControllerSpec extends SpecBase {
         }
       }
 
+      "must redirect to BusinessVerificationController and lock the user via SA UTR when a partnership's business verification fails" in {
+
+        val partnershipJourneyData = emptyJourneyData.copy(
+          businessVerification = Some(testBV.copy(companyType = Some(GrsCompanyType.GeneralPartnership)))
+        )
+
+        val application = applicationBuilder(journeyData = Some(partnershipJourneyData)).build()
+        val grsResponse = basePartnershipGRSResponse(businessVerificationStatus = Some(BvFail))
+
+        when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.GeneralPartnership), eqTo(journeyId))(any()))
+          .thenReturn(Future.successful(grsResponse))
+
+        when(mockBvLockoutService.lockout(eqTo(testGroupId), eqTo("1234567890")))
+          .thenReturn(Future.successful(()))
+
+        running(application) {
+          val result = route(application, fakeRequest).value
+
+          status(result)                 shouldBe SEE_OTHER
+          redirectLocation(result).value shouldBe controllers.routes.BusinessVerificationController.lockout().url
+
+          verify(mockBvLockoutService).lockout(testGroupId, "1234567890")
+        }
+      }
+
       "must show error page when business verification fails but UTR is missing" in {
 
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
         val grsResponse =
-          baseGRSResponse(
+          baseIncorporatedEntityGRSResponse(
             businessVerificationStatus = Some(BvFail),
             ctutr = None
           )
 
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
 
         running(application) {
@@ -148,12 +188,12 @@ class GrsControllerSpec extends SpecBase {
 
       "must show error page when no business registration/verification data present" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-        val grsResponse = baseGRSResponse(
+        val grsResponse = baseIncorporatedEntityGRSResponse(
           businessRegistrationStatus = FailedStatus,
           businessVerificationStatus = None
         )
 
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
 
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
@@ -188,9 +228,9 @@ class GrsControllerSpec extends SpecBase {
 
       "must show error page when business registration fails" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-        val grsResponse = baseGRSResponse(businessRegistrationStatus = FailedStatus)
+        val grsResponse = baseIncorporatedEntityGRSResponse(businessRegistrationStatus = FailedStatus)
 
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
 
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
@@ -225,9 +265,9 @@ class GrsControllerSpec extends SpecBase {
 
       "must propagate exception if journeyAnswersService fails" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
-        val grsResponse = baseGRSResponse()
+        val grsResponse = baseIncorporatedEntityGRSResponse()
 
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
           .thenReturn(Future.successful(grsResponse))
 
         when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
@@ -242,7 +282,7 @@ class GrsControllerSpec extends SpecBase {
       "must propagate exception if grsService fails" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
 
-        when(mockGrsService.fetchGRSJourneyData(eqTo(journeyId))(any()))
+        when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
           .thenReturn(Future.failed(new Exception("GRS failed - Service Down")))
 
         running(application) {

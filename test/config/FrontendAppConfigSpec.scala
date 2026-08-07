@@ -17,10 +17,9 @@
 package config
 
 import base.SpecBase
+import models.grs.GrsCompanyType
 import play.api.Configuration
-import play.api.i18n.Lang
 import play.api.test.FakeRequest
-import uk.gov.hmrc.hmrcfrontend.config.SupportedLanguagesConfig.{cy, en}
 
 import java.net.URLEncoder
 
@@ -61,6 +60,15 @@ class FrontendAppConfigSpec extends SpecBase {
       "urls.external.businessTaxAccount"                                           -> businessTaxAccountUrl,
       "enrolments.manageIsa"                                                       -> manageIsaEnrolmentKey,
       "features.welsh-translation"                                                 -> true,
+      "features.grs.european-institution-with-a-uk-base-enabled"                   -> true,
+      "features.grs.general-partnership-enabled"                                   -> false,
+      "features.grs.incorporated-friendly-society-enabled"                         -> true,
+      "features.grs.limited-company-enabled"                                       -> false,
+      "features.grs.limited-liability-partnership-enabled"                         -> true,
+      "features.grs.limited-partnership-enabled"                                   -> false,
+      "features.grs.registered-friendly-society-enabled"                           -> true,
+      "features.grs.scottish-limited-partnership-enabled"                          -> false,
+      "features.grs.scottish-partnership-enabled"                                  -> true,
       "timeout-dialog.timeout"                                                     -> 900,
       "timeout-dialog.countdown"                                                   -> 120,
       "mongodb.timeToLiveInSeconds"                                                -> 900,
@@ -88,7 +96,10 @@ class FrontendAppConfigSpec extends SpecBase {
       "microservice.services.feedback-frontend.port"                               -> 9514,
       "microservice.services.incorporated-entity-identification-frontend.protocol" -> "http",
       "microservice.services.incorporated-entity-identification-frontend.host"     -> "localhost",
-      "microservice.services.incorporated-entity-identification-frontend.port"     -> 9754
+      "microservice.services.incorporated-entity-identification-frontend.port"     -> 9754,
+      "microservice.services.partnership-identification-frontend.protocol"         -> "http",
+      "microservice.services.partnership-identification-frontend.host"             -> "localhost",
+      "microservice.services.partnership-identification-frontend.port"             -> 9722
     )
   )
 
@@ -162,8 +173,40 @@ class FrontendAppConfigSpec extends SpecBase {
       appConfig.languageTranslationEnabled mustBe true
     }
 
-    "must return language Map" in {
-      appConfig.languageMap mustBe Map("en" -> Lang(en), "cy" -> Lang(cy))
+    "must return whether europeanInstitutionWithAUkBase is enabled" in {
+      appConfig.europeanInstitutionWithAUkBaseEnabled mustBe true
+    }
+
+    "must return whether generalPartnership is enabled" in {
+      appConfig.generalPartnershipEnabled mustBe false
+    }
+
+    "must return whether incorporatedFriendlySociety is enabled" in {
+      appConfig.incorporatedFriendlySocietyEnabled mustBe true
+    }
+
+    "must return whether limitedCompany is enabled" in {
+      appConfig.limitedCompanyEnabled mustBe false
+    }
+
+    "must return whether limitedLiabilityPartnership is enabled" in {
+      appConfig.limitedLiabilityPartnershipEnabled mustBe true
+    }
+
+    "must return whether limitedPartnership is enabled" in {
+      appConfig.limitedPartnershipEnabled mustBe false
+    }
+
+    "must return whether registeredFriendlySociety is enabled" in {
+      appConfig.registeredFriendlySocietyEnabled mustBe true
+    }
+
+    "must return whether scottishLimitedPartnership is enabled" in {
+      appConfig.scottishLimitedPartnershipEnabled mustBe false
+    }
+
+    "must return whether scottishPartnership is enabled" in {
+      appConfig.scottishPartnershipEnabled mustBe true
     }
 
     "must return timeout value" in {
@@ -206,11 +249,32 @@ class FrontendAppConfigSpec extends SpecBase {
       appConfig.incorporatedEntityIdentificationHost mustBe "http://localhost:9754"
     }
 
-    "must generate GRS retrieve result URL" in {
+    "must generate partnershipIdentificationHost" in {
+      appConfig.partnershipIdentificationHost mustBe "http://localhost:9722"
+    }
+
+    "must generate GRS create journey URL for an incorporated entity company type" in {
+      appConfig.grsCreateJourneyUrl(GrsCompanyType.LimitedCompany) mustBe
+        "http://localhost:9754/incorporated-entity-identification/api/limited-company-journey"
+    }
+
+    "must generate GRS create journey URL for a partnership company type" in {
+      appConfig.grsCreateJourneyUrl(GrsCompanyType.GeneralPartnership) mustBe
+        "http://localhost:9722/partnership-identification/api/general-partnership-journey"
+    }
+
+    "must generate GRS retrieve result URL for an incorporated entity company type" in {
       val journeyId = "test-journey-id"
 
-      appConfig.grsRetrieveResultUrl(journeyId) mustBe
+      appConfig.grsRetrieveResultUrl(GrsCompanyType.LimitedCompany, journeyId) mustBe
         "http://localhost:9754/incorporated-entity-identification/api/journey/test-journey-id"
+    }
+
+    "must generate GRS retrieve result URL for a partnership company type" in {
+      val journeyId = "test-journey-id"
+
+      appConfig.grsRetrieveResultUrl(GrsCompanyType.GeneralPartnership, journeyId) mustBe
+        "http://localhost:9722/partnership-identification/api/journey/test-journey-id"
     }
 
     "must return GRS callback URL" in {

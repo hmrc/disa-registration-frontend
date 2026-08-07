@@ -99,7 +99,7 @@ object SubmissionCyaViewModel {
     Seq(
       businessVerification.flatMap(_.companyName).map(staticRow("submissionCya.organisationName.label", _)),
       businessVerification.flatMap(_.companyNumber).map(staticRow("submissionCya.registrationNumber.label", _)),
-      businessVerification.flatMap(_.ctUtr).map(staticRow("submissionCya.utrNumber.label", _)),
+      businessVerification.flatMap(_.utr).map(staticRow("submissionCya.utrNumber.label", _)),
       businessVerification.flatMap(_.registeredAddress).flatMap(addressRow("submissionCya.registeredAddress.label", _)),
       organisationDetails.flatMap(_.registeredToManageIsa).map { answer =>
         changeRow(

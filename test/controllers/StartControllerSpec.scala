@@ -18,8 +18,9 @@ package controllers
 
 import base.SpecBase
 import models.GetOrCreateJourneyData
+import models.grs.GrsCompanyType
 import models.journeydata.{BusinessVerification, JourneyData, RegisteredAddress}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.mvc.RequestHeader
@@ -34,6 +35,10 @@ class StartControllerSpec extends SpecBase {
 
   private def fakeRequest =
     FakeRequest(GET, controllers.routes.StartController.onPageLoad().url)
+
+  private def stubPersistCompanyType(): Unit =
+    when(mockJourneyAnswersService.update(any[BusinessVerification], any[String], any[String])(any(), any()))
+      .thenReturn(Future.successful(testBV.copy(companyType = Some(GrsCompanyType.LimitedCompany))))
 
   "StartController" - {
 
@@ -69,7 +74,7 @@ class StartControllerSpec extends SpecBase {
           BusinessVerification(
             businessRegistrationPassed = Some(true),
             businessVerificationPassed = Some(true),
-            ctUtr = Some("1234567890"),
+            utr = Some("1234567890"),
             companyName = Some(testString),
             businessPartnerId = Some(testString),
             registeredAddress = Some(
@@ -110,7 +115,7 @@ class StartControllerSpec extends SpecBase {
           BusinessVerification(
             businessRegistrationPassed = Some(true),
             businessVerificationPassed = Some(false),
-            ctUtr = Some("1234567890"),
+            utr = Some("1234567890"),
             companyName = Some(testString),
             businessPartnerId = Some(testString),
             registeredAddress = Some(
@@ -129,7 +134,9 @@ class StartControllerSpec extends SpecBase {
       when(mockBvLockoutService.isGroupLockedOut(any[String]))
         .thenReturn(Future.successful(false))
 
-      when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
+      stubPersistCompanyType()
+
+      when(mockGrsService.getGRSJourneyStartUrl(any[GrsCompanyType])(any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.successful("http://grs-start-url"))
 
       val application =
@@ -143,6 +150,8 @@ class StartControllerSpec extends SpecBase {
         redirectLocation(result).value shouldBe "http://grs-start-url"
 
         verify(mockBvLockoutService).isGroupLockedOut(any[String])
+        verify(mockGrsService)
+          .getGRSJourneyStartUrl(eqTo(GrsCompanyType.LimitedCompany))(any[HeaderCarrier], any[RequestHeader])
       }
     }
 
@@ -151,7 +160,9 @@ class StartControllerSpec extends SpecBase {
       when(mockBvLockoutService.isGroupLockedOut(any[String]))
         .thenReturn(Future.successful(false))
 
-      when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
+      stubPersistCompanyType()
+
+      when(mockGrsService.getGRSJourneyStartUrl(any[GrsCompanyType])(any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.successful("http://grs-start-url"))
 
       val application =
@@ -163,6 +174,42 @@ class StartControllerSpec extends SpecBase {
 
         status(result)                 shouldBe SEE_OTHER
         redirectLocation(result).value shouldBe "http://grs-start-url"
+
+        verify(mockGrsService)
+          .getGRSJourneyStartUrl(eqTo(GrsCompanyType.LimitedCompany))(any[HeaderCarrier], any[RequestHeader])
+      }
+    }
+
+    "must reuse the already-persisted company type on subsequent starts rather than defaulting" in {
+
+      val journeyData = emptyJourneyData.copy(
+        businessVerification = Some(
+          testBV.copy(
+            businessVerificationPassed = None,
+            companyType = Some(GrsCompanyType.GeneralPartnership)
+          )
+        )
+      )
+
+      when(mockBvLockoutService.isGroupLockedOut(any[String]))
+        .thenReturn(Future.successful(false))
+
+      stubPersistCompanyType()
+
+      when(mockGrsService.getGRSJourneyStartUrl(any[GrsCompanyType])(any[HeaderCarrier], any[RequestHeader]))
+        .thenReturn(Future.successful("http://grs-start-url"))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+        val result = route(application, fakeRequest).value
+
+        status(result) shouldBe SEE_OTHER
+
+        verify(mockGrsService)
+          .getGRSJourneyStartUrl(eqTo(GrsCompanyType.GeneralPartnership))(any[HeaderCarrier], any[RequestHeader])
       }
     }
 
@@ -171,7 +218,9 @@ class StartControllerSpec extends SpecBase {
       when(mockBvLockoutService.isGroupLockedOut(any[String]))
         .thenReturn(Future.successful(false))
 
-      when(mockGrsService.getGRSJourneyStartUrl(any[HeaderCarrier], any[RequestHeader]))
+      stubPersistCompanyType()
+
+      when(mockGrsService.getGRSJourneyStartUrl(any[GrsCompanyType])(any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.failed(new Exception("GRS down")))
 
       val application =

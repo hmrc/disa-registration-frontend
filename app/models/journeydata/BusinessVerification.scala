@@ -16,16 +16,18 @@
 
 package models.journeydata
 
+import models.grs.GrsCompanyType
 import play.api.libs.json.{Json, OFormat}
 
 case class BusinessVerification(
   businessRegistrationPassed: Option[Boolean],
   businessVerificationPassed: Option[Boolean],
-  ctUtr: Option[String],
+  utr: Option[String],
   registeredAddress: Option[RegisteredAddress],
   companyName: Option[String],
   businessPartnerId: Option[String],
-  companyNumber: Option[String]
+  companyNumber: Option[String],
+  companyType: Option[GrsCompanyType] = None
 ) extends TaskListSection {
   override def sectionName: String = "businessVerification"
 }

@@ -18,7 +18,7 @@ package services
 
 import config.FrontendAppConfig
 import connectors.GrsConnector
-import models.grs.{GRSResponse, GrsCreateJourneyRequest, Labels, ServiceLabel}
+import models.grs.{GRSResponse, GrsCompanyType, GrsCreateJourneyRequest, Labels, ServiceLabel}
 import play.api.Logging
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.RequestHeader
@@ -33,7 +33,9 @@ class GrsService @Inject() (grsConnector: GrsConnector, appConfig: FrontendAppCo
 ) extends HttpErrorFunctions
     with Logging {
 
-  def getGRSJourneyStartUrl(implicit hc: HeaderCarrier, request: RequestHeader): Future[String] = {
+  def getGRSJourneyStartUrl(
+    companyType: GrsCompanyType
+  )(implicit hc: HeaderCarrier, request: RequestHeader): Future[String] = {
     val serviceLabel: String = messagesApi.preferred(Seq(Lang("en"))).messages("service.name")
 
     val requestBody = GrsCreateJourneyRequest(
@@ -47,9 +49,11 @@ class GrsService @Inject() (grsConnector: GrsConnector, appConfig: FrontendAppCo
       labels = Some(Labels(en = Some(ServiceLabel(serviceLabel))))
     )
 
-    grsConnector.createJourney(grsJourneyRequest = requestBody).map(_.journeyStartUrl)
+    grsConnector.createJourney(companyType, grsJourneyRequest = requestBody).map(_.journeyStartUrl)
   }
 
-  def fetchGRSJourneyData(journeyId: String)(implicit hc: HeaderCarrier): Future[GRSResponse] =
-    grsConnector.fetchJourneyData(journeyId)
+  def fetchGRSJourneyData(companyType: GrsCompanyType, journeyId: String)(implicit
+    hc: HeaderCarrier
+  ): Future[GRSResponse] =
+    grsConnector.fetchJourneyData(companyType, journeyId)
 }

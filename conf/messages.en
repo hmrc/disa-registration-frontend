@@ -31,9 +31,6 @@ error.title.prefix = Error:
 error.prefix = Error
 error.summary.title = There is a problem
 
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
-
 fullStop = .
 signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
