@@ -62,7 +62,7 @@ class OrganisationDetailsCheckYourAnswersControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
 
         redirectLocation(result).value mustEqual
-          controllers.routes.StartController.onPageLoad().url
+          controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

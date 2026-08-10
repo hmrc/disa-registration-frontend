@@ -49,14 +49,14 @@ class TaskListController @Inject() (
           Ok(view(TaskListViewModel(journeyData, request.credentialRole)))
 
         case _ =>
-          Redirect(routes.StartController.onPageLoad())
+          Redirect(routes.GrsStartController.onPageLoad())
       }
     }
 
   def continueTo(section: String): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
       if (!TaskListProgress.canAccessTaskList(request.journeyData)) {
-        Redirect(routes.StartController.onPageLoad())
+        Redirect(routes.GrsStartController.onPageLoad())
       } else {
         TaskListRoutes
           .destination(section, request.journeyData, request.credentialRole)

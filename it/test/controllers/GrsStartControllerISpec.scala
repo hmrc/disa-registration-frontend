@@ -25,15 +25,14 @@ import play.api.test.Helpers.*
 import repositories.BusinessVerificationLockoutRepository
 import uk.gov.hmrc.http.SessionKeys
 import utils.BaseIntegrationSpec
-import utils.WiremockHelper.{stubPost, stubPut}
+import utils.WiremockHelper.{stubGet, stubPost}
 
-class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
+class GrsStartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
 
   private val controllerEndpoint = "/obligations/enrolment/isa/start"
-  private val getOrCreateEnrolmentUrl = s"/disa-registration/journey/$testGroupId"
-  private val grsStartUrl = "/incorporated-entity-identification/api/limited-company-journey"
-  private val businessVerificationStoreUrl = s"/disa-registration/store/$testGroupId/businessVerification"
-  
+  private val getJourneyDataUrl  = s"/disa-registration/store/$testGroupId"
+  private val grsStartUrl        = "/incorporated-entity-identification/api/limited-company-journey"
+
   override lazy val app: Application =
     new GuiceApplicationBuilder()
       .configure(config)
@@ -81,26 +80,40 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
       )
     }
 
+    "redirect to select company type when no journey data exists at all" in {
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, NOT_FOUND, "")
+
+      clearLock()
+
+      val request =
+        FakeRequest(GET, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+
+      val result = route(app, request).get
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some(routes.GrsCompanyTypeController.onPageLoad().url)
+    }
+
     "redirect to TaskList when business verification has passed" in {
 
       val response =
         s"""
            |{
-           |  "isNewEnrolmentJourney": true,
-           |  "journeyData": {
-           |    "groupId": "$testGroupId",
-           |    "enrolmentId": "$testEnrolmentId",
-           |    "businessVerification": {
-           |      "businessRegistrationPassed": true,
-           |      "businessVerificationPassed": true,
-           |      "ctutr": "1234567890"
-           |    }
+           |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testEnrolmentId",
+           |  "businessVerification": {
+           |    "businessRegistrationPassed": true,
+           |    "businessVerificationPassed": true,
+           |    "ctutr": "1234567890"
            |  }
            |}
            |""".stripMargin
 
       stubAuth()
-      stubPut(getOrCreateEnrolmentUrl, CREATED, response)
+      stubGet(getJourneyDataUrl, OK, response)
 
       clearLock()
 
@@ -119,21 +132,18 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
       val response =
         s"""
            |{
-           |  "isNewEnrolmentJourney": true,
-           |  "journeyData": {
-           |    "groupId": "$testGroupId",
-           |    "enrolmentId": "$testEnrolmentId",
-           |    "businessVerification": {
-           |      "businessRegistrationPassed": true,
-           |      "businessVerificationPassed": false,
-           |      "ctutr": "1234567890"
-           |    }
+           |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testEnrolmentId",
+           |  "businessVerification": {
+           |    "businessRegistrationPassed": true,
+           |    "businessVerificationPassed": false,
+           |    "ctutr": "1234567890"
            |  }
            |}
            |""".stripMargin
 
       stubAuth()
-      stubPut(getOrCreateEnrolmentUrl, CREATED, response)
+      stubGet(getJourneyDataUrl, OK, response)
 
       lockUser()
 
@@ -147,31 +157,25 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
       redirectLocation(result) shouldBe Some(routes.BusinessVerificationController.lockout().url)
     }
 
-    "redirect to GRS start URL when user is not locked out and no BV data exists" in {
+    "redirect to select company type when BV exists but not passed, user NOT locked out and no company type has been selected" in {
 
       val response =
         s"""
            |{
-           |  "isNewEnrolmentJourney": false,
-           |  "journeyData": {
-           |    "groupId": "$testGroupId",
-           |    "enrolmentId": "$testEnrolmentId"
+           |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testEnrolmentId",
+           |  "businessVerification": {
+           |    "businessRegistrationPassed": true,
+           |    "businessVerificationPassed": false,
+           |    "ctutr": "1234567890"
            |  }
            |}
            |""".stripMargin
 
       stubAuth()
-      stubPut(getOrCreateEnrolmentUrl, OK, response)
+      stubGet(getJourneyDataUrl, OK, response)
 
       clearLock()
-
-      stubPost(businessVerificationStoreUrl, NO_CONTENT, "")
-
-      stubPost(
-        grsStartUrl,
-        OK,
-        """{ "journeyStartUrl": "http://localhost:9999/grs/start" }"""
-      )
 
       val request =
         FakeRequest(GET, controllerEndpoint)
@@ -180,33 +184,29 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
       val result = route(app, request).get
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("http://localhost:9999/grs/start")
+      redirectLocation(result) shouldBe Some(routes.GrsCompanyTypeController.onPageLoad().url)
     }
 
-    "redirect to GRS start URL when BV exists but not passed and user NOT locked out" in {
+    "redirect to GRS start URL when BV exists but not passed, user NOT locked out and a company type has been selected" in {
 
       val response =
         s"""
            |{
-           |  "isNewEnrolmentJourney": true,
-           |  "journeyData": {
-           |    "groupId": "$testGroupId",
-           |    "enrolmentId": "$testEnrolmentId",
-           |    "businessVerification": {
-           |      "businessRegistrationPassed": true,
-           |      "businessVerificationPassed": false,
-           |      "ctutr": "1234567890"
-           |    }
+           |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testEnrolmentId",
+           |  "businessVerification": {
+           |    "businessRegistrationPassed": true,
+           |    "businessVerificationPassed": false,
+           |    "ctutr": "1234567890",
+           |    "companyType": "limitedCompany"
            |  }
            |}
            |""".stripMargin
 
       stubAuth()
-      stubPut(getOrCreateEnrolmentUrl, CREATED, response)
+      stubGet(getJourneyDataUrl, OK, response)
 
       clearLock()
-
-      stubPost(businessVerificationStoreUrl, NO_CONTENT, "")
 
       stubPost(
         grsStartUrl,
@@ -229,20 +229,18 @@ class StartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
       val response =
         s"""
            |{
-           |  "isNewEnrolmentJourney": false,
-           |  "journeyData": {
-           |    "groupId": "$testGroupId",
-           |    "enrolmentId": "$testEnrolmentId"
+           |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testEnrolmentId",
+           |  "businessVerification": {
+           |    "companyType": "limitedCompany"
            |  }
            |}
            |""".stripMargin
 
       stubAuth()
-      stubPut(getOrCreateEnrolmentUrl, OK, response)
+      stubGet(getJourneyDataUrl, OK, response)
 
       clearLock()
-
-      stubPost(businessVerificationStoreUrl, NO_CONTENT, "")
 
       stubPost(
         grsStartUrl,

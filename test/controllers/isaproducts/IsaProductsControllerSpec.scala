@@ -18,7 +18,7 @@ package controllers.isaproducts
 
 import base.SpecBase
 import controllers.isaproducts.routes.IsaProductsController
-import controllers.routes.StartController
+import controllers.routes.GrsStartController
 import forms.IsaProductsFormProvider
 import models.NormalMode
 import models.journeydata.JourneyData
@@ -144,7 +144,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to StartController if missing required data" in {
+    "must redirect to GrsStartController if missing required data" in {
       val application = applicationBuilder(journeyData = None).build()
 
       running(application) {
@@ -153,7 +153,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual StartController.onPageLoad().url
+        redirectLocation(result).value mustEqual GrsStartController.onPageLoad().url
       }
     }
 

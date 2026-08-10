@@ -8,7 +8,10 @@ GET         /assets/*file                                controllers.Assets.vers
 
 GET         /keep-alive                                  controllers.KeepAliveController.keepAlive()
 
-GET         /start                                       controllers.StartController.onPageLoad()
+GET         /company-type                                controllers.GrsCompanyTypeController.onPageLoad()
+POST        /company-type                                controllers.GrsCompanyTypeController.onSubmit()
+
+GET         /start                                       controllers.GrsStartController.onPageLoad()
 
 GET         /task-list                                   controllers.TaskListController.onPageLoad()
 GET         /task-list/:section                          controllers.TaskListController.continueTo(section: String)

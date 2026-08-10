@@ -39,6 +39,19 @@ signedOut.guidance = We saved your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
+grsCompanyType.title = What type of organisation are you registering?
+grsCompanyType.heading = What type of organisation are you registering?
+grsCompanyType.error.required = Select an option
+grsCompanyType.limitedCompany = Limited company
+grsCompanyType.europeanInstitutionWithAUkBase = European institution with a UK base
+grsCompanyType.incorporatedFriendlySociety = Incorporated friendly society
+grsCompanyType.registeredFriendlySociety = Registered friendly society
+grsCompanyType.generalPartnership = General partnership
+grsCompanyType.scottishPartnership = Scottish partnership
+grsCompanyType.scottishLimitedPartnership = Scottish limited partnership
+grsCompanyType.limitedPartnership = Limited partnership
+grsCompanyType.limitedLiabilityPartnership = Limited liability partnership
+
 pageNotFound.title = Page not found
 pageNotFound.heading = Page not found
 pageNotFound.paragraph1 = If you typed the web address, check it is correct.

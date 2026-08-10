@@ -47,8 +47,9 @@ class GrsController @Inject() (
     (identify andThen getData).async { implicit request =>
       val existingBusinessVerification = request.journeyData.flatMap(_.businessVerification)
 
-      // No company type selection page exists yet - defaults to LimitedCompany, mirroring the
-      // same default StartController falls back to when starting the journey.
+      // GrsStartController persists a companyType before starting the GRS journey, so this
+      // should always be populated by the time the callback fires. LimitedCompany is a
+      // defensive fallback only.
       val companyType =
         existingBusinessVerification.flatMap(_.companyType).getOrElse(GrsCompanyType.LimitedCompany)
 

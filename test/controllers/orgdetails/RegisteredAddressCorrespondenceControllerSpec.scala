@@ -87,7 +87,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual StartController.onPageLoad().url
+        redirectLocation(result).value mustEqual GrsStartController.onPageLoad().url
       }
     }
 
@@ -322,7 +322,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual StartController.onPageLoad().url
+        redirectLocation(result).value mustEqual GrsStartController.onPageLoad().url
       }
     }
 

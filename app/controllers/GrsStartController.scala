@@ -1,0 +1,79 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers
+
+import controllers.actions.*
+import play.api.Logging
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{BusinessVerificationLockoutService, GrsService}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
+
+class GrsStartController @Inject() (
+  override val messagesApi: MessagesApi,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  val controllerComponents: MessagesControllerComponents,
+  genericRegistrationService: GrsService,
+  businessVerificationLockoutService: BusinessVerificationLockoutService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
+
+  def onPageLoad(): Action[AnyContent] =
+    (identify andThen getData).async { implicit request =>
+      val businessVerification = request.journeyData.flatMap(_.businessVerification)
+
+      businessVerification.flatMap(_.businessVerificationPassed) match {
+        case Some(true) =>
+          Future.successful(
+            Redirect(routes.TaskListController.onPageLoad())
+          )
+
+        case _ =>
+          businessVerificationLockoutService.isGroupLockedOut(request.groupId).flatMap {
+            case true =>
+              logger.warn(
+                s"[GrsStartController][onPageLoad] GroupId: ${request.groupId} is locked out of Business Verification journey"
+              )
+              Future.successful(
+                Redirect(routes.BusinessVerificationController.lockout())
+              )
+
+            case false =>
+              businessVerification.flatMap(_.companyType) match {
+                case Some(companyType) =>
+                  genericRegistrationService
+                    .getGRSJourneyStartUrl(companyType)
+                    .map(url => Redirect(url))
+                    .recover { case NonFatal(ex) =>
+                      logger.error("Failed to fetch GRS journey URL", ex)
+                      Redirect(routes.InternalServerErrorController.onPageLoad())
+                    }
+
+                case None =>
+                  Future.successful(Redirect(routes.GrsCompanyTypeController.onPageLoad()))
+              }
+          }
+      }
+    }
+}

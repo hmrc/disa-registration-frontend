@@ -119,7 +119,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
         val result  = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.StartController.onPageLoad().url
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

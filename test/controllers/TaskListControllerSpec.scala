@@ -117,7 +117,7 @@ class TaskListControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.StartController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.GrsStartController.onPageLoad().url
       }
     }
 
@@ -139,7 +139,7 @@ class TaskListControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.StartController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.GrsStartController.onPageLoad().url
       }
     }
 
