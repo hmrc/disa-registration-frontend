@@ -49,7 +49,7 @@ class GrsController @Inject() (
       val existingBusinessVerification = request.journeyData.flatMap(_.businessVerification)
 
       existingBusinessVerification.flatMap(_.companyType) match {
-        case None =>
+        case None              =>
           Future.successful(Redirect(routes.GrsCompanyTypeController.onPageLoad()))
         case Some(companyType) =>
           grsService
@@ -57,8 +57,8 @@ class GrsController @Inject() (
             .flatMap { grsResponse =>
               val businessVerification =
                 buildBusinessVerification(grsResponse, companyType, existingBusinessVerification)
-              val verificationPassed = grsResponse.businessVerificationStatus
-              val registrationPassed = grsResponse.businessRegistrationStatus == RegisteredStatus
+              val verificationPassed   = grsResponse.businessVerificationStatus
+              val registrationPassed   = grsResponse.businessRegistrationStatus == RegisteredStatus
 
               (verificationPassed, registrationPassed) match {
                 case (Some(BvPass), true) | (Some(CtEnrolled), true) =>
