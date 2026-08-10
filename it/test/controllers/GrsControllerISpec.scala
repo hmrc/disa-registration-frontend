@@ -33,6 +33,9 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
     s"/obligations/enrolment/isa/incorporated-identity-callback?journeyId=$journeyId"
 
   private val getJourneyDataUrl =
+    s"/disa-registration/store/$testGroupId"
+
+  private val updateJourneyDataUrl =
     s"/disa-registration/store/$testGroupId/businessVerification"
 
   private val fetchGrsJourneyUrl =
@@ -90,7 +93,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
     "redirect to TaskList when registration AND verification pass" in {
 
       val journeyData =
-        s"""{ "groupId": "$testGroupId" }"""
+        s"""{ "groupId": "$testGroupId", "enrolmentId": "$testEnrolmentId", "businessVerification": { "companyType": "limitedCompany" } }"""
 
       val grsResponse =
         baseGrsResponse("REGISTERED", Some("PASS"))
@@ -98,7 +101,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
-      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+      stubPost(updateJourneyDataUrl, NO_CONTENT, "")
 
       val result = route(app,
         FakeRequest(GET, callbackUrl)
@@ -115,7 +118,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
     "lock user and redirect to lockout when verification FAILS with UTR present" in {
 
       val journeyData =
-        s"""{ "groupId": "$testGroupId" }"""
+        s"""{ "groupId": "$testGroupId", "enrolmentId": "$testEnrolmentId", "businessVerification": { "companyType": "limitedCompany" } }"""
 
       val grsResponse =
         baseGrsResponse("REGISTERED", Some("FAIL"))
@@ -123,7 +126,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
-      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+      stubPost(updateJourneyDataUrl, NO_CONTENT, "")
 
       val result = route(app,
         FakeRequest(GET, callbackUrl)
@@ -140,7 +143,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
     "show error page when verification FAILS but UTR is missing (no lockout)" in {
 
       val journeyData =
-        s"""{ "groupId": "$testGroupId" }"""
+        s"""{ "groupId": "$testGroupId", "enrolmentId": "$testEnrolmentId", "businessVerification": { "companyType": "limitedCompany" } }"""
 
       val grsResponse =
         baseGrsResponse("REGISTERED", Some("FAIL"), ctutr = None)
@@ -148,7 +151,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
-      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+      stubPost(updateJourneyDataUrl, NO_CONTENT, "")
 
       val result = route(app,
         FakeRequest(GET, callbackUrl)
@@ -163,7 +166,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
     "redirect to Start when registration FAILS" in {
 
       val journeyData =
-        s"""{ "groupId": "$testGroupId" }"""
+        s"""{ "groupId": "$testGroupId", "enrolmentId": "$testEnrolmentId", "businessVerification": { "companyType": "limitedCompany" } }"""
 
       val grsResponse =
         baseGrsResponse("REGISTRATION_FAILED", Some("PASS"))
@@ -171,7 +174,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
-      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+      stubPost(updateJourneyDataUrl, NO_CONTENT, "")
 
       val result = route(app,
         FakeRequest(GET, callbackUrl)
@@ -186,7 +189,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
     "redirect to Start when registration NOT CALLED" in {
 
       val journeyData =
-        s"""{ "groupId": "$testGroupId" }"""
+        s"""{ "groupId": "$testGroupId", "enrolmentId": "$testEnrolmentId", "businessVerification": { "companyType": "limitedCompany" } }"""
 
       val grsResponse =
         baseGrsResponse("REGISTRATION_NOT_CALLED", None)
@@ -194,7 +197,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
-      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+      stubPost(updateJourneyDataUrl, NO_CONTENT, "")
 
       val result = route(app,
         FakeRequest(GET, callbackUrl)
@@ -209,7 +212,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
     "redirect to Start when verification is missing" in {
 
       val journeyData =
-        s"""{ "groupId": "$testGroupId" }"""
+        s"""{ "groupId": "$testGroupId", "enrolmentId": "$testEnrolmentId", "businessVerification": { "companyType": "limitedCompany" } }"""
 
       val grsResponse =
         baseGrsResponse("REGISTERED", None)
@@ -217,7 +220,46 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyData)
       stubGet(fetchGrsJourneyUrl, OK, grsResponse)
-      stubPost(getJourneyDataUrl, NO_CONTENT, "")
+      stubPost(updateJourneyDataUrl, NO_CONTENT, "")
+
+      val result = route(app,
+        FakeRequest(GET, callbackUrl)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+      ).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+
+      isLockedOut shouldBe false
+    }
+
+    "redirect to select company type when no company type has been selected" in {
+
+      val journeyData =
+        s"""{ "groupId": "$testGroupId", "enrolmentId": "$testEnrolmentId" }"""
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, journeyData)
+
+      val result = route(app,
+        FakeRequest(GET, callbackUrl)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+      ).get
+
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe
+        Some(routes.GrsCompanyTypeController.onPageLoad().url)
+
+      isLockedOut shouldBe false
+    }
+
+    "show error page when fetching GRS journey data fails" in {
+
+      val journeyData =
+        s"""{ "groupId": "$testGroupId", "enrolmentId": "$testEnrolmentId", "businessVerification": { "companyType": "limitedCompany" } }"""
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, journeyData)
+      stubGet(fetchGrsJourneyUrl, INTERNAL_SERVER_ERROR, """{"error":"GRS unavailable"}""")
 
       val result = route(app,
         FakeRequest(GET, callbackUrl)

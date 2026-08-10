@@ -35,6 +35,9 @@ class GrsControllerSpec extends SpecBase {
   private def fakeRequest =
     FakeRequest(GET, controllers.routes.GrsController.grsCallback(journeyId).url)
 
+  private def journeyDataWithCompanyType(companyType: GrsCompanyType) =
+    emptyJourneyData.copy(businessVerification = Some(testBV.copy(companyType = Some(companyType))))
+
   private def baseIncorporatedEntityGRSResponse(
     businessRegistrationStatus: BusinessRegistrationStatus = RegisteredStatus,
     businessVerificationStatus: Option[BusinessVerificationStatus] = Some(BvPass),
@@ -80,8 +83,23 @@ class GrsControllerSpec extends SpecBase {
 
     "grsCallback" - {
 
-      "must redirect to TaskList when both registration and verification pass" in {
+      "must redirect to select company type when no company type has been selected" in {
         val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+
+        running(application) {
+          val result = route(application, fakeRequest).value
+
+          status(result)                 shouldBe SEE_OTHER
+          redirectLocation(result).value shouldBe controllers.routes.GrsCompanyTypeController.onPageLoad().url
+
+          verify(mockGrsService, Mockito.never())
+            .fetchGRSJourneyData(any[GrsCompanyType], any[String])(any())
+        }
+      }
+
+      "must redirect to TaskList when both registration and verification pass" in {
+        val application =
+          applicationBuilder(journeyData = Some(journeyDataWithCompanyType(GrsCompanyType.LimitedCompany))).build()
         val grsResponse = baseIncorporatedEntityGRSResponse()
 
         when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
@@ -119,7 +137,8 @@ class GrsControllerSpec extends SpecBase {
 
       "must redirect to BusinessVerificationController when business verification fails and lock the user when UTR is present" in {
 
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application =
+          applicationBuilder(journeyData = Some(journeyDataWithCompanyType(GrsCompanyType.LimitedCompany))).build()
         val grsResponse = baseIncorporatedEntityGRSResponse(businessVerificationStatus = Some(BvFail))
 
         when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
@@ -164,7 +183,8 @@ class GrsControllerSpec extends SpecBase {
 
       "must show error page when business verification fails but UTR is missing" in {
 
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application =
+          applicationBuilder(journeyData = Some(journeyDataWithCompanyType(GrsCompanyType.LimitedCompany))).build()
 
         val grsResponse =
           baseIncorporatedEntityGRSResponse(
@@ -187,7 +207,8 @@ class GrsControllerSpec extends SpecBase {
       }
 
       "must show error page when no business registration/verification data present" in {
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application =
+          applicationBuilder(journeyData = Some(journeyDataWithCompanyType(GrsCompanyType.LimitedCompany))).build()
         val grsResponse = baseIncorporatedEntityGRSResponse(
           businessRegistrationStatus = FailedStatus,
           businessVerificationStatus = None
@@ -227,7 +248,8 @@ class GrsControllerSpec extends SpecBase {
       }
 
       "must show error page when business registration fails" in {
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application =
+          applicationBuilder(journeyData = Some(journeyDataWithCompanyType(GrsCompanyType.LimitedCompany))).build()
         val grsResponse = baseIncorporatedEntityGRSResponse(businessRegistrationStatus = FailedStatus)
 
         when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
@@ -263,8 +285,9 @@ class GrsControllerSpec extends SpecBase {
         }
       }
 
-      "must propagate exception if journeyAnswersService fails" in {
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      "must show error page when journeyAnswersService fails" in {
+        val application =
+          applicationBuilder(journeyData = Some(journeyDataWithCompanyType(GrsCompanyType.LimitedCompany))).build()
         val grsResponse = baseIncorporatedEntityGRSResponse()
 
         when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
@@ -274,20 +297,25 @@ class GrsControllerSpec extends SpecBase {
           .thenReturn(Future.failed(new Exception("Update journeyAnswersService failed - Service Down")))
 
         running(application) {
-          val thrown = route(application, fakeRequest).value.failed.futureValue
-          thrown.getMessage shouldBe "Update journeyAnswersService failed - Service Down"
+          val result = route(application, fakeRequest).value
+
+          status(result) shouldBe INTERNAL_SERVER_ERROR
+          verify(mockErrorHandler).internalServerError(any)
         }
       }
 
-      "must propagate exception if grsService fails" in {
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      "must show error page when grsService fails" in {
+        val application =
+          applicationBuilder(journeyData = Some(journeyDataWithCompanyType(GrsCompanyType.LimitedCompany))).build()
 
         when(mockGrsService.fetchGRSJourneyData(eqTo(GrsCompanyType.LimitedCompany), eqTo(journeyId))(any()))
           .thenReturn(Future.failed(new Exception("GRS failed - Service Down")))
 
         running(application) {
-          val thrown = route(application, fakeRequest).value.failed.futureValue
-          thrown.getMessage shouldBe "GRS failed - Service Down"
+          val result = route(application, fakeRequest).value
+
+          status(result) shouldBe INTERNAL_SERVER_ERROR
+          verify(mockErrorHandler).internalServerError(any)
         }
       }
     }

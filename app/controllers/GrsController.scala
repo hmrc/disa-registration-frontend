@@ -27,7 +27,8 @@ import services.{BusinessVerificationLockoutService, GrsService, JourneyAnswersS
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 class GrsController @Inject() (
   override val messagesApi: MessagesApi,
@@ -47,48 +48,51 @@ class GrsController @Inject() (
     (identify andThen getData).async { implicit request =>
       val existingBusinessVerification = request.journeyData.flatMap(_.businessVerification)
 
-      // GrsStartController persists a companyType before starting the GRS journey, so this
-      // should always be populated by the time the callback fires. LimitedCompany is a
-      // defensive fallback only.
-      val companyType =
-        existingBusinessVerification.flatMap(_.companyType).getOrElse(GrsCompanyType.LimitedCompany)
+      existingBusinessVerification.flatMap(_.companyType) match {
+        case None =>
+          Future.successful(Redirect(routes.GrsCompanyTypeController.onPageLoad()))
+        case Some(companyType) =>
+          grsService
+            .fetchGRSJourneyData(companyType, journeyId)
+            .flatMap { grsResponse =>
+              val businessVerification =
+                buildBusinessVerification(grsResponse, companyType, existingBusinessVerification)
+              val verificationPassed = grsResponse.businessVerificationStatus
+              val registrationPassed = grsResponse.businessRegistrationStatus == RegisteredStatus
 
-      grsService.fetchGRSJourneyData(companyType, journeyId).flatMap { grsResponse =>
+              (verificationPassed, registrationPassed) match {
+                case (Some(BvPass), true) | (Some(CtEnrolled), true) =>
+                  journeyAnswersService
+                    .update(businessVerification, request.groupId, request.credentials.providerId)
+                    .map { _ =>
+                      Redirect(routes.TaskListController.onPageLoad())
+                    }
 
-        val businessVerification =
-          buildBusinessVerification(grsResponse, companyType, existingBusinessVerification)
+                case (_, _) if grsResponse.businessVerificationStatus.contains(BvFail) =>
+                  grsResponse.utr match {
+                    case Some(identifier) =>
+                      businessVerificationLockoutService
+                        .lockout(request.groupId, identifier)
+                        .map { _ =>
+                          Redirect(routes.BusinessVerificationController.lockout())
+                        }
 
-        val verificationPassed = grsResponse.businessVerificationStatus
-        val registrationPassed = grsResponse.businessRegistrationStatus == RegisteredStatus
-
-        (verificationPassed, registrationPassed) match {
-
-          case (Some(BvPass), true) | (Some(CtEnrolled), true) =>
-            journeyAnswersService
-              .update(businessVerification, request.groupId, request.credentials.providerId)
-              .map { _ =>
-                Redirect(routes.TaskListController.onPageLoad())
-              }
-
-          case (_, _) if grsResponse.businessVerificationStatus.contains(BvFail) =>
-            grsResponse.utr match {
-              case Some(identifier) =>
-                businessVerificationLockoutService
-                  .lockout(request.groupId, identifier)
-                  .map { _ =>
-                    Redirect(routes.BusinessVerificationController.lockout())
+                    case None =>
+                      logger.warn(s"[BV] Missing UTR on failed verification for groupId=${request.groupId}")
+                      errorHandler.internalServerError
                   }
-
-              case None =>
-                logger.warn(s"[BV] Missing UTR on failed verification for groupId=${request.groupId}")
-                errorHandler.internalServerError
+                case _                                                                 =>
+                  val bvStatus = grsResponse.businessVerificationStatus.map(status => s" BV Status: [$status]")
+                  logger.warn(
+                    s"Failure from GRS/BV. Registration status: [${grsResponse.businessRegistrationStatus}]$bvStatus"
+                  )
+                  errorHandler.internalServerError
+              }
             }
-          case _                                                                 =>
-            val bvStatus = grsResponse.businessVerificationStatus.map(status => s" BV Status: [$status]")
-            logger
-              .warn(s"Failure from GRS/BV. Registration status: [${grsResponse.businessRegistrationStatus}]$bvStatus")
-            errorHandler.internalServerError
-        }
+            .recoverWith { case NonFatal(ex) =>
+              logger.error(s"Failed to fetch GRS journey data for journeyId=[$journeyId]", ex)
+              errorHandler.internalServerError
+            }
       }
     }
 
