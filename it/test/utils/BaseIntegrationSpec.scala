@@ -64,6 +64,8 @@ trait BaseIntegrationSpec
       "microservice.services.tax-enrolments.port" -> wiremockPort.toString,
       "microservice.services.incorporated-entity-identification-frontend.host" -> wiremockHost,
       "microservice.services.incorporated-entity-identification-frontend.port" -> wiremockPort.toString,
+      "microservice.services.partnership-identification-frontend.host" -> wiremockHost,
+      "microservice.services.partnership-identification-frontend.port" -> wiremockPort.toString,
       "microservice.services.address-lookup.host" -> wiremockHost,
       "microservice.services.address-lookup.port" -> wiremockPort.toString,
       "microservice.services.email-verification.host" -> wiremockHost,

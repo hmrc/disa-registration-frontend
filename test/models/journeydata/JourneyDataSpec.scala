@@ -38,7 +38,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         BusinessVerification(
           businessRegistrationPassed = Some(true),
           businessVerificationPassed = Some(true),
-          ctUtr = Some("12345678"),
+          utr = Some("12345678"),
           registeredAddress = Some(
             RegisteredAddress(
               addressLine1 = Some("address line 1"),
@@ -106,7 +106,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
       "businessVerification": {
         "businessRegistrationPassed": true,
         "businessVerificationPassed": true,
-        "ctUtr": "12345678",
+        "utr": "12345678",
         "registeredAddress": {
           "addressLine1": "address line 1",
           "addressLine2": "address line 2",
@@ -161,7 +161,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
     "businessVerification": {
       "businessRegistrationPassed": true,
       "businessVerificationPassed": true,
-      "ctUtr": "12345678",
+      "utr": "12345678",
       "registeredAddress": {
         "addressLine1": "address line 1",
         "addressLine2": "address line 2",

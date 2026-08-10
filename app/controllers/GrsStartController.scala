@@ -27,10 +27,10 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-class StartController @Inject() (
+class GrsStartController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
-  getOrCreateJourneyData: GetOrCreateJourneyDataAction,
+  getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
   genericRegistrationService: GrsService,
   businessVerificationLockoutService: BusinessVerificationLockoutService
@@ -40,10 +40,10 @@ class StartController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getOrCreateJourneyData).async { implicit request =>
-      request.journeyData.businessVerification
-        .flatMap(_.businessVerificationPassed) match {
+    (identify andThen getData).async { implicit request =>
+      val businessVerification = request.journeyData.flatMap(_.businessVerification)
 
+      businessVerification.flatMap(_.businessVerificationPassed) match {
         case Some(true) =>
           Future.successful(
             Redirect(routes.TaskListController.onPageLoad())
@@ -53,19 +53,26 @@ class StartController @Inject() (
           businessVerificationLockoutService.isGroupLockedOut(request.groupId).flatMap {
             case true =>
               logger.warn(
-                s"[StartController][onPageLoad] GroupId: ${request.groupId} is locked out of Business Verification journey"
+                s"[GrsStartController][onPageLoad] GroupId: ${request.groupId} is locked out of Business Verification journey"
               )
               Future.successful(
                 Redirect(routes.BusinessVerificationController.lockout())
               )
 
             case false =>
-              genericRegistrationService.getGRSJourneyStartUrl
-                .map(url => Redirect(url))
-                .recover { case NonFatal(ex) =>
-                  logger.error("Failed to fetch GRS journey URL", ex)
-                  Redirect(routes.InternalServerErrorController.onPageLoad())
-                }
+              businessVerification.flatMap(_.companyType) match {
+                case Some(companyType) =>
+                  genericRegistrationService
+                    .getGRSJourneyStartUrl(companyType)
+                    .map(url => Redirect(url))
+                    .recover { case NonFatal(ex) =>
+                      logger.error("Failed to fetch GRS journey URL", ex)
+                      Redirect(routes.InternalServerErrorController.onPageLoad())
+                    }
+
+                case None =>
+                  Future.successful(Redirect(routes.GrsCompanyTypeController.onPageLoad()))
+              }
           }
       }
     }

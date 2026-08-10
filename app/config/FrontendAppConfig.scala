@@ -17,8 +17,8 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
+import models.grs.{GrsCompanyType, GrsIdentificationService}
 import play.api.Configuration
-import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -74,11 +74,6 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
   lazy val scottishPartnershipEnabled: Boolean            =
     getBoolean("features.grs.scottish-partnership-enabled")
 
-  def languageMap: Map[String, Lang] = Map(
-    "en" -> Lang("en"),
-    "cy" -> Lang("cy")
-  )
-
   lazy val timeout: Int       = getInt("timeout-dialog.timeout")
   lazy val countdown: Int     = getInt("timeout-dialog.countdown")
   lazy val cacheTtl: Long     = getInt("mongodb.timeToLiveInSeconds")
@@ -92,8 +87,20 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
   lazy val incorporatedEntityIdentificationHost: String =
     baseUrl("incorporated-entity-identification-frontend")
 
-  def grsRetrieveResultUrl(journeyId: String): String =
-    s"$incorporatedEntityIdentificationHost/incorporated-entity-identification/api/journey/$journeyId"
+  lazy val partnershipIdentificationHost: String =
+    baseUrl("partnership-identification-frontend")
+
+  private def grsHost(identificationService: GrsIdentificationService): String =
+    identificationService match {
+      case GrsIdentificationService.IncorporatedEntityIdentification => incorporatedEntityIdentificationHost
+      case GrsIdentificationService.PartnershipIdentification        => partnershipIdentificationHost
+    }
+
+  def grsCreateJourneyUrl(companyType: GrsCompanyType): String =
+    s"${grsHost(companyType.identificationService)}/${companyType.identificationService.apiBasePath}/${companyType.createJourneyPath}"
+
+  def grsRetrieveResultUrl(companyType: GrsCompanyType, journeyId: String): String =
+    s"${grsHost(companyType.identificationService)}/${companyType.identificationService.apiBasePath}/journey/$journeyId"
 
   lazy val grsCallback: String = "/obligations/enrolment/isa/incorporated-identity-callback"
 

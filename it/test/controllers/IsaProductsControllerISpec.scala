@@ -23,7 +23,7 @@ import play.api.http.Status.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, POST, contentAsString, redirectLocation, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
 import uk.gov.hmrc.http.SessionKeys
-import utils.WiremockHelper.{stubGet, stubPost, stubPut}
+import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
 class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {

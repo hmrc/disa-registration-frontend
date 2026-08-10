@@ -57,7 +57,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
       }
     }
 
-    "must redirect to StartController for a GET if no existing data is found" in {
+    "must redirect to GrsStartController for a GET if no existing data is found" in {
       val application = applicationBuilder(journeyData = None).build()
 
       running(application) {
@@ -66,7 +66,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.StartController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.GrsStartController.onPageLoad().url
       }
     }
 

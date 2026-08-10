@@ -29,6 +29,6 @@ class IndexController @Inject() (
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify { implicit request =>
-    Redirect(routes.StartController.onPageLoad())
+    Redirect(routes.GrsCompanyTypeController.onPageLoad())
   }
 }

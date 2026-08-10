@@ -21,26 +21,37 @@ import play.api.libs.json.*
 
 import java.time.LocalDate
 
-case class GRSResponse(
-  companyNumber: String,
+sealed trait GRSResponse {
+  def identifiersMatch: Boolean
+  def businessRegistrationStatus: BusinessRegistrationStatus
+  def businessVerificationStatus: Option[BusinessVerificationStatus]
+  def bpSafeId: Option[String]
+  def companyName: Option[String]
+  def companyNumber: Option[String]
+  def registeredAddress: Option[RegisteredAddress]
+  def utr: Option[String]
+}
+
+case class IncorporatedEntityGRSResponse(
+  companyNumber: Option[String],
   companyName: Option[String],
   ctutr: Option[String] = None,
-  chrn: Option[String] = None,
   dateOfIncorporation: Option[LocalDate],
-  countryOfIncorporation: String = "GB",
   identifiersMatch: Boolean,
   businessRegistrationStatus: BusinessRegistrationStatus,
   businessVerificationStatus: Option[BusinessVerificationStatus],
   bpSafeId: Option[String],
   registeredAddress: Option[RegisteredAddress]
-)
+) extends GRSResponse {
+  override def utr: Option[String] = ctutr
+}
 
-object GRSResponse {
+object IncorporatedEntityGRSResponse {
 
-  implicit val writes: OWrites[GRSResponse] = Json.writes[GRSResponse]
+  implicit val writes: OWrites[IncorporatedEntityGRSResponse] = Json.writes[IncorporatedEntityGRSResponse]
 
-  implicit val reads: Reads[GRSResponse] = for {
-    companyNumber              <- (JsPath \ "companyProfile" \ "companyNumber").read[String]
+  implicit val reads: Reads[IncorporatedEntityGRSResponse] = for {
+    companyNumber              <- (JsPath \ "companyProfile" \ "companyNumber").readNullable[String]
     companyName                <- (JsPath \ "companyProfile" \ "companyName").readNullable[String]
     dateOfIncorporation        <- (JsPath \ "companyProfile" \ "dateOfIncorporation").readNullable[LocalDate]
     identifiersMatch           <- (JsPath \ "identifiersMatch").read[Boolean]
@@ -53,14 +64,56 @@ object GRSResponse {
       (JsPath \ "businessVerification" \ "verificationStatus").readNullable[BusinessVerificationStatus]
     registeredAddress          <-
       (JsPath \ "companyProfile" \ "unsanitisedCHROAddress").readNullable(RegisteredAddress.grsReads)
-
-  } yield GRSResponse(
+  } yield IncorporatedEntityGRSResponse(
     companyNumber = companyNumber,
     companyName = companyName,
     ctutr = ctutr,
-    chrn = None,
     dateOfIncorporation = dateOfIncorporation,
-    countryOfIncorporation = "GB",
+    identifiersMatch = identifiersMatch,
+    businessRegistrationStatus = businessRegistrationStatus,
+    businessVerificationStatus = businessVerificationStatus,
+    bpSafeId = bpSafeId,
+    registeredAddress = registeredAddress
+  )
+}
+
+case class PartnershipGRSResponse(
+  sautr: Option[String] = None,
+  saPostcode: Option[String] = None,
+  companyNumber: Option[String] = None,
+  companyName: Option[String] = None,
+  identifiersMatch: Boolean,
+  businessRegistrationStatus: BusinessRegistrationStatus,
+  businessVerificationStatus: Option[BusinessVerificationStatus],
+  bpSafeId: Option[String],
+  registeredAddress: Option[RegisteredAddress]
+) extends GRSResponse {
+  override def utr: Option[String] = sautr
+}
+
+object PartnershipGRSResponse {
+
+  implicit val writes: OWrites[PartnershipGRSResponse] = Json.writes[PartnershipGRSResponse]
+
+  implicit val reads: Reads[PartnershipGRSResponse] = for {
+    sautr                      <- (JsPath \ "sautr").readNullable[String]
+    saPostcode                 <- (JsPath \ "postcode").readNullable[String]
+    companyNumber              <- (JsPath \ "companyProfile" \ "companyNumber").readNullable[String]
+    companyName                <- (JsPath \ "companyProfile" \ "companyName").readNullable[String]
+    identifiersMatch           <- (JsPath \ "identifiersMatch").read[Boolean]
+    businessRegistrationStatus <-
+      (JsPath \ "registration" \ "registrationStatus").read[BusinessRegistrationStatus]
+    bpSafeId                   <-
+      (JsPath \ "registration" \ "registeredBusinessPartnerId").readNullable[String]
+    businessVerificationStatus <-
+      (JsPath \ "businessVerification" \ "verificationStatus").readNullable[BusinessVerificationStatus]
+    registeredAddress          <-
+      (JsPath \ "companyProfile" \ "unsanitisedCHROAddress").readNullable(RegisteredAddress.grsReads)
+  } yield PartnershipGRSResponse(
+    sautr = sautr,
+    saPostcode = saPostcode,
+    companyNumber = companyNumber,
+    companyName = companyName,
     identifiersMatch = identifiersMatch,
     businessRegistrationStatus = businessRegistrationStatus,
     businessVerificationStatus = businessVerificationStatus,

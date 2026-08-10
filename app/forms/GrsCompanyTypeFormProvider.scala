@@ -1,5 +1,5 @@
-@*
- * Copyright 2025 HM Revenue & Customs
+/*
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,24 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcPageHeading
+package forms
 
-@this(
-    layout: templates.Layout,
-    govukSummaryList: GovukSummaryList,
-    hmrcPageHeading: HmrcPageHeading
-)
+import javax.inject.Inject
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+import forms.mappings.Mappings
+import models.grs.GrsCompanyType
+import play.api.data.Form
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+class GrsCompanyTypeFormProvider @Inject() extends Mappings {
 
-    @hmrcPageHeading(PageHeading(
-        text = messages("checkYourAnswers.heading"),
-        headingClasses = Some("govuk-heading-l")
-    ))
-
-    @govukSummaryList(list)
+  def apply(): Form[GrsCompanyType] =
+    Form(
+      "value" -> enumerable[GrsCompanyType]("grsCompanyType.error.required")
+    )
 }
