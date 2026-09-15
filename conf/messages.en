@@ -614,7 +614,7 @@ registrationSubmitted.whatHappensNext.heading = What happens next?
 
 registrationSubmitted.existing.panel.title = Enrolment completed
 registrationSubmitted.existing.thankYou = Thank you for enrolling onto the digital service.
-registrationSubmitted.existing.letterIntro = You will receive a letter to confirm if you have been successful enrolled onto the Manage ISAs service.
+registrationSubmitted.existing.letterIntro = You will receive a letter to confirm if you have been successful enrolling onto the Manage ISAs service.
 registrationSubmitted.existing.emailInfo = If we need further information to support your enrolment we will email you with the email address you provided.
 
 registrationSubmitted.existing.manage.heading = Manage your account
