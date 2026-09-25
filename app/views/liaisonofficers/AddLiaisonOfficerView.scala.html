@@ -40,8 +40,7 @@
       captionClasses = Some("govuk-caption-l")
     ))
 
-    <p class="govuk-body">@messages("addLiaisonOfficer.p1")</p>
-    <p class="govuk-body">@messages("addLiaisonOfficer.p2", appConfig.maxLiaisonOfficers)</p>
+    <p class="govuk-body">@messages("addLiaisonOfficer.p1", appConfig.maxLiaisonOfficers)</p>
 
     @govukDetails(Details(
       summary = Text(messages("addLiaisonOfficer.details.summary")),
