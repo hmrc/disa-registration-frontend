@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 class IsaProductsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
-  grsGuard: GrsGuardAction,
+  grsGuard: GrsGuardActionFilter,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
@@ -39,7 +39,7 @@ class IsaProductsCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen grsGuard) { implicit request =>
     val summaryListRows =
       request.journeyData.toSeq.flatMap { jd =>
         Seq(
@@ -49,8 +49,6 @@ class IsaProductsCheckYourAnswersController @Inject() (
           PeerToPeerPlatformNumberSummary.row(jd)
         )
       }.flatten
-
-    grsGuard.businessVerificationGuard(request, view(SummaryListViewModel(summaryListRows)))
 
     Ok(view(SummaryListViewModel(summaryListRows)))
   }

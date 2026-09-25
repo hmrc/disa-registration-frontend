@@ -3,25 +3,28 @@ package controllers.actions
 import models.journeydata.BusinessVerification
 import models.requests.OptionalDataRequest
 import navigation.Navigator
-import play.api.mvc.{AnyContent, Result}
+import play.api.mvc.{ActionFilter, AnyContent, Result, Results}
 import play.api.mvc.Results.{Ok, Redirect}
 import play.twirl.api.HtmlFormat
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
-class GrsGuardAction @Inject()(
+class GrsGuardActionFilter @Inject()(
                                 navigator: Navigator
-                              ) {
+                              ) (implicit val executionContext: ExecutionContext)
+  extends ActionFilter[OptionalDataRequest] with Results {
 
-  def businessVerificationGuard(request: OptionalDataRequest[AnyContent], page: HtmlFormat.Appendable): Result = {
+  override protected def filter[A](request: OptionalDataRequest[A]): Future[Option[Result]] = {
     val businessV = request.journeyData.flatMap(_.businessVerification)
 
-    val result = businessV match {
+    val isVerified = businessV match {
       case Some(business) => checkVerificationAndRegistration(business)
       case _ => false
     }
 
-    if result then Ok(page) else Redirect(navigator.nextPageGrsGuard())
+    val result = if isVerified then None else Some(Redirect(navigator.nextPageGrsGuard()))
+    Future.successful(result)
 
   }
 
