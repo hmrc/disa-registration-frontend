@@ -30,6 +30,7 @@ import javax.inject.Inject
 
 class IsaProductsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
+  grsGuard: GrsGuardAction,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
@@ -48,6 +49,8 @@ class IsaProductsCheckYourAnswersController @Inject() (
           PeerToPeerPlatformNumberSummary.row(jd)
         )
       }.flatten
+
+    grsGuard.businessVerificationGuard(request, view(SummaryListViewModel(summaryListRows)))
 
     Ok(view(SummaryListViewModel(summaryListRows)))
   }

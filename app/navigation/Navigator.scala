@@ -105,6 +105,11 @@ class Navigator @Inject() () {
     hasInProgressItems: Boolean = false
   ): Call =
     addedThirdPartiesNextPage(answer, count, connectedOrganisations, mode, returnTo, hasInProgressItems)
+  
+  def nextPageGrsGuard(): Call =
+  {
+    FinancialOrganisationController.onPageLoad(NormalMode, None)
+  }
 
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](
