@@ -109,6 +109,9 @@ class Navigator @Inject() () {
   def nextPageGrsGuard(): Call =
     GrsStartController.onPageLoad()
 
+  def nextPageCyaGuard(): Call =
+    TaskListController.onPageLoad()
+
   // TODO: Consider creating navigator defs for each task list journey to keep maintainable and clear
   private[navigation] def normalRoutes[A <: TaskListSection](
     page: Page[A],

@@ -39,8 +39,7 @@ class GrsGuardActionFilter @Inject() (
       case _              => false
     }
 
-    val result = if isVerified then None else Some(Redirect(navigator.nextPageGrsGuard()))
-    Future.successful(result)
+    Future.successful(if isVerified then None else Some(Redirect(navigator.nextPageGrsGuard())))
 
   }
 
