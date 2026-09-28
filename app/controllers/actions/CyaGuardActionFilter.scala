@@ -47,9 +47,9 @@ class CyaGuardActionFilter @Inject() (navigator: Navigator)(implicit ec: Executi
       case Some(organisation: OrganisationDetails) => true
       case Some(product: IsaProducts)              => true
       case Some(coa: CertificatesOfAuthority)      => true
-      case Some(lo: LiaisonOfficers)               => lo.liaisonOfficers.exists(_.id == id.get)
-      case Some(s: Signatories)                    => s.signatories.exists(_.id == id.get)
-      case Some(parties: ThirdPartyOrganisations)  => parties.thirdParties.exists(_.id == id.get)
+      case Some(lo: LiaisonOfficers)               => id.exists(i => lo.liaisonOfficers.exists(o => o.id == i && !o.inProgress))
+      case Some(s: Signatories)                    => id.exists(i => s.signatories.exists(x => x.id == i && !x.inProgress))
+      case Some(parties: ThirdPartyOrganisations)  => true // !parties.thirdParties.find(_.id == id.get).get.inProgress
       case Some(t: ThirdParty)                     => if !t.inProgress then true else false
       case _                                       => false
 

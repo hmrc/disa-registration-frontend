@@ -32,6 +32,7 @@ import javax.inject.Inject
 
 class SignatoryCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
+  cyaGuard: CyaGuardActionFilter,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -43,11 +44,9 @@ class SignatoryCheckYourAnswersController @Inject() (
 
   def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData) { implicit request =>
-      findSignatory(id) match {
-        case Some(signatory) if isValid(signatory) =>
-          Ok(view(SummaryListViewModel(buildSummaryRows(id, returnTo)), returnTo))
-        case _                                     =>
-          Redirect(controllers.routes.TaskListController.onPageLoad())
+      cyaGuard.sortingData(request.journeyData.signatories, Some(id)) match {
+        case Some(call) => Redirect(call)
+        case _          => Ok(view(SummaryListViewModel(buildSummaryRows(id, returnTo)), returnTo))
       }
     }
 
@@ -65,7 +64,4 @@ class SignatoryCheckYourAnswersController @Inject() (
   private def findSignatory(id: String)(implicit request: DataRequest[_]): Option[Signatory] =
     request.journeyData.signatories.flatMap(_.signatories.find(_.id == id))
 
-  private def isValid(signatory: Signatory): Boolean =
-    signatory.fullName.isDefined &&
-      signatory.jobTitle.isDefined
 }
