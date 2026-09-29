@@ -24,9 +24,7 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukCheckboxes: GovukCheckboxes,
-    govukButton: GovukButton,
-    hmrcPageHeading: HmrcPageHeading
-)
+    govukButton: GovukButton)
 
 @(form: Form[_], mode: Mode, returnTo: Option[ReturnTo])(implicit request: Request[_], messages: Messages)
 
@@ -38,20 +36,11 @@
             @govukErrorSummary(ErrorSummaryViewModel(form, errorLinkOverrides = Map("value" -> "value_0")))
         }
 
-        @hmrcPageHeading(PageHeading(
-          text = messages("financialOrganisation.heading"),
-          section = Some(messages("sectionTitle.certificatesOfAuthority")),
-          headingClasses = Some("govuk-heading-l"),
-          captionClasses = Some("govuk-caption-l")
-        ))
-
-        <p class="govuk-body">@messages("financialOrganisation.p1")</p>
-
         @govukCheckboxes(
             CheckboxesViewModel(
                 form   = form,
                 name   = "value",
-                legend = LegendViewModel(messages("financialOrganisation.legend")).withCssClass("govuk-fieldset__legend--m"),
+                legend = HmrcPageHeadingLegend.apply(Text(messages("financialOrganisation.heading")), HmrcSectionCaption(messages("sectionTitle.certificatesOfAuthority")), "govuk-fieldset__legend--l"),
                 items  = FinancialOrganisation.checkboxItems,
                 hint = Some(Hint(content = Text(messages("financialOrganisation.hint"))))
             )

@@ -41,6 +41,9 @@ final case class RegistrationSubmittedViewModel(
   val letterIntroKey: String =
     s"$contentPrefix.letterIntro"
 
+  val emailInfoKey: Option[String] =
+    if (showManageAccount) Some(s"$contentPrefix.emailInfo") else None
+
   val manageAccountHeadingKey: String =
     "registrationSubmitted.existing.manage.heading"
 
@@ -72,7 +75,7 @@ object RegistrationSubmittedViewModel {
     journeyData.formBundleId.map { formBundleId =>
       val existingIsaManager = isExistingIsaManager(journeyData)
       val contentKey         = if (existingIsaManager) Existing else New
-      val bulletCount        = if (existingIsaManager) 2 else 3
+      val bulletCount        = if (existingIsaManager) 0 else 3
 
       RegistrationSubmittedViewModel(
         formBundleId = formBundleId,
