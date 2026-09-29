@@ -33,7 +33,7 @@ import javax.inject.Inject
 class IsaProductsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   grsGuard: GrsGuardActionFilter,
-  cyaGuard: CyaGuardActionFilter,
+  cyaGuard: CyaGuardAction,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,

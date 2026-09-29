@@ -22,25 +22,12 @@ import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
-import models.requests.DataRequest
 import navigation.Navigator
-import play.api.mvc.{ActionFilter, Call, Result, Results}
+import play.api.mvc.Call
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
-class CyaGuardActionFilter @Inject() (navigator: Navigator)(implicit ec: ExecutionContext) {
-
-  def apply(isComplete: Boolean): ActionFilter[DataRequest] =
-    new ActionFilter[DataRequest] {
-      override protected def executionContext: ExecutionContext = ec
-
-      override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] =
-        Future.successful(
-          if isComplete then None
-          else Some(Results.Redirect(navigator.nextPageCyaGuard()))
-        )
-    }
+class CyaGuardAction @Inject() (navigator: Navigator) {
 
   def sortingData[T](data: T, id: Option[String] = None): Option[Call] = {
     val isThereData = data match

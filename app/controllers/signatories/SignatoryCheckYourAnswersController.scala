@@ -32,7 +32,7 @@ import javax.inject.Inject
 
 class SignatoryCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
-  cyaGuard: CyaGuardActionFilter,
+  cyaGuard: CyaGuardAction,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,

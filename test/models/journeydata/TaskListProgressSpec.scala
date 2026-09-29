@@ -70,12 +70,13 @@ class TaskListProgressSpec extends SpecBase {
   "TaskListProgress.isOrganisationInformationComplete" - {
 
     "must support completed organisation information paths" in {
-      TaskListProgress.isOrganisationInformationComplete(
-        emptyJourneyData.copy(organisationDetails = Some(completeTaskListOrganisationDetails))
-      ) mustBe true
+      emptyJourneyData
+        .copy(organisationDetails = Some(completeTaskListOrganisationDetails))
+        .organisationDetails
+        .exists(_.isComplete) mustBe true
 
-      TaskListProgress.isOrganisationInformationComplete(
-        emptyJourneyData.copy(organisationDetails =
+      emptyJourneyData
+        .copy(organisationDetails =
           Some(
             completeTaskListOrganisationDetails.copy(
               registeredToManageIsa = Some(YesNoAnswer.Yes),
@@ -83,10 +84,11 @@ class TaskListProgressSpec extends SpecBase {
             )
           )
         )
-      ) mustBe true
+        .organisationDetails
+        .exists(_.isComplete) mustBe true
 
-      TaskListProgress.isOrganisationInformationComplete(
-        emptyJourneyData.copy(organisationDetails =
+      emptyJourneyData
+        .copy(organisationDetails =
           Some(
             completeTaskListOrganisationDetails.copy(
               registeredAddressCorrespondence = Some(YesNoAnswer.No),
@@ -94,7 +96,8 @@ class TaskListProgressSpec extends SpecBase {
             )
           )
         )
-      ) mustBe true
+        .organisationDetails
+        .exists(_.isComplete) mustBe true
     }
 
     "must be false when required organisation information is missing" in {
@@ -114,63 +117,25 @@ class TaskListProgressSpec extends SpecBase {
           correspondenceAddress = None
         ),
         completeTaskListOrganisationDetails.copy(orgTelephoneNumber = None)
-      ).foreach { organisationDetails =>
-        TaskListProgress.isOrganisationInformationComplete(
-          emptyJourneyData.copy(organisationDetails = Some(organisationDetails))
-        ) mustBe false
-      }
+      ).foreach(_.isComplete mustBe false)
+
     }
   }
 
   "TaskListProgress.isOrganisationEmailVerified" - {
 
     "must be true only when an email is present and verified" in {
-      TaskListProgress.isOrganisationEmailVerified(
-        emptyJourneyData.copy(organisationEmail = Some(completeTaskListOrganisationEmail))
-      ) mustBe true
+      emptyJourneyData
+        .copy(organisationEmail = Some(completeTaskListOrganisationEmail))
+        .organisationEmail
+        .exists(_.isComplete) mustBe true
 
       Seq(
         OrganisationEmail(None, Some(true)),
         OrganisationEmail(Some(""), Some(true)),
         unverifiedTaskListOrganisationEmail,
         OrganisationEmail(Some("test@example.com"), None)
-      ).foreach { organisationEmail =>
-        TaskListProgress.isOrganisationEmailVerified(
-          emptyJourneyData.copy(organisationEmail = Some(organisationEmail))
-        ) mustBe false
-      }
-    }
-  }
-
-  "TaskListProgress.isIsaProductsComplete" - {
-
-    "must be true for complete ISA product answers" in {
-      Seq(
-        completeTaskListIsaProducts,
-        IsaProducts(
-          isaProducts = Some(Seq(InnovativeFinanceIsas)),
-          innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)),
-          p2pPlatform = Some("platform"),
-          p2pPlatformNumber = Some("1234567")
-        )
-      ).foreach { isaProducts =>
-        TaskListProgress.isIsaProductsComplete(emptyJourneyData.copy(isaProducts = Some(isaProducts))) mustBe true
-      }
-    }
-
-    "must be false when required ISA product answers are missing" in {
-      Seq(
-        IsaProducts(),
-        IsaProducts(isaProducts = Some(Nil)),
-        IsaProducts(isaProducts = Some(Seq(InnovativeFinanceIsas))),
-        IsaProducts(
-          isaProducts = Some(Seq(InnovativeFinanceIsas)),
-          innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)),
-          p2pPlatform = Some("platform")
-        )
-      ).foreach { isaProducts =>
-        TaskListProgress.isIsaProductsComplete(emptyJourneyData.copy(isaProducts = Some(isaProducts))) mustBe false
-      }
+      ).foreach(_.isComplete mustBe false)
     }
   }
 
@@ -183,10 +148,8 @@ class TaskListProgressSpec extends SpecBase {
           certificatesYesNo = Some(CertificatesNo),
           financialOrganisation = Some(Seq(EuropeanInstitution))
         )
-      ).foreach { certificatesOfAuthority =>
-        TaskListProgress.isCertificatesOfAuthorityComplete(
-          emptyJourneyData.copy(certificatesOfAuthority = Some(certificatesOfAuthority))
-        ) mustBe true
+      ).foreach {
+        _.isComplete mustBe true
       }
     }
 
@@ -195,10 +158,8 @@ class TaskListProgressSpec extends SpecBase {
         CertificatesOfAuthority(),
         CertificatesOfAuthority(certificatesYesNo = Some(CertificatesYes)),
         CertificatesOfAuthority(certificatesYesNo = Some(CertificatesNo))
-      ).foreach { certificatesOfAuthority =>
-        TaskListProgress.isCertificatesOfAuthorityComplete(
-          emptyJourneyData.copy(certificatesOfAuthority = Some(certificatesOfAuthority))
-        ) mustBe false
+      ).foreach {
+        _.isComplete mustBe false
       }
     }
   }
@@ -232,32 +193,6 @@ class TaskListProgressSpec extends SpecBase {
       TaskListProgress.areSignatoriesComplete(
         emptyJourneyData.copy(signatories = Some(signatoriesWith(inProgressTaskListSignatory("sig-1"))))
       ) mustBe false
-    }
-  }
-
-  "TaskListProgress.areThirdPartyOrganisationsComplete" - {
-
-    "must be true when third parties are not used or all required third parties are complete" in {
-      TaskListProgress.areThirdPartyOrganisationsComplete(
-        emptyJourneyData.copy(thirdPartyOrganisations = Some(thirdPartyOrganisationsNotUsed))
-      ) mustBe true
-
-      TaskListProgress.areThirdPartyOrganisationsComplete(
-        emptyJourneyData.copy(thirdPartyOrganisations =
-          Some(testThirdPartyOrganisations(Seq(completeTaskListThirdParty("tp-1"))))
-        )
-      ) mustBe true
-    }
-
-    "must be false when third parties are used but missing or incomplete" in {
-      Seq(
-        ThirdPartyOrganisations(managedByThirdParty = Some(YesNoAnswer.Yes)),
-        testThirdPartyOrganisations(Seq(inProgressTaskListThirdParty("tp-1")))
-      ).foreach { thirdPartyOrganisations =>
-        TaskListProgress.areThirdPartyOrganisationsComplete(
-          emptyJourneyData.copy(thirdPartyOrganisations = Some(thirdPartyOrganisations))
-        ) mustBe false
-      }
     }
   }
 }

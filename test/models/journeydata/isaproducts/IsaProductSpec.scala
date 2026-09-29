@@ -17,6 +17,9 @@
 package models.journeydata.isaproducts
 
 import generators.{ModelGenerators, arbitraryIsaProducts}
+import models.journeydata.TaskListProgress
+import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
+import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
@@ -59,5 +62,39 @@ class IsaProductSpec
         Json.toJson(isaProducts) mustEqual JsString(isaProducts.toString)
       }
     }
+  }
+
+  "isComplete should" - {
+
+    "return true for complete ISA product answers" in {
+      val completeTaskListIsaProducts: IsaProducts =
+        IsaProducts(isaProducts = Some(Seq(CashIsas)))
+
+      Seq(
+        completeTaskListIsaProducts,
+        IsaProducts(
+          isaProducts = Some(Seq(InnovativeFinanceIsas)),
+          innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)),
+          p2pPlatform = Some("platform"),
+          p2pPlatformNumber = Some("1234567")
+        )
+      ).foreach {
+        _.isComplete mustBe true
+      }
+    }
+
+    "return false when required ISA product answers are missing" in {
+      Seq(
+        IsaProducts(),
+        IsaProducts(isaProducts = Some(Nil)),
+        IsaProducts(isaProducts = Some(Seq(InnovativeFinanceIsas))),
+        IsaProducts(
+          isaProducts = Some(Seq(InnovativeFinanceIsas)),
+          innovativeFinancialProducts = Some(Seq(PeertopeerLoansUsingAPlatformWith36hPermissions)),
+          p2pPlatform = Some("platform")
+        )
+      ).foreach(_.isComplete mustBe false)
+    }
+
   }
 }

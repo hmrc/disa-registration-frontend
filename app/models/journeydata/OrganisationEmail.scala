@@ -21,6 +21,10 @@ import play.api.libs.json.{Json, OFormat}
 case class OrganisationEmail(organisationEmail: Option[String] = None, verified: Option[Boolean] = None)
     extends TaskListSection {
   def sectionName: String = OrganisationEmail.sectionName
+
+  def isComplete: Boolean = (organisationEmail, verified) match
+    case (Some(email), Some(true)) => if email.nonEmpty then true else false
+    case _                         => false
 }
 
 object OrganisationEmail {
