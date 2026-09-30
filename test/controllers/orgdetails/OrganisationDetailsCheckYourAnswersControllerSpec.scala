@@ -78,7 +78,9 @@ class OrganisationDetailsCheckYourAnswersControllerSpec extends SpecBase {
     "must redirect to Task List for a GET if no existing Org Details data is found" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = None))).build()
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = None))
+        ).build()
 
       running(application) {
 

@@ -70,6 +70,27 @@ class CoaCheckYourAnswersControllerSpec extends SpecBase with SummaryListFluency
         ).toString
       }
     }
+
+    "must redirect to Task List for a GET if no existing Org Details data is found" in {
+
+      val application =
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = None))
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.CoaCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.TaskListController.onPageLoad().url
+      }
+    }
   }
 
   def expectedSummaryRows(journeyData: JourneyData): Seq[SummaryListRow] = Seq(

@@ -41,6 +41,7 @@ class ThirdPartyCheckYourAnswersControllerSpec extends SpecBase {
     JourneyData(
       groupId = testGroupId,
       enrolmentId = testString,
+      businessVerification = Some(testBV),
       thirdPartyOrganisations = Some(
         ThirdPartyOrganisations(
           managedByThirdParty = Some(Yes),
@@ -193,6 +194,27 @@ class ThirdPartyCheckYourAnswersControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Task List for a GET if no existing Org Details data is found" in {
+
+      val application =
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = None))
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl(existingId))
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.TaskListController.onPageLoad().url
       }
     }
   }

@@ -38,6 +38,7 @@ class SignatoryCheckYourAnswersControllerSpec extends SpecBase {
     JourneyData(
       groupId = testGroupId,
       enrolmentId = testString,
+      businessVerification = Some(testBV),
       signatories = Some(Signatories(signatories))
     )
 
