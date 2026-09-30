@@ -31,13 +31,13 @@ class CyaGuardAction @Inject() (navigator: Navigator) {
 
   def sortingData[T](data: T, id: Option[String] = None): Option[Call] = {
     val isThereData = data match
-      case Some(organisation: OrganisationDetails) => true
-      case Some(product: IsaProducts)              => true
-      case Some(coa: CertificatesOfAuthority)      => true
+      case Some(organisation: OrganisationDetails) => organisation.isComplete
+      case Some(product: IsaProducts)              => product.isComplete
+      case Some(coa: CertificatesOfAuthority)      => coa.isComplete
+      case Some(parties: ThirdPartyOrganisations)  => parties.isComplete
+      case Some(t: ThirdParty)                     => !t.inProgress
       case Some(lo: LiaisonOfficers)               => id.exists(i => lo.liaisonOfficers.exists(o => o.id == i && !o.inProgress))
       case Some(s: Signatories)                    => id.exists(i => s.signatories.exists(x => x.id == i && !x.inProgress))
-      case Some(parties: ThirdPartyOrganisations)  => true // !parties.thirdParties.find(_.id == id.get).get.inProgress
-      case Some(t: ThirdParty)                     => if !t.inProgress then true else false
       case _                                       => false
 
     if isThereData then None else Some(navigator.nextPageCyaGuard())

@@ -17,8 +17,11 @@
 package controllers.orgdetails
 
 import base.SpecBase
+import models.YesNoAnswer
+import models.journeydata.JourneyData
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
+import viewmodels.checkAnswers.orgDetails.{AddedCorrespondenceAddressSummary, FirmReferenceNumberSummary, OrganisationTelephoneNumberSummary, RegisteredAddressCorrespondenceSummary, RegisteredIsaManagerSummary, TradingNameSummary, TradingUsingDifferentNameSummary, ZReferenceNumberSummary}
 import viewmodels.govuk.summarylist.SummaryListViewModel
 import views.html.orgdetails.OrganisationDetailsCheckYourAnswersView
 
@@ -28,8 +31,18 @@ class OrganisationDetailsCheckYourAnswersControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET" in {
 
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        organisationDetails = Some(completeTaskListOrganisationDetails)
+      )
+
+      val orgDetails = jd.organisationDetails
+
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        applicationBuilder(journeyData =
+          Some(emptyJourneyData.copy(organisationDetails = Some(completeTaskListOrganisationDetails)))
+        ).build()
 
       running(application) {
 
@@ -40,10 +53,44 @@ class OrganisationDetailsCheckYourAnswersControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[OrganisationDetailsCheckYourAnswersView]
 
-        val list = SummaryListViewModel(Seq.empty)
+        val expectedRows =
+          Seq(
+            RegisteredIsaManagerSummary.row(jd),
+            ZReferenceNumberSummary.row(jd),
+            TradingUsingDifferentNameSummary.row(jd),
+            TradingNameSummary.row(jd),
+            FirmReferenceNumberSummary.row(jd),
+            RegisteredAddressCorrespondenceSummary.row(jd),
+            AddedCorrespondenceAddressSummary
+              .row(jd)
+              .filter(_ => !orgDetails.flatMap(_.registeredAddressCorrespondence).contains(YesNoAnswer.Yes)),
+            OrganisationTelephoneNumberSummary.row(jd)
+          ).flatten
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(SummaryListViewModel(expectedRows))(
+          request,
+          messages(application)
+        ).toString
+      }
+    }
+
+    "must redirect to Task List for a GET if no existing Org Details data is found" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.OrganisationDetailsCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.TaskListController.onPageLoad().url
       }
     }
 

@@ -22,8 +22,6 @@ import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No as CertificatesNo, Yes as CertificatesYes}
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
 import models.journeydata.certificatesofauthority.FinancialOrganisation.EuropeanInstitution
-import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
-import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories

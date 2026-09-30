@@ -31,6 +31,7 @@ import javax.inject.Inject
 
 class OrganisationDetailsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
+  cyaGuard: CyaGuardAction,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -60,6 +61,9 @@ class OrganisationDetailsCheckYourAnswersController @Inject() (
           OrganisationTelephoneNumberSummary.row(jd)
         ).flatten
 
-      Ok(view(SummaryListViewModel(summaryListRows)))
+      cyaGuard.sortingData(orgDetails) match {
+        case Some(call) => Redirect(call)
+        case _          => Ok(view(SummaryListViewModel(summaryListRows)))
+      }
     }
 }

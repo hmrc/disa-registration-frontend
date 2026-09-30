@@ -17,7 +17,6 @@
 package models.journeydata.isaproducts
 
 import generators.{ModelGenerators, arbitraryIsaProducts}
-import models.journeydata.TaskListProgress
 import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
 import org.scalacheck.Arbitrary.arbitrary
