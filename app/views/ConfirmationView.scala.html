@@ -80,11 +80,19 @@
     @messages(viewModel.letterIntroKey)
   </p>
 
-  <ul class="govuk-list govuk-list--bullet">
-    @for(bulletKey <- viewModel.bulletKeys) {
-      <li>@messages(bulletKey)</li>
-    }
-  </ul>
+  @if(viewModel.bulletKeys.nonEmpty) {
+    <ul class="govuk-list govuk-list--bullet">
+      @for(bulletKey <- viewModel.bulletKeys) {
+        <li>@messages(bulletKey)</li>
+      }
+    </ul>
+  }
+
+  @for(emailInfoKey <- viewModel.emailInfoKey) {
+    <p class="govuk-body">
+      @messages(emailInfoKey)
+    </p>
+  }
 
   @if(viewModel.showManageAccount) {
     <h2 class="govuk-heading-m">

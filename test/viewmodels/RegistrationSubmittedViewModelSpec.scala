@@ -63,6 +63,7 @@ class RegistrationSubmittedViewModelSpec extends SpecBase {
           "registrationSubmitted.new.bullet.2",
           "registrationSubmitted.new.bullet.3"
         )
+        result.emailInfoKey mustEqual None
         result.showManageAccount mustBe false
         result.businessTaxAccountUrl mustEqual businessTaxAccountUrl
         result.guidanceUrl mustEqual guidanceUrl
@@ -95,10 +96,8 @@ class RegistrationSubmittedViewModelSpec extends SpecBase {
 
         result.formBundleId mustEqual testFormBundleId
         result.contentKey mustEqual "existing"
-        result.bulletKeys mustEqual Seq(
-          "registrationSubmitted.existing.bullet.1",
-          "registrationSubmitted.existing.bullet.2"
-        )
+        result.bulletKeys mustEqual Seq.empty
+        result.emailInfoKey mustEqual Some("registrationSubmitted.existing.emailInfo")
         result.showManageAccount mustBe true
         result.businessTaxAccountUrl mustEqual businessTaxAccountUrl
         result.guidanceUrl mustEqual guidanceUrl

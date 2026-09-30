@@ -7,6 +7,7 @@ site.no = No
 site.yes = Yes
 site.continue = Continue
 site.saveAndContinue = Save and continue
+site.confirmAndContinue = Confirm and continue
 site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
@@ -156,8 +157,8 @@ registeredAddressCorrespondence.error.required = Select yes if you want HMRC to 
 registeredAddressCorrespondence.change.hidden = registered correspondence address
 registeredAddressCorrespondence.checkYourAnswersLabel = Registered address for correspondence
 
-AddAnotherAddress.title = Add another address for your organisation
-AddAnotherAddress.heading = Add another address for your organisation
+AddAnotherAddress.title = Where do you want us to send you letters?
+AddAnotherAddress.heading = Where do you want us to send you letters?
 AddAnotherAddress.postcode.input.label = Postcode
 AddAnotherAddress.postcode.error.required = Enter your postcode. Use the correct format, for example, AA1 1AA
 AddAnotherAddress.postcode.error.invalid = Enter your postcode in the correct format, for example, AA1 1AA
@@ -171,8 +172,8 @@ AddAnotherAddress.link.text = Enter the address manually
 AddAnotherAddress.checkYourAnswersLabel = Third-party {0} details
 AddAnotherAddress.change.hidden = third-party {0} details
 
-chooseAddress.title = Choose the correct address
-chooseAddress.heading = Choose the correct address
+chooseAddress.title = Which is the correct address?
+chooseAddress.heading = Which is the correct address?
 chooseAddress.error.required = Select one of the address options or choose ‘none of these’, if the addresses given aren’t correct
 chooseAddress.none.of.these = None of these
 chooseAddress.radio.divider = or
@@ -206,19 +207,19 @@ organisationDetailsCya.heading = Check your organisation details
 
 organisationEmailAddress.title = What is the email address of your organisation?
 organisationEmailAddress.heading = What is the email address of your organisation?
-organisationEmailAddress.hint = This email will be used to notify you of any messages within your Business Tax Account (BTA) that need your attention
+organisationEmailAddress.hint = This email will be used to notify you of any messages within your business tax account (BTA) that need your attention
 organisationEmailAddress.checkYourAnswersLabel = Organisation email
 organisationEmailAddress.error.required = Enter the email address of your organisation. Use a name, @ symbol and a domain name, like yourname@example.com
 organisationEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
 organisationEmailAddress.change.hidden = organisation email address
 
-emailVerificationCode.title = Enter the code to confirm your organisation email
-emailVerificationCode.heading = Enter the code to confirm your organisation email
+emailVerificationCode.title = Code to confirm your organisation email
+emailVerificationCode.heading = Code to confirm your organisation email
 emailVerificationCode.p1 = We have sent an email to <strong>{0}</strong>
 emailVerificationCode.p2 = The email may take a few minutes to arrive. Its subject line is: ‘Confirm your email address - Government Gateway’. Check your spam or junk folder. If it still has not arrived you can request a new code. You can also {0}.
 emailVerificationCode.p2.link = change the email address
 emailVerificationCode.link = Request a new code
-emailVerificationCode.label = Confirmation code
+emailVerificationCode.label = What is your confirmation code?
 emailVerificationCode.hint = For example WSGMCN
 emailVerificationCode.error.required = You need to enter a valid confirmation code. Use a code, like WXYZRS or ABCDEF
 emailVerificationCode.error.format = You need to enter a confirmation code in the correct format. Use a code that contains letters only
@@ -278,7 +279,7 @@ isaProductsCheckYourAnswers.heading = Check your ISA products
 ### Signatories
 addASignatory.title = Add a signatory
 addASignatory.heading = Add a signatory
-addASignatory.p1 = You must have at least 1 signatory. The maximum is 25.
+addASignatory.p1 = You must add at least 1 signatory. You can add a total of 25.
 addASignatory.details.summary = What is a signatory?
 addASignatory.details.content = A signatory is the appointed person who will act with the authority to sign formal documentation on behalf of your organisation.
 addASignatory.details.button = Add a signatory
@@ -290,7 +291,7 @@ removeSignatory.error.required = Select yes if you want to remove this signatory
 
 signatoryName.title = What is the full name of the signatory?
 signatoryName.heading = What is the full name of the signatory?
-signatoryName.hint = You must have at least 1 signatory. The maximum is 25.
+signatoryName.hint = You must add at least 1 signatory. You can add a total of 25.
 signatoryName.error.required = Enter the full name of the signatory you’re adding
 signatoryName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
 signatoryName.checkYourAnswersLabel = Name
@@ -299,14 +300,6 @@ signatoryName.change.hidden = name of signatory
 removeSignatory.title = Are you sure you want to remove {0} as a signatory?
 removeSignatory.heading = Are you sure you want to remove {0} as a signatory?
 removeSignatory.error.required = Select yes if you want to remove this signatory
-
-signatoryName.title = What is the full name of the signatory?
-signatoryName.heading = What is the full name of the signatory?
-signatoryName.hint = You must have at least 1 signatory. The maximum is 25.
-signatoryName.error.required = Enter the full name of the signatory you’re adding
-signatoryName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
-signatoryName.checkYourAnswersLabel = Name
-signatoryName.change.hidden = name of signatory
 
 signatoryJobTitle.title = What is the job title of {0} within the organisation?
 signatoryJobTitle.heading = What is the job title of {0} within the organisation?
@@ -322,7 +315,7 @@ addedSignatory.title = You have added a signatory
 addedSignatory.heading = You have added a signatory
 addedSignatory.title.plural = You have added {0} signatories
 addedSignatory.heading.plural = You have added {0} signatories
-addedSignatory.p = You must have at least <strong>1</strong> signatory. The maximum is {0}.
+addedSignatory.p = You must add at least <strong>1</strong> signatory. You can add a total of {0}.
 addedSignatory.addAnother = Do you want to add another signatory?
 addedSignatory.error.required = Select yes if you’d like to add another signatory
 addedSignatory.complete = Complete
@@ -334,10 +327,10 @@ removeSignatory.heading = Are you sure you want to remove {0} as a signatory?
 removeSignatory.error.required = Select yes if you want to remove this signatory
 
 ### LOs
-addLiaisonOfficer.title = Add liaison officer
-addLiaisonOfficer.heading = Add liaison officer
-addLiaisonOfficer.p1 = You must have at least 1 liaison officer to register your organisation as an ISA manager.
-addLiaisonOfficer.p2 = You can add up to {0} liaison officers.
+addLiaisonOfficer.title = Add a liaison officer
+addLiaisonOfficer.heading = Add a liaison officer
+addLiaisonOfficer.p1 = You must add at least 1 liaison officer. You can add a total of {0}.
+addLiaisonOfficer.p2 = You can add a total of {0} liaison officers.
 addLiaisonOfficer.details.summary = What is a liaison officer?
 addLiaisonOfficer.details.content.p1 = Liaison officers act as a point of contact between the ISA manager and HMRC.
 addLiaisonOfficer.details.content.p2 = They provide their name, telephone number and email address and are individuals an organisation appoints to provide day-to-day contact with HMRC.
@@ -346,7 +339,7 @@ addLiaisonOfficer.link = Return to Manage ISAs
 
 liaisonOfficerName.title = What is the full name of the liaison officer?
 liaisonOfficerName.heading = What is the full name of the liaison officer?
-liaisonOfficerName.hint = You must have at least 1 liaison officer to register your organisation as an ISA manager. You can add up to {0} liaison officers.
+liaisonOfficerName.hint = You must have at least 1 liaison officer. You can add a total of {0}.
 liaisonOfficerName.error.required = Enter the full name of the liaison officer you’re adding
 liaisonOfficerName.error.invalid = The full name must only include letters a to z, hyphens, spaces and apostrophes
 liaisonOfficerName.checkYourAnswersLabel = Name
@@ -360,16 +353,16 @@ liaisonOfficerEmail.error.invalid = Enter an email address in the correct format
 liaisonOfficerEmail.checkYourAnswersLabel = Email address
 liaisonOfficerEmail.change.hidden = email address
 
-liaisonOfficerPhoneNumber.title = What is {0}’s phone number?
-liaisonOfficerPhoneNumber.heading = What is {0}’s phone number?
+liaisonOfficerPhoneNumber.title = What is the phone number of {0}?
+liaisonOfficerPhoneNumber.heading = What is the phone number of {0}?
 liaisonOfficerPhoneNumber.p1 = This is the phone number that HMRC will use if there is a need to contact the liaison officer.
 liaisonOfficerPhoneNumber.hint = This can be either a UK mobile or landline number
 liaisonOfficerPhoneNumber.error.required = Enter the phone number of the liaison officer you’re adding. Use a UK phone number, like 01642 123 456 or 07777 777 777
 liaisonOfficerPhoneNumber.error.invalid = The phone number must not include letters a to z, hyphens or apostrophes and must be a UK phone number, like 01642 123 456 or 07777 777 777
 liaisonOfficerPhoneNumber.error.tooLong = The phone number you have entered is too long. Enter a UK phone number, like 01642 123 456 or 07777 777 777
 liaisonOfficerPhoneNumber.error.tooShort = The phone number you have entered is too short. Enter a UK phone number, like 01642 123 456 or 07777 777 777
-liaisonOfficerPhoneNumber.checkYourAnswersLabel = UK phone number
-liaisonOfficerPhoneNumber.change.hidden = UK phone number
+liaisonOfficerPhoneNumber.checkYourAnswersLabel =Telephone number
+liaisonOfficerPhoneNumber.change.hidden = telephone number
 
 liaisonOfficerCommunication.title = How should we communicate with {0}?
 liaisonOfficerCommunication.heading = How should we communicate with {0}?
@@ -390,7 +383,7 @@ removeLiaisonOfficer.error.required = Select yes if you want to remove this liai
 
 addedLiaisonOfficers.title = You have added {0}
 addedLiaisonOfficers.heading = You have added {0}
-addedLiaisonOfficers.guidance = You need to add at least <strong>1</strong> liaison officer. You can add a total of {0}
+addedLiaisonOfficers.guidance = You must add at least <strong>1</strong> liaison officer. You can add a total of {0}.
 addedLiaisonOfficers.complete = Complete
 addedLiaisonOfficers.inProgress = In progress
 addedLiaisonOfficers.legend = Do you want to add another liaison officer?
@@ -432,7 +425,7 @@ investorFundsUsedByThirdParty.change.hidden = if investor funds will be used for
 
 thirdPartyInvestorFundsPercentage.title = What percentage of investor funds will be paid to {0} as commissions or incentives?
 thirdPartyInvestorFundsPercentage.heading = What percentage of investor funds will be paid to {0} as commissions or incentives?
-thirdPartyInvestorFundsPercentage.hint = Add a whole number that shows the percentage
+thirdPartyInvestorFundsPercentage.hint = Must be a whole number
 thirdPartyInvestorFundsPercentage.error.required = Add a whole number to show the percentage of investor funds that will be paid to the third-party organisation as commissions or incentives
 thirdPartyInvestorFundsPercentage.error.invalid = The percentage must be a number between 0 and 100 and should be a whole number
 thirdPartyInvestorFundsPercentage.checkYourAnswersLabel = Percentage of investor funds used for commissions or incentives?
@@ -445,7 +438,7 @@ addedThirdParties.title = You have added a third-party organisation
 addedThirdParties.heading = You have added a third-party organisation
 addedThirdParties.title.plural = You have added {0} third-party organisations
 addedThirdParties.heading.plural = You have added {0} third-party organisations
-addedThirdParties.p = Use this to add organisations who you will outsource your ISA returns to. You can add up to 10 third-party organisations.
+addedThirdParties.p = Use this to add organisations who you will outsource your ISA returns to. You can add a total of 10.
 addedThirdParties.addAnother = Do you want to add another organisation?
 addedThirdParties.error.required = Select yes if you’d like to add another third-party organisation
 addedThirdParties.complete = Complete
@@ -476,7 +469,7 @@ thirdPartiesCheckYourAnswers.heading = Check added third-party organisations
 thirdPartiesCheckYourAnswers.sub.heading = Third-party {0}
 thirdPartiesCheckYourAnswers.connectedOrganisations.sub.heading = Connected organisations
 thirdPartiesCheckYourAnswers.addAnother.sub.heading = Add another
-thirdPartiesCheckYourAnswers.addAnother.label = Add or remove third party
+thirdPartiesCheckYourAnswers.addAnother.label = Add or remove third-party
 
 ### Certificates of Authority
 
@@ -505,9 +498,8 @@ certificatesOfAuthorityYesNo.error.required = You need to tell us if the certifi
 certificatesOfAuthorityYesNo.checkYourAnswersLabel = Certificates of authority that apply to your organisation
 certificatesOfAuthorityYesNo.change.hidden = certificates of authority
 
-financialOrganisation.title = Financial organisation
-financialOrganisation.heading = Financial organisation
-financialOrganisation.p1 = We need to know which type of organisation you are.
+financialOrganisation.title = Which best describes your organisation?
+financialOrganisation.heading = Which best describes your organisation?
 financialOrganisation.legend = Which best describes your organisation?
 financialOrganisation.hint = Select all that apply
 financialOrganisation.europeanInstitution = A European institution that has a base in the UK
@@ -552,13 +544,13 @@ CoaCheckYourAnswers.heading = Check your certificates of authority
 ### Task List
 taskList.title = Manage ISAs
 taskList.heading = Manage ISAs
-taskList.section.organisationInformation = Organisation information
+taskList.section.organisationInformation = Organisation details
 taskList.section.eligibility = Eligibility
 taskList.section.authorisedUsers = Authorised users
-taskList.section.thirdPartyOrganisations = Third party organisations
+taskList.section.thirdPartyOrganisations = Third-party organisations
 taskList.section.submit = Submit answers
-taskList.organisationInformation.add = Add organisation information
-taskList.organisationInformation.change = Change organisation information
+taskList.organisationInformation.add = Add organisation details
+taskList.organisationInformation.change = Change organisation details
 taskList.organisationEmail.add = Add organisation email
 taskList.organisationEmail.change = Change organisation email
 taskList.isaProducts.add = ISA products you manage
@@ -583,8 +575,8 @@ taskList.count.liaisonOfficer.one = {0} liaison officer
 taskList.count.liaisonOfficer.other = {0} liaison officers
 taskList.count.signatory.one = {0} signatory
 taskList.count.signatory.other = {0} signatories
-taskList.count.thirdParty.one = {0} third party
-taskList.count.thirdParty.other = {0} third parties
+taskList.count.thirdParty.one = {0} third-party
+taskList.count.thirdParty.other = {0} third-parties
 
 
 ### Business Verification Lockout
@@ -605,15 +597,15 @@ declarationForIsaManagers.title = Declaration for registering and enrolling ISA 
 declarationForIsaManagers.heading = Declaration for registering and enrolling ISA managers
 declarationForIsaManagers.junior.li1 = I’m applying to manage Junior ISA accounts, I undertake to publicise (and update where appropriate) statements of the minimum amount that may be subscribed to a Junior ISA account on a single occasion, and the permitted means of payment on subscriptions
 declarationForIsaManagers.junior.li2 = I’m applying to manage Junior ISA accounts, I undertake to inform persons proposing to make a subscription to a Junior ISA account (other than the named child) that the subscription is a gift to the child
-declarationForIsaManagers.p1 = Do you agree to the following statements:
+declarationForIsaManagers.p1 = Confirm you understand the following statements:
 declarationForIsaManagers.li1 = the ISA products and investments will meet the qualifying criteria as described in the ISA regulations and ISA managers’ guidance
 declarationForIsaManagers.li2 = the ISAs opened and subscriptions made under my management will comply with the ISA regulations
 declarationForIsaManagers.li3 = all HMRC ISA returns and reporting obligations will be accurate and made in accordance with the ISA regulations and ISA managers’ guidance
 declarationForIsaManagers.li4 = I’m not subject to any requirement or prohibition imposed by or under any rules made by the Financial Conduct Authority or the Prudential Regulation Authority under Part 4A of FISMA 2000 which would prevent me from acting as an account manager
 declarationForIsaManagers.li5 = the information I’ve provided in this application is, to the best of my knowledge and belief, is correct and true
 declarationForIsaManagers.li6 = I understand that if my circumstances change I’ll notify HM Revenue and Customs immediately
-declarationForIsaManagers.p2 = By continuing, I confirm that I have understood all of the statements.
-declarationForIsaManagers.action = I agree, submit
+declarationForIsaManagers.p2 = By submitting, I can confirm that I have understood all of the statements.
+declarationForIsaManagers.action = Confirm and submit
 
 ## Confirmation
 registrationSubmitted.panel.formBundleId = Your reference number
@@ -621,10 +613,9 @@ registrationSubmitted.panel.formBundleId = Your reference number
 registrationSubmitted.whatHappensNext.heading = What happens next?
 
 registrationSubmitted.existing.panel.title = Enrolment completed
-registrationSubmitted.existing.thankYou = Thank you for submitting your enrolment application for the digital service.
-registrationSubmitted.existing.letterIntro = You will receive a letter to confirm if:
-registrationSubmitted.existing.bullet.1 = you have been successful enrolling onto the Manage ISAs service
-registrationSubmitted.existing.bullet.2 = we need further information to support your enrolment
+registrationSubmitted.existing.thankYou = Thank you for enrolling onto the digital service.
+registrationSubmitted.existing.letterIntro = You will receive a letter to confirm if you have been successful enrolling onto the Manage ISAs service.
+registrationSubmitted.existing.emailInfo = If we need further information to support your enrolment we will email you with the email address you provided.
 
 registrationSubmitted.existing.manage.heading = Manage your account
 registrationSubmitted.existing.manage.paragraph = You can use your {0} to manage your ISAs and upload monthly reports and annual statistical returns.
@@ -650,10 +641,10 @@ organisationIsEnrolled.inProgress.p1 = You will be notified by letter if your en
 organisationIsEnrolled.businessTaxAccount.linkText = business tax account
 
 ### Submission Check Your Answers
-submissionCya.title = Check your answers
-submissionCya.heading = Check your answers
+submissionCya.title = Check all your answers before you submit
+submissionCya.heading = Check all your answers before you submit
 submissionCya.printAnswers = Print your answers
-submissionCya.organisationInformation.heading = Organisation information
+submissionCya.organisationInformation.heading = Organisation details
 submissionCya.organisationEmail.heading = Verified organisation email
 submissionCya.productsAndCertificates.heading = Products and certificates
 submissionCya.authorisedUsers.heading = Authorised users
