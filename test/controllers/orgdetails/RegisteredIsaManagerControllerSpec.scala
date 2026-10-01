@@ -17,6 +17,7 @@
 package controllers.orgdetails
 
 import base.SpecBase
+import controllers.isaproducts.routes
 import controllers.orgdetails
 import forms.YesNoAnswerFormProvider
 import models.YesNoAnswer.{No, Yes}
@@ -46,6 +47,25 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
     orgdetails.routes.RegisteredIsaManagerController.onPageLoad(NormalMode, None).url
 
   "onPageLoad" - {
+
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.IsaProductsCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
 
     "must return OK with empty form when no existing answer" in {
 
@@ -265,7 +285,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
     "must return BAD_REQUEST and render errors when invalid form submitted" in {
 
-      val app = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val app = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(app) {
         val request =
@@ -293,7 +313,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       ).thenReturn(Future.failed(new Exception("boom")))
 
       val app =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 

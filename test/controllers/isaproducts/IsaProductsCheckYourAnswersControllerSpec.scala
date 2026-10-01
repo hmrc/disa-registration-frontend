@@ -35,25 +35,6 @@ class IsaProductsCheckYourAnswersControllerSpec extends SpecBase with SummaryLis
 
   "IsaProductsCheckYourAnswersController Controller" - {
 
-    "must return OK and correctly load the check your answers page" in {
-
-      val application = applicationBuilder(journeyData = Some(testJourneyData)).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, routes.IsaProductsCheckYourAnswersController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[IsaProductsCheckYourAnswersView]
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(SummaryListViewModel(testSummaryRows))(
-          request,
-          messages(application)
-        ).toString
-      }
-    }
-
     "must redirect to Start for if not Business Verified" in {
 
       val application =
@@ -70,6 +51,25 @@ class IsaProductsCheckYourAnswersControllerSpec extends SpecBase with SummaryLis
 
         redirectLocation(result).value mustEqual
           controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
+    "must return OK and correctly load the check your answers page" in {
+
+      val application = applicationBuilder(journeyData = Some(testJourneyData)).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, routes.IsaProductsCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[IsaProductsCheckYourAnswersView]
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view(SummaryListViewModel(testSummaryRows))(
+          request,
+          messages(application)
+        ).toString
       }
     }
 
