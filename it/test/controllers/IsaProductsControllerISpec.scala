@@ -29,8 +29,8 @@ import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
 
   private val controllerEndpoint = "/obligations/enrolment/isa/isa-products"
-  private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
-  private val updateJourneyUrl = s"/disa-registration/store/$testGroupId/isaProducts"
+  private val getJourneyDataUrl  = s"/disa-registration/store/$testGroupId"
+  private val updateJourneyUrl   = s"/disa-registration/store/$testGroupId/isaProducts"
 
   "GET /isa-products" should {
 
@@ -40,11 +40,16 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
           |{
           |    "groupId": "$testGroupId",
           |    "enrolmentId": "$testString",
+          |    "businessVerification": {
+          |       "businessRegistrationPassed": true,
+          |       "businessVerificationPassed": true,
+          |       "ctutr": "1234567890"
+          |     },
           |     "isaProducts": {
           |       "isaProducts": ["cashJuniorIsas", "cashIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"]
           |     }
           |}
-          |""" .stripMargin
+          |""".stripMargin
 
       stubAuth()
       stubGet(getJourneyDataUrl, OK, journeyDataResponse)
@@ -86,16 +91,18 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
 
       val result = route(app, request).get
 
-      status(result) shouldBe SEE_OTHER
+      status(result)           shouldBe SEE_OTHER
       redirectLocation(result) shouldBe Some("/obligations/enrolment/isa/isa-products-check-your-answers")
 
       verify(
         postRequestedFor(urlEqualTo(updateJourneyUrl))
-          .withRequestBody(equalToJson(
-            """{
+          .withRequestBody(
+            equalToJson(
+              """{
               |  "isaProducts": ["cashJuniorIsas"]
               |}""".stripMargin
-          ))
+            )
+          )
       )
     }
   }
