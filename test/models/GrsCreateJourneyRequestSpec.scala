@@ -26,7 +26,7 @@ class GrsCreateJourneyRequestSpec extends JsonFormatSpec[GrsCreateJourneyRequest
     businessVerificationCheck = true,
     deskProServiceId = "deskProId",
     signOutUrl = "/some/url",
-    regime = "ISA",
+    regime = "DISA",
     accessibilityUrl = "/some/url",
     labels = Some(Labels(en = Some(ServiceLabel("serviceLabel"))))
   )
@@ -39,7 +39,7 @@ class GrsCreateJourneyRequestSpec extends JsonFormatSpec[GrsCreateJourneyRequest
       "businessVerificationCheck": true,
       "deskProServiceId": "deskProId",
       "signOutUrl": "/some/url",
-      "regime": "ISA",
+      "regime": "DISA",
       "accessibilityUrl": "/some/url",
       "labels": {
         "en": {

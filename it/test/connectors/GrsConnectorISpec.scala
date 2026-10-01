@@ -41,7 +41,7 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
       businessVerificationCheck = true,
       deskProServiceId = "deskProServiceId",
       signOutUrl = "/some/sign-out-url",
-      regime = "ISA",
+      regime = "DISA",
       accessibilityUrl = "/accessibility-statement/my-service",
       labels = None
     )
