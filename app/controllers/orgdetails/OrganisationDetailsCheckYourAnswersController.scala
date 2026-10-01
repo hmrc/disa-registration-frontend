@@ -32,6 +32,7 @@ import javax.inject.Inject
 class OrganisationDetailsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   cyaGuard: CyaGuardAction,
+  grsGuard: GrsGuardActionFilter,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -42,7 +43,7 @@ class OrganisationDetailsCheckYourAnswersController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
 
       val jd         = request.journeyData
       val orgDetails = jd.organisationDetails

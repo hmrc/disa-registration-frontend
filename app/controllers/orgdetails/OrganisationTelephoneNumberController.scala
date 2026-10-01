@@ -24,6 +24,7 @@ import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.organisationdetails.OrganisationTelephoneNumberPage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
@@ -38,6 +39,7 @@ class OrganisationTelephoneNumberController @Inject() (
   override val messagesApi: MessagesApi,
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
+  grsGuard: GrsGuardActionFilter,
   errorHandler: ErrorHandler,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -50,10 +52,10 @@ class OrganisationTelephoneNumberController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider("organisationTelephoneNumber")
+  val form: Form[String] = formProvider("organisationTelephoneNumber")
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
 
       val preparedForm = request.journeyData.organisationDetails.flatMap(_.orgTelephoneNumber) match {
         case None        => form

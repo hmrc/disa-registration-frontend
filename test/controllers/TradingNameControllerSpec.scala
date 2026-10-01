@@ -25,9 +25,10 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes
-import play.api.mvc.{Call, RequestHeader}
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.orgdetails.TradingNameView
@@ -38,14 +39,19 @@ class TradingNameControllerSpec extends SpecBase {
 
   def onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new TradingNameFormProvider()
-  val form         = formProvider()
+  val formProvider       = new TradingNameFormProvider()
+  val form: Form[String] = formProvider()
 
-  lazy val tradingNameRoute = TradingNameController.onPageLoad(NormalMode, None).url
+  lazy val tradingNameRoute: String = TradingNameController.onPageLoad(NormalMode, None).url
 
-  val validAnswer      = testString
-  val validJourneyData =
-    JourneyData(testGroupId, testString, organisationDetails = Some(OrganisationDetails(tradingName = None)))
+  val validAnswer: String = testString
+  val validJourneyData    =
+    JourneyData(
+      testGroupId,
+      testString,
+      businessVerification = Some(testBV),
+      organisationDetails = Some(OrganisationDetails(tradingName = None))
+    )
 
   "TradingName Controller" - {
 
@@ -76,7 +82,7 @@ class TradingNameControllerSpec extends SpecBase {
         val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
         running(application) {
-          implicit val request = FakeRequest(GET, tradingNameRoute)
+          implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, tradingNameRoute)
 
           val view = application.injector.instanceOf[TradingNameView]
 
@@ -87,6 +93,25 @@ class TradingNameControllerSpec extends SpecBase {
             request,
             messages(application)
           ).toString
+        }
+      }
+
+      "must redirect to Start if not Business Verified" in {
+
+        val application =
+          applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, tradingNameRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.routes.GrsStartController.onPageLoad().url
         }
       }
     }
@@ -127,7 +152,7 @@ class TradingNameControllerSpec extends SpecBase {
         val application = applicationBuilder(journeyData = Some(validJourneyData)).build()
 
         running(application) {
-          implicit val request =
+          implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
             FakeRequest(POST, tradingNameRoute)
               .withFormUrlEncodedBody(("value", ""))
 
@@ -155,7 +180,7 @@ class TradingNameControllerSpec extends SpecBase {
             .build()
 
         running(application) {
-          implicit val request =
+          implicit val request: FakeRequest[AnyContentAsFormUrlEncoded] =
             FakeRequest(POST, tradingNameRoute)
               .withFormUrlEncodedBody(("value", validAnswer))
 

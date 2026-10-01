@@ -30,6 +30,7 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.libs.json.Writes
+import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.orgdetails.ChooseAddressView
@@ -38,7 +39,7 @@ import scala.concurrent.Future
 
 class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = TaskListController.onPageLoad()
+  def onwardRoute: Call = TaskListController.onPageLoad()
 
   val formProvider       = new ChooseAddressFormProvider()
   val form: Form[String] = formProvider()
@@ -73,6 +74,7 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
     JourneyData(
       groupId = testGroupId,
       enrolmentId = testString,
+      businessVerification = Some(testBV),
       organisationDetails = Some(
         OrganisationDetails(
           addAnotherAddress = Some(addAnotherAddress)
@@ -80,13 +82,32 @@ class ChooseAddressControllerSpec extends SpecBase with MockitoSugar {
       )
     )
 
-  lazy val routeUrl =
+  lazy val routeUrl: String =
     ChooseAddressController.onPageLoad(NormalMode, None).url
 
-  lazy val submitUrl =
+  lazy val submitUrl: String =
     ChooseAddressController.onSubmit(NormalMode, None).url
 
   "ChooseAddressController" - {
+
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
 
     "must return OK and load page with empty form" in {
 

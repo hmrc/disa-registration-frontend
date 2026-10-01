@@ -48,9 +48,28 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
 
   "OrganisationTelephoneNumberController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -66,7 +85,7 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET if no existing answer found" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -83,7 +102,9 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
     "must populate the view correctly on a GET when previously answered" in {
 
       val journeyData =
-        emptyJourneyData.copy(organisationDetails = Some(OrganisationDetails(orgTelephoneNumber = Some(testTelNo))))
+        emptyJourneyDataWithBusinessVerification.copy(organisationDetails =
+          Some(OrganisationDetails(orgTelephoneNumber = Some(testTelNo)))
+        )
 
       val application = applicationBuilder(journeyData = Some(journeyData)).build()
 
@@ -104,7 +125,7 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
 
     "must return BadRequest and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -125,7 +146,7 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
     "must redirect to the next page when valid data is submitted and existing section is present" in {
 
       val expectedSection = OrganisationDetails(orgTelephoneNumber = Some(testTelNo))
-      val journeyData     = emptyJourneyData.copy(organisationDetails = Some(expectedSection))
+      val journeyData     = emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(expectedSection))
 
       when(
         mockJourneyAnswersService
@@ -161,7 +182,7 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
       ) thenReturn Future.successful(expectedSection)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -185,7 +206,7 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
       ) thenReturn Future.failed(new Exception("fubar"))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -202,7 +223,7 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
 
     "must render view with CheckMode on a GET" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, OrganisationTelephoneNumberController.onPageLoad(CheckMode).url)
@@ -223,7 +244,7 @@ class OrganisationTelephoneNumberControllerSpec extends SpecBase {
       ) thenReturn Future.successful(expectedSection)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 

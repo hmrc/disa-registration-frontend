@@ -49,7 +49,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK with empty form when no existing answer" in {
 
-      val app = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val app = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(app) {
         val request = FakeRequest(GET, routePath)
@@ -68,6 +68,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       val jd = JourneyData(
         groupId = testGroupId,
         enrolmentId = testString,
+        businessVerification = Some(testBV),
         organisationDetails = Some(
           OrganisationDetails(registeredToManageIsa = None)
         )
@@ -92,6 +93,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       val jd = JourneyData(
         groupId = testGroupId,
         enrolmentId = testString,
+        businessVerification = Some(testBV),
         organisationDetails = Some(
           OrganisationDetails(registeredToManageIsa = Some(Yes))
         )
@@ -120,6 +122,25 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
+    "must redirect to Start for a GET if no existing data is found" in {
+
+      val application =
+        applicationBuilder(journeyData = None).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routePath)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

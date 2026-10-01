@@ -32,6 +32,7 @@ import javax.inject.Inject
 
 class IsaProductsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
+  grsGuard: GrsGuardActionFilter,
   cyaGuard: CyaGuardAction,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -41,7 +42,7 @@ class IsaProductsCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen grsGuard) { implicit request =>
     cyaGuard.sortingData(request.journeyData.get.isaProducts) match {
       case Some(call) => Redirect(call)
       case _          => Ok(view(SummaryListViewModel(summaryListRows(request.journeyData))))

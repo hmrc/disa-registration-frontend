@@ -29,11 +29,31 @@ class OrganisationDetailsCheckYourAnswersControllerSpec extends SpecBase {
 
   "OrganisationDetailsCheckYourAnswersController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.OrganisationDetailsCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET" in {
 
       val jd = JourneyData(
         groupId = testGroupId,
         enrolmentId = testString,
+        businessVerification = Some(testBV),
         organisationDetails = Some(completeTaskListOrganisationDetails)
       )
 
@@ -41,7 +61,11 @@ class OrganisationDetailsCheckYourAnswersControllerSpec extends SpecBase {
 
       val application =
         applicationBuilder(journeyData =
-          Some(emptyJourneyData.copy(organisationDetails = Some(completeTaskListOrganisationDetails)))
+          Some(
+            emptyJourneyDataWithBusinessVerification.copy(organisationDetails =
+              Some(completeTaskListOrganisationDetails)
+            )
+          )
         ).build()
 
       running(application) {
