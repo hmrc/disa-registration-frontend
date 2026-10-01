@@ -57,6 +57,9 @@ class AuthenticatedIdentifierAction @Inject() (
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
+    // TODO(DFI investigation, QA-only hotfix): remove once investigation into available auth retrievals is complete.
+    logAuthRetrievalsForInvestigation()
+
     authorised().retrieve(groupIdentifier and affinityGroup and credentials and credentialRole and allEnrolments) {
       case Some(groupId) ~ Some(Organisation) ~ Some(credentials) ~ Some(role) ~ enrolments =>
         sessionRepository
@@ -102,6 +105,23 @@ class AuthenticatedIdentifierAction @Inject() (
     case _: AuthorisationException =>
       Redirect(routes.UnauthorisedController.onPageLoad())
   }
+
+  // TODO(DFI investigation, QA-only hotfix): remove this method and its call site once investigation is complete.
+  // Fire-and-forget: independent of the main authorisation retrieve above, so failures here must never
+  // affect the existing login/enrolment flow.
+  private def logAuthRetrievalsForInvestigation()(implicit hc: HeaderCarrier): Unit =
+    authorised()
+      .retrieve(name and itmpName and email and emailVerified) {
+        case optName ~ optItmpName ~ optEmail ~ optEmailVerified =>
+          logger.warn(
+            "[AuthRetrievalInvestigation] " +
+              s"name=$optName, itmpName=$optItmpName, email=$optEmail, emailVerified=$optEmailVerified"
+          )
+          Future.unit
+      }
+      .recover { case NonFatal(e) =>
+        logger.warn(s"[AuthRetrievalInvestigation] failed to retrieve additional auth fields: ${e.getMessage}")
+      }
 
   private def isAlreadyEnrolled(enrolments: Enrolments): Boolean =
     enrolments
