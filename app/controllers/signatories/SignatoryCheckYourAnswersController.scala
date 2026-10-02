@@ -34,6 +34,7 @@ class SignatoryCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   cyaGuard: CyaGuardAction,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
@@ -43,7 +44,7 @@ class SignatoryCheckYourAnswersController @Inject() (
     with Logging {
 
   def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       cyaGuard.sortingData(request.journeyData.signatories, Some(id)) match {
         case Some(call) => Redirect(call)
         case _          => Ok(view(SummaryListViewModel(buildSummaryRows(id, returnTo)), returnTo))

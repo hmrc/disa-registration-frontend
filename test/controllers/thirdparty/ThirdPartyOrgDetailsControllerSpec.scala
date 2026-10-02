@@ -43,6 +43,8 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
   private val newId       = "new-id-123"
   private val generatedId = "generated-id-123"
 
+  private val routeUrl = ThirdPartyOrgDetailsController.onPageLoad(Some(generatedId), NormalMode, None).url
+
   lazy val formProvider: ThirdPartyOrgDetailsFormProvider =
     new ThirdPartyOrgDetailsFormProvider()
 
@@ -53,18 +55,37 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
   "ThirdPartyOrgDetailsController onPageLoad" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and empty form when no existing data and id provided" in {
 
       when(mockUuidGenerator.generate()).thenReturn(generatedId)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[UuidGenerator].toInstance(mockUuidGenerator))
           .build()
 
       running(application) {
         val request =
-          FakeRequest(GET, ThirdPartyOrgDetailsController.onPageLoad(Some(generatedId), NormalMode, None).url)
+          FakeRequest(GET, routeUrl)
 
         val result = route(application, request).value
 
@@ -87,6 +108,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(
             ThirdPartyOrganisations(
               None,
@@ -125,6 +147,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(
             ThirdPartyOrganisations(
               managedByThirdParty = None,
@@ -171,6 +194,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(
             ThirdPartyOrganisations(
               managedByThirdParty = None,
@@ -205,7 +229,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
     "must return BAD_REQUEST when invalid data is submitted" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -373,7 +397,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
 
     "must render CheckMode view" in {
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {
@@ -409,7 +433,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
       ).thenReturn(Future.successful(expected))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =

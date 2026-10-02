@@ -41,6 +41,7 @@ class ThirdPartyConnectedOrganisationsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  grsGuard: GrsGuardActionFilter,
   requireData: DataRequiredAction,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
@@ -56,7 +57,7 @@ class ThirdPartyConnectedOrganisationsController @Inject() (
   private val form: Form[Seq[String]] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       request.journeyData.thirdPartyOrganisations.fold {
         Redirect(TaskListController.onPageLoad())
       } { section =>

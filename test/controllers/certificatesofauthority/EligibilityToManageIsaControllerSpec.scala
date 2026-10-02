@@ -29,7 +29,8 @@ class EligibilityToManageIsaControllerSpec extends SpecBase {
     "must redirect to Start for if not Business Verified" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None)))
+          .build()
 
       running(application) {
 

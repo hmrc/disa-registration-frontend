@@ -35,6 +35,7 @@ import javax.inject.Inject
 class AddedSignatoryController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
@@ -49,7 +50,7 @@ class AddedSignatoryController @Inject() (
     formProvider("addedSignatory.error.required")
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       getInProgressAndCompleteSignatories.fold {
         Redirect(TaskListController.onPageLoad())
       } { case (inProgress, complete) =>

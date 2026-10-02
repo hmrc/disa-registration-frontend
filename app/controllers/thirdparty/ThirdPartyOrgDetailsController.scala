@@ -42,6 +42,7 @@ import scala.util.control.NonFatal
 class ThirdPartyOrgDetailsController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   journeyAnswersService: JourneyAnswersService,
@@ -60,7 +61,7 @@ class ThirdPartyOrgDetailsController @Inject() (
   val form: Form[ThirdPartyOrgDetailsForm] = formProvider()
 
   def onPageLoad(id: Option[String], mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       id match {
         case None =>
           if (cannotAddAnotherThirdParty(None, request)) {

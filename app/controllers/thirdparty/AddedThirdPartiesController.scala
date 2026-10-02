@@ -18,7 +18,7 @@ package controllers.thirdparty
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, GrsGuardActionFilter, IdentifierAction}
 import controllers.routes.*
 import forms.YesNoAnswerFormProvider
 import models.requests.DataRequest
@@ -35,6 +35,7 @@ class AddedThirdPartiesController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  grsGuard: GrsGuardActionFilter,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
   val controllerComponents: MessagesControllerComponents,
@@ -48,7 +49,7 @@ class AddedThirdPartiesController @Inject() (
     formProvider("addedThirdParties.error.required")
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       getInProgressAndCompleteThirdParty.fold {
         Redirect(TaskListController.onPageLoad())
       } { case (inProgress, complete) =>

@@ -52,11 +52,30 @@ class SignatoryNameControllerSpec extends SpecBase {
 
   "SignatoryNameController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET when an id is provided and no existing answer is found" in {
 
       when(mockUuidGenerator.generate()).thenReturn(generatedId)
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData))
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
         .overrides(bind[UuidGenerator].toInstance(mockUuidGenerator))
         .build()
 
@@ -81,6 +100,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(
             Signatories(
               Seq(
@@ -113,7 +133,7 @@ class SignatoryNameControllerSpec extends SpecBase {
       when(mockUuidGenerator.generate()).thenReturn(generatedId)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[UuidGenerator].toInstance(mockUuidGenerator))
           .build()
 
@@ -132,7 +152,7 @@ class SignatoryNameControllerSpec extends SpecBase {
 
     "must return BadRequest and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -159,6 +179,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(
             Signatories(
               Seq(
@@ -207,6 +228,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(
             Signatories(
               Seq(
@@ -258,7 +280,7 @@ class SignatoryNameControllerSpec extends SpecBase {
       ).thenReturn(Future.successful(expectedSection))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithFailedBusinessVerification))
           .build()
 
       running(application) {
@@ -299,7 +321,7 @@ class SignatoryNameControllerSpec extends SpecBase {
     }
 
     "must render view with CheckMode on a GET" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData))
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
         .build()
 
       running(application) {
@@ -327,7 +349,7 @@ class SignatoryNameControllerSpec extends SpecBase {
       ).thenReturn(Future.successful(expectedSection))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {
@@ -348,6 +370,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(
             Signatories(
               Seq(
@@ -393,6 +416,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(
             Signatories(
               Seq(
@@ -438,6 +462,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(
             Signatories(Seq.empty)
           )
@@ -476,6 +501,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(
             Signatories(
               Seq(
@@ -510,6 +536,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(
             Signatories(
               Seq(Signatory("id-1", Some("Person One")))
