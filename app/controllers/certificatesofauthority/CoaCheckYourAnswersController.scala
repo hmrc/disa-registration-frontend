@@ -31,7 +31,9 @@ import javax.inject.Inject
 
 class CoaCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
+  cyaGuard: CyaGuardAction,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
@@ -40,10 +42,13 @@ class CoaCheckYourAnswersController @Inject() (
     with I18nSupport
     with Logging {
 
-  // TODO: Create ticket to ensure CYA validates required journeyData before loading
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
-      Ok(view(SummaryListViewModel(buildSummaryRows(request.journeyData))))
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
+      cyaGuard.sortingData(request.journeyData.certificatesOfAuthority) match {
+        case Some(call) => Redirect(call)
+        case _          => Ok(view(SummaryListViewModel(buildSummaryRows(request.journeyData))))
+      }
+
     }
 
   private def buildSummaryRows(journeyData: JourneyData)(implicit messages: Messages) =

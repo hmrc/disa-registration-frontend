@@ -35,12 +35,32 @@ class OrganisationEmailCyaControllerSpec extends SpecBase {
 
   "OrganisationEmailCyaController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view when organisation email is present and verified" in {
 
       val journeyData =
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = Some(email),
@@ -77,6 +97,7 @@ class OrganisationEmailCyaControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = None
         )
 
@@ -102,6 +123,7 @@ class OrganisationEmailCyaControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = None,
@@ -132,6 +154,7 @@ class OrganisationEmailCyaControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = Some(email),
@@ -162,6 +185,7 @@ class OrganisationEmailCyaControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = Some(email),

@@ -31,6 +31,7 @@ class SubmissionCyaController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  grsGuard: GrsGuardActionFilter,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: SubmissionCyaView
@@ -38,7 +39,7 @@ class SubmissionCyaController @Inject() (
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       val canSubmit = TaskListProgress.canSubmitAnswers(request.journeyData, request.credentialRole)
 
       if (canSubmit) Ok(view(SubmissionCyaViewModel(request.journeyData)))

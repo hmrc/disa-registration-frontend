@@ -447,5 +447,28 @@ class ThirdPartyOrganisationsSpec extends SpecBase {
         result.connectedOrganisations mustBe Seq.empty
       }
     }
+
+    "isComplete should" - {
+      "return true when third parties are not used or all required third parties are complete" in {
+
+        emptyJourneyData
+          .copy(thirdPartyOrganisations = Some(thirdPartyOrganisationsNotUsed))
+          .thirdPartyOrganisations
+          .exists(_.isComplete) mustBe true
+
+        emptyJourneyData
+          .copy(thirdPartyOrganisations = Some(testThirdPartyOrganisations(Seq(completeTaskListThirdParty("tp-1")))))
+          .thirdPartyOrganisations
+          .exists(_.isComplete) mustBe true
+
+      }
+
+      "false when third parties are used but missing or incomplete" in {
+        Seq(
+          ThirdPartyOrganisations(managedByThirdParty = Some(YesNoAnswer.Yes)),
+          testThirdPartyOrganisations(Seq(inProgressTaskListThirdParty("tp-1")))
+        ).foreach(_.isComplete mustBe false)
+      }
+    }
   }
 }

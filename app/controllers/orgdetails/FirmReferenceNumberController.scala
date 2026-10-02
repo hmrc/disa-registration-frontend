@@ -40,6 +40,7 @@ class FirmReferenceNumberController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   formProvider: FirmReferenceNumberFormProvider,
   journeyAnswersService: JourneyAnswersService,
@@ -52,12 +53,12 @@ class FirmReferenceNumberController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
-    implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard) { implicit request =>
       val preparedForm = prepareForm(form)(_.organisationDetails.flatMap(_.fcaNumber))(identity)
 
       Ok(view(preparedForm, mode, returnTo))
-  }
+    }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
     implicit request =>

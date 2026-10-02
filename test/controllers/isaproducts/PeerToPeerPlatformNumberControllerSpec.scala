@@ -46,11 +46,34 @@ class PeerToPeerPlatformNumberControllerSpec extends SpecBase {
 
   val validAnswer                   = "123456"
   val validJourneyData: JourneyData =
-    JourneyData(testGroupId, testString, isaProducts = Some(IsaProducts(p2pPlatform = Some(testString))))
+    JourneyData(
+      testGroupId,
+      testString,
+      businessVerification = Some(testBV),
+      isaProducts = Some(IsaProducts(p2pPlatform = Some(testString)))
+    )
 
   "PeerToPeerPlatformNumber Controller" - {
 
     "GET" - {
+      "must redirect to Start for if not Business Verified" in {
+
+        val application =
+          applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, peerToPeerPlatformNumberRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.routes.GrsStartController.onPageLoad().url
+        }
+      }
 
       "must return OK and the correct view for a GET" in {
 

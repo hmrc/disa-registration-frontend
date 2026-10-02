@@ -57,7 +57,7 @@ object TaskListRoutes {
       sectionName match {
         case OrganisationDetails.sectionName =>
           Some(
-            if (TaskListProgress.isOrganisationInformationComplete(journeyData))
+            if (journeyData.organisationDetails.exists(_.isComplete))
               OrganisationDetailsCheckYourAnswersController.onPageLoad()
             else
               RegisteredIsaManagerController.onPageLoad(NormalMode)
@@ -68,13 +68,13 @@ object TaskListRoutes {
 
         case IsaProducts.sectionName =>
           Some(
-            if (TaskListProgress.isIsaProductsComplete(journeyData)) IsaProductsCheckYourAnswersController.onPageLoad()
+            if (journeyData.isaProducts.exists(_.isComplete)) IsaProductsCheckYourAnswersController.onPageLoad()
             else IsaProductsController.onPageLoad(NormalMode)
           )
 
         case CertificatesOfAuthority.sectionName =>
           Some(
-            if (TaskListProgress.isCertificatesOfAuthorityComplete(journeyData))
+            if (journeyData.certificatesOfAuthority.exists(_.isComplete))
               CoaCheckYourAnswersController.onPageLoad()
             else
               EligibilityToManageIsaController.onPageLoad()
@@ -111,7 +111,7 @@ object TaskListRoutes {
 
   private def organisationEmailDestination(journeyData: JourneyData): Option[Call] = {
     val email    = journeyData.organisationEmail.flatMap(_.organisationEmail)
-    val verified = TaskListProgress.isOrganisationEmailVerified(journeyData)
+    val verified = journeyData.organisationEmail.exists(_.isComplete)
 
     Some(
       if (verified) OrganisationEmailCyaController.onPageLoad()
@@ -123,7 +123,7 @@ object TaskListRoutes {
   private def thirdPartyOrganisationsDestination(journeyData: JourneyData): Option[Call] = {
     val section            = journeyData.thirdPartyOrganisations
     val count              = section.fold(0)(_.thirdParties.size)
-    val complete           = TaskListProgress.areThirdPartyOrganisationsComplete(journeyData)
+    val complete           = journeyData.thirdPartyOrganisations.exists(_.isComplete)
     val hasIncompleteItems = section.exists(_.thirdParties.exists(_.inProgress))
 
     Some(

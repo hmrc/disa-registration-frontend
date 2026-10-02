@@ -40,6 +40,7 @@ import scala.util.control.NonFatal
 class AddAnotherAddressController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   journeyAnswersService: JourneyAnswersService,
@@ -57,7 +58,7 @@ class AddAnotherAddressController @Inject() (
   private val form: Form[AddAnotherAddress] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       val preparedForm =
         request.journeyData.organisationDetails
           .flatMap(_.addAnotherAddress)

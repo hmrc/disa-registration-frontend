@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package models.journeydata
+package controllers.actions
 
-import play.api.libs.json.{Json, OFormat}
+import models.journeydata.BusinessVerification
 
-case class OrganisationEmail(organisationEmail: Option[String] = None, verified: Option[Boolean] = None)
-    extends TaskListSection {
-  def sectionName: String = OrganisationEmail.sectionName
+trait GrsVerificationHelper {
 
-  def isComplete: Boolean = (organisationEmail, verified) match
-    case (Some(email), Some(true)) => if email.nonEmpty then true else false
-    case _                         => false
-}
+  def checkVerificationAndRegistration(business: BusinessVerification): Boolean =
+    (for {
+      verification <- business.businessVerificationPassed
+      registration <- business.businessRegistrationPassed
+    } yield verification && registration).getOrElse(false)
 
-object OrganisationEmail {
-  val sectionName = "organisationEmail"
-
-  implicit val format: OFormat[OrganisationEmail] = Json.format[OrganisationEmail]
 }

@@ -41,6 +41,7 @@ class ThirdPartyInvestorFundsPercentageController @Inject() (
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   errorHandler: ErrorHandler,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -54,7 +55,7 @@ class ThirdPartyInvestorFundsPercentageController @Inject() (
   val form = formProvider()
 
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       findThirdPartyWithDetails(id).fold {
         Redirect(TaskListController.onPageLoad())
       } { case (thirdParty, name, answer) =>

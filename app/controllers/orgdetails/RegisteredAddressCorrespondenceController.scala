@@ -41,6 +41,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
@@ -54,8 +55,8 @@ class RegisteredAddressCorrespondenceController @Inject() (
 
   val form: Form[YesNoAnswer] = formProvider("registeredAddressCorrespondence.error.required")
 
-  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
-    implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard) { implicit request =>
       (for {
         jd      <- request.journeyData
         bv      <- jd.businessVerification
@@ -72,7 +73,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
 
           Ok(view(preparedForm, mode, registeredAddress, returnTo))
       }
-  }
+    }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen requireData).async { implicit request =>

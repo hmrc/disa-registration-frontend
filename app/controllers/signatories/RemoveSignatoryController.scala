@@ -43,6 +43,7 @@ class RemoveSignatoryController @Inject() (
   navigator: Navigator,
   errorHandler: ErrorHandler,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
@@ -55,7 +56,7 @@ class RemoveSignatoryController @Inject() (
   val form = formProvider("removeSignatory.error.required")
 
   def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       providingName(id, name => Future.successful(Ok(view(id, name, form, returnTo))))
     }
 

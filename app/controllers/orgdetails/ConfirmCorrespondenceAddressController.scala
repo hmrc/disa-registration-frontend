@@ -31,6 +31,7 @@ import javax.inject.Inject
 class ConfirmCorrespondenceAddressController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   navigator: Navigator,
   val controllerComponents: MessagesControllerComponents,
@@ -39,7 +40,7 @@ class ConfirmCorrespondenceAddressController @Inject() (
     with I18nSupport {
 
   def onPageLoad(returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData) { implicit request =>
+    (identify andThen getData andThen grsGuard) { implicit request =>
       val address =
         for {
           jd                    <- request.journeyData

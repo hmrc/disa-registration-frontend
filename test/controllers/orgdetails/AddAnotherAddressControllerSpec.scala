@@ -59,10 +59,31 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
   "AddAnotherAddressController onPageLoad" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.AddAnotherAddressController.onPageLoad(mode, None).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK with empty form when no data exists" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .build()
 
       running(application) {
@@ -84,7 +105,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
     "must populate form when existing answer is present" in {
 
       val filledJourney =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = Some(
             journeyDetails.copy(addAnotherAddress = Some(baseAnswer))
           )

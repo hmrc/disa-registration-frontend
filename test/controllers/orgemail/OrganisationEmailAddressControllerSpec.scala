@@ -64,12 +64,32 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
 
   "OrganisationEmailAddressController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET when the question has not previously been answered" in {
 
       val journeyData =
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(OrganisationEmail())
         )
 
@@ -99,6 +119,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = Some(oldEmail),
@@ -139,6 +160,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(existingSection)
         )
 
@@ -180,6 +202,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(existingSection)
         )
 
@@ -402,7 +425,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
       ).thenReturn(Future.failed(new Exception("fubar")))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
@@ -426,6 +449,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = Some(oldEmail),

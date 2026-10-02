@@ -31,6 +31,8 @@ import javax.inject.Inject
 
 class OrganisationDetailsCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
+  cyaGuard: CyaGuardAction,
+  grsGuard: GrsGuardActionFilter,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -41,7 +43,7 @@ class OrganisationDetailsCheckYourAnswersController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
 
       val jd         = request.journeyData
       val orgDetails = jd.organisationDetails
@@ -60,6 +62,9 @@ class OrganisationDetailsCheckYourAnswersController @Inject() (
           OrganisationTelephoneNumberSummary.row(jd)
         ).flatten
 
-      Ok(view(SummaryListViewModel(summaryListRows)))
+      cyaGuard.sortingData(orgDetails) match {
+        case Some(call) => Redirect(call)
+        case _          => Ok(view(SummaryListViewModel(summaryListRows)))
+      }
     }
 }

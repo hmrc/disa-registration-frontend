@@ -40,6 +40,11 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec wit
           |{
           | "groupId": "$testGroupId",
           | "enrolmentId": "$testString",
+          | "businessVerification": {
+          |       "businessRegistrationPassed": true,
+          |       "businessVerificationPassed": true,
+          |       "ctutr": "1234567890"
+          |     },
           | "isaProducts": {
           |   "innovativeFinancialProducts": ["peerToPeerLoansUsingAPlatformWith36HPermissions", "peerToPeerLoansAndHave36HPermissions", "crowdfundedDebentures", "longTermAssetFunds"]
           | }

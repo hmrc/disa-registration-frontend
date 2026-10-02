@@ -65,12 +65,32 @@ class RemoveSignatoryControllerSpec extends SpecBase {
 
   "RemoveSignatoryController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET when the signatory exists" in {
 
       val journeyData =
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(Signatories(Seq(existingSignatory, otherSignatory)))
         )
 
@@ -97,6 +117,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(Signatories(Seq(otherSignatory)))
         )
 
@@ -114,7 +135,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
 
     "must redirect to TaskList on a GET when the section is absent" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)

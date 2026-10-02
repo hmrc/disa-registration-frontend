@@ -25,6 +25,7 @@ import models.requests.DataRequest
 import models.{Mode, ReturnTo, YesNoAnswer}
 import navigation.Navigator
 import pages.thirdparty.ThirdPartyManagingReturnsPage
+import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -41,6 +42,7 @@ class ThirdPartyManagingReturnsController @Inject() (
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   errorHandler: ErrorHandler,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -51,10 +53,10 @@ class ThirdPartyManagingReturnsController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider("returnsManagedByThirdParty.error.required")
+  val form: Form[YesNoAnswer] = formProvider("returnsManagedByThirdParty.error.required")
 
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       findThirdPartyWithDetails(id).fold {
         Redirect(TaskListController.onPageLoad())
       } { case (_, name, answer) =>

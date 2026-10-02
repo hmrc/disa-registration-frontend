@@ -41,6 +41,7 @@ class InnovativeFinancialProductsController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   formProvider: InnovativeFinancialProductsFormProvider,
   journeyAnswersService: JourneyAnswersService,
@@ -55,7 +56,7 @@ class InnovativeFinancialProductsController @Inject() (
   val form: Form[Set[InnovativeFinancialProduct]] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData) { implicit request =>
+    (identify andThen getData andThen grsGuard) { implicit request =>
       val preparedForm = prepareForm(form)(_.isaProducts.flatMap(_.innovativeFinancialProducts))(_.toSet)
       Ok(view(preparedForm, mode, returnTo))
     }

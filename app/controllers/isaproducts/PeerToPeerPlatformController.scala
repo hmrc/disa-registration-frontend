@@ -39,6 +39,7 @@ class PeerToPeerPlatformController @Inject() (
   override val messagesApi: MessagesApi,
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
+  grsGuard: GrsGuardActionFilter,
   errorHandler: ErrorHandler,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -52,8 +53,8 @@ class PeerToPeerPlatformController @Inject() (
 
   val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
-    implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard) { implicit request =>
       val preparedForm = (for {
         journeyData <- request.journeyData
         section     <- journeyData.isaProducts
@@ -61,7 +62,7 @@ class PeerToPeerPlatformController @Inject() (
       } yield form.fill(name)).getOrElse(form)
 
       Ok(view(preparedForm, mode, returnTo))
-  }
+    }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
     implicit request =>

@@ -44,6 +44,7 @@ class InvestorFundsUsedByThirdPartyController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   errorHandler: ErrorHandler,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
@@ -56,7 +57,7 @@ class InvestorFundsUsedByThirdPartyController @Inject() (
   val form: Form[YesNoAnswer] = formProvider("investorFundsUsedByThirdParty.error.required")
 
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       findThirdPartyWithDetails(id).fold {
         Redirect(TaskListController.onPageLoad())
       } { case (thirdParty, name, answer) =>

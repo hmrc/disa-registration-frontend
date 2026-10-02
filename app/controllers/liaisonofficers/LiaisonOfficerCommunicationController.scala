@@ -26,6 +26,7 @@ import models.{Mode, ReturnTo}
 import navigation.Navigator
 import pages.liaisonofficers.LiaisonOfficerCommunicationPage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
@@ -40,6 +41,7 @@ class LiaisonOfficerCommunicationController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: LiaisonOfficerCommunicationFormProvider,
@@ -52,10 +54,10 @@ class LiaisonOfficerCommunicationController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form: Form[Set[LiaisonOfficerCommunication]] = formProvider()
 
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       findLiaisonOfficerWithDetails(id).fold {
         Redirect(TaskListController.onPageLoad())
       } { case (liaisonOfficer, name, communication) =>

@@ -35,6 +35,7 @@ import javax.inject.Inject
 class AddedLiaisonOfficersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
@@ -48,7 +49,7 @@ class AddedLiaisonOfficersController @Inject() (
   val form: Form[YesNoAnswer] = formProvider("addedLiaisonOfficers.error.required")
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       getInProgressAndCompleteLiaisonOfficers.fold {
         Redirect(TaskListController.onPageLoad())
       } { case (inProgress, complete) =>

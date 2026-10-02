@@ -28,12 +28,15 @@ import javax.inject.Inject
 class AddASignatoryController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
+  getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
   view: AddASignatoryView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(returnTo: Option[ReturnTo]): Action[AnyContent] = (Action andThen identify) { implicit request =>
-    Ok(view(returnTo))
-  }
+  def onPageLoad(returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (Action andThen identify andThen getData andThen grsGuard) { implicit request =>
+      Ok(view(returnTo))
+    }
 }

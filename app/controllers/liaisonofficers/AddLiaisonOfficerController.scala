@@ -28,13 +28,15 @@ import javax.inject.Inject
 class AddLiaisonOfficerController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
+  getData: DataRetrievalAction,
   val controllerComponents: MessagesControllerComponents,
   view: AddLiaisonOfficerView
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(returnTo: Option[ReturnTo] = None): Action[AnyContent] = (Action andThen identify) {
-    implicit request =>
+  def onPageLoad(returnTo: Option[ReturnTo] = None): Action[AnyContent] =
+    (Action andThen identify andThen getData andThen grsGuard) { implicit request =>
       Ok(view(returnTo))
-  }
+    }
 }

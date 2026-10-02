@@ -40,6 +40,7 @@ class ProductsManagedByThirdPartyController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
@@ -55,7 +56,7 @@ class ProductsManagedByThirdPartyController @Inject() (
   val form: Form[YesNoAnswer] = formProvider("productsManagedByThirdParty.error.required")
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
 
       val preparedForm = request.journeyData.thirdPartyOrganisations.flatMap(_.managedByThirdParty) match {
         case None        => form

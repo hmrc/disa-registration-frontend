@@ -20,10 +20,11 @@ import controllers.actions.*
 import forms.FinancialOrganisationFormProvider
 import handlers.ErrorHandler
 import models.{Mode, ReturnTo}
-import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, FinancialOrganisation}
 import navigation.Navigator
 import pages.certificatesofauthority.FinancialOrganisationPage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
@@ -38,6 +39,7 @@ class FinancialOrganisationController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   journeyAnswersService: JourneyAnswersService,
@@ -50,10 +52,10 @@ class FinancialOrganisationController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form: Form[Set[FinancialOrganisation]] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
 
       val preparedForm = request.journeyData.certificatesOfAuthority.flatMap(_.financialOrganisation) match {
         case None        => form

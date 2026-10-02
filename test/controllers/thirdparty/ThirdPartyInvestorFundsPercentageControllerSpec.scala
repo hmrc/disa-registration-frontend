@@ -55,6 +55,25 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
 
     "GET" - {
 
+      "must redirect to Start for if not Business Verified" in {
+
+        val application =
+          applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, routeUrl)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.routes.GrsStartController.onPageLoad().url
+        }
+      }
+
       "must return OK when third party exists and no answer yet" in {
 
         val journeyData =

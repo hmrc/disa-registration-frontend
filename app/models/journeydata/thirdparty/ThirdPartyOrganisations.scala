@@ -17,6 +17,7 @@
 package models.journeydata.thirdparty
 
 import models.YesNoAnswer
+import models.YesNoAnswer.Yes
 import models.journeydata.TaskListSection
 import play.api.libs.json.{Json, OFormat}
 
@@ -76,6 +77,12 @@ case class ThirdPartyOrganisations(
       connectedOrganisations = updatedConnectedOrganisations
     )
   }
+
+  def isComplete: Boolean =
+    managedByThirdParty.exists {
+      case YesNoAnswer.No => true
+      case Yes            => thirdParties.nonEmpty && thirdParties.forall(!_.inProgress)
+    }
 
   def completedThirdParties: Seq[ThirdParty] =
     thirdParties.filterNot(_.inProgress)
