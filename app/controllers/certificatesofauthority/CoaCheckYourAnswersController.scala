@@ -33,6 +33,7 @@ class CoaCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   cyaGuard: CyaGuardAction,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
@@ -42,7 +43,7 @@ class CoaCheckYourAnswersController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       cyaGuard.sortingData(request.journeyData.certificatesOfAuthority) match {
         case Some(call) => Redirect(call)
         case _          => Ok(view(SummaryListViewModel(buildSummaryRows(request.journeyData))))

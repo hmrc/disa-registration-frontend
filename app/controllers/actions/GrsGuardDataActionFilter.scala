@@ -17,7 +17,7 @@
 package controllers.actions
 
 import models.journeydata.BusinessVerification
-import models.requests.OptionalDataRequest
+import models.requests.DataRequest
 import navigation.Navigator
 import play.api.mvc.{ActionFilter, Result, Results}
 import play.api.mvc.Results.Redirect
@@ -25,22 +25,18 @@ import play.api.mvc.Results.Redirect
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class GrsGuardActionFilter @Inject() (
+class GrsGuardDataActionFilter @Inject() (
   navigator: Navigator
 )(implicit val executionContext: ExecutionContext)
-    extends ActionFilter[OptionalDataRequest]
+    extends ActionFilter[DataRequest]
     with Results
     with GrsVerificationHelper {
 
-  override protected def filter[A](request: OptionalDataRequest[A]): Future[Option[Result]] = {
-    val businessV = request.journeyData.flatMap(_.businessVerification)
+  override protected def filter[A](request: DataRequest[A]): Future[Option[Result]] = {
+    val isVerified = request.journeyData.businessVerification.exists(checkVerificationAndRegistration)
 
-    val isVerified = businessV match {
-      case Some(business) => checkVerificationAndRegistration(business)
-      case _              => false
-    }
-
-    Future.successful(if isVerified then None else Some(Redirect(navigator.nextPageGrsGuard())))
-
+    Future.successful(
+      if isVerified then None else Some(Redirect(navigator.nextPageGrsGuard()))
+    )
   }
 }

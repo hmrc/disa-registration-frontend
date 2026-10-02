@@ -28,6 +28,7 @@ import javax.inject.Inject
 class EligibilityToManageIsaController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardDataActionFilter,
   getOrCreateJourneyDataAction: GetOrCreateJourneyDataAction,
   val controllerComponents: MessagesControllerComponents,
   view: EligibilityToManageIsaView,
@@ -35,7 +36,8 @@ class EligibilityToManageIsaController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getOrCreateJourneyDataAction) { implicit request =>
-    Ok(view(guidanceHref = appConfig.isaManagerGuidanceUrl))
+  def onPageLoad(): Action[AnyContent] = (identify andThen getOrCreateJourneyDataAction andThen grsGuard) {
+    implicit request =>
+      Ok(view(guidanceHref = appConfig.isaManagerGuidanceUrl))
   }
 }

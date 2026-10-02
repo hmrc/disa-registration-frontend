@@ -17,7 +17,7 @@
 package controllers.liaisonofficers
 
 import base.SpecBase
-import controllers.actions.AuthenticatedIdentifierAction
+import controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, GrsGuardActionFilter}
 import controllers.liaisonofficers.routes.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -31,12 +31,30 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AddLiaisonOfficerControllerSpec extends SpecBase {
   implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-
+  private val routeUrl                            = AddLiaisonOfficerController.onPageLoad().url
   "AddLiaisonOfficerController" - {
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
 
     "must return OK for Organisation users" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
       val view        = application.injector.instanceOf[AddLiaisonOfficerView]
 
       running(application) {
@@ -59,11 +77,13 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
         val controller = new AddLiaisonOfficerController(
           messagesApi = application.injector.instanceOf[play.api.i18n.MessagesApi],
           identify = authAction,
+          grsGuard = application.injector.instanceOf[GrsGuardActionFilter],
+          getData = application.injector.instanceOf[DataRetrievalAction],
           controllerComponents = application.injector.instanceOf[play.api.mvc.MessagesControllerComponents],
           view = view
         )
 
-        val request = FakeRequest(GET, AddLiaisonOfficerController.onPageLoad().url)
+        val request = FakeRequest(GET, routeUrl)
         val result  = controller.onPageLoad()(request)
 
         status(result) mustEqual OK
@@ -73,7 +93,7 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
 
     "must redirect Agent users to Unsupported Affinity Group page" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
@@ -93,11 +113,13 @@ class AddLiaisonOfficerControllerSpec extends SpecBase {
         val controller = new AddLiaisonOfficerController(
           messagesApi = application.injector.instanceOf[play.api.i18n.MessagesApi],
           identify = authAction,
+          grsGuard = application.injector.instanceOf[GrsGuardActionFilter],
+          getData = application.injector.instanceOf[DataRetrievalAction],
           controllerComponents = application.injector.instanceOf[play.api.mvc.MessagesControllerComponents],
           view = application.injector.instanceOf[AddLiaisonOfficerView]
         )
 
-        val request = FakeRequest(GET, AddLiaisonOfficerController.onPageLoad().url)
+        val request = FakeRequest(GET, routeUrl)
         val result  = controller.onPageLoad()(request)
 
         status(result) mustEqual SEE_OTHER
