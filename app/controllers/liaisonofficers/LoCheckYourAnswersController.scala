@@ -33,6 +33,7 @@ import javax.inject.Inject
 class LoCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   cyaGuard: CyaGuardAction,
+  grsGuard: GrsGuardActionFilter,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -43,7 +44,7 @@ class LoCheckYourAnswersController @Inject() (
     with Logging {
 
   def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       cyaGuard.sortingData(request.journeyData.liaisonOfficers, Some(id)) match {
         case Some(call) => Redirect(call)
         case _          => Ok(view(SummaryListViewModel(buildSummaryRows(id, returnTo)), returnTo))

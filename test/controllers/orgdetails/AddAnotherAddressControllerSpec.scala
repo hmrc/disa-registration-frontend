@@ -135,6 +135,21 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
   "AddAnotherAddressController onSubmit" - {
 
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode, None).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return BAD_REQUEST when form is invalid" in {
 
       val application =
@@ -330,7 +345,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         )
 
       val journeyData =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = Some(existingDetails)
         )
 
@@ -383,7 +398,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           journeyData = Some(
-            emptyJourneyData.copy(organisationDetails = None)
+            emptyJourneyDataWithBusinessVerification.copy(organisationDetails = None)
           )
         ).build()
 
@@ -408,7 +423,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       }
     }
 
-    "must return INTERNAL_SERVER_ERROR when update fails" in {
+    "must redirect to Start for if not Business Verified" in {
 
       when(
         mockJourneyAnswersService.update(
@@ -424,7 +439,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           journeyData = Some(
-            emptyJourneyData.copy(
+            emptyJourneyDataWithBusinessVerification.copy(
               organisationDetails = Some(journeyDetails)
             )
           )
@@ -446,15 +461,48 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       }
     }
 
-    "POST must redirect to Start for if not Business Verified" in {
-      val app =
-        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+    "must bho" in {
 
-      running(app) {
+      val existingDetails =
+        OrganisationDetails(
+          correspondenceAddress = Some(mock[models.journeydata.CorrespondenceAddress]),
+          addAnotherAddress = Some(baseAnswer)
+        )
+
+      val updatedSection =
+        existingDetails.copy(
+          correspondenceAddress = None,
+          addAnotherAddress = None
+        )
+
+      val journeyData =
+        emptyJourneyDataWithFailedBusinessVerification.copy(
+          organisationDetails = Some(existingDetails)
+        )
+
+      when(
+        mockJourneyAnswersService.update(
+          eqTo(updatedSection),
+          any[String],
+          any[String]
+        )(any[Writes[OrganisationDetails]], any())
+      ).thenReturn(Future.successful(updatedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+
         val request =
-          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode, None).url)
+          FakeRequest(
+            GET,
+            routes.AddAnotherAddressController
+              .clearCorrespondenceAddressAndRedirect()
+              .url
+          )
 
-        val result = route(app, request).value
+        val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url

@@ -347,6 +347,7 @@ class EmailVerificationCodeControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(OrganisationEmail())
         )
 

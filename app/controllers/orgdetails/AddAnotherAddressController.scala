@@ -112,7 +112,7 @@ class AddAnotherAddressController @Inject() (
     }
 
   def clearCorrespondenceAddressAndRedirect(): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       request.journeyData.organisationDetails match {
 
         case Some(existing) =>

@@ -189,6 +189,22 @@ class TradingNameControllerSpec extends SpecBase {
           verify(mockErrorHandler).internalServerError(any[RequestHeader])
         }
       }
+
+      "POST must redirect to Start for if not Business Verified" in {
+
+        val app =
+          applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, tradingNameRoute)
+
+          val result = route(app, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
+        }
+      }
     }
   }
 }
