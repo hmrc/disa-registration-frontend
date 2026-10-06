@@ -20,6 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import controllers.routes.TaskListController
 import controllers.signatories.routes.*
+import models.journeydata.JourneyData
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.{NormalMode, YesNoAnswer}
 import play.api.test.FakeRequest
@@ -266,6 +267,27 @@ class AddedSignatoryControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual TaskListController.onPageLoad().url
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        businessVerification = None
+      )
+
+      val app =
+        applicationBuilder(journeyData = Some(jd)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, submitUrl)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

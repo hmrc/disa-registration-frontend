@@ -18,8 +18,9 @@ package controllers.thirdparty
 
 import base.SpecBase
 import controllers.routes.TaskListController
-import controllers.thirdparty.routes._
+import controllers.thirdparty.routes.*
 import forms.ThirdPartyInvestorFundsPercentageFormProvider
+import models.journeydata.JourneyData
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.{CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -178,6 +179,27 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
     }
 
     "POST" - {
+
+      "POST must redirect to Start for if not Business Verified" in {
+        val jd = JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          businessVerification = None
+        )
+
+        val app =
+          applicationBuilder(journeyData = Some(jd)).build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, submitUrl)
+
+          val result = route(app, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
+        }
+      }
 
       "must return BadRequest when invalid data submitted" in {
 

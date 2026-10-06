@@ -21,11 +21,11 @@ import controllers.routes.TaskListController
 import controllers.orgdetails.routes.EnterYourOrganisationAddressController
 import forms.EnterYourOrganisationAddressFormProvider
 import models.{CheckMode, NormalMode}
-import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
+import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
 import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, never, verify, when}
 import play.api.data.Form
 import play.api.inject.bind
@@ -400,6 +400,27 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
         await(route(application, request).value)
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        businessVerification = None
+      )
+
+      val app =
+        applicationBuilder(journeyData = Some(jd)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, submitUrl)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

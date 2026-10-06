@@ -167,6 +167,27 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
 
   "onSubmit" - {
 
+    "POST must redirect to Start for if not Business Verified" in {
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        businessVerification = None
+      )
+
+      val app =
+        applicationBuilder(journeyData = Some(jd)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routePath)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must create OrganisationDetails when none exists (Yes)" in {
 
       when(

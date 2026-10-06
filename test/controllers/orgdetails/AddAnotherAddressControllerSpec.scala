@@ -445,5 +445,26 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         status(result) mustEqual INTERNAL_SERVER_ERROR
       }
     }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        businessVerification = None
+      )
+
+      val app =
+        applicationBuilder(journeyData = Some(jd)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode, None).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
   }
 }

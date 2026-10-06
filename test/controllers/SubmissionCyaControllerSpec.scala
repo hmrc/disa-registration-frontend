@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import models.journeydata.JourneyData
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.Assistant
@@ -139,6 +140,27 @@ class SubmissionCyaControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.TaskListController.onPageLoad().url
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        businessVerification = None
+      )
+
+      val app =
+        applicationBuilder(journeyData = Some(jd)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

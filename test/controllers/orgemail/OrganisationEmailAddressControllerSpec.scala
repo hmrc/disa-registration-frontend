@@ -62,6 +62,12 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
   val form: Form[String] =
     formProvider()
 
+  private val expectedSection =
+    OrganisationEmail(
+      organisationEmail = Some(newEmail),
+      verified = Some(false)
+    )
+
   "OrganisationEmailAddressController" - {
 
     "must redirect to Start for if not Business Verified" in {
@@ -483,12 +489,6 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
 
     "must submit with CheckMode and redirect" in {
 
-      val expectedSection =
-        OrganisationEmail(
-          organisationEmail = Some(newEmail),
-          verified = Some(false)
-        )
-
       when(
         mockJourneyAnswersService
           .update(eqTo(expectedSection), any[String], any[String])(any[Writes[OrganisationEmail]], any)
@@ -514,6 +514,27 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val jd = JourneyData(
+        groupId = testGroupId,
+        enrolmentId = testString,
+        businessVerification = None
+      )
+
+      val app =
+        applicationBuilder(journeyData = Some(jd)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, OrganisationEmailAddressController.onSubmit(CheckMode).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }
