@@ -57,7 +57,7 @@ class ConfirmCorrespondenceAddressController @Inject() (
     }
 
   def onSubmit(returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData) { implicit request =>
+    (identify andThen getData andThen grsGuard) { implicit request =>
       Redirect(
         request.journeyData
           .flatMap(_.organisationDetails)

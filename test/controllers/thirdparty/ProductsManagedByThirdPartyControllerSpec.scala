@@ -205,6 +205,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(existingSection)
         )
 
@@ -250,6 +251,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(existingSection)
         )
 
@@ -322,6 +324,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(existingSection)
         )
 

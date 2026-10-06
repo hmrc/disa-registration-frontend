@@ -223,7 +223,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
 
       "must redirect to TaskList when invalid data and third party not found" in {
 
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
         running(application) {
           val request =
@@ -291,7 +291,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
 
       "must redirect to TaskList when section missing" in {
 
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
         running(application) {
           val request =

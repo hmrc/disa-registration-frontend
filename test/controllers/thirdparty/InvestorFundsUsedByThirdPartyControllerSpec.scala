@@ -17,8 +17,8 @@
 package controllers.thirdparty
 
 import base.SpecBase
-import controllers.thirdparty.routes._
-import controllers.routes._
+import controllers.thirdparty.routes.*
+import controllers.routes.*
 import forms.YesNoAnswerFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
@@ -27,7 +27,7 @@ import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
 import play.api.libs.json.Writes
-import play.api.mvc.RequestHeader
+import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.thirdparty.InvestorFundsUsedByThirdPartyView
@@ -45,7 +45,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
   val formProvider: YesNoAnswerFormProvider = new YesNoAnswerFormProvider()
   val form: Form[YesNoAnswer]               = formProvider("investorFundsUsedByThirdParty.error.required")
 
-  def onwardRoute(id: String) =
+  def onwardRoute(id: String): Call =
     routes.ThirdPartyInvestorFundsPercentageController.onPageLoad(id, NormalMode, None)
 
   lazy val routeUrl: String =
@@ -225,7 +225,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
 
       "must redirect to TaskList when invalid data and third party not found" in {
 
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
         running(application) {
           val request =

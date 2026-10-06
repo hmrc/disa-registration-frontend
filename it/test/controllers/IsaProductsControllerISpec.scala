@@ -78,8 +78,22 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
   "POST /isa-products" should {
 
     "call correct endpoint with correct data shape" in {
+
+      val testJourneyData: String =
+        s"""
+           |{
+           |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testString",
+           |  "businessVerification": {
+           |    "businessRegistrationPassed": true,
+           |    "businessVerificationPassed": true,
+           |    "ctutr": "1234567890"
+           |  }
+           |}
+           |""".stripMargin
+
       stubAuth()
-      stubGet(getJourneyDataUrl, NOT_FOUND, """{"code":"NOT_FOUND", "message":"Not found"}""")
+      stubGet(getJourneyDataUrl, OK, testJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value[0]" -> "cashJuniorIsas"

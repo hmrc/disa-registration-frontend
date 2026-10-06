@@ -55,7 +55,7 @@ class TaskListController @Inject() (
     }
 
   def continueTo(section: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       if (!TaskListProgress.canAccessTaskList(request.journeyData)) {
         Redirect(routes.GrsStartController.onPageLoad())
       } else {

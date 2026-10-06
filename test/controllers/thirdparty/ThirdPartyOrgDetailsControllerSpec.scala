@@ -263,6 +263,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(
             ThirdPartyOrganisations(
               Some(Yes),
@@ -317,6 +318,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(
             ThirdPartyOrganisations(None, Seq.empty, Seq.empty)
           )
@@ -365,7 +367,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
         .thenReturn(Future.failed(new Exception("Update journeyAnswersService failed - Service Down")))
 
       val journeyData =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           thirdPartyOrganisations = Some(
             ThirdPartyOrganisations(
               None,

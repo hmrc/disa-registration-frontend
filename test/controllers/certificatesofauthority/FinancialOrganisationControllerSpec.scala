@@ -152,6 +152,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           certificatesOfAuthority = Some(CertificatesOfAuthority(financialOrganisation = Some(Seq(BuildingSociety))))
         )
 

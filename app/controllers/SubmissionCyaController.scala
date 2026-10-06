@@ -47,7 +47,7 @@ class SubmissionCyaController @Inject() (
     }
 
   def onSubmit(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       if (TaskListProgress.canSubmitAnswers(request.journeyData, request.credentialRole)) {
         Redirect(routes.DeclarationForIsaManagersController.onPageLoad())
       } else {

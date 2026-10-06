@@ -233,7 +233,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
 
     "must redirect to TaskList when invalid data is submitted and signatory details cannot be found" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -299,7 +299,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
     "must redirect to TaskList when valid data is submitted and the section is absent" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {

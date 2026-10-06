@@ -168,7 +168,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
       ) thenReturn Future.successful(expectedSection)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {

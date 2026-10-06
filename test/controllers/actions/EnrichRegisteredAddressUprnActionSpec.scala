@@ -43,6 +43,9 @@ class EnrichRegisteredAddressUprnActionSpec extends SpecBase with MockitoSugar {
   private val providerId = "providerId"
   private val groupId    = testGroupId
 
+  private val testJourneyData: JourneyData =
+    JourneyData(groupId = groupId, enrolmentId = "enrolmentId", businessVerification = Some(testBV))
+
   private def buildRequest(journeyData: Option[JourneyData]): OptionalDataRequest[_] =
     OptionalDataRequest(
       request = FakeRequest(),
@@ -58,7 +61,7 @@ class EnrichRegisteredAddressUprnActionSpec extends SpecBase with MockitoSugar {
 
       "must call enrichment service and allow request to proceed" in {
 
-        val request = buildRequest(Some(mock[JourneyData]))
+        val request = buildRequest(Some(testJourneyData))
 
         when(
           mockUprnService.enrichUprnIfMissing(
@@ -131,7 +134,7 @@ class EnrichRegisteredAddressUprnActionSpec extends SpecBase with MockitoSugar {
 
     "must always allow request to proceed regardless of outcome" in {
 
-      val request = buildRequest(Some(mock[JourneyData]))
+      val request = buildRequest(Some(testJourneyData))
 
       when(
         mockUprnService.enrichUprnIfMissing(

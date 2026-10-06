@@ -205,7 +205,7 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
         )
 
       val journeyData =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = Some(organisationDetailsWithoutAddAnotherAddress)
         )
 
@@ -338,7 +338,7 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
     "must redirect to the task list when submitted but organisation details do not exist" in {
 
       val journeyData =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = None
         )
 

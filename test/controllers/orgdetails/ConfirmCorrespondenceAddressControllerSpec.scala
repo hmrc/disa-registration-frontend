@@ -165,7 +165,7 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
     "must redirect to TaskList on submit when organisation details are missing" in {
 
       val application =
-        applicationBuilder(journeyData = None).build()
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
 

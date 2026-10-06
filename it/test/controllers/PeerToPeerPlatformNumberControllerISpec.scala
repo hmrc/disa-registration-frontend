@@ -79,6 +79,11 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
            |{
            | "groupId": "$testGroupId",
            | "enrolmentId": "$testString",
+           | "businessVerification": {
+           |   "businessRegistrationPassed": true,
+           |   "businessVerificationPassed": true,
+           |   "ctutr": "1234567890"
+           | },
            | "isaProducts": {
            |   "p2pPlatform": "platform"
            | }

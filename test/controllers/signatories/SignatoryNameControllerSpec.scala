@@ -280,7 +280,7 @@ class SignatoryNameControllerSpec extends SpecBase {
       ).thenReturn(Future.successful(expectedSection))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyDataWithFailedBusinessVerification))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {
@@ -306,7 +306,7 @@ class SignatoryNameControllerSpec extends SpecBase {
       ).thenReturn(Future.failed(new Exception("fubar")))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {

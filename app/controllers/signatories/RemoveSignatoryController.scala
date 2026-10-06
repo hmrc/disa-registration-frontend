@@ -20,12 +20,13 @@ import controllers.actions.*
 import controllers.routes.TaskListController
 import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
-import models.{NormalMode, ReturnTo}
+import models.{NormalMode, ReturnTo, YesNoAnswer}
 import models.YesNoAnswer.{No, Yes}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.signatories.RemoveSignatoryPage
+import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -53,7 +54,7 @@ class RemoveSignatoryController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider("removeSignatory.error.required")
+  val form: Form[YesNoAnswer] = formProvider("removeSignatory.error.required")
 
   def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
     (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
@@ -61,7 +62,7 @@ class RemoveSignatoryController @Inject() (
     }
 
   def onSubmit(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       providingName(
         id,
         name =>

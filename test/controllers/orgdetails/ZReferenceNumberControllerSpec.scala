@@ -99,7 +99,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -125,7 +125,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -143,7 +143,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -169,7 +169,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.failed(new Exception)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )

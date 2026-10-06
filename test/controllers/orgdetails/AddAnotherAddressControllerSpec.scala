@@ -138,7 +138,9 @@ class AddAnotherAddressControllerSpec extends SpecBase {
     "must return BAD_REQUEST when form is invalid" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .build()
 
       running(application) {
@@ -172,7 +174,9 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       when(navigator.nextPage(any(), any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .overrides(bind[Navigator].toInstance(navigator))
           .build()
 
@@ -203,7 +207,9 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         .thenReturn(Future.successful(journeyDetails))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .build()
 
       running(application) {
@@ -232,7 +238,9 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         .thenReturn(Future.successful(InternalServerError))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .build()
 
       running(application) {
@@ -252,7 +260,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
     "must create OrganisationDetails when none exists in journey data" in {
 
       val emptyJourney =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = None
         )
 

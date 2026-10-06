@@ -59,7 +59,7 @@ class AddedSignatoryController @Inject() (
     }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       getInProgressAndCompleteSignatories.fold {
         Redirect(TaskListController.onPageLoad())
       } { case (inProgress, complete) =>

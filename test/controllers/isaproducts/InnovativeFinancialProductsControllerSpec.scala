@@ -151,7 +151,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 

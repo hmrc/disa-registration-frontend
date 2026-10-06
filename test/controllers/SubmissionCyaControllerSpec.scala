@@ -130,7 +130,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
     }
 
     "must redirect back to task list for a POST when required tasks are incomplete" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)

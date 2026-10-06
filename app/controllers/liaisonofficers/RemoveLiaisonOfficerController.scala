@@ -62,7 +62,7 @@ class RemoveLiaisonOfficerController @Inject() (
     }
 
   def onSubmit(id: String, returnTo: Option[ReturnTo] = None): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       providingName(
         id,
         name =>

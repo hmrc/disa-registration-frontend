@@ -123,7 +123,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -149,7 +149,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -205,7 +205,7 @@ class IsaProductsControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.failed(new Exception)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )

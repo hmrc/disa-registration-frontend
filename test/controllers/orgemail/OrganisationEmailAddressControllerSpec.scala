@@ -240,7 +240,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
     "must return BadRequest and errors when blank data is submitted" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector))
           .build()
 
@@ -268,7 +268,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
       val invalidEmail = "not-an-email"
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector))
           .build()
 
@@ -296,7 +296,8 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
       val journeyData =
         JourneyData(
           groupId = testGroupId,
-          enrolmentId = testString
+          enrolmentId = testString,
+          businessVerification = Some(testBV)
         )
 
       val expectedSection =
@@ -345,6 +346,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = Some(oldEmail),
@@ -396,7 +398,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         .thenReturn(Future.failed(new RuntimeException("email verification failed")))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
@@ -496,7 +498,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         .thenReturn(Future.successful(()))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)

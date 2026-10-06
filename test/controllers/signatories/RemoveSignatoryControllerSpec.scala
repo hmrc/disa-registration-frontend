@@ -153,6 +153,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(Signatories(Seq(existingSignatory, otherSignatory)))
         )
 
@@ -183,6 +184,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(Signatories(Seq(existingSignatory, otherSignatory)))
         )
 
@@ -222,6 +224,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(existingSection)
         )
 
@@ -261,6 +264,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(existingSection)
         )
 
@@ -294,6 +298,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(Signatories(Seq(otherSignatory)))
         )
 
@@ -316,7 +321,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
     "must redirect to TaskList when data is submitted and the section is absent" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {
@@ -337,6 +342,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(Signatories(Seq(existingSignatory)))
         )
 
@@ -371,6 +377,7 @@ class RemoveSignatoryControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           signatories = Some(existingSection)
         )
 

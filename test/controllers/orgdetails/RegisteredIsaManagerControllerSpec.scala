@@ -177,6 +177,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       val jd = JourneyData(
         groupId = testGroupId,
         enrolmentId = testString,
+        businessVerification = Some(testBV),
         organisationDetails = None
       )
 
@@ -213,6 +214,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       val jd = JourneyData(
         groupId = testGroupId,
         enrolmentId = testString,
+        businessVerification = Some(testBV),
         organisationDetails = None
       )
 
@@ -249,6 +251,7 @@ class RegisteredIsaManagerControllerSpec extends SpecBase with MockitoSugar {
       val jd = JourneyData(
         groupId = testGroupId,
         enrolmentId = testString,
+        businessVerification = Some(testBV),
         organisationDetails = Some(existing)
       )
 

@@ -61,8 +61,8 @@ class InnovativeFinancialProductsController @Inject() (
       Ok(view(preparedForm, mode, returnTo))
     }
 
-  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -98,5 +98,5 @@ class InnovativeFinancialProductsController @Inject() (
               }
           }
         )
-  }
+    }
 }
