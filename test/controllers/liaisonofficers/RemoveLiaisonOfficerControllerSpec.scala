@@ -383,14 +383,8 @@ class RemoveLiaisonOfficerControllerSpec extends SpecBase {
     }
 
     "POST must redirect to Start for if not Business Verified" in {
-      val jd = JourneyData(
-        groupId = testGroupId,
-        enrolmentId = testString,
-        businessVerification = None
-      )
-
       val app =
-        applicationBuilder(journeyData = Some(jd)).build()
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
 
       running(app) {
         val request =
