@@ -28,7 +28,7 @@ import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
 class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
 
-  private val controllerEndpoint = "/obligations/enrolment/isa/innovative-financial-products"
+  private val controllerEndpoint = s"$registrationFrontendRoutePrefix/innovative-financial-products"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   private val updateJourneyUrl = s"/disa-registration/store/$testGroupId/isaProducts"
 
@@ -87,7 +87,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec wit
       val result = route(app, request).get
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("/obligations/enrolment/isa/peer-to-peer-loans")
+      redirectLocation(result) shouldBe Some(s"$registrationFrontendRoutePrefix/peer-to-peer-loans")
 
       verify(
         postRequestedFor(urlEqualTo(updateJourneyUrl))

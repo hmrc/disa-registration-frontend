@@ -40,8 +40,8 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
   lazy val routeUrl: String  = CertificatesOfAuthorityYesNoController.onPageLoad(NormalMode).url
   lazy val submitUrl: String = CertificatesOfAuthorityYesNoController.onSubmit(NormalMode).url
 
-  val onwardRouteFcaArticle   = "/obligations/enrolment/isa/fca-articles"
-  val onwardRouteFinancialOrg = "/obligations/enrolment/isa/financial-organisation"
+  val onwardRouteFcaArticle   = s"$registrationFrontendRoutePrefix/fca-articles"
+  val onwardRouteFinancialOrg = s"$registrationFrontendRoutePrefix/financial-organisation"
 
   val formProvider                             = new CertificatesOfAuthorityYesNoFormProvider()
   val form: Form[CertificatesOfAuthorityYesNo] = formProvider()

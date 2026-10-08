@@ -37,7 +37,7 @@ import scala.concurrent.Future
 
 class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
-  val onwardRoute = "/obligations/enrolment/isa/certificates-of-authority-check-your-answers"
+  val onwardRoute = s"$registrationFrontendRoutePrefix/certificates-of-authority-check-your-answers"
 
   lazy val fcaArticlesRoute: String = routes.FcaArticlesController.onPageLoad(NormalMode).url
 

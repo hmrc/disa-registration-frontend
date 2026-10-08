@@ -42,7 +42,7 @@ class SignatoryNameControllerSpec extends SpecBase {
   private val newId       = "new-id-123"
   private val generatedId = "generated-id-123"
 
-  def onwardRoute(id: String): Call = Call("GET", s"/obligations/enrolment/isa/signatory-job-title?id=$id")
+  def onwardRoute(id: String): Call = Call("GET", s"$registrationFrontendRoutePrefix/signatory-job-title?id=$id")
 
   lazy val routeUrl: String  = SignatoryNameController.onPageLoad(Some(existingId), NormalMode).url
   lazy val submitUrl: String = SignatoryNameController.onSubmit(existingId, NormalMode).url
@@ -338,7 +338,7 @@ class SignatoryNameControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual s"/obligations/enrolment/isa/check-added-signatory?id=$existingId"
+        redirectLocation(result).value mustEqual s"/register-for-manage-isas/check-added-signatory?id=$existingId"
       }
     }
 
