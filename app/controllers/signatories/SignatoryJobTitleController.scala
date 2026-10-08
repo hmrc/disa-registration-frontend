@@ -25,6 +25,7 @@ import models.journeydata.signatories.{Signatories, Signatory}
 import models.requests.DataRequest
 import navigation.Navigator
 import pages.signatories.SignatoryJobTitlePage
+import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -42,6 +43,7 @@ class SignatoryJobTitleController @Inject() (
   navigator: Navigator,
   identify: IdentifierAction,
   errorHandler: ErrorHandler,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: SignatoryJobTitleFormProvider,
@@ -51,10 +53,10 @@ class SignatoryJobTitleController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[String] = formProvider()
 
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       findSignatoryWithDetails(id).fold {
         Redirect(TaskListController.onPageLoad())
       } { case (signatory, name, jobTitle) =>
@@ -64,7 +66,7 @@ class SignatoryJobTitleController @Inject() (
     }
 
   def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

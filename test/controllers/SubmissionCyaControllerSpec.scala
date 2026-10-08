@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import models.journeydata.JourneyData
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.Assistant
@@ -26,6 +27,25 @@ import views.html.SubmissionCyaView
 class SubmissionCyaControllerSpec extends SpecBase {
 
   "Submission CYA Controller" - {
+
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.SubmissionCyaController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
 
     "must return OK and the correct view for a GET when the user can submit" in {
       val application = applicationBuilder(journeyData = Some(completeTaskListJourneyData)).build()
@@ -71,7 +91,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
     }
 
     "must redirect to TaskList for a GET if required tasks are incomplete" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, routes.SubmissionCyaController.onPageLoad().url)
@@ -111,7 +131,7 @@ class SubmissionCyaControllerSpec extends SpecBase {
     }
 
     "must redirect back to task list for a POST when required tasks are incomplete" in {
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)
@@ -120,6 +140,21 @@ class SubmissionCyaControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.TaskListController.onPageLoad().url
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routes.SubmissionCyaController.onSubmit().url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

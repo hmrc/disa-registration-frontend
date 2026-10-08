@@ -30,6 +30,7 @@ import views.html.ConfirmationView
 class ConfirmationController @Inject() (
   override val messagesApi: MessagesApi,
   appConfig: FrontendAppConfig,
+  grsGuard: GrsGuardActionFilter,
   identify: IdentifierAction,
   retrieveData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -38,11 +39,12 @@ class ConfirmationController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen retrieveData andThen requireData) { implicit request =>
-    RegistrationSubmittedViewModel
-      .from(request.journeyData, appConfig)
-      .fold(Redirect(TaskListController.onPageLoad())) { viewModel =>
-        Ok(view(viewModel))
-      }
+  def onPageLoad(): Action[AnyContent] = (identify andThen retrieveData andThen grsGuard andThen requireData) {
+    implicit request =>
+      RegistrationSubmittedViewModel
+        .from(request.journeyData, appConfig)
+        .fold(Redirect(TaskListController.onPageLoad())) { viewModel =>
+          Ok(view(viewModel))
+        }
   }
 }

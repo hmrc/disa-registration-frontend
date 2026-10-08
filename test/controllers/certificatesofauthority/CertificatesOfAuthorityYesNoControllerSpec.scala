@@ -48,9 +48,28 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
 
   "CertificatesOfAuthorityYesNoController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -70,6 +89,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           certificatesOfAuthority = Some(CertificatesOfAuthority(certificatesYesNo = Some(Yes)))
         )
 
@@ -92,7 +112,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
 
     "must return BadRequest and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -121,7 +141,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
       ).thenReturn(Future.successful(expectedSection))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {
@@ -148,7 +168,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
       ) thenReturn Future.successful(expectedSection)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {
@@ -172,7 +192,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
       ) thenReturn Future.failed(new Exception("fubar"))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {
@@ -188,7 +208,7 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
 
     "must render view with CheckMode on GET" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, CertificatesOfAuthorityYesNoController.onPageLoad(CheckMode).url)
@@ -260,6 +280,22 @@ class CertificatesOfAuthorityYesNoControllerSpec extends SpecBase {
         val updatedSection = captor.getValue
 
         updatedSection.fcaArticles mustBe None
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, CertificatesOfAuthorityYesNoController.onSubmit(CheckMode).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

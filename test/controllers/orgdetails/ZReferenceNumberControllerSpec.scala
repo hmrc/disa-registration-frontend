@@ -48,7 +48,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, zReferenceNumberRoute)
@@ -68,6 +68,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationDetails = Some(OrganisationDetails(zRefNumber = Some("zRef")))
         )
 
@@ -98,7 +99,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -124,7 +125,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -142,7 +143,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -168,7 +169,7 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.failed(new Exception)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
@@ -182,6 +183,40 @@ class ZReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
         await(route(application, request).value)
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
+      }
+    }
+
+    "must redirect to Start for a GET if no existing data is found" in {
+
+      val application =
+        applicationBuilder(journeyData = None).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, zReferenceNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, zReferenceNumberRoute)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

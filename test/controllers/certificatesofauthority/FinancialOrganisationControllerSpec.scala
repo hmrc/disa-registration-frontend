@@ -48,9 +48,28 @@ class FinancialOrganisationControllerSpec extends SpecBase {
 
   "FinancialOrganisationController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -66,7 +85,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
 
     "must return OK and the correct view for a GET if no existing answer found" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -86,6 +105,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           certificatesOfAuthority = Some(CertificatesOfAuthority(financialOrganisation = Some(Seq(Bank))))
         )
 
@@ -108,7 +128,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
 
     "must return BadRequest and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -132,6 +152,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           certificatesOfAuthority = Some(CertificatesOfAuthority(financialOrganisation = Some(Seq(BuildingSociety))))
         )
 
@@ -171,7 +192,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
       ) thenReturn Future.successful(expectedSection)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -195,7 +216,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
       ) thenReturn Future.failed(new Exception("fubar"))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -212,7 +233,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
 
     "must render view with CheckMode on a GET" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, FinancialOrganisationController.onPageLoad(CheckMode).url)
@@ -233,7 +254,7 @@ class FinancialOrganisationControllerSpec extends SpecBase {
       ) thenReturn Future.successful(expectedSection)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -246,6 +267,22 @@ class FinancialOrganisationControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, FinancialOrganisationController.onSubmit(CheckMode).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

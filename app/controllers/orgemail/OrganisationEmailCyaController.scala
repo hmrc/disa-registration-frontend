@@ -32,6 +32,7 @@ import javax.inject.Inject
 class OrganisationEmailCyaController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
@@ -39,13 +40,14 @@ class OrganisationEmailCyaController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    verifiedEmailOrRedirect(request.journeyData).fold(
-      redirect => redirect,
-      email =>
-        val summaryListRows = Seq(OrganisationEmailSummary.row(email))
-        Ok(view(SummaryListViewModel(summaryListRows)))
-    )
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen grsGuard andThen requireData) {
+    implicit request =>
+      verifiedEmailOrRedirect(request.journeyData).fold(
+        redirect => redirect,
+        email =>
+          val summaryListRows = Seq(OrganisationEmailSummary.row(email))
+          Ok(view(SummaryListViewModel(summaryListRows)))
+      )
   }
 
   private def verifiedEmailOrRedirect(jd: JourneyData): Either[Result, String] = {

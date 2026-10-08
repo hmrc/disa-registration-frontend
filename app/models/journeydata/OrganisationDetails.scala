@@ -38,6 +38,32 @@ case class OrganisationDetails(
 
   def hasNoSelectedCorrespondenceAddress: Boolean =
     !hasSelectedCorrespondenceAddress
+
+  def isComplete: Boolean =
+    registeredToManageIsa.isDefined &&
+      zReferenceComplete &&
+      tradingNameComplete &&
+      fcaNumber.exists(_.nonEmpty) &&
+      correspondenceAddressComplete &&
+      orgTelephoneNumber.exists(_.nonEmpty)
+
+  private def zReferenceComplete: Boolean =
+    registeredToManageIsa.exists {
+      case YesNoAnswer.No  => true
+      case YesNoAnswer.Yes => zRefNumber.exists(_.nonEmpty)
+    }
+
+  private def tradingNameComplete: Boolean =
+    tradingUsingDifferentName.exists {
+      case YesNoAnswer.Yes => tradingName.exists(_.nonEmpty)
+      case YesNoAnswer.No  => true
+    }
+
+  private def correspondenceAddressComplete: Boolean =
+    registeredAddressCorrespondence.exists {
+      case YesNoAnswer.Yes => true
+      case YesNoAnswer.No  => hasSelectedCorrespondenceAddress
+    }
 }
 
 object OrganisationDetails {

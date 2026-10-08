@@ -26,6 +26,7 @@ import models.requests.DataRequest
 import navigation.Navigator
 import pages.liaisonofficers.LiaisonOfficerPhoneNumberPage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
@@ -40,6 +41,7 @@ class LiaisonOfficerPhoneNumberController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: TelephoneNumberFormProvider,
@@ -52,10 +54,10 @@ class LiaisonOfficerPhoneNumberController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider("liaisonOfficerPhoneNumber")
+  val form: Form[String] = formProvider("liaisonOfficerPhoneNumber")
 
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       findLiaisonOfficerWithDetails(id).fold {
         Redirect(TaskListController.onPageLoad())
       } { case (liaisonOfficer, name, number) =>
@@ -65,7 +67,7 @@ class LiaisonOfficerPhoneNumberController @Inject() (
     }
 
   def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

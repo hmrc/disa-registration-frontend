@@ -40,6 +40,7 @@ class TradingUsingDifferentNameController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
@@ -55,7 +56,7 @@ class TradingUsingDifferentNameController @Inject() (
   val form: Form[YesNoAnswer] = formProvider("tradingUsingDifferentName.error.required")
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       val preparedForm = request.journeyData.organisationDetails
         .flatMap(_.tradingUsingDifferentName)
         .fold(form)(form.fill)
@@ -63,8 +64,8 @@ class TradingUsingDifferentNameController @Inject() (
       Ok(view(preparedForm, mode, returnTo))
     }
 
-  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -90,5 +91,5 @@ class TradingUsingDifferentNameController @Inject() (
               }
           }
         )
-  }
+    }
 }

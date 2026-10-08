@@ -40,6 +40,7 @@ class IsaProductsController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: IsaProductsFormProvider,
@@ -55,7 +56,7 @@ class IsaProductsController @Inject() (
   val form: Form[Set[IsaProduct]] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       val preparedForm = (for {
         products <- request.journeyData.isaProducts
         values   <- products.isaProducts
@@ -64,8 +65,8 @@ class IsaProductsController @Inject() (
       Ok(view(preparedForm, mode, returnTo))
     }
 
-  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -100,5 +101,5 @@ class IsaProductsController @Inject() (
               }
           }
         )
-  }
+    }
 }

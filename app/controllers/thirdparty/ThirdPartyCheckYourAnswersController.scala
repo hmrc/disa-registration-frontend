@@ -35,6 +35,7 @@ import javax.inject.Inject
 class ThirdPartyCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
@@ -44,7 +45,7 @@ class ThirdPartyCheckYourAnswersController @Inject() (
     with Logging {
 
   def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       findThirdParty(id) match {
         case Some(thirdParty) if !thirdParty.inProgress =>
           Ok(view(SummaryListViewModel(buildSummaryRows(id, returnTo)), returnTo))

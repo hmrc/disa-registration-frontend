@@ -21,11 +21,11 @@ import controllers.routes.TaskListController
 import controllers.orgdetails.routes.EnterYourOrganisationAddressController
 import forms.EnterYourOrganisationAddressFormProvider
 import models.{CheckMode, NormalMode}
-import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
+import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
 import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, never, verify, when}
 import play.api.data.Form
 import play.api.inject.bind
@@ -72,7 +72,7 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
     )
 
   private val journeyDataWithOrganisationDetails =
-    emptyJourneyData.copy(
+    emptyJourneyDataWithBusinessVerification.copy(
       organisationDetails = Some(organisationDetails)
     )
 
@@ -95,11 +95,29 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
     formProvider()
 
   "EnterYourOrganisationAddressController" - {
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
 
     "must return OK and the correct view for a GET" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -187,7 +205,7 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
         )
 
       val journeyData =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = Some(organisationDetailsWithoutAddAnotherAddress)
         )
 
@@ -320,7 +338,7 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
     "must redirect to the task list when submitted but organisation details do not exist" in {
 
       val journeyData =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = None
         )
 
@@ -382,6 +400,21 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
         await(route(application, request).value)
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, submitUrl)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

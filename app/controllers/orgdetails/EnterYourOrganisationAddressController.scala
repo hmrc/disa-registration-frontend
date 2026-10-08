@@ -21,12 +21,13 @@ import controllers.actions.*
 import forms.EnterYourOrganisationAddressFormProvider
 import handlers.ErrorHandler
 import models.{Mode, ReturnTo}
-import models.journeydata.OrganisationDetails
+import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
 import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
 import navigation.Navigator
 import pages.EnterYourOrganisationAddressPage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
@@ -41,6 +42,7 @@ class EnterYourOrganisationAddressController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   journeyAnswersService: JourneyAnswersService,
+  grsGuard: GrsGuardActionFilter,
   errorHandler: ErrorHandler,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
@@ -53,10 +55,10 @@ class EnterYourOrganisationAddressController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form: Form[CorrespondenceAddress] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       val preparedForm = (for {
         section <- request.journeyData.organisationDetails
         address <- section.correspondenceAddress
@@ -66,7 +68,7 @@ class EnterYourOrganisationAddressController @Inject() (
     }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

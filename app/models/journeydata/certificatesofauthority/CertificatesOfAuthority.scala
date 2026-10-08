@@ -25,6 +25,12 @@ case class CertificatesOfAuthority(
   financialOrganisation: Option[Seq[FinancialOrganisation]] = None
 ) extends TaskListSection {
   override def sectionName: String = CertificatesOfAuthority.sectionName
+
+  def isComplete: Boolean =
+    certificatesYesNo.exists {
+      case CertificatesOfAuthorityYesNo.Yes => fcaArticles.exists(_.nonEmpty)
+      case CertificatesOfAuthorityYesNo.No  => financialOrganisation.exists(_.nonEmpty)
+    }
 }
 
 object CertificatesOfAuthority {

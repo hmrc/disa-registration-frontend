@@ -18,6 +18,7 @@ package controllers.certificatesofauthority
 
 import config.FrontendAppConfig
 import controllers.actions.*
+import navigation.Navigator
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -28,14 +29,22 @@ import javax.inject.Inject
 class EligibilityToManageIsaController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  navigator: Navigator,
   getOrCreateJourneyDataAction: GetOrCreateJourneyDataAction,
   val controllerComponents: MessagesControllerComponents,
   view: EligibilityToManageIsaView,
   appConfig: FrontendAppConfig
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with GrsVerificationHelper {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getOrCreateJourneyDataAction) { implicit request =>
-    Ok(view(guidanceHref = appConfig.isaManagerGuidanceUrl))
+
+    val isBusinessVerified = request.journeyData.businessVerification match {
+      case Some(bv) => checkVerificationAndRegistration(bv)
+      case _        => false
+    }
+    if isBusinessVerified then Ok(view(guidanceHref = appConfig.isaManagerGuidanceUrl))
+    else Redirect(navigator.nextPageGrsGuard())
   }
 }

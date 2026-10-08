@@ -17,8 +17,8 @@
 package controllers.thirdparty
 
 import base.SpecBase
-import controllers.thirdparty.routes._
-import controllers.routes._
+import controllers.thirdparty.routes.*
+import controllers.routes.*
 import forms.YesNoAnswerFormProvider
 import models.journeydata.JourneyData
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
@@ -27,7 +27,7 @@ import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{atMostOnce, verify, when}
 import play.api.data.Form
 import play.api.libs.json.Writes
-import play.api.mvc.RequestHeader
+import play.api.mvc.{Call, RequestHeader}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import views.html.thirdparty.InvestorFundsUsedByThirdPartyView
@@ -45,7 +45,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
   val formProvider: YesNoAnswerFormProvider = new YesNoAnswerFormProvider()
   val form: Form[YesNoAnswer]               = formProvider("investorFundsUsedByThirdParty.error.required")
 
-  def onwardRoute(id: String) =
+  def onwardRoute(id: String): Call =
     routes.ThirdPartyInvestorFundsPercentageController.onPageLoad(id, NormalMode, None)
 
   lazy val routeUrl: String =
@@ -58,12 +58,32 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
 
     "GET" - {
 
+      "must redirect to Start for if not Business Verified" in {
+
+        val application =
+          applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, routeUrl)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.routes.GrsStartController.onPageLoad().url
+        }
+      }
+
       "must return OK when third party exists and no answer yet" in {
 
         val journeyData =
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -95,6 +115,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -129,6 +150,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Seq.empty)
             )
@@ -150,6 +172,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Seq.empty)
             )
@@ -174,6 +197,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, Some(name))), Seq.empty)
             )
@@ -201,7 +225,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
 
       "must redirect to TaskList when invalid data and third party not found" in {
 
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
         running(application) {
           val request =
@@ -220,6 +244,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -270,6 +295,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -320,6 +346,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -346,6 +373,27 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           verify(mockErrorHandler).internalServerError(any[RequestHeader])
         }
       }
+
+      "POST must redirect to Start for if not Business Verified" in {
+        val jd = JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          businessVerification = None
+        )
+
+        val app =
+          applicationBuilder(journeyData = Some(jd)).build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, submitUrl)
+
+          val result = route(app, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
+        }
+      }
     }
 
     "CheckMode" - {
@@ -356,6 +404,7 @@ class InvestorFundsUsedByThirdPartyControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,

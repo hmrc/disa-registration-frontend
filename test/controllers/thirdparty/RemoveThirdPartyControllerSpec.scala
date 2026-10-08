@@ -21,6 +21,7 @@ import controllers.routes.TaskListController
 import controllers.thirdparty.routes.RemoveThirdPartyController
 import forms.YesNoAnswerFormProvider
 import models.YesNoAnswer.{No, Yes}
+import models.journeydata.JourneyData
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.{NormalMode, YesNoAnswer}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -63,6 +64,25 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
     )
 
   "RemoveThirdPartyController" - {
+
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
 
     "must return OK and view when third party exists with name" in {
 
@@ -268,6 +288,21 @@ class RemoveThirdPartyControllerSpec extends SpecBase {
         await(route(application, request).value)
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, submitUrl)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

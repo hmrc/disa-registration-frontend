@@ -24,6 +24,7 @@ import models.journeydata.OrganisationDetails
 import navigation.Navigator
 import pages.organisationdetails.TradingNamePage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
@@ -37,6 +38,7 @@ import scala.util.control.NonFatal
 class TradingNameController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
+  grsGuard: GrsGuardActionFilter,
   journeyAnswersService: JourneyAnswersService,
   errorHandler: ErrorHandler,
   identify: IdentifierAction,
@@ -49,10 +51,10 @@ class TradingNameController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form: Form[String] = formProvider()
 
-  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData) {
-    implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard) { implicit request =>
       val preparedForm = (for {
         journeyData <- request.journeyData
         section     <- journeyData.organisationDetails
@@ -60,10 +62,10 @@ class TradingNameController @Inject() (
       } yield form.fill(name)).getOrElse(form)
 
       Ok(view(preparedForm, mode, returnTo))
-  }
+    }
 
-  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -88,5 +90,5 @@ class TradingNameController @Inject() (
               }
           }
         )
-  }
+    }
 }
