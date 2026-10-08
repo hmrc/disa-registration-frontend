@@ -27,6 +27,7 @@ import models.requests.DataRequest
 import navigation.Navigator
 import pages.orgemail.OrganisationEmailAddressPage
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.JourneyAnswersService
@@ -41,6 +42,7 @@ class OrganisationEmailAddressController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: OrganisationEmailAddressFormProvider,
@@ -54,10 +56,10 @@ class OrganisationEmailAddressController @Inject() (
     with I18nSupport
     with Logging {
 
-  val form = formProvider()
+  val form: Form[String] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       val preparedForm =
         request.journeyData.organisationEmail
           .flatMap(_.organisationEmail)
@@ -67,7 +69,7 @@ class OrganisationEmailAddressController @Inject() (
     }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

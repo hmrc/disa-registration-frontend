@@ -35,6 +35,25 @@ class IsaProductsCheckYourAnswersControllerSpec extends SpecBase with SummaryLis
 
   "IsaProductsCheckYourAnswersController Controller" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.IsaProductsCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and correctly load the check your answers page" in {
 
       val application = applicationBuilder(journeyData = Some(testJourneyData)).build()
@@ -51,6 +70,27 @@ class IsaProductsCheckYourAnswersControllerSpec extends SpecBase with SummaryLis
           request,
           messages(application)
         ).toString
+      }
+    }
+
+    "must redirect to Task List for a GET if no existing Org Details data is found" in {
+
+      val application =
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = None))
+        ).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.IsaProductsCheckYourAnswersController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.TaskListController.onPageLoad().url
       }
     }
   }

@@ -43,6 +43,7 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
     JourneyData(
       groupId = testGroupId,
       enrolmentId = testString,
+      businessVerification = Some(testBV),
       organisationDetails = Some(OrganisationDetails(fcaNumber = Some(fcaNumber)))
     )
 
@@ -51,9 +52,28 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
   "FirmReferenceNumber Controller" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, firmReferenceNumberRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and correctly load the FirmReferenceNumber page" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, firmReferenceNumberRoute)
@@ -113,7 +133,7 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -131,7 +151,7 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must return Internal Server Error when theres an issue updating the journey answers" in {
+    "must return Internal Server Error when there's an issue updating the journey answers" in {
 
       when(
         mockJourneyAnswersService
@@ -139,7 +159,7 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.failed(new Exception)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {
@@ -151,6 +171,21 @@ class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual INTERNAL_SERVER_ERROR
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, firmReferenceNumberRoute)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

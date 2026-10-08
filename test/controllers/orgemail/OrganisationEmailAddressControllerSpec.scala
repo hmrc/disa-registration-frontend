@@ -62,7 +62,32 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
   val form: Form[String] =
     formProvider()
 
+  private val expectedSection =
+    OrganisationEmail(
+      organisationEmail = Some(newEmail),
+      verified = Some(false)
+    )
+
   "OrganisationEmailAddressController" - {
+
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
 
     "must return OK and the correct view for a GET when the question has not previously been answered" in {
 
@@ -70,6 +95,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(OrganisationEmail())
         )
 
@@ -99,6 +125,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = Some(oldEmail),
@@ -139,6 +166,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(existingSection)
         )
 
@@ -180,6 +208,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(existingSection)
         )
 
@@ -217,7 +246,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
     "must return BadRequest and errors when blank data is submitted" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector))
           .build()
 
@@ -245,7 +274,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
       val invalidEmail = "not-an-email"
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector))
           .build()
 
@@ -273,7 +302,8 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
       val journeyData =
         JourneyData(
           groupId = testGroupId,
-          enrolmentId = testString
+          enrolmentId = testString,
+          businessVerification = Some(testBV)
         )
 
       val expectedSection =
@@ -322,6 +352,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = Some(oldEmail),
@@ -373,7 +404,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         .thenReturn(Future.failed(new RuntimeException("email verification failed")))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
@@ -402,7 +433,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
       ).thenReturn(Future.failed(new Exception("fubar")))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
@@ -426,6 +457,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           organisationEmail = Some(
             OrganisationEmail(
               organisationEmail = Some(oldEmail),
@@ -457,12 +489,6 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
 
     "must submit with CheckMode and redirect" in {
 
-      val expectedSection =
-        OrganisationEmail(
-          organisationEmail = Some(newEmail),
-          verified = Some(false)
-        )
-
       when(
         mockJourneyAnswersService
           .update(eqTo(expectedSection), any[String], any[String])(any[Writes[OrganisationEmail]], any)
@@ -472,7 +498,7 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
         .thenReturn(Future.successful(()))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[EmailVerificationConnector].toInstance(mockEmailVerificationConnector)
@@ -488,6 +514,21 @@ class OrganisationEmailAddressControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, OrganisationEmailAddressController.onSubmit(CheckMode).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

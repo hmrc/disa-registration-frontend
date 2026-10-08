@@ -119,7 +119,7 @@ object TaskListViewModel {
   private def organisationInformationTask(journeyData: JourneyData)(implicit
     messages: Messages
   ): TaskListTaskViewModel = {
-    val completed = TaskListProgress.isOrganisationInformationComplete(journeyData)
+    val completed = journeyData.organisationDetails.exists(_.isComplete)
     val started   = organisationInformationStarted(journeyData)
 
     TaskListTaskViewModel(
@@ -140,7 +140,7 @@ object TaskListViewModel {
     messages: Messages
   ): TaskListTaskViewModel = {
     val email    = journeyData.organisationEmail.flatMap(_.organisationEmail)
-    val verified = TaskListProgress.isOrganisationEmailVerified(journeyData)
+    val verified = journeyData.organisationEmail.exists(_.isComplete)
 
     TaskListTaskViewModel(
       title =
@@ -160,7 +160,7 @@ object TaskListViewModel {
   ): TaskListTaskViewModel =
     standardTask(
       unlocked = unlocked,
-      complete = TaskListProgress.isIsaProductsComplete(journeyData),
+      complete = journeyData.isaProducts.exists(_.isComplete),
       started = isaProductsStarted(journeyData),
       addMessage = "taskList.isaProducts.add",
       changeMessage = "taskList.isaProducts.change",
@@ -172,7 +172,7 @@ object TaskListViewModel {
   ): TaskListTaskViewModel =
     standardTask(
       unlocked = unlocked,
-      complete = TaskListProgress.isCertificatesOfAuthorityComplete(journeyData),
+      complete = journeyData.certificatesOfAuthority.exists(_.isComplete),
       started = certificatesOfAuthorityStarted(journeyData),
       addMessage = "taskList.certificatesOfAuthority.add",
       changeMessage = "taskList.certificatesOfAuthority.change",
@@ -218,7 +218,7 @@ object TaskListViewModel {
   ): TaskListTaskViewModel = {
     val section            = journeyData.thirdPartyOrganisations
     val count              = section.fold(0)(_.thirdParties.size)
-    val complete           = TaskListProgress.areThirdPartyOrganisationsComplete(journeyData)
+    val complete           = journeyData.thirdPartyOrganisations.exists(_.isComplete)
     val started            = section.flatMap(_.managedByThirdParty).isDefined
     val hasIncompleteItems =
       section.exists(_.thirdParties.exists(_.inProgress))

@@ -1,0 +1,45 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.actions
+
+import models.journeydata.OrganisationDetails
+import models.journeydata.certificatesofauthority.CertificatesOfAuthority
+import models.journeydata.isaproducts.IsaProducts
+import models.journeydata.liaisonofficers.LiaisonOfficers
+import models.journeydata.signatories.Signatories
+import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
+import navigation.Navigator
+import play.api.mvc.Call
+
+import javax.inject.Inject
+
+class CyaGuardAction @Inject() (navigator: Navigator) {
+
+  def sortingData[T](data: T, id: Option[String] = None): Option[Call] = {
+    val isThereData = data match
+      case Some(organisation: OrganisationDetails) => organisation.isComplete
+      case Some(product: IsaProducts)              => product.isComplete
+      case Some(coa: CertificatesOfAuthority)      => coa.isComplete
+      case Some(parties: ThirdPartyOrganisations)  => parties.isComplete
+      case Some(t: ThirdParty)                     => !t.inProgress
+      case Some(lo: LiaisonOfficers)               => id.exists(i => lo.liaisonOfficers.exists(o => o.id == i && !o.inProgress))
+      case Some(s: Signatories)                    => id.exists(i => s.signatories.exists(x => x.id == i && !x.inProgress))
+      case _                                       => false
+
+    if isThereData then None else Some(navigator.nextPageCyaGuard())
+  }
+}

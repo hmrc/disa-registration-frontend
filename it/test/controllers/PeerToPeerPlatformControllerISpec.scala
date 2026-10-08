@@ -39,6 +39,11 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
            |{
            | "groupId": "$testGroupId",
            | "enrolmentId": "$testString",
+           | "businessVerification": {
+           |       "businessRegistrationPassed": true,
+           |       "businessVerificationPassed": true,
+           |       "ctutr": "1234567890"
+           |     },
            | "isaProducts": {
            |   "p2pPlatform": "platform"
            | }
@@ -69,8 +74,21 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
   "POST /peer-to-peer-loans" should {
 
     "call correct endpoint with correct data shape" in {
+      val testJourneyData =
+        s"""
+           |{
+           |  "groupId": "$testGroupId",
+           |  "enrolmentId": "$testString",
+           |  "businessVerification": {
+           |    "businessRegistrationPassed": true,
+           |    "businessVerificationPassed": true,
+           |    "ctutr": "1234567890"
+           |  }
+           |}
+           |""".stripMargin
+
       stubAuth()
-      stubGet(getJourneyDataUrl, NOT_FOUND, """{"code":"NOT_FOUND", "message":"Not found"}""")
+      stubGet(getJourneyDataUrl, OK, testJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value" -> "platform"

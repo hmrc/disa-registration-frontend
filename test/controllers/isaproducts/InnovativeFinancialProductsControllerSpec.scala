@@ -47,6 +47,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
     JourneyData(
       groupId = testGroupId,
       enrolmentId = testString,
+      businessVerification = Some(testBV),
       isaProducts = Some(IsaProducts(None, None, None, Some(InnovativeFinancialProduct.values)))
     )
 
@@ -55,9 +56,28 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
 
   "InnovativeFinancialProducts Controller" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, innovativeFinancialProductsRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and correctly load the InnovativeFinancialProducts page" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, innovativeFinancialProductsRoute)
@@ -131,7 +151,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -149,7 +169,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -174,7 +194,7 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
       ) thenReturn Future.failed(new Exception)
 
       val application =
-        applicationBuilder(journeyData = None)
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
@@ -188,6 +208,21 @@ class InnovativeFinancialProductsControllerSpec extends SpecBase with MockitoSug
         await(route(application, request).value)
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, innovativeFinancialProductsRoute)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

@@ -18,8 +18,9 @@ package controllers.thirdparty
 
 import base.SpecBase
 import controllers.routes.TaskListController
-import controllers.thirdparty.routes._
+import controllers.thirdparty.routes.*
 import forms.ThirdPartyInvestorFundsPercentageFormProvider
+import models.journeydata.JourneyData
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import models.{CheckMode, NormalMode}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
@@ -54,6 +55,25 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
   "ThirdPartyInvestorFundsPercentageController" - {
 
     "GET" - {
+
+      "must redirect to Start for if not Business Verified" in {
+
+        val application =
+          applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, routeUrl)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.routes.GrsStartController.onPageLoad().url
+        }
+      }
 
       "must return OK when third party exists and no answer yet" in {
 
@@ -159,6 +179,27 @@ class ThirdPartyInvestorFundsPercentageControllerSpec extends SpecBase {
     }
 
     "POST" - {
+
+      "POST must redirect to Start for if not Business Verified" in {
+        val jd = JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          businessVerification = None
+        )
+
+        val app =
+          applicationBuilder(journeyData = Some(jd)).build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, submitUrl)
+
+          val result = route(app, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
+        }
+      }
 
       "must return BadRequest when invalid data submitted" in {
 

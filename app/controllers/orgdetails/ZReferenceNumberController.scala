@@ -16,7 +16,7 @@
 
 package controllers.orgdetails
 
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.{DataRetrievalAction, GrsGuardActionFilter, IdentifierAction}
 import forms.ZReferenceNumberFormProvider
 import handlers.ErrorHandler
 import models.{Mode, ReturnTo}
@@ -38,6 +38,7 @@ import scala.util.control.NonFatal
 class ZReferenceNumberController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   formProvider: ZReferenceNumberFormProvider,
   view: ZReferenceNumberView,
@@ -50,18 +51,18 @@ class ZReferenceNumberController @Inject() (
 
   private val form = formProvider()
 
-  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
-    implicit request =>
+  def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard).async { implicit request =>
       val preparedForm = (for {
         journeyData <- request.journeyData
         orgDetails  <- journeyData.organisationDetails
         value       <- orgDetails.zRefNumber
       } yield form.fill(value)).getOrElse(form)
       Future.successful(Ok(view(preparedForm, mode, returnTo)))
-  }
+    }
 
-  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] = (identify andThen getData).async {
-    implicit request =>
+  def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
+    (identify andThen getData andThen grsGuard).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -86,5 +87,5 @@ class ZReferenceNumberController @Inject() (
               }
           }
         )
-  }
+    }
 }

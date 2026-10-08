@@ -48,9 +48,28 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
 
   "ProductsManagedByThirdPartyController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET when there is no existing answer" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, routeUrl)
@@ -70,6 +89,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(
             ThirdPartyOrganisations(
               managedByThirdParty = Some(Yes)
@@ -100,6 +120,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(
             ThirdPartyOrganisations(
               managedByThirdParty = Some(No)
@@ -123,7 +144,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
 
     "must return BadRequest and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -154,7 +175,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
       ).thenReturn(Future.successful(expectedSection))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -184,6 +205,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(existingSection)
         )
 
@@ -229,6 +251,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(existingSection)
         )
 
@@ -275,7 +298,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
       ).thenReturn(Future.failed(new Exception("fubar")))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -301,6 +324,7 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           thirdPartyOrganisations = Some(existingSection)
         )
 
@@ -328,6 +352,21 @@ class ProductsManagedByThirdPartyControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, submitUrl)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

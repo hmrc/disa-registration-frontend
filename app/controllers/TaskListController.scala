@@ -33,6 +33,7 @@ class TaskListController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  grsGuard: GrsGuardActionFilter,
   getUprn: EnrichRegisteredAddressUprnAction,
   requireData: DataRequiredAction,
   auditService: AuditService,
@@ -43,7 +44,7 @@ class TaskListController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen getUprn andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen getUprn andThen requireData) { implicit request =>
       request.journeyData match {
         case journeyData if TaskListProgress.canAccessTaskList(journeyData) =>
           Ok(view(TaskListViewModel(journeyData, request.credentialRole)))
@@ -54,7 +55,7 @@ class TaskListController @Inject() (
     }
 
   def continueTo(section: String): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       if (!TaskListProgress.canAccessTaskList(request.journeyData)) {
         Redirect(routes.GrsStartController.onPageLoad())
       } else {

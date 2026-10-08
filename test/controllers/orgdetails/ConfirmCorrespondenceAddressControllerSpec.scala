@@ -40,6 +40,7 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
     JourneyData(
       groupId = testGroupId,
       enrolmentId = testString,
+      businessVerification = Some(testBV),
       organisationDetails = Some(
         OrganisationDetails(
           correspondenceAddress = Some(address)
@@ -51,6 +52,7 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
     JourneyData(
       groupId = testGroupId,
       enrolmentId = testString,
+      businessVerification = Some(testBV),
       organisationDetails = Some(
         OrganisationDetails(
           correspondenceAddress = None
@@ -65,6 +67,25 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
     ConfirmCorrespondenceAddressController.onSubmit(None).url
 
   "ConfirmCorrespondenceAddressController" - {
+
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
 
     "must return OK and display the confirm correspondence address view when address exists" in {
 
@@ -107,7 +128,7 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
     "must redirect to TaskList when organisation details are missing" in {
 
       val application =
-        applicationBuilder(journeyData = None).build()
+        applicationBuilder(journeyData = Some(journeyDataWithoutAddress.copy(organisationDetails = None))).build()
 
       running(application) {
 
@@ -144,7 +165,7 @@ class ConfirmCorrespondenceAddressControllerSpec extends SpecBase with MockitoSu
     "must redirect to TaskList on submit when organisation details are missing" in {
 
       val application =
-        applicationBuilder(journeyData = None).build()
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
 

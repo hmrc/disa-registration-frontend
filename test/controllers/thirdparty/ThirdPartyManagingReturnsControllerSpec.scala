@@ -56,12 +56,32 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
 
     "GET" - {
 
+      "must redirect to Start for if not Business Verified" in {
+
+        val application =
+          applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+        running(application) {
+
+          val request =
+            FakeRequest(GET, routeUrl)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+
+          redirectLocation(result).value mustEqual
+            controllers.routes.GrsStartController.onPageLoad().url
+        }
+      }
+
       "must return OK when third party exists and no answer yet" in {
 
         val journeyData =
           JourneyData(
             groupId = testGroupId,
             enrolmentId = testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -93,6 +113,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -127,6 +148,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(None, Seq(ThirdParty(otherId, Some("Other"))), Seq.empty)
             )
@@ -148,6 +170,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, None)), Seq.empty)
             )
@@ -172,6 +195,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(None, Seq(ThirdParty(existingId, Some(name))), Seq.empty)
             )
@@ -199,7 +223,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
 
       "must redirect to TaskList when invalid data and third party not found" in {
 
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
         running(application) {
           val request =
@@ -218,6 +242,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -266,7 +291,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
 
       "must redirect to TaskList when section missing" in {
 
-        val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+        val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
         running(application) {
           val request =
@@ -286,6 +311,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -322,6 +348,7 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
           JourneyData(
             testGroupId,
             testString,
+            businessVerification = Some(testBV),
             thirdPartyOrganisations = Some(
               ThirdPartyOrganisations(
                 None,
@@ -345,6 +372,27 @@ class ThirdPartyManagingReturnsControllerSpec extends SpecBase {
             request,
             messages(application)
           ).toString
+        }
+      }
+
+      "POST must redirect to Start for if not Business Verified" in {
+        val jd = JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          businessVerification = None
+        )
+
+        val app =
+          applicationBuilder(journeyData = Some(jd)).build()
+
+        running(app) {
+          val request =
+            FakeRequest(POST, submitUrl)
+
+          val result = route(app, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
         }
       }
     }

@@ -25,6 +25,7 @@ import models.requests.DataRequest
 import models.{Mode, ReturnTo, YesNoAnswer}
 import navigation.Navigator
 import pages.thirdparty.ThirdPartyInvestorFundsPercentagePage
+import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -41,6 +42,7 @@ class ThirdPartyInvestorFundsPercentageController @Inject() (
   journeyAnswersService: JourneyAnswersService,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   errorHandler: ErrorHandler,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
@@ -51,10 +53,10 @@ class ThirdPartyInvestorFundsPercentageController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = formProvider()
+  val form: Form[String] = formProvider()
 
   def onPageLoad(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       findThirdPartyWithDetails(id).fold {
         Redirect(TaskListController.onPageLoad())
       } { case (thirdParty, name, answer) =>
@@ -64,7 +66,7 @@ class ThirdPartyInvestorFundsPercentageController @Inject() (
     }
 
   def onSubmit(id: String, mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

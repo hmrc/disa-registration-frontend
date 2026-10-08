@@ -17,6 +17,8 @@
 package models.journeydata.isaproducts
 
 import models.journeydata.TaskListSection
+import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
+import models.journeydata.isaproducts.IsaProduct.*
 import play.api.libs.json.{Json, OFormat}
 
 case class IsaProducts(
@@ -26,6 +28,23 @@ case class IsaProducts(
   innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]] = None
 ) extends TaskListSection {
   override def sectionName: String = IsaProducts.sectionName
+
+  def isComplete: Boolean =
+    isaProducts.exists(_.nonEmpty) &&
+      (!hasInnovativeFinanceIsas || innovativeProductsComplete)
+
+  private def hasInnovativeFinanceIsas: Boolean =
+    isaProducts.exists(_.contains(InnovativeFinanceIsas))
+
+  private def hasP2pProduct: Boolean =
+    innovativeFinancialProducts.exists(_.contains(PeertopeerLoansUsingAPlatformWith36hPermissions))
+
+  private def innovativeProductsComplete: Boolean =
+    innovativeFinancialProducts.exists(_.nonEmpty) &&
+      (!hasP2pProduct || p2pDetailsComplete)
+
+  private def p2pDetailsComplete: Boolean =
+    p2pPlatform.exists(_.nonEmpty) && p2pPlatformNumber.exists(_.nonEmpty)
 }
 
 object IsaProducts {

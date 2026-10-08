@@ -16,10 +16,6 @@
 
 package models.journeydata
 
-import models.YesNoAnswer
-import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No as CertificatesNo, Yes as CertificatesYes}
-import models.journeydata.isaproducts.InnovativeFinancialProduct.PeertopeerLoansUsingAPlatformWith36hPermissions
-import models.journeydata.isaproducts.IsaProduct.InnovativeFinanceIsas
 import uk.gov.hmrc.auth.core.{CredentialRole, User}
 
 object TaskListProgress {
@@ -34,65 +30,13 @@ object TaskListProgress {
     credentialRole == User && canAccessTaskList(journeyData) && allRequiredTasksComplete(journeyData)
 
   def allRequiredTasksComplete(journeyData: JourneyData): Boolean =
-    isOrganisationInformationComplete(journeyData) &&
-      isOrganisationEmailVerified(journeyData) &&
-      isIsaProductsComplete(journeyData) &&
-      isCertificatesOfAuthorityComplete(journeyData) &&
+    journeyData.organisationDetails.exists(_.isComplete) &&
+      journeyData.organisationEmail.exists(_.isComplete) &&
+      journeyData.isaProducts.exists(_.isComplete) &&
+      journeyData.certificatesOfAuthority.exists(_.isComplete) &&
       areLiaisonOfficersComplete(journeyData) &&
       areSignatoriesComplete(journeyData) &&
-      areThirdPartyOrganisationsComplete(journeyData)
-
-  def isOrganisationInformationComplete(journeyData: JourneyData): Boolean =
-    journeyData.organisationDetails.exists { organisationDetails =>
-      organisationDetails.registeredToManageIsa.exists { registeredToManageIsa =>
-        val zReferenceComplete =
-          registeredToManageIsa == YesNoAnswer.No || organisationDetails.zRefNumber.exists(nonEmpty)
-
-        val tradingNameComplete =
-          organisationDetails.tradingUsingDifferentName.exists {
-            case YesNoAnswer.Yes => organisationDetails.tradingName.exists(nonEmpty)
-            case YesNoAnswer.No  => true
-          }
-
-        val correspondenceAddressComplete =
-          organisationDetails.registeredAddressCorrespondence.exists {
-            case YesNoAnswer.Yes => true
-            case YesNoAnswer.No  => organisationDetails.correspondenceAddress.exists(_.isPopulated)
-          }
-
-        zReferenceComplete &&
-        tradingNameComplete &&
-        organisationDetails.fcaNumber.exists(nonEmpty) &&
-        correspondenceAddressComplete &&
-        organisationDetails.orgTelephoneNumber.exists(nonEmpty)
-      }
-    }
-
-  def isOrganisationEmailVerified(journeyData: JourneyData): Boolean =
-    journeyData.organisationEmail.exists { organisationEmail =>
-      organisationEmail.organisationEmail.exists(nonEmpty) && organisationEmail.verified.contains(true)
-    }
-
-  def isIsaProductsComplete(journeyData: JourneyData): Boolean =
-    journeyData.isaProducts.exists { isaProducts =>
-      isaProducts.isaProducts.exists(_.nonEmpty) &&
-      (!isaProducts.isaProducts.exists(_.contains(InnovativeFinanceIsas)) ||
-        (
-          isaProducts.innovativeFinancialProducts.exists(_.nonEmpty) &&
-            (!isaProducts.innovativeFinancialProducts.exists(
-              _.contains(PeertopeerLoansUsingAPlatformWith36hPermissions)
-            ) ||
-              (isaProducts.p2pPlatform.exists(nonEmpty) && isaProducts.p2pPlatformNumber.exists(nonEmpty)))
-        ))
-    }
-
-  def isCertificatesOfAuthorityComplete(journeyData: JourneyData): Boolean =
-    journeyData.certificatesOfAuthority.exists { certificatesOfAuthority =>
-      certificatesOfAuthority.certificatesYesNo.exists {
-        case CertificatesYes => certificatesOfAuthority.fcaArticles.exists(_.nonEmpty)
-        case CertificatesNo  => certificatesOfAuthority.financialOrganisation.exists(_.nonEmpty)
-      }
-    }
+      journeyData.thirdPartyOrganisations.exists(_.isComplete)
 
   def areLiaisonOfficersComplete(journeyData: JourneyData): Boolean =
     journeyData.liaisonOfficers.exists { liaisonOfficers =>
@@ -102,15 +46,6 @@ object TaskListProgress {
   def areSignatoriesComplete(journeyData: JourneyData): Boolean =
     journeyData.signatories.exists { signatories =>
       signatories.signatories.nonEmpty && signatories.signatories.forall(!_.inProgress)
-    }
-
-  def areThirdPartyOrganisationsComplete(journeyData: JourneyData): Boolean =
-    journeyData.thirdPartyOrganisations.exists { thirdPartyOrganisations =>
-      thirdPartyOrganisations.managedByThirdParty.exists {
-        case YesNoAnswer.No  => true
-        case YesNoAnswer.Yes =>
-          thirdPartyOrganisations.thirdParties.nonEmpty && thirdPartyOrganisations.thirdParties.forall(!_.inProgress)
-      }
     }
 
   private def nonEmpty(value: String): Boolean =

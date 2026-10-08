@@ -46,9 +46,28 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
   "FcaArticles Controller" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, fcaArticlesRoute)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request = FakeRequest(GET, fcaArticlesRoute)
@@ -69,6 +88,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           certificatesOfAuthority = Some(CertificatesOfAuthority(fcaArticles = Some(FcaArticles.values)))
         )
 
@@ -99,7 +119,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
       ) thenReturn Future.successful(expectedJourneyData)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .build()
 
       running(application) {
@@ -117,7 +137,12 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
     "must redirect to the next page when valid data is submitted and no existing data was found" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, enrolmentId = testString, certificatesOfAuthority = None)
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          businessVerification = Some(testBV),
+          certificatesOfAuthority = None
+        )
 
       val expectedJourneyData = CertificatesOfAuthority(fcaArticles = Some(Seq(Article14)))
 
@@ -154,6 +179,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           certificatesOfAuthority = Some(existingCertificates)
         )
 
@@ -199,6 +225,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           certificatesOfAuthority = Some(existingCertificates)
         )
 
@@ -234,7 +261,7 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -255,7 +282,12 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
     "must return Internal Server Error when failed to store data" in {
 
       val journeyData =
-        JourneyData(groupId = testGroupId, enrolmentId = testString, certificatesOfAuthority = None)
+        JourneyData(
+          groupId = testGroupId,
+          enrolmentId = testString,
+          businessVerification = Some(testBV),
+          certificatesOfAuthority = None
+        )
 
       when(
         mockJourneyAnswersService
@@ -274,6 +306,21 @@ class FcaArticlesControllerSpec extends SpecBase with MockitoSugar {
         await(route(application, request).value)
 
         verify(mockErrorHandler).internalServerError(any[RequestHeader])
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, fcaArticlesRoute)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

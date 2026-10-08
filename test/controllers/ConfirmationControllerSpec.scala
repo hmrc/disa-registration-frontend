@@ -27,9 +27,28 @@ class ConfirmationControllerSpec extends SpecBase {
 
   "Confirmation Controller" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET when submission data is available" in {
 
-      val journeyData = emptyJourneyData.copy(
+      val journeyData = emptyJourneyDataWithBusinessVerification.copy(
         formBundleId = Some(testFormBundleId)
       )
 
@@ -56,7 +75,7 @@ class ConfirmationControllerSpec extends SpecBase {
 
     "must redirect to the task list when submission data is missing" in {
 
-      val journeyData = emptyJourneyData.copy(
+      val journeyData = emptyJourneyDataWithBusinessVerification.copy(
         formBundleId = None
       )
 

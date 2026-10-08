@@ -54,12 +54,32 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
 
   "LiaisonOfficerEmailController" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routeUrl)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK and the correct view for a GET when the liaison officer exists and has no email" in {
 
       val journeyData =
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -92,6 +112,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -125,6 +146,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -152,6 +174,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -179,6 +202,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -211,7 +235,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
 
     "must redirect to TaskList when invalid data is submitted and liaison officer details cannot be found" in {
 
-      val application = applicationBuilder(journeyData = Some(emptyJourneyData)).build()
+      val application = applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification)).build()
 
       running(application) {
         val request =
@@ -231,6 +255,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -277,7 +302,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
     "must redirect to TaskList when valid data is submitted and the section is absent" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData))
+        applicationBuilder(journeyData = Some(emptyJourneyDataWithBusinessVerification))
           .overrides(bind[Navigator].toInstance(new FakeNavigator(onwardRoute)))
           .build()
 
@@ -299,6 +324,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -331,6 +357,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -367,6 +394,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -399,6 +427,7 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
         JourneyData(
           groupId = testGroupId,
           enrolmentId = testString,
+          businessVerification = Some(testBV),
           liaisonOfficers = Some(
             LiaisonOfficers(
               Seq(
@@ -434,6 +463,21 @@ class LiaisonOfficerEmailControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, LiaisonOfficerEmailController.onSubmit(existingId, CheckMode).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

@@ -44,6 +44,7 @@ class RemoveThirdPartyController @Inject() (
   navigator: Navigator,
   errorHandler: ErrorHandler,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
@@ -56,12 +57,12 @@ class RemoveThirdPartyController @Inject() (
   val form: Form[YesNoAnswer] = formProvider("removeThirdParty.error.required")
 
   def onPageLoad(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       providingName(id, name => Future.successful(Ok(view(id, name, form, returnTo))))
     }
 
   def onSubmit(id: String, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       providingName(
         id,
         name =>

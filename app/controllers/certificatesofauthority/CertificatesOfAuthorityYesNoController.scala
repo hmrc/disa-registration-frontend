@@ -39,6 +39,7 @@ import scala.util.control.NonFatal
 class CertificatesOfAuthorityYesNoController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   journeyAnswersService: JourneyAnswersService,
@@ -55,7 +56,7 @@ class CertificatesOfAuthorityYesNoController @Inject() (
   val form: Form[CertificatesOfAuthorityYesNo] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
 
       val preparedForm = request.journeyData.certificatesOfAuthority.flatMap(_.certificatesYesNo) match {
         case None        => form
@@ -66,7 +67,7 @@ class CertificatesOfAuthorityYesNoController @Inject() (
     }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

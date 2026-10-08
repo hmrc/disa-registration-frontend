@@ -43,6 +43,7 @@ class EmailVerificationCodeController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: EmailVerificationCodeFormProvider,
@@ -59,7 +60,7 @@ class EmailVerificationCodeController @Inject() (
   val form: Form[String] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       organisationEmailOrRedirect(mode, returnTo).fold(
         redirect => redirect,
         email => Ok(view(form, mode, returnTo, email))
@@ -67,7 +68,7 @@ class EmailVerificationCodeController @Inject() (
     }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       organisationEmailOrRedirect(mode, returnTo).fold(
         redirect => Future.successful(redirect),
         email =>
@@ -127,7 +128,7 @@ class EmailVerificationCodeController @Inject() (
     }
 
   def requestNewCode(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       organisationEmailOrRedirect(mode, returnTo).fold(
         redirect => Future.successful(redirect),
         email =>

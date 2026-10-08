@@ -59,10 +59,31 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
   "AddAnotherAddressController onPageLoad" - {
 
+    "must redirect to Start for if not Business Verified" in {
+
+      val application =
+        applicationBuilder(journeyData = Some(emptyJourneyData.copy(isaProducts = None))).build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(GET, routes.AddAnotherAddressController.onPageLoad(mode, None).url)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+
+        redirectLocation(result).value mustEqual
+          controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return OK with empty form when no data exists" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .build()
 
       running(application) {
@@ -84,7 +105,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
     "must populate form when existing answer is present" in {
 
       val filledJourney =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = Some(
             journeyDetails.copy(addAnotherAddress = Some(baseAnswer))
           )
@@ -114,10 +135,27 @@ class AddAnotherAddressControllerSpec extends SpecBase {
 
   "AddAnotherAddressController onSubmit" - {
 
+    "POST must redirect to Start for if not Business Verified" in {
+      val app =
+        applicationBuilder(Some(emptyJourneyDataWithFailedBusinessVerification)).build()
+
+      running(app) {
+        val request =
+          FakeRequest(POST, routes.AddAnotherAddressController.onSubmit(mode, None).url)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
+      }
+    }
+
     "must return BAD_REQUEST when form is invalid" in {
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .build()
 
       running(application) {
@@ -151,7 +189,9 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       when(navigator.nextPage(any(), any(), any(), any())).thenReturn(onwardRoute)
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .overrides(bind[Navigator].toInstance(navigator))
           .build()
 
@@ -182,7 +222,9 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         .thenReturn(Future.successful(journeyDetails))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .build()
 
       running(application) {
@@ -211,7 +253,9 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         .thenReturn(Future.successful(InternalServerError))
 
       val application =
-        applicationBuilder(journeyData = Some(emptyJourneyData.copy(organisationDetails = Some(journeyDetails))))
+        applicationBuilder(journeyData =
+          Some(emptyJourneyDataWithBusinessVerification.copy(organisationDetails = Some(journeyDetails)))
+        )
           .build()
 
       running(application) {
@@ -231,7 +275,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
     "must create OrganisationDetails when none exists in journey data" in {
 
       val emptyJourney =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = None
         )
 
@@ -301,7 +345,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         )
 
       val journeyData =
-        emptyJourneyData.copy(
+        emptyJourneyDataWithBusinessVerification.copy(
           organisationDetails = Some(existingDetails)
         )
 
@@ -354,7 +398,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           journeyData = Some(
-            emptyJourneyData.copy(organisationDetails = None)
+            emptyJourneyDataWithBusinessVerification.copy(organisationDetails = None)
           )
         ).build()
 
@@ -379,7 +423,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       }
     }
 
-    "must return INTERNAL_SERVER_ERROR when update fails" in {
+    "must redirect to Start for if not Business Verified" in {
 
       when(
         mockJourneyAnswersService.update(
@@ -395,7 +439,7 @@ class AddAnotherAddressControllerSpec extends SpecBase {
       val application =
         applicationBuilder(
           journeyData = Some(
-            emptyJourneyData.copy(
+            emptyJourneyDataWithBusinessVerification.copy(
               organisationDetails = Some(journeyDetails)
             )
           )
@@ -414,6 +458,54 @@ class AddAnotherAddressControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         status(result) mustEqual INTERNAL_SERVER_ERROR
+      }
+    }
+
+    "must bho" in {
+
+      val existingDetails =
+        OrganisationDetails(
+          correspondenceAddress = Some(mock[models.journeydata.CorrespondenceAddress]),
+          addAnotherAddress = Some(baseAnswer)
+        )
+
+      val updatedSection =
+        existingDetails.copy(
+          correspondenceAddress = None,
+          addAnotherAddress = None
+        )
+
+      val journeyData =
+        emptyJourneyDataWithFailedBusinessVerification.copy(
+          organisationDetails = Some(existingDetails)
+        )
+
+      when(
+        mockJourneyAnswersService.update(
+          eqTo(updatedSection),
+          any[String],
+          any[String]
+        )(any[Writes[OrganisationDetails]], any())
+      ).thenReturn(Future.successful(updatedSection))
+
+      val application =
+        applicationBuilder(journeyData = Some(journeyData))
+          .build()
+
+      running(application) {
+
+        val request =
+          FakeRequest(
+            GET,
+            routes.AddAnotherAddressController
+              .clearCorrespondenceAddressAndRedirect()
+              .url
+          )
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.GrsStartController.onPageLoad().url
       }
     }
   }

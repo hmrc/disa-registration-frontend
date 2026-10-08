@@ -39,6 +39,7 @@ class FcaArticlesController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
+  grsGuard: GrsGuardActionFilter,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: FcaArticlesFormProvider,
@@ -53,7 +54,7 @@ class FcaArticlesController @Inject() (
   val form: Form[Set[FcaArticles]] = formProvider()
 
   def onPageLoad(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       val preparedForm = (for {
         certificatesOfAuthority <- request.journeyData.certificatesOfAuthority
         values                  <- certificatesOfAuthority.fcaArticles
@@ -63,7 +64,7 @@ class FcaArticlesController @Inject() (
     }
 
   def onSubmit(mode: Mode, returnTo: Option[ReturnTo]): Action[AnyContent] =
-    (identify andThen getData andThen requireData).async { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData).async { implicit request =>
       form
         .bindFromRequest()
         .fold(

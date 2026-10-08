@@ -32,6 +32,7 @@ class ThirdPartiesCheckYourAnswersController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
+  grsGuard: GrsGuardActionFilter,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: ThirdPartiesCheckYourAnswersView
@@ -40,7 +41,7 @@ class ThirdPartiesCheckYourAnswersController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] =
-    (identify andThen getData andThen requireData) { implicit request =>
+    (identify andThen getData andThen grsGuard andThen requireData) { implicit request =>
       request.journeyData.thirdPartyOrganisations match {
         case Some(section) if section.canAccessCheckYourAnswers =>
           Ok(view(section))
