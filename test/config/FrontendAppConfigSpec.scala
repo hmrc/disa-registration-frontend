@@ -279,7 +279,7 @@ class FrontendAppConfigSpec extends SpecBase {
     }
 
     "must return GRS callback URL" in {
-      appConfig.grsCallback mustBe "/register-for-manage-isas/incorporated-identity-callback"
+      appConfig.grsCallback mustBe s"$registrationFrontendRoutePrefix/incorporated-identity-callback"
     }
 
     "must return accessibility statement URL" in {

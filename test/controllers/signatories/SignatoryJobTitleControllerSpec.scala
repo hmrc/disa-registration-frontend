@@ -42,7 +42,7 @@ class SignatoryJobTitleControllerSpec extends SpecBase {
   private val existingJobTitle = "Existing Job Title"
   private val newJobTitle      = "New Job Title"
 
-  def onwardRoute: Call = Call("GET", s"/register-for-manage-isas/check-added-signatory?id=$existingId")
+  def onwardRoute: Call = Call("GET", s"$registrationFrontendRoutePrefix/check-added-signatory?id=$existingId")
 
   lazy val routeUrl: String  = SignatoryJobTitleController.onPageLoad(existingId, NormalMode).url
   lazy val submitUrl: String = SignatoryJobTitleController.onSubmit(existingId, NormalMode).url
