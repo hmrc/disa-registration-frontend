@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class FirmReferenceNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute: Call = Call("GET", "/obligations/enrolment/isa/registered-address-correspondence")
+  def onwardRoute: Call = Call("GET", s"$registrationFrontendRoutePrefix/registered-address-correspondence")
 
   val formProvider             = new FirmReferenceNumberFormProvider()
   val form: Form[String]       = formProvider()

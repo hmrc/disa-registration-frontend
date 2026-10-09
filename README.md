@@ -28,6 +28,8 @@ sm2 --start DISA_REGISTRATION_ALL
 ```bash
 sbt run
 ```
+> [!NOTE]
+> Remember in the authority wizard to add, under CredId: "grs-retrieval-success" otherwise the GrsGuard won't allow you further into the app.
 
 You can then query the app to ensure it is working with the following command:
 

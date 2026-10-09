@@ -102,7 +102,7 @@ class FrontendAppConfig @Inject(config: Configuration) extends ServicesConfig(co
   def grsRetrieveResultUrl(companyType: GrsCompanyType, journeyId: String): String =
     s"${grsHost(companyType.identificationService)}/${companyType.identificationService.apiBasePath}/journey/$journeyId"
 
-  lazy val grsCallback: String = "/obligations/enrolment/isa/incorporated-identity-callback"
+  lazy val grsCallback: String = "/register-for-manage-isas/incorporated-identity-callback"
 
   lazy val accessibilityStatementUrl = "/accessibility-statement/disa-registration-frontend?useServiceNavigation"
 

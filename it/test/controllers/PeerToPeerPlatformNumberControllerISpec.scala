@@ -27,7 +27,7 @@ import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
 class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
 
-  private val controllerEndpoint = "/obligations/enrolment/isa/fca-platform-number"
+  private val controllerEndpoint = s"$registrationFrontendRoutePrefix/fca-platform-number"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
   private val updateJourneyUrl = s"/disa-registration/store/$testGroupId/isaProducts"
 
@@ -104,7 +104,7 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
       val result = route(app, request).get
 
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) shouldBe Some("/obligations/enrolment/isa/isa-products-check-your-answers")
+      redirectLocation(result) shouldBe Some(s"$registrationFrontendRoutePrefix/isa-products-check-your-answers")
 
       verify(
         postRequestedFor(urlEqualTo(updateJourneyUrl))

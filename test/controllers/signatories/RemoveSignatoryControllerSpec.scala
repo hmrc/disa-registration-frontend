@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class RemoveSignatoryControllerSpec extends SpecBase {
 
-  def onwardRoute(path: String): Call = Call("GET", s"/obligations/enrolment/isa$path")
+  def onwardRoute(path: String): Call = Call("GET", s"$registrationFrontendRoutePrefix$path")
   private val addedSignatoriesPath    = "/added-signatories"
   private val addASignatoryPath       = "/add-a-signatory"
   private val existingId              = "existing-id-123"

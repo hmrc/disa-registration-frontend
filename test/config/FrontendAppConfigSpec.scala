@@ -19,6 +19,7 @@ package config
 import base.SpecBase
 import models.grs.GrsCompanyType
 import play.api.Configuration
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 
 import java.net.URLEncoder
@@ -120,7 +121,7 @@ class FrontendAppConfigSpec extends SpecBase {
     }
 
     "must generate feedbackUrl" in {
-      implicit val request = FakeRequest("GET", "/some-page?foo=bar")
+      implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/some-page?foo=bar")
 
       appConfig.feedbackUrl mustBe
         "http://localhost:9250/contact/beta-feedback?service=disa-registration-frontend&backUrl=http://localhost:1200/some-page?foo=bar&useServiceNavigation"
@@ -278,7 +279,7 @@ class FrontendAppConfigSpec extends SpecBase {
     }
 
     "must return GRS callback URL" in {
-      appConfig.grsCallback mustBe "/obligations/enrolment/isa/incorporated-identity-callback"
+      appConfig.grsCallback mustBe s"$registrationFrontendRoutePrefix/incorporated-identity-callback"
     }
 
     "must return accessibility statement URL" in {
