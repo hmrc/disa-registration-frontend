@@ -21,5 +21,4 @@ trait Address {
   def addressLine2: Option[String]
   def addressLine3: Option[String]
   def postCode: Option[String]
-  def uprn: Option[String]
 }

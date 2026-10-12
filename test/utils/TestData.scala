@@ -202,8 +202,7 @@ trait TestData extends Generators {
     addressLine1 = Some("testLine1"),
     addressLine2 = Some("test town"),
     addressLine3 = Some("test city"),
-    postCode = Some("AA11AA"),
-    uprn = None
+    postCode = Some("AA11AA")
   )
 
   val testCorrespondenceAddress: CorrespondenceAddress = CorrespondenceAddress(

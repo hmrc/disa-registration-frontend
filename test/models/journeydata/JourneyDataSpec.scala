@@ -44,8 +44,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
               addressLine1 = Some("address line 1"),
               addressLine2 = Some("address line 2"),
               addressLine3 = Some("address line 3"),
-              postCode = Some("post code"),
-              uprn = None
+              postCode = Some("post code")
             )
           ),
           companyName = Some(testString),
@@ -166,8 +165,7 @@ class JourneyDataSpec extends JsonFormatSpec[JourneyData] {
         "addressLine1": "address line 1",
         "addressLine2": "address line 2",
         "addressLine3": "address line 3",
-        "postCode": "post code",
-        "uprn": null
+        "postCode": "post code"
       },
       "companyName":"test",
       "companyNumber":"test",

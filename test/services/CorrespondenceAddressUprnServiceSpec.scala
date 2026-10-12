@@ -17,7 +17,6 @@
 package services
 
 import base.SpecBase
-import config.Constants.defaultUprn
 import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{never, verify, when}
@@ -87,18 +86,6 @@ class CorrespondenceAddressUprnServiceSpec extends SpecBase {
         any[Writes[OrganisationDetails]],
         any[HeaderCarrier]
       )
-    }
-
-    "must persist the default UPRN returned by address lookup" in {
-      val details = OrganisationDetails(correspondenceAddress = Some(address))
-      val updated = details.copy(correspondenceAddress = Some(address.copy(uprn = Some(defaultUprn))))
-      when(mockAddressLookupService.getUprn(eqTo(address))(any())).thenReturn(Future.successful(Some(defaultUprn)))
-      when(mockJourneyAnswersService.update(eqTo(updated), any(), any())(any[Writes[OrganisationDetails]], any()))
-        .thenReturn(Future.successful(updated))
-
-      service.enrichUprnIfMissing(testGroupId, providerId, Some(journeyDataWith(Some(details)))).futureValue
-
-      verify(mockJourneyAnswersService).update(eqTo(updated), any(), any())(any(), any())
     }
 
     "must not persist when lookup returns no UPRN" in {

@@ -16,7 +16,6 @@
 
 package services
 
-import config.Constants.defaultUprn
 import connectors.AddressLookupConnector
 import models.addresslookup.LookupAddress
 import models.journeydata.Address
@@ -46,16 +45,13 @@ class AddressLookupService @Inject() (
     connector
       .searchAddress(postcode, filter)
       .map { results =>
-        results.headOption.flatMap(_.uprn) match {
-          case Some(uprn) =>
-            logger.info(s"UPRN found for postcode: $postcode")
-            Some(uprn)
-          case None       =>
-            logger.warn(
-              s"No UPRN found in lookup response, using default. Postcode: $postcode, filter: $filter"
-            )
-            Some(defaultUprn)
+        val uprn = results.headOption.flatMap(_.uprn)
+        if (uprn.isDefined) {
+          logger.info(s"UPRN found for postcode: $postcode")
+        } else {
+          logger.warn(s"No UPRN found in lookup response. Postcode: $postcode, filter: $filter")
         }
+        uprn
       }
       .recover { case NonFatal(e) =>
         logger.warn(s"Address lookup failed for postcode: $postcode, filter: $filter", e)
