@@ -30,7 +30,7 @@ class GrsControllerISpec extends BaseIntegrationSpec with CommonStubs with Scala
   private val journeyId = "test-journey-id"
 
   private val callbackUrl =
-    s"/obligations/enrolment/isa/incorporated-identity-callback?journeyId=$journeyId"
+    s"$registrationFrontendRoutePrefix/incorporated-identity-callback?journeyId=$journeyId"
 
   private val getJourneyDataUrl =
     s"/disa-registration/store/$testGroupId"

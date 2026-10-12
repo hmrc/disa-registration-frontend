@@ -51,7 +51,7 @@ class ThirdPartyOrgDetailsControllerSpec extends SpecBase {
   lazy val form: Form[ThirdPartyOrgDetailsForm] = formProvider()
 
   def onwardRoute(id: String) =
-    Call("GET", s"/obligations/enrolment/isa/isa-returns-managed-by-third-party?id=$id")
+    Call("GET", s"$registrationFrontendRoutePrefix/isa-returns-managed-by-third-party?id=$id")
 
   "ThirdPartyOrgDetailsController onPageLoad" - {
 

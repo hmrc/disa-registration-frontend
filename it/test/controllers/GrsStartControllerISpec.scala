@@ -29,7 +29,7 @@ import utils.WiremockHelper.{stubGet, stubPost}
 
 class GrsStartControllerISpec extends BaseIntegrationSpec with ScalaFutures {
 
-  private val controllerEndpoint = "/obligations/enrolment/isa/start"
+  private val controllerEndpoint = s"$registrationFrontendRoutePrefix/start"
   private val getJourneyDataUrl  = s"/disa-registration/store/$testGroupId"
   private val grsStartUrl        = "/incorporated-entity-identification/api/limited-company-journey"
 
