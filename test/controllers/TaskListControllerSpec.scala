@@ -70,7 +70,7 @@ class TaskListControllerSpec extends SpecBase {
     }
 
     "must return OK and render the view when UPRN enrichment succeeds" in {
-      when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
+      when(mockCorrespondenceAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
         .thenReturn(Future.successful(()))
 
       val journeyData = emptyJourneyDataWithBusinessVerification
@@ -99,7 +99,7 @@ class TaskListControllerSpec extends SpecBase {
     }
 
     "must still return OK even if UPRN enrichment fails (non-blocking)" in {
-      when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
+      when(mockCorrespondenceAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
         .thenReturn(Future.failed(new RuntimeException("boom")))
 
       val journeyData = emptyJourneyDataWithBusinessVerification
@@ -120,7 +120,7 @@ class TaskListControllerSpec extends SpecBase {
     }
 
     "must redirect to Start when no journey data exists" in {
-      when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
+      when(mockCorrespondenceAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
         .thenReturn(Future.successful(()))
 
       val application = taskListApplicationBuilder(
@@ -141,7 +141,7 @@ class TaskListControllerSpec extends SpecBase {
     }
 
     "must redirect to Start when business verification has not succeeded" in {
-      when(mockRegisteredAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
+      when(mockCorrespondenceAddressUprnService.enrichUprnIfMissing(any(), any(), any())(any()))
         .thenReturn(Future.successful(()))
 
       val journeyData = emptyJourneyDataWithFailedBusinessVerification

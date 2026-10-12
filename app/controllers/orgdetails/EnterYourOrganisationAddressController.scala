@@ -30,7 +30,7 @@ import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.JourneyAnswersService
+import services.{AddressLookupService, JourneyAnswersService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.orgdetails.EnterYourOrganisationAddressView
 
@@ -42,6 +42,7 @@ class EnterYourOrganisationAddressController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   journeyAnswersService: JourneyAnswersService,
+  addressLookupService: AddressLookupService,
   grsGuard: GrsGuardActionFilter,
   errorHandler: ErrorHandler,
   identify: IdentifierAction,
@@ -73,36 +74,36 @@ class EnterYourOrganisationAddressController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode, returnTo))),
-          answer => {
-            val existing       = request.journeyData.organisationDetails
-            val updatedSection =
-              existing.map(ex =>
-                ex.copy(
-                  correspondenceAddress = Some(answer),
-                  addAnotherAddress = ex.addAnotherAddress.map { addAnotherAddress =>
-                    addAnotherAddress.copy(
-                      selectedAddress = Some(ManualEntry)
-                    )
-                  }
-                )
-              )
-
-            updatedSection.fold {
+          answer =>
+            request.journeyData.organisationDetails.fold {
               Future.successful(Redirect(TaskListController.onPageLoad()))
-            } { updatedSection =>
-              journeyAnswersService
-                .update(updatedSection, request.groupId, request.credentials.providerId)
-                .map { updatedSection =>
-                  Redirect(navigator.nextPage(EnterYourOrganisationAddressPage, updatedSection, mode, returnTo))
+            } { existing =>
+              addressLookupService
+                .getUprn(answer)
+                .flatMap { uprn =>
+                  val enrichedAnswer = answer.copy(uprn = uprn)
+                  val updatedSection = existing.copy(
+                    correspondenceAddress = Some(enrichedAnswer),
+                    addAnotherAddress = existing.addAnotherAddress.map { addAnotherAddress =>
+                      addAnotherAddress.copy(
+                        selectedAddress = Some(ManualEntry)
+                      )
+                    }
+                  )
+
+                  journeyAnswersService
+                    .update(updatedSection, request.groupId, request.credentials.providerId)
+                    .map { updatedSection =>
+                      Redirect(navigator.nextPage(EnterYourOrganisationAddressPage, updatedSection, mode, returnTo))
+                    }
                 }
                 .recoverWith { case NonFatal(e) =>
                   logger.warn(
-                    s"Failed updating answers for section [${updatedSection.sectionName}] for groupId [${request.groupId}] with error: [$e]"
+                    s"Failed updating answers for section [${existing.sectionName}] for groupId [${request.groupId}] with error: [$e]"
                   )
                   errorHandler.internalServerError
                 }
             }
-          }
         )
     }
 }

@@ -156,15 +156,19 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
 
     "must update the section, set selectedAddress to ManualEntry, and redirect to the next page when valid data is submitted" in {
 
+      val uprn = "123456789"
+
       val expectedSection =
         organisationDetails.copy(
-          correspondenceAddress = Some(updatedAddress),
+          correspondenceAddress = Some(updatedAddress.copy(uprn = Some(uprn))),
           addAnotherAddress = Some(
             addAnotherAddress.copy(
               selectedAddress = Some(ManualEntry)
             )
           )
         )
+
+      when(mockAddressLookupService.getUprn(eqTo(updatedAddress))(any())).thenReturn(Future.successful(Some(uprn)))
 
       when(
         mockJourneyAnswersService
@@ -188,15 +192,16 @@ class EnterYourOrganisationAddressControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        verify(mockJourneyAnswersService, atMostOnce())
-          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[OrganisationDetails]], any)
-
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+
+        verify(mockJourneyAnswersService, atMostOnce())
+          .update(eqTo(expectedSection), any[String], any[String])(any[Writes[OrganisationDetails]], any)
+        verify(mockAddressLookupService).getUprn(eqTo(updatedAddress))(any())
       }
     }
 
-    "must update the section and redirect when valid data is submitted and addAnotherAddress does not exist" in {
+    "must save without a UPRN and redirect when lookup does not resolve one and addAnotherAddress does not exist" in {
 
       val organisationDetailsWithoutAddAnotherAddress =
         OrganisationDetails(

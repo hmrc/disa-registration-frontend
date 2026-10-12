@@ -16,6 +16,7 @@
 
 package models.journeydata
 
+import models.addresslookup.LookupAddress
 import org.scalacheck.Gen
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
@@ -34,11 +35,13 @@ class CorrespondenceAddressSpec extends AnyFreeSpec with Matchers with ScalaChec
         line2    <- Gen.alphaStr.suchThat(_.nonEmpty)
         line3    <- Gen.alphaStr.suchThat(_.nonEmpty)
         postCode <- Gen.alphaStr.suchThat(_.nonEmpty)
+        uprn     <- Gen.alphaNumStr.suchThat(_.nonEmpty)
       } yield CorrespondenceAddress(
         Some(line1),
         Some(line2),
         Some(line3),
-        Some(postCode)
+        Some(postCode),
+        Some(uprn)
       )
 
       forAll(gen) { address =>
@@ -66,6 +69,28 @@ class CorrespondenceAddressSpec extends AnyFreeSpec with Matchers with ScalaChec
       val json = Json.toJson(address)
 
       json.validate[CorrespondenceAddress].asOpt.value mustEqual address
+    }
+
+    "must read legacy JSON with no UPRN" in {
+      val json = Json.obj(
+        "addressLine1" -> "Line 1",
+        "postCode"     -> "AB1 2CD"
+      )
+
+      json.validate[CorrespondenceAddress].asOpt.value mustEqual CorrespondenceAddress(
+        addressLine1 = Some("Line 1"),
+        postCode = Some("AB1 2CD")
+      )
+    }
+
+    "must retain the UPRN when converting a lookup result" in {
+      val lookupAddress = LookupAddress(
+        addressLine1 = Some("Line 1"),
+        postCode = Some("AB1 2CD"),
+        uprn = Some("123456789")
+      )
+
+      CorrespondenceAddress.fromLookup(lookupAddress).uprn mustBe Some("123456789")
     }
   }
 }

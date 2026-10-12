@@ -19,7 +19,7 @@ package controllers.actions
 import models.requests.OptionalDataRequest
 import play.api.Logging
 import play.api.mvc.{ActionFilter, Result}
-import services.RegisteredAddressUprnService
+import services.CorrespondenceAddressUprnService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -27,8 +27,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-//TODO: this action will need to be updated to consume a RequiredDataAction once we have built stubs for GRS/BV/AddressLookup
-class EnrichRegisteredAddressUprnAction @Inject() (uprnService: RegisteredAddressUprnService)(implicit
+class EnrichCorrespondenceAddressUprnAction @Inject() (uprnService: CorrespondenceAddressUprnService)(implicit
   ec: ExecutionContext
 ) extends ActionFilter[OptionalDataRequest]
     with Logging {

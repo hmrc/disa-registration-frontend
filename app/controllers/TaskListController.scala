@@ -34,7 +34,7 @@ class TaskListController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   grsGuard: GrsGuardActionFilter,
-  getUprn: EnrichRegisteredAddressUprnAction,
+  getUprn: EnrichCorrespondenceAddressUprnAction,
   requireData: DataRequiredAction,
   auditService: AuditService,
   val controllerComponents: MessagesControllerComponents,

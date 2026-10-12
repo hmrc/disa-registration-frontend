@@ -72,27 +72,28 @@ trait SpecBase
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
   // Mocks
-  protected val mockAuditConnector: AuditConnector                             = mock[AuditConnector]
-  protected val mockDisaRegistrationConnector: DisaRegistrationConnector       = mock[DisaRegistrationConnector]
-  protected val mockJourneyAnswersService: JourneyAnswersService               = mock[JourneyAnswersService]
-  protected val mockSubmissionService: SubmissionService                       = mock[SubmissionService]
-  protected val mockGrsService: GrsService                                     = mock[GrsService]
-  protected val mockAuditService: AuditService                                 = mock[AuditService]
-  protected val mockHttpClient: HttpClientV2                                   = mock[HttpClientV2]
-  protected val mockAppConfig: FrontendAppConfig                               = mock[FrontendAppConfig]
-  protected val mockRequestBuilder: RequestBuilder                             = mock[RequestBuilder]
-  protected val mockErrorHandler: ErrorHandler                                 = mock[ErrorHandler]
-  protected val mockSessionRepository: SessionRepository                       = mock[SessionRepository]
-  protected val mockBvLockoutRepository: BusinessVerificationLockoutRepository =
+  protected val mockAuditConnector: AuditConnector                                     = mock[AuditConnector]
+  protected val mockDisaRegistrationConnector: DisaRegistrationConnector               = mock[DisaRegistrationConnector]
+  protected val mockJourneyAnswersService: JourneyAnswersService                       = mock[JourneyAnswersService]
+  protected val mockSubmissionService: SubmissionService                               = mock[SubmissionService]
+  protected val mockGrsService: GrsService                                             = mock[GrsService]
+  protected val mockAuditService: AuditService                                         = mock[AuditService]
+  protected val mockHttpClient: HttpClientV2                                           = mock[HttpClientV2]
+  protected val mockAppConfig: FrontendAppConfig                                       = mock[FrontendAppConfig]
+  protected val mockRequestBuilder: RequestBuilder                                     = mock[RequestBuilder]
+  protected val mockErrorHandler: ErrorHandler                                         = mock[ErrorHandler]
+  protected val mockSessionRepository: SessionRepository                               = mock[SessionRepository]
+  protected val mockBvLockoutRepository: BusinessVerificationLockoutRepository         =
     mock[BusinessVerificationLockoutRepository]
-  protected val mockAddressLookupService: AddressLookupService                 = mock[AddressLookupService]
-  protected val mockAddressLookupConnector: AddressLookupConnector             = mock[AddressLookupConnector]
-  protected val mockRegisteredAddressUprnService: RegisteredAddressUprnService = mock[RegisteredAddressUprnService]
-  protected val mockBvLockoutService: BusinessVerificationLockoutService       = mock[BusinessVerificationLockoutService]
-  protected val mockUuidGenerator: UuidGenerator                               = mock[UuidGenerator]
-  protected val mockEmailVerificationConnector: EmailVerificationConnector     = mock[EmailVerificationConnector]
-  protected val mockTaxEnrolmentsConnector: TaxEnrolmentsConnector             = mock[TaxEnrolmentsConnector]
-  protected val mockTaxEnrolmentsService: TaxEnrolmentsService                 = mock[TaxEnrolmentsService]
+  protected val mockAddressLookupService: AddressLookupService                         = mock[AddressLookupService]
+  protected val mockAddressLookupConnector: AddressLookupConnector                     = mock[AddressLookupConnector]
+  protected val mockCorrespondenceAddressUprnService: CorrespondenceAddressUprnService =
+    mock[CorrespondenceAddressUprnService]
+  protected val mockBvLockoutService: BusinessVerificationLockoutService               = mock[BusinessVerificationLockoutService]
+  protected val mockUuidGenerator: UuidGenerator                                       = mock[UuidGenerator]
+  protected val mockEmailVerificationConnector: EmailVerificationConnector             = mock[EmailVerificationConnector]
+  protected val mockTaxEnrolmentsConnector: TaxEnrolmentsConnector                     = mock[TaxEnrolmentsConnector]
+  protected val mockTaxEnrolmentsService: TaxEnrolmentsService                         = mock[TaxEnrolmentsService]
 
   override def beforeEach(): Unit = {
     Mockito.reset(
@@ -109,7 +110,7 @@ trait SpecBase
       mockSessionRepository,
       mockAddressLookupService,
       mockAddressLookupConnector,
-      mockRegisteredAddressUprnService,
+      mockCorrespondenceAddressUprnService,
       mockUuidGenerator,
       mockBvLockoutService,
       mockBvLockoutRepository,
@@ -120,6 +121,7 @@ trait SpecBase
     when(mockErrorHandler.internalServerError(any[RequestHeader])).thenReturn(Future.successful(InternalServerError))
     when(mockErrorHandler.badRequest(any[RequestHeader])).thenReturn(Future.successful(BadRequest))
     when(mockSessionRepository.keepAlive(any[String])).thenReturn(Future.successful(()))
+    when(mockAddressLookupService.getUprn(any())(any())).thenReturn(Future.successful(None))
     when(mockTaxEnrolmentsService.hasManageIsaSubscriptionInProgress(any[String])(any[HeaderCarrier]))
       .thenReturn(Future.successful(false))
   }
@@ -142,7 +144,7 @@ trait SpecBase
       inject.bind[JourneyAnswersService].toInstance(mockJourneyAnswersService),
       inject.bind[GrsService].toInstance(mockGrsService),
       inject.bind[ErrorHandler].toInstance(mockErrorHandler),
-      inject.bind[RegisteredAddressUprnService].toInstance(mockRegisteredAddressUprnService),
+      inject.bind[CorrespondenceAddressUprnService].toInstance(mockCorrespondenceAddressUprnService),
       inject.bind[AddressLookupService].toInstance(mockAddressLookupService),
       inject.bind[BusinessVerificationLockoutService].toInstance(mockBvLockoutService),
       inject.bind[BusinessVerificationLockoutRepository].toInstance(mockBvLockoutRepository)

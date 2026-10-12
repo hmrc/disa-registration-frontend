@@ -19,7 +19,7 @@ package services
 import config.Constants.defaultUprn
 import connectors.AddressLookupConnector
 import models.addresslookup.LookupAddress
-import models.journeydata.RegisteredAddress
+import models.journeydata.Address
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -33,7 +33,7 @@ class AddressLookupService @Inject() (
     extends Logging {
 
   // TODO: Further discussion to be had around what happens if GRS/BV doesn't return all expected address fields
-  def getUprn(address: RegisteredAddress)(implicit hc: HeaderCarrier): Future[Option[String]] = {
+  def getUprn(address: Address)(implicit hc: HeaderCarrier): Future[Option[String]] = {
 
     val postcode = address.postCode.getOrElse {
       val message = s"Postcode is required for address lookup but was missing. Address: $address"
