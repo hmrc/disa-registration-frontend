@@ -24,8 +24,9 @@ case class CorrespondenceAddress(
   addressLine1: Option[String] = None,
   addressLine2: Option[String] = None,
   addressLine3: Option[String] = None,
-  postCode: Option[String] = None
-) {
+  postCode: Option[String] = None,
+  uprn: Option[String] = None
+) extends Address {
   def isPopulated: Boolean =
     List(addressLine1, addressLine3, postCode).exists(_.isDefined)
 }
@@ -39,7 +40,8 @@ object CorrespondenceAddress {
       addressLine1 = address.addressLine1,
       addressLine2 = address.addressLine2,
       addressLine3 = address.addressLine3,
-      postCode = address.postCode
+      postCode = address.postCode,
+      uprn = address.uprn
     )
 
   def fromSelectedAddress(

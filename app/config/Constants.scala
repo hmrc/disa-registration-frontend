@@ -17,6 +17,5 @@
 package config
 
 object Constants {
-  val defaultUprn: String    = "100000000000"
   val noneRadioValue: String = "none"
 }

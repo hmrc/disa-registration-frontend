@@ -26,7 +26,7 @@ import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails, RegisteredAddress}
 import models.{CheckMode, NormalMode, YesNoAnswer}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.{never, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.libs.json.Writes
@@ -140,6 +140,8 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
 
     "must update journeyAnswers and populate correspondenceAddress when 'yes' is submitted" in {
 
+      val uprn = "123456789"
+
       val initialJourneyData = JourneyData(
         groupId = testGroupId,
         enrolmentId = "enrolment",
@@ -154,10 +156,13 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
             addressLine1 = testRegisteredAddress.addressLine1,
             addressLine2 = testRegisteredAddress.addressLine2,
             addressLine3 = testRegisteredAddress.addressLine3,
-            postCode = testRegisteredAddress.postCode
+            postCode = testRegisteredAddress.postCode,
+            uprn = Some(uprn)
           )
         )
       )
+
+      when(mockAddressLookupService.getUprn(any())(any())).thenReturn(Future.successful(Some(uprn)))
 
       when(
         mockJourneyAnswersService.update(
@@ -179,6 +184,8 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         redirectLocation(result).value mustEqual OrganisationTelephoneNumberController
           .onPageLoad(NormalMode)
           .url
+
+        verify(mockAddressLookupService).getUprn(any())(any())
       }
     }
 
@@ -213,6 +220,8 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual AddAnotherAddressController.onPageLoad(NormalMode, None).url
+
+        verify(mockAddressLookupService, never()).getUprn(any())(any())
       }
     }
 

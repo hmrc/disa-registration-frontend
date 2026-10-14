@@ -29,7 +29,8 @@ import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.JourneyAnswersService
+import services.{AddressLookupService, JourneyAnswersService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.orgdetails.RegisteredAddressCorrespondenceView
 
@@ -46,6 +47,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
   requireData: DataRequiredAction,
   formProvider: YesNoAnswerFormProvider,
   journeyAnswersService: JourneyAnswersService,
+  addressLookupService: AddressLookupService,
   errorHandler: ErrorHandler,
   val controllerComponents: MessagesControllerComponents,
   view: RegisteredAddressCorrespondenceView
@@ -96,26 +98,29 @@ class RegisteredAddressCorrespondenceController @Inject() (
                 val existingSection            = request.journeyData.organisationDetails
                 val updatedOrganisationDetails = buildOrganisationDetails(existingSection, answer, registeredAddress)
 
-                val finalOrganisationDetails =
-                  (existingSection.flatMap(_.registeredAddressCorrespondence), answer) match {
-                    case (Some(No), Yes) if updatedOrganisationDetails.addAnotherAddress.nonEmpty =>
-                      clearStalePages(RegisteredAddressCorrespondencePage, updatedOrganisationDetails)
-                    case _                                                                        =>
-                      updatedOrganisationDetails
-                  }
+                enrichCorrespondenceAddress(updatedOrganisationDetails, answer)
+                  .flatMap { enrichedOrganisationDetails =>
+                    val finalOrganisationDetails =
+                      (existingSection.flatMap(_.registeredAddressCorrespondence), answer) match {
+                        case (Some(No), Yes) if enrichedOrganisationDetails.addAnotherAddress.nonEmpty =>
+                          clearStalePages(RegisteredAddressCorrespondencePage, enrichedOrganisationDetails)
+                        case _                                                                         =>
+                          enrichedOrganisationDetails
+                      }
 
-                journeyAnswersService
-                  .update(finalOrganisationDetails, request.groupId, request.credentials.providerId)
-                  .map { _ =>
-                    Redirect(
-                      navigator.nextPage(
-                        RegisteredAddressCorrespondencePage,
-                        existingSection,
-                        finalOrganisationDetails,
-                        mode,
-                        returnTo
-                      )
-                    )
+                    journeyAnswersService
+                      .update(finalOrganisationDetails, request.groupId, request.credentials.providerId)
+                      .map { _ =>
+                        Redirect(
+                          navigator.nextPage(
+                            RegisteredAddressCorrespondencePage,
+                            existingSection,
+                            finalOrganisationDetails,
+                            mode,
+                            returnTo
+                          )
+                        )
+                      }
                   }
                   .recoverWith { case NonFatal(e) =>
                     logger.warn(
@@ -157,4 +162,17 @@ class RegisteredAddressCorrespondenceController @Inject() (
       correspondenceAddress = correspondenceAddress
     )
   }
+
+  private def enrichCorrespondenceAddress(
+    organisationDetails: OrganisationDetails,
+    answer: YesNoAnswer
+  )(implicit hc: HeaderCarrier): Future[OrganisationDetails] =
+    (answer, organisationDetails.correspondenceAddress) match {
+      case (Yes, Some(address)) =>
+        addressLookupService
+          .getUprn(address)
+          .map(uprn => organisationDetails.copy(correspondenceAddress = Some(address.copy(uprn = uprn))))
+      case _                    =>
+        Future.successful(organisationDetails)
+    }
 }

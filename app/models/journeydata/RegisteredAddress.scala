@@ -22,9 +22,8 @@ case class RegisteredAddress(
   addressLine1: Option[String] = None,
   addressLine2: Option[String] = None,
   addressLine3: Option[String] = None,
-  postCode: Option[String] = None,
-  uprn: Option[String] = None
-)
+  postCode: Option[String] = None
+) extends Address
 
 object RegisteredAddress {
 

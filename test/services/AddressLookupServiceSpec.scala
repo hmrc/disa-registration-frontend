@@ -17,8 +17,7 @@
 package services
 
 import base.SpecBase
-import config.Constants.defaultUprn
-import models.journeydata.RegisteredAddress
+import models.journeydata.CorrespondenceAddress
 import models.addresslookup.LookupAddress
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -32,7 +31,7 @@ class AddressLookupServiceSpec extends SpecBase {
 
   private val service = new AddressLookupService(mockAddressLookupConnector)
 
-  private val address = RegisteredAddress(
+  private val address = CorrespondenceAddress(
     addressLine1 = Some("line1"),
     addressLine2 = Some("line2"),
     addressLine3 = Some("line3"),
@@ -62,7 +61,7 @@ class AddressLookupServiceSpec extends SpecBase {
       result shouldBe Some("123456789012")
     }
 
-    "must return default UPRN when no UPRN is found in results" in {
+    "must return none when no UPRN is found in results" in {
 
       val results = Seq(
         LookupAddress(
@@ -79,7 +78,7 @@ class AddressLookupServiceSpec extends SpecBase {
 
       val result = service.getUprn(address).futureValue
 
-      result shouldBe Some(defaultUprn)
+      result shouldBe None
     }
 
     "must return none for UPRN when connector fails" in {
