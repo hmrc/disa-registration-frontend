@@ -101,7 +101,7 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
       )
     }
 
-    "call correct endpoint with incorrect data" in {
+    "return BAD_REQUEST when the form data submitted is invalid" in {
 
       stubAuth()
       stubGet(getJourneyDataUrl, OK, itTestJourneyData)

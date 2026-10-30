@@ -105,7 +105,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec wit
       )
     }
 
-    "call correct endpoint with incorrect form data" in {
+    "return BAD_REQUEST when the form data submitted is invalid" in {
 
       stubAuth()
       stubGet(getJourneyDataUrl, OK, itTestJourneyData)

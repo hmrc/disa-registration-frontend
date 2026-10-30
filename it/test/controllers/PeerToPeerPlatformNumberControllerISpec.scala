@@ -116,7 +116,7 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
       )
     }
 
-    "call correct endpoint with incorrect data" in {
+    "return BAD_REQUEST when the form data submitted is invalid" in {
 
       val testJourneyData =
         s"""

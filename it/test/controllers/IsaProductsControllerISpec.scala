@@ -105,7 +105,7 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
       )
     }
 
-    "call correct endpoint with incorrect data" in {
+    "return BAD_REQUEST when the form data submitted is invalid" in {
 
       stubAuth()
       stubGet(getJourneyDataUrl, OK, itTestJourneyData)
