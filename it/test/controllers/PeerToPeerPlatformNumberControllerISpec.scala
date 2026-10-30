@@ -89,7 +89,6 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
            | }
            |}
            |""".stripMargin
-
       stubAuth()
       stubGet(getJourneyDataUrl, OK, testJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
@@ -115,6 +114,76 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
               |}""".stripMargin
           ))
       )
+    }
+
+    "return BAD_REQUEST when the form data submitted is invalid" in {
+
+      val testJourneyData =
+        s"""
+           |{
+           | "groupId": "$testGroupId",
+           | "enrolmentId": "$testString",
+           | "businessVerification": {
+           |   "businessRegistrationPassed": true,
+           |   "businessVerificationPassed": true,
+           |   "ctutr": "1234567890"
+           | },
+           | "isaProducts": {
+           |   "p2pPlatform": ""
+           | }
+           |}
+           |""".stripMargin
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubPost(updateJourneyUrl, NO_CONTENT, "")
+
+      val form = "value" -> ""
+
+      val request =
+        FakeRequest(POST, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody(form)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe BAD_REQUEST
+      redirectLocation(result) shouldBe None
+    }
+
+    "return INTERNAL_SERVER_ERROR when updating the journey fails" in {
+
+      val testJourneyData =
+        s"""
+           |{
+           | "groupId": "$testGroupId",
+           | "enrolmentId": "$testString",
+           | "businessVerification": {
+           |   "businessRegistrationPassed": true,
+           |   "businessVerificationPassed": true,
+           |   "ctutr": "1234567890"
+           | },
+           | "isaProducts": {
+           |   "p2pPlatform": "platform"
+           | }
+           |}
+           |""".stripMargin
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubPost(updateJourneyUrl, INTERNAL_SERVER_ERROR, "")
+
+      val form = "value" -> "1234567"
+
+      val request =
+        FakeRequest(POST, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody(form)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+      redirectLocation(result) shouldBe None
     }
   }
 }

@@ -79,21 +79,8 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec wit
 
     "call correct endpoint with correct data shape" in {
 
-      val testJourneyData: String =
-        s"""
-           |{
-           |  "groupId": "$testGroupId",
-           |  "enrolmentId": "$testString",
-           |  "businessVerification": {
-           |    "businessRegistrationPassed": true,
-           |    "businessVerificationPassed": true,
-           |    "ctutr": "1234567890"
-           |  }
-           |}
-           |""".stripMargin
-
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value[0]" -> "peerToPeerLoansUsingAPlatformWith36HPermissions"
@@ -116,6 +103,44 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec wit
               |}""".stripMargin
           ))
       )
+    }
+
+    "return BAD_REQUEST when the form data submitted is invalid" in {
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubPost(updateJourneyUrl, NO_CONTENT, "")
+
+      val form = "value[0]" -> "wrongDataOrProduct"
+
+      val request =
+        FakeRequest(POST, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody(form)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe BAD_REQUEST
+      redirectLocation(result) shouldBe None
+    }
+
+    "return INTERNAL_SERVER_ERROR when updating the journey fails" in {
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubPost(updateJourneyUrl, INTERNAL_SERVER_ERROR, "")
+
+      val form = "value[0]" -> "peerToPeerLoansUsingAPlatformWith36HPermissions"
+
+      val request =
+        FakeRequest(POST, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody(form)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+      redirectLocation(result) shouldBe None
     }
   }
 }
