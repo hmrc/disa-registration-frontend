@@ -74,21 +74,9 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
   "POST /peer-to-peer-loans" should {
 
     "call correct endpoint with correct data shape" in {
-      val testJourneyData =
-        s"""
-           |{
-           |  "groupId": "$testGroupId",
-           |  "enrolmentId": "$testString",
-           |  "businessVerification": {
-           |    "businessRegistrationPassed": true,
-           |    "businessVerificationPassed": true,
-           |    "ctutr": "1234567890"
-           |  }
-           |}
-           |""".stripMargin
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value" -> "platform"
@@ -111,6 +99,42 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
               |}""".stripMargin
           ))
       )
+    }
+
+    "call correct endpoint with incorrect data" in {
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubPost(updateJourneyUrl, NO_CONTENT, "")
+
+      val form = "value" -> ""
+
+      val request =
+        FakeRequest(POST, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody(form)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe BAD_REQUEST
+      redirectLocation(result) shouldBe None
+    }
+
+    "return INTERNAL_SERVER_ERROR when updating the journey fails" in {
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubPost(updateJourneyUrl, INTERNAL_SERVER_ERROR, "")
+
+      val request =
+        FakeRequest(POST, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody("value" -> "platform")
+
+      val result = route(app, request).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+      redirectLocation(result) shouldBe None
     }
   }
 }
