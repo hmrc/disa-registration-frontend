@@ -76,7 +76,7 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
     "call correct endpoint with correct data shape" in {
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value" -> "platform"
@@ -104,7 +104,7 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
     "return BAD_REQUEST when the form data submitted is invalid" in {
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value" -> ""
@@ -123,7 +123,7 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
     "return INTERNAL_SERVER_ERROR when updating the journey fails" in {
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, INTERNAL_SERVER_ERROR, "")
 
       val request =

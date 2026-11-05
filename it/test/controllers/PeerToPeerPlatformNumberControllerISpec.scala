@@ -118,7 +118,7 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
 
     "return BAD_REQUEST when the form data submitted is invalid" in {
 
-      val testJourneyData =
+      val noP2pJourneyData =
         s"""
            |{
            | "groupId": "$testGroupId",
@@ -135,7 +135,7 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
            |""".stripMargin
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubGet(getJourneyDataUrl, OK, noP2pJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value" -> ""
@@ -153,7 +153,7 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
 
     "return INTERNAL_SERVER_ERROR when updating the journey fails" in {
 
-      val testJourneyData =
+      val JourneyDataWithP2p =
         s"""
            |{
            | "groupId": "$testGroupId",
@@ -170,7 +170,7 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
            |""".stripMargin
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubGet(getJourneyDataUrl, OK, JourneyDataWithP2p)
       stubPost(updateJourneyUrl, INTERNAL_SERVER_ERROR, "")
 
       val form = "value" -> "1234567"

@@ -80,7 +80,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec wit
     "call correct endpoint with correct data shape" in {
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value[0]" -> "peerToPeerLoansUsingAPlatformWith36HPermissions"
@@ -108,7 +108,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec wit
     "return BAD_REQUEST when the form data submitted is invalid" in {
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value[0]" -> "wrongDataOrProduct"
@@ -127,7 +127,7 @@ class InnovativeFinancialProductsControllerISpec extends BaseIntegrationSpec wit
     "return INTERNAL_SERVER_ERROR when updating the journey fails" in {
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, INTERNAL_SERVER_ERROR, "")
 
       val form = "value[0]" -> "peerToPeerLoansUsingAPlatformWith36HPermissions"

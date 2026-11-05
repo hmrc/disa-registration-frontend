@@ -93,7 +93,7 @@ trait BaseIntegrationSpec
   implicit val ws: WSClient                       = app.injector.instanceOf[WSClient]
   implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-  val itTestJourneyData: String =
+  val validGrsJourneyData: String =
     s"""
        |{
        |  "groupId": "$testGroupId",

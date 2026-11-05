@@ -80,7 +80,7 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
     "call correct endpoint with correct data shape" in {
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value[0]" -> "cashJuniorIsas"
@@ -108,7 +108,7 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
     "return BAD_REQUEST when the form data submitted is invalid" in {
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value[0]" -> "wrongData"
@@ -127,7 +127,7 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
     "return INTERNAL_SERVER_ERROR when updating the journey fails" in {
 
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, itTestJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, INTERNAL_SERVER_ERROR, "")
 
       val form = "value[0]" -> "cashJuniorIsas"
