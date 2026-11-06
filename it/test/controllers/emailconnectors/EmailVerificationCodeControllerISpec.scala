@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.emailconnectors
 
 import models.journeydata.OrganisationEmail
 import org.jsoup.Jsoup
 import play.api.http.Status.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, POST, await, contentAsString, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
+import play.api.test.Helpers.{GET, POST, contentAsString, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
 import uk.gov.hmrc.http.SessionKeys
 import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}

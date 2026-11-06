@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.emailconnectors
 
 import models.journeydata.OrganisationEmail
 import org.jsoup.Jsoup
