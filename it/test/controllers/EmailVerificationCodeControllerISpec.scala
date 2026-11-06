@@ -27,8 +27,10 @@ import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
 class EmailVerificationCodeControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper  {
 
+  private val sendCodePath = "/email-verification/v2/send-code"
   private val verifyCodePath = "/email-verification/v2/verify-code"
   private val controllerEndpoint = s"$registrationFrontendRoutePrefix/email-verification-code"
+  private val resendControllerEndpoint = s"$registrationFrontendRoutePrefix/request-new-code"
   private val getJourneyDataUrl = s"/disa-registration/store/$testGroupId"
 
   val testSectionAnswers = OrganisationEmail(Some(testEmail), Some(false))
@@ -132,7 +134,7 @@ class EmailVerificationCodeControllerISpec extends BaseIntegrationSpec with Comm
       //Stub GRS
       stubGet(getJourneyDataUrl, OK, emailJourneyData)
       //Stub Connector
-      stubPost(verifyCodePath, INTERNAL_SERVER_ERROR, "")
+      stubPost(verifyCodePath, SERVICE_UNAVAILABLE, """{"result": "Service unavailable"}""")
       //Stub taskList update
       stubPost(updateTaskListJourneyUrl, NO_CONTENT, "")
 
@@ -140,6 +142,51 @@ class EmailVerificationCodeControllerISpec extends BaseIntegrationSpec with Comm
 
       val request =
         FakeRequest(POST, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody(form)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+    }
+
+  }
+
+  "POST /request-new-code" should {
+    "return 303 when the right code is submitted" in {
+      stubAuth()
+      //Stub GRS
+      stubGet(getJourneyDataUrl, OK, emailJourneyData)
+      //Stub Connector
+      stubPost(sendCodePath, OK, """{"result": "sent"}""")
+      //Stub taskList update
+      stubPost(updateTaskListJourneyUrl, NO_CONTENT, "")
+
+      val form = "value" -> testEmail
+
+      val request =
+        FakeRequest(POST, resendControllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody(form)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe SEE_OTHER
+    }
+
+    "return 500 when the right code is submitted but the service is unavailable" in {
+      stubAuth()
+      //Stub GRS
+      stubGet(getJourneyDataUrl, OK, emailJourneyData)
+      //Stub Connector
+      stubPost(sendCodePath, SERVICE_UNAVAILABLE, """{"result": "Service unavailable"}""")
+      //Stub taskList update
+      stubPost(updateTaskListJourneyUrl, NO_CONTENT, "")
+
+      val form = "value" -> testEmail
+
+      val request =
+        FakeRequest(POST, resendControllerEndpoint)
           .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
           .withFormUrlEncodedBody(form)
 

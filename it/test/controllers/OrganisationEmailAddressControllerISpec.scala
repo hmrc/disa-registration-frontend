@@ -94,7 +94,7 @@ class OrganisationEmailAddressControllerISpec extends BaseIntegrationSpec with C
       //Stub GRS
       stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       //Stub Connector
-      stubPost(sendCodePath, INTERNAL_SERVER_ERROR, "")
+      stubPost(sendCodePath, SERVICE_UNAVAILABLE, """{"result": "Service unavailable"}""")
       //Stub taskList Controller
       stubPost(updateTaskListJourneyUrl, NO_CONTENT, "")
 
