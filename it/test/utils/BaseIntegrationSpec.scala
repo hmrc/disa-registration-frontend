@@ -92,4 +92,18 @@ trait BaseIntegrationSpec
   implicit val mat: Materializer                  = app.injector.instanceOf[Materializer]
   implicit val ws: WSClient                       = app.injector.instanceOf[WSClient]
   implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+
+  val testEmail = "org@example.com"
+  val validGrsJourneyData: String =
+    s"""
+       |{
+       |  "groupId": "$testGroupId",
+       |  "enrolmentId": "$testString",
+       |  "businessVerification": {
+       |    "businessRegistrationPassed": true,
+       |    "businessVerificationPassed": true,
+       |    "ctutr": "1234567890"
+       |  }
+       |}
+       |""".stripMargin
 }

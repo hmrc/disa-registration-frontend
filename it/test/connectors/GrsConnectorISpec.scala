@@ -69,6 +69,23 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
 
       response shouldBe CreateJourneyResponse("http://localhost/start")
     }
+
+    "fail with UpstreamErrorResponse when GRS returns a 500" in {
+      stubPost(
+        "/partnership-identification/api/general-partnership-journey",
+        500,
+        """{ "message": "Create GRS journey failed - Status: 500, Body: Internal Server Error" }"""
+      )
+
+      val result = connector.createJourney(GrsCompanyType.GeneralPartnership, requestBody)
+
+      val exception = intercept[UpstreamErrorResponse] {
+        await(result)
+      }
+
+      exception.statusCode shouldBe 500
+      exception.message should include("reate GRS journey failed - Status: 500, Body:")
+    }
   }
 
   "GrsConnector.fetchJourneyData" should {
