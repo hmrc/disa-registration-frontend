@@ -93,6 +93,7 @@ trait BaseIntegrationSpec
   implicit val ws: WSClient                       = app.injector.instanceOf[WSClient]
   implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
+  val testEmail = "org@example.com"
   val validGrsJourneyData: String =
     s"""
        |{
