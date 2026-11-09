@@ -42,7 +42,7 @@ trait BaseIntegrationSpec
     with CommonStubs
     with TestData {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier             = HeaderCarrier()
   implicit lazy val messagesApi: MessagesApi =
     app.injector.instanceOf[MessagesApi]
 
@@ -55,21 +55,21 @@ trait BaseIntegrationSpec
 
   def config: Map[String, String] =
     Map(
-      "auditing.enabled"                -> "false",
-      "microservice.services.auth.host" -> wiremockHost,
-      "microservice.services.auth.port" -> wiremockPort.toString,
-      "microservice.services.disa-registration.host" -> wiremockHost,
-      "microservice.services.disa-registration.port" -> wiremockPort.toString,
-      "microservice.services.tax-enrolments.host" -> wiremockHost,
-      "microservice.services.tax-enrolments.port" -> wiremockPort.toString,
+      "auditing.enabled"                                                       -> "false",
+      "microservice.services.auth.host"                                        -> wiremockHost,
+      "microservice.services.auth.port"                                        -> wiremockPort.toString,
+      "microservice.services.disa-registration.host"                           -> wiremockHost,
+      "microservice.services.disa-registration.port"                           -> wiremockPort.toString,
+      "microservice.services.tax-enrolments.host"                              -> wiremockHost,
+      "microservice.services.tax-enrolments.port"                              -> wiremockPort.toString,
       "microservice.services.incorporated-entity-identification-frontend.host" -> wiremockHost,
       "microservice.services.incorporated-entity-identification-frontend.port" -> wiremockPort.toString,
-      "microservice.services.partnership-identification-frontend.host" -> wiremockHost,
-      "microservice.services.partnership-identification-frontend.port" -> wiremockPort.toString,
-      "microservice.services.address-lookup.host" -> wiremockHost,
-      "microservice.services.address-lookup.port" -> wiremockPort.toString,
-      "microservice.services.email-verification.host" -> wiremockHost,
-      "microservice.services.email-verification.port" -> wiremockPort.toString,
+      "microservice.services.partnership-identification-frontend.host"         -> wiremockHost,
+      "microservice.services.partnership-identification-frontend.port"         -> wiremockPort.toString,
+      "microservice.services.address-lookup.host"                              -> wiremockHost,
+      "microservice.services.address-lookup.port"                              -> wiremockPort.toString,
+      "microservice.services.email-verification.host"                          -> wiremockHost,
+      "microservice.services.email-verification.port"                          -> wiremockPort.toString
     )
 
   override def beforeAll(): Unit = {
@@ -93,7 +93,7 @@ trait BaseIntegrationSpec
   implicit val ws: WSClient                       = app.injector.instanceOf[WSClient]
   implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-  val testEmail = "org@example.com"
+  val testEmail                   = "org@example.com"
   val validGrsJourneyData: String =
     s"""
        |{
@@ -106,4 +106,14 @@ trait BaseIntegrationSpec
        |  }
        |}
        |""".stripMargin
+
+  val lookUpAddressResponse: String =
+    """[{
+       |  "id": "GB100023336956",
+       |  "address": {
+       |    "lines": ["1 Test Street"],
+       |    "town": "Testtown",
+       |    "postcode": "AB1 2CD"
+       |  }
+       |}]""".stripMargin
 }
