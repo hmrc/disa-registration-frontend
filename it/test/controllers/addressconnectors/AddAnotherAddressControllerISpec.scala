@@ -20,7 +20,7 @@ import models.journeydata.CorrespondenceAddress
 import org.jsoup.Jsoup
 import play.api.http.Status.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, POST, contentAsString, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
+import play.api.test.Helpers.{GET, POST, contentAsString, redirectLocation, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
 import uk.gov.hmrc.http.SessionKeys
 import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
@@ -79,6 +79,7 @@ class AddAnotherAddressControllerISpec extends BaseIntegrationSpec with CommonSt
 
       val result = route(app, request).get
       status(result) shouldBe SEE_OTHER
+      redirectLocation(result) should not be Some(controllers.routes.GrsStartController.onPageLoad().url)
     }
 
     "return 400 when the wrong data is submitted" in {

@@ -20,7 +20,7 @@ import models.journeydata.CorrespondenceAddress
 import org.jsoup.Jsoup
 import play.api.http.Status.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, POST, contentAsString, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
+import play.api.test.Helpers.{GET, POST, contentAsString, redirectLocation, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
 import uk.gov.hmrc.http.SessionKeys
 import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
@@ -34,28 +34,7 @@ class EnterYourOrganisationAddressControllerISep extends BaseIntegrationSpec wit
     CorrespondenceAddress(addressLine1 = Some("1 Test Street"), postCode = Some("AB1 2CD"), uprn = Some("100023336956"))
   val updateTaskListJourneyUrl   = s"/disa-registration/store/$testGroupId/organisationDetails"
 
-  val emailJourneyData: String =
-    s"""
-       |{
-       |  "groupId": "$testGroupId",
-       |  "enrolmentId": "$testString",
-       |  "businessVerification": {
-       |    "businessRegistrationPassed": true,
-       |    "businessVerificationPassed": true,
-       |    "ctutr": "1234567890"
-       |  },
-       |  "organisationDetails": {
-       |    "registeredToManageIsa": "no",
-       |    "tradingUsingDifferentName": "no",
-       |    "fcaNumber": "123456",
-       |    "registeredAddressCorrespondence": "no",
-       |    "correspondenceAddress": {
-       |      "addressLine1": "bhoooo",
-       |      "postCode": "AB1 23CD"
-       |    }
-       |  }
-       |}
-       |""".stripMargin
+  
 
   "GET /enter-your-organisation-address" should {
 
@@ -92,7 +71,7 @@ class EnterYourOrganisationAddressControllerISep extends BaseIntegrationSpec wit
     "return 303 when an address is submitted" in {
       stubAuth()
       // Stub GRS
-      stubGet(getJourneyDataUrl, OK, emailJourneyData)
+      stubGet(getJourneyDataUrl, OK, grsRegAddressOrgDetailsJourneyData)
       // Stub Connector
       stubPost(
         addressUrl,
@@ -110,12 +89,13 @@ class EnterYourOrganisationAddressControllerISep extends BaseIntegrationSpec wit
       val result = route(app, request).get
 
       status(result) shouldBe SEE_OTHER
+      redirectLocation(result) should not be Some(controllers.routes.GrsStartController.onPageLoad().url)
     }
 
     "return 500 when an address is submitted" in {
       stubAuth()
       // Stub GRS
-      stubGet(getJourneyDataUrl, OK, emailJourneyData)
+      stubGet(getJourneyDataUrl, OK, grsRegAddressOrgDetailsJourneyData)
       // Stub Connector
       stubPost(
         addressUrl,

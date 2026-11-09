@@ -109,11 +109,36 @@ trait BaseIntegrationSpec
 
   val lookUpAddressResponse: String =
     """[{
-       |  "id": "GB100023336956",
-       |  "address": {
-       |    "lines": ["1 Test Street"],
-       |    "town": "Testtown",
-       |    "postcode": "AB1 2CD"
+      |  "id": "100023336956",
+      |  "address": { "lines": ["1 Test Street"], "town": "Testtown", "postcode": "AB1 2CD" }
+      |}]""".stripMargin
+
+  val grsRegAddressOrgDetailsJourneyData: String =
+    s"""
+       |{
+       |  "groupId": "$testGroupId",
+       |  "enrolmentId": "$testString",
+       |  "businessVerification": {
+       |    "businessRegistrationPassed": true,
+       |    "businessVerificationPassed": true,
+       |    "ctutr": "1234567890",
+       |    "registeredAddress": {
+       |      "addressLine1": "1 Test Street",
+       |      "addressLine2": "Testtown",
+       |      "addressLine3": "Testshire",
+       |      "postCode": "AB1 2CD"
+       |    }
+       |  },
+       |  "organisationDetails": {
+       |    "registeredToManageIsa": "no",
+       |    "tradingUsingDifferentName": "no",
+       |    "fcaNumber": "123456",
+       |    "registeredAddressCorrespondence": "no",
+       |    "correspondenceAddress": {
+       |      "addressLine1": "bhoooo",
+       |      "postCode": "AB1 23CD"
+       |    }
        |  }
-       |}]""".stripMargin
+       |}
+       |""".stripMargin
 }
