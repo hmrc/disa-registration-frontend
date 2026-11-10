@@ -28,17 +28,20 @@ import viewmodels.implicits.*
 object RegisteredAddressCorrespondenceSummary {
 
   def row(answers: JourneyData)(implicit messages: Messages): Option[SummaryListRow] =
-    answers.organisationDetails.flatMap(_.registeredAddressCorrespondence).map { answer =>
-      SummaryListRowViewModel(
-        key = "registeredAddressCorrespondence.checkYourAnswersLabel",
-        value = ValueViewModel(s"site.$answer"),
-        actions = Seq(
-          ActionItemViewModel(
-            "site.change",
-            RegisteredAddressCorrespondenceController.onPageLoad(CheckMode, Some(OrganisationDetailsCya)).url
+    answers.businessVerification
+      .flatMap(_.registeredAddress)
+      .flatMap(_ => answers.organisationDetails.flatMap(_.registeredAddressCorrespondence))
+      .map { answer =>
+        SummaryListRowViewModel(
+          key = "registeredAddressCorrespondence.checkYourAnswersLabel",
+          value = ValueViewModel(s"site.$answer"),
+          actions = Seq(
+            ActionItemViewModel(
+              "site.change",
+              RegisteredAddressCorrespondenceController.onPageLoad(CheckMode, Some(OrganisationDetailsCya)).url
+            )
+              .withVisuallyHiddenText(messages("registeredAddressCorrespondence.change.hidden"))
           )
-            .withVisuallyHiddenText(messages("registeredAddressCorrespondence.change.hidden"))
         )
-      )
-    }
+      }
 }

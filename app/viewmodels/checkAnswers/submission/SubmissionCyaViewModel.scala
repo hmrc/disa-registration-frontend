@@ -83,7 +83,7 @@ object SubmissionCyaViewModel {
     val organisationDetails                       = answers.organisationDetails
     val correspondenceRow: Option[SummaryListRow] =
       organisationDetails.flatMap(_.registeredAddressCorrespondence) match {
-        case Some(No) =>
+        case answer if businessVerification.flatMap(_.registeredAddress).isEmpty || answer.contains(No) =>
           organisationDetails.flatMap(_.correspondenceAddress).flatMap { address =>
             addressRow(
               key = "submissionCya.correspondenceAddress.label",
@@ -92,7 +92,7 @@ object SubmissionCyaViewModel {
               hidden = Some("registeredAddressCorrespondence.change.hidden")
             )
           }
-        case _        =>
+        case _                                                                                          =>
           None
       }
 
@@ -141,14 +141,17 @@ object SubmissionCyaViewModel {
           hidden = "firmReferenceNumber.change.hidden"
         )
       },
-      organisationDetails.flatMap(_.registeredAddressCorrespondence).map { answer =>
-        changeRow(
-          key = "submissionCya.registeredAddressCorrespondence.label",
-          value = yesNo(answer),
-          href = RegisteredAddressCorrespondenceController.onPageLoad(CheckMode, returnTo).url,
-          hidden = "registeredAddressCorrespondence.change.hidden"
-        )
-      },
+      organisationDetails
+        .flatMap(_.registeredAddressCorrespondence)
+        .filter(_ => businessVerification.flatMap(_.registeredAddress).nonEmpty)
+        .map { answer =>
+          changeRow(
+            key = "submissionCya.registeredAddressCorrespondence.label",
+            value = yesNo(answer),
+            href = RegisteredAddressCorrespondenceController.onPageLoad(CheckMode, returnTo).url,
+            hidden = "registeredAddressCorrespondence.change.hidden"
+          )
+        },
       correspondenceRow,
       organisationDetails.flatMap(_.orgTelephoneNumber).map { answer =>
         changeRow(

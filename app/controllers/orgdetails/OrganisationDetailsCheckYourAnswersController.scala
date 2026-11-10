@@ -58,7 +58,10 @@ class OrganisationDetailsCheckYourAnswersController @Inject() (
           RegisteredAddressCorrespondenceSummary.row(jd),
           AddedCorrespondenceAddressSummary
             .row(jd)
-            .filter(_ => !orgDetails.flatMap(_.registeredAddressCorrespondence).contains(YesNoAnswer.Yes)),
+            .filter(_ =>
+              jd.businessVerification.flatMap(_.registeredAddress).isEmpty ||
+                !orgDetails.flatMap(_.registeredAddressCorrespondence).contains(YesNoAnswer.Yes)
+            ),
           OrganisationTelephoneNumberSummary.row(jd)
         ).flatten
 
