@@ -34,25 +34,8 @@ class PeerToPeerPlatformNumberControllerISpec extends BaseIntegrationSpec with C
   "GET /isa-products" should {
 
     "fetch data from the correct endpoint" in {
-      val testJourneyData =
-        s"""
-           |{
-           | "groupId": "$testGroupId",
-           | "enrolmentId": "$testString",
-           |  "businessVerification": {
-           |       "businessRegistrationPassed": true,
-           |       "businessVerificationPassed": true,
-           |       "ctutr": "1234567890"
-           |     },
-           | "isaProducts": {
-           |   "p2pPlatform": "platform",
-           |   "p2pPlatformNumber": "1234567"
-           | }
-           |}
-           |""".stripMargin
-
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubGet(getJourneyDataUrl, OK, isaProductsJourneyData)
 
       val request =
         FakeRequest(GET, controllerEndpoint)

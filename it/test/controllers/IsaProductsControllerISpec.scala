@@ -35,24 +35,8 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
   "GET /isa-products" should {
 
     "fetch data from the correct endpoint" in {
-      val journeyDataResponse =
-        s"""
-          |{
-          |    "groupId": "$testGroupId",
-          |    "enrolmentId": "$testString",
-          |    "businessVerification": {
-          |       "businessRegistrationPassed": true,
-          |       "businessVerificationPassed": true,
-          |       "ctutr": "1234567890"
-          |     },
-          |     "isaProducts": {
-          |       "isaProducts": ["cashJuniorIsas", "cashIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"]
-          |     }
-          |}
-          |""".stripMargin
-
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, journeyDataResponse)
+      stubGet(getJourneyDataUrl, OK, isaProductsJourneyData)
 
       val request =
         FakeRequest(GET, controllerEndpoint)

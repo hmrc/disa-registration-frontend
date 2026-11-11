@@ -34,24 +34,8 @@ class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonS
   "GET /peer-to-peer-loans" should {
 
     "fetch data from the correct endpoint" in {
-      val testJourneyData =
-        s"""
-           |{
-           | "groupId": "$testGroupId",
-           | "enrolmentId": "$testString",
-           | "businessVerification": {
-           |       "businessRegistrationPassed": true,
-           |       "businessVerificationPassed": true,
-           |       "ctutr": "1234567890"
-           |     },
-           | "isaProducts": {
-           |   "p2pPlatform": "platform"
-           | }
-           |}
-           |""".stripMargin
-
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubGet(getJourneyDataUrl, OK, isaProductsJourneyData)
 
       val request =
         FakeRequest(GET, controllerEndpoint)

@@ -141,4 +141,22 @@ trait BaseIntegrationSpec
        |  }
        |}
        |""".stripMargin
+
+  val isaProductsJourneyData: String =
+    s"""
+       |{
+       | "groupId": "$testGroupId",
+       | "enrolmentId": "$testString",
+       |  "businessVerification": {
+       |       "businessRegistrationPassed": true,
+       |       "businessVerificationPassed": true,
+       |       "ctutr": "1234567890"
+       |     },
+       | "isaProducts": {
+       |   "isaProducts": ["cashJuniorIsas", "cashIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"],
+       |   "p2pPlatform": "platform",
+       |   "p2pPlatformNumber": "1234567"
+       | }
+       |}
+       |""".stripMargin
 }

@@ -20,12 +20,12 @@ import models.journeydata.OrganisationEmail
 import org.jsoup.Jsoup
 import play.api.http.Status.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, POST, contentAsString, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
+import play.api.test.Helpers.{GET, POST, contentAsString, redirectLocation, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
 import uk.gov.hmrc.http.SessionKeys
 import utils.WiremockHelper.{stubGet, stubPost}
 import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
 
-class EmailVerificationCodeControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper  {
+class EmailVerificationCodeControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
 
   private val sendCodePath = "/email-verification/v2/send-code"
   private val verifyCodePath = "/email-verification/v2/verify-code"
@@ -106,6 +106,7 @@ class EmailVerificationCodeControllerISpec extends BaseIntegrationSpec with Comm
       val result = route(app, request).get
 
       status(result) shouldBe SEE_OTHER
+      redirectLocation(result) shouldBe Some(controllers.orgemail.routes.OrganisationEmailCyaController.onPageLoad().url)
     }
 
     "return 400 when the wrong code is submitted" in {
