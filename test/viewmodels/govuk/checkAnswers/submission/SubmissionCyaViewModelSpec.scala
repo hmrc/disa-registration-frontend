@@ -42,6 +42,20 @@ class SubmissionCyaViewModelSpec extends SpecBase {
 
   "SubmissionCyaViewModel" - {
 
+    for (answer <- Seq(None, Some(YesNoAnswer.Yes), Some(YesNoAnswer.No)))
+      s"must show correspondence address and omit the registered address question without a GRS address for $answer" in {
+        val jd        = populatedJourneyData.copy(
+          businessVerification = Some(testBV.copy(registeredAddress = None)),
+          organisationDetails =
+            populatedJourneyData.organisationDetails.map(_.copy(registeredAddressCorrespondence = answer))
+        )
+        val viewModel = SubmissionCyaViewModel(jd)
+        val keys      = viewModel.sections.flatMap(_.rows).map(_.key.content.asHtml.toString)
+        keys must contain(messages("submissionCya.correspondenceAddress.label"))
+        keys must not contain messages("submissionCya.registeredAddressCorrespondence.label")
+        actionHrefs(viewModel).exists(_.contains("registered-address-correspondence")) mustBe false
+      }
+
     "must not render empty sections" in {
       val viewModel = SubmissionCyaViewModel(emptyJourneyData)
 

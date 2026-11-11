@@ -98,6 +98,18 @@ class TaskListProgressSpec extends SpecBase {
         .exists(_.isComplete) mustBe true
     }
 
+    "must allow a skipped registered address question only with a populated correspondence address" in {
+      val details = completeTaskListOrganisationDetails.copy(
+        registeredAddressCorrespondence = None,
+        correspondenceAddress = Some(testCorrespondenceAddress)
+      )
+      details.isComplete mustBe true
+      details.copy(correspondenceAddress = None).isComplete mustBe false
+      details
+        .copy(correspondenceAddress = Some(models.journeydata.CorrespondenceAddress()))
+        .isComplete mustBe false
+    }
+
     "must be false when required organisation information is missing" in {
       Seq(
         completeTaskListOrganisationDetails.copy(registeredToManageIsa = None),

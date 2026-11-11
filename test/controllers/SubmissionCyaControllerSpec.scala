@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.journeydata.JourneyData
+import models.journeydata.{CorrespondenceAddress, JourneyData}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.Assistant

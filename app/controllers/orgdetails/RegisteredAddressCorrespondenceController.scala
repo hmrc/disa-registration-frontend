@@ -65,7 +65,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
         regAddr <- bv.registeredAddress
       } yield regAddr) match {
         case None =>
-          Redirect(controllers.routes.GrsStartController.onPageLoad())
+          Redirect(routes.AddAnotherAddressController.onPageLoad(mode, returnTo))
 
         case Some(registeredAddress) =>
           val preparedForm = request.journeyData
@@ -88,7 +88,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
 
       registeredAddress match {
         case None                    =>
-          Future.successful(Redirect(controllers.routes.GrsStartController.onPageLoad()))
+          Future.successful(Redirect(routes.AddAnotherAddressController.onPageLoad(mode, returnTo)))
         case Some(registeredAddress) =>
           form
             .bindFromRequest()
