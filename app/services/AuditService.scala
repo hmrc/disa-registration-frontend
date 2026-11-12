@@ -18,8 +18,8 @@ package services
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
+import models.audit.EnrolmentSubmittedEventPayload
 import models.journeydata.JourneyData
-import models.journeydata.JourneyData.auditWrites
 import models.requests.{DataRequest, IdentifierRequest}
 import models.submission.SubmissionResult
 import play.api.Logging
@@ -111,29 +111,25 @@ class AuditService @Inject() (
     journeyData: JourneyData,
     failureReason: Option[String]
   )(implicit hc: HeaderCarrier): Future[Unit] = {
-    implicit val payloadWrites: OWrites[JourneyData] = auditWrites
-    val baseData                                     = Json.obj(
-      EventData.providerType.toString         -> credentials.providerType,
-      EventData.credId.toString               -> credentials.providerId,
-      EventData.credentialRole.toString       -> credentialRole.toString,
-      EventData.submissionStatus.toString     -> status.toString,
-      EventData.numberLiasonOfficers.toString -> journeyData.liaisonOfficers.fold(0)(_.liaisonOfficers.size).toString,
-      EventData.numberSignatories.toString    -> journeyData.signatories.fold(0)(_.signatories.size).toString,
-      EventData.payload.toString              -> journeyData
+    val baseData = Json.obj(
+      EventData.providerType.toString           -> credentials.providerType,
+      EventData.internalRegistrationId.toString -> journeyData.enrolmentId,
+      EventData.credId.toString                 -> credentials.providerId,
+      EventData.credentialRole.toString         -> credentialRole.toString,
+      EventData.submissionStatus.toString       -> status.toString,
+      EventData.groupId.toString                -> journeyData.groupId,
+      EventData.groupName.toString              -> journeyData.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
+      EventData.numberLiaisonOfficers.toString  -> journeyData.liaisonOfficers.fold(0)(_.liaisonOfficers.size),
+      EventData.numberSignatories.toString      -> journeyData.signatories.fold(0)(_.signatories.size)
     )
-
-    val failureData: String => JsObject = reason =>
-      Json.obj(
-        EventData.groupId.toString                -> journeyData.groupId,
-        EventData.groupName.toString              -> journeyData.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
-        EventData.internalRegistrationId.toString -> journeyData.enrolmentId,
-        EventData.failureReason.toString          -> JsString(reason)
-      )
 
     val auditData: JsObject =
       failureReason match {
-        case Some(reason) => baseData - EventData.payload.toString ++ failureData(reason)
-        case _            => baseData
+        case Some(reason) => baseData ++ Json.obj(EventData.failureReason.toString -> reason)
+        case None         =>
+          baseData ++ Json.obj(
+            EventData.payload.toString -> EnrolmentSubmittedEventPayload.fromJourneyData(journeyData)
+          )
       }
 
     val event = createAuditEvent(EnrolmentSubmitted, auditData)
@@ -168,6 +164,6 @@ object AuditTypes extends Enumeration {
 object EventData extends Enumeration {
   type Data = Value
   val providerType, credId, credentialRole, groupId, submissionStatus, failureReason, payload, journeyType,
-    internalRegistrationId, continuingSection, startEnrolment, continueEnrolment, groupName, numberLiasonOfficers,
+    internalRegistrationId, continuingSection, startEnrolment, continueEnrolment, groupName, numberLiaisonOfficers,
     numberSignatories = Value
 }

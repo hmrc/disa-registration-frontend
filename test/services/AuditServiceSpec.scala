@@ -110,9 +110,11 @@ class AuditServiceSpec extends SpecBase {
       (detail \ EventData.providerType.toString).as[String] mustEqual testString
       (detail \ EventData.credentialRole.toString).as[String] mustEqual credentialRole.toString
       (detail \ EventData.submissionStatus.toString).as[String] mustEqual SubmissionResult.Success.toString
-      (detail \ EventData.numberLiasonOfficers.toString).as[String] mustEqual "1"
-      (detail \ EventData.numberSignatories.toString).as[String] mustEqual "1"
-      (detail \ EventData.payload.toString \ EventData.groupName.toString).as[String] mustEqual "unknown"
+      (detail \ EventData.internalRegistrationId.toString).as[String] mustEqual testJourneyData.enrolmentId
+      (detail \ EventData.groupId.toString).as[String] mustEqual testJourneyData.groupId
+      (detail \ EventData.groupName.toString).as[String] mustEqual "unknown"
+      (detail \ EventData.numberLiaisonOfficers.toString).as[Int] mustEqual 1
+      (detail \ EventData.numberSignatories.toString).as[Int] mustEqual 1
 
       (detail \ EventData.payload.toString).toOption.isDefined mustEqual true
 
@@ -140,7 +142,7 @@ class AuditServiceSpec extends SpecBase {
 
       val detail = event.detail.as[JsObject]
 
-      (detail \ EventData.payload.toString \ EventData.groupName.toString).as[String] mustEqual testString
+      (detail \ EventData.groupName.toString).as[String] mustEqual testString
     }
 
     "must include subscriptionId in the payload when formBundleId is present" in {
@@ -188,6 +190,9 @@ class AuditServiceSpec extends SpecBase {
       val detail = event.detail.as[JsObject]
 
       (detail \ EventData.failureReason.toString).as[String] mustEqual reason
+      (detail \ EventData.groupId.toString).as[String] mustEqual jd.groupId
+      (detail \ EventData.internalRegistrationId.toString).as[String] mustEqual jd.enrolmentId
+      (detail \ EventData.payload.toString).toOption mustEqual None
     }
 
     "must not include failureReason when status is Failure but no reason is provided" in {

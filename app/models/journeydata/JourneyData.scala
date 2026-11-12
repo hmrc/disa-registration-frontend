@@ -21,7 +21,7 @@ import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.ThirdPartyOrganisations
-import play.api.libs.json.{Format, Json, OWrites}
+import play.api.libs.json.{Format, Json}
 
 case class JourneyData(
   groupId: String,
@@ -41,22 +41,4 @@ case class JourneyData(
 
 object JourneyData {
   implicit val format: Format[JourneyData] = Json.format[JourneyData]
-
-  val auditWrites: OWrites[JourneyData] = OWrites[JourneyData] { jd =>
-    Json.obj(
-      "groupId"                      -> jd.groupId,
-      "groupName"                    -> jd.businessVerification.flatMap(_.companyName).getOrElse("unknown"),
-      "internalRegistrationId"       -> jd.enrolmentId,
-      "subscriptionId"               -> jd.formBundleId,
-      "organisationDetails"          -> jd.organisationDetails,
-      "organisationEmail"            -> jd.organisationEmail,
-      "isaProducts"                  -> jd.isaProducts,
-      "certificatesOfAuthority"      -> jd.certificatesOfAuthority,
-      "liaisonOfficers"              -> jd.liaisonOfficers,
-      "signatories"                  -> jd.signatories,
-      "outsourcedAdministration"     -> jd.outsourcedAdministration,
-      "feesCommissionsAndIncentives" -> jd.feesCommissionsAndIncentives,
-      "thirdPartyOrganisations"      -> jd.thirdPartyOrganisations
-    )
-  }
 }
