@@ -95,7 +95,9 @@ class EnrolmentSubmittedEventPayloadSpec extends AnyFreeSpec with Matchers {
       )
     ),
     signatories = Some(
-      Signatories(Seq(Signatory(id = "signatory-1", fullName = Some("John Doe"), jobTitle = Some("Compliance Manager"))))
+      Signatories(
+        Seq(Signatory(id = "signatory-1", fullName = Some("John Doe"), jobTitle = Some("Compliance Manager")))
+      )
     ),
     thirdPartyOrganisations = Some(
       ThirdPartyOrganisations(
@@ -129,7 +131,7 @@ class EnrolmentSubmittedEventPayloadSpec extends AnyFreeSpec with Matchers {
     "must write every section of a completed journey in the audit format" in {
       payloadJson(fullJourneyData) mustBe Json.obj(
         "subscriptionId"            -> "XMADP0000000208",
-        "groupType"                 -> "Limited company",
+        "groupType"                 -> "limitedCompany",
         "isaManagerProviderDetails" -> Json.obj(
           "existingManager"           -> "Yes",
           "zReference"                -> "Z1234",

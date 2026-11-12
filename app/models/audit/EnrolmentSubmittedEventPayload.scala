@@ -17,7 +17,6 @@
 package models.audit
 
 import models.YesNoAnswer
-import models.grs.GrsCompanyType
 import models.journeydata.certificatesofauthority.{CertificatesOfAuthority, CertificatesOfAuthorityYesNo, FinancialOrganisation}
 import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication}
@@ -43,7 +42,7 @@ object EnrolmentSubmittedEventPayload {
   def fromJourneyData(journeyData: JourneyData): EnrolmentSubmittedEventPayload =
     EnrolmentSubmittedEventPayload(
       subscriptionId = journeyData.formBundleId,
-      groupType = journeyData.businessVerification.flatMap(_.companyType).map(groupType),
+      groupType = journeyData.businessVerification.flatMap(_.companyType).map(_.toString),
       isaManagerProviderDetails = journeyData.organisationDetails.map(IsaManagerProviderDetails.from),
       orgEmailAddress = journeyData.organisationEmail.flatMap(_.organisationEmail),
       liaisonOfficers = journeyData.liaisonOfficers.map(_.liaisonOfficers.map(LiaisonOfficerDetail.from)),
@@ -52,20 +51,6 @@ object EnrolmentSubmittedEventPayload {
       certificateAuthority = journeyData.certificatesOfAuthority.map(CertificateAuthorityDetail.from),
       furtherInformation = journeyData.thirdPartyOrganisations.map(FurtherInformation.from)
     )
-
-  // Fixed English labels, so the audit event doesn't change if the page content is reworded.
-  private def groupType(companyType: GrsCompanyType): String =
-    companyType match {
-      case GrsCompanyType.LimitedCompany                 => "Limited company"
-      case GrsCompanyType.EuropeanInstitutionWithAUkBase => "European institution with a UK base"
-      case GrsCompanyType.IncorporatedFriendlySociety    => "Incorporated friendly society"
-      case GrsCompanyType.RegisteredFriendlySociety      => "Registered friendly society"
-      case GrsCompanyType.GeneralPartnership             => "General partnership"
-      case GrsCompanyType.ScottishPartnership            => "Scottish partnership"
-      case GrsCompanyType.ScottishLimitedPartnership     => "Scottish limited partnership"
-      case GrsCompanyType.LimitedPartnership             => "Limited partnership"
-      case GrsCompanyType.LimitedLiabilityPartnership    => "Limited liability partnership"
-    }
 
   private[audit] def yesNo(answer: YesNoAnswer): String =
     answer match {
