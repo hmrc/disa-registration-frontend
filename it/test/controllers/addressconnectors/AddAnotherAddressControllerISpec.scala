@@ -16,6 +16,7 @@
 
 package controllers.addressconnectors
 
+import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, matchingJsonPath, postRequestedFor, urlEqualTo, verify}
 import models.journeydata.CorrespondenceAddress
 import org.jsoup.Jsoup
 import play.api.http.Status.*
@@ -79,7 +80,17 @@ class AddAnotherAddressControllerISpec extends BaseIntegrationSpec with CommonSt
 
       val result = route(app, request).get
       status(result) shouldBe SEE_OTHER
-      redirectLocation(result) should not be Some(controllers.routes.GrsStartController.onPageLoad().url)
+      redirectLocation(result) shouldBe Some(controllers.orgdetails.routes.ConfirmCorrespondenceAddressController.onPageLoad().url)
+      verify(
+        1,
+        postRequestedFor(urlEqualTo(updateTaskListJourneyUrl))
+          .withRequestBody(
+            matchingJsonPath("$.correspondenceAddress.addressLine1", equalTo("1 Test Street"))
+          )
+          .withRequestBody(
+            matchingJsonPath("$.correspondenceAddress.postCode", equalTo("AB1 2CD"))
+          )
+      )
     }
 
     "return 400 when the wrong data is submitted" in {
