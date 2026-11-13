@@ -16,8 +16,8 @@
 
 package viewmodels.checkAnswers.submission
 
-import controllers.certificatesofauthority.routes.{CertificatesOfAuthorityYesNoController, FcaArticlesController, FinancialOrganisationController}
-import controllers.isaproducts.routes.{InnovativeFinancialProductsController, IsaProductsController, PeerToPeerPlatformController, PeerToPeerPlatformNumberController}
+import controllers.certificatesofauthority.routes.*
+import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.AddedLiaisonOfficersController
 import controllers.orgdetails.routes.*
 import controllers.orgemail.routes.OrganisationEmailAddressController
@@ -25,13 +25,13 @@ import controllers.signatories.routes.AddedSignatoryController
 import models.ReturnTo.SubmissionCya
 import models.YesNoAnswer.No
 import models.journeydata.thirdparty.ThirdParty
-import models.journeydata.{CorrespondenceAddress, JourneyData, RegisteredAddress}
-import models.{CheckMode, ReturnTo, YesNoAnswer}
+import models.journeydata.*
+import models.*
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow, Value}
-import viewmodels.checkAnswers.liaisonofficers.{LiaisonOfficerCommunicationSummary, LiaisonOfficerEmailSummary, LiaisonOfficerNameSummary, LiaisonOfficerPhoneNumberSummary}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import viewmodels.checkAnswers.liaisonofficers.*
 import viewmodels.checkAnswers.signatories.{SignatoryJobTitleSummary, SignatoryNameSummary}
 import viewmodels.checkAnswers.thirdparty.finalcya.*
 import viewmodels.govuk.summarylist.*

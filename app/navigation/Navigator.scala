@@ -37,12 +37,12 @@ import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.ThirdPartyOrganisations
 import models.journeydata.{OrganisationDetails, TaskListSection}
 import pages.*
-import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
-import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
+import pages.certificatesofauthority.*
+import pages.isaproducts.*
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.orgemail.*
-import pages.signatories.{RemoveSignatoryPage, SignatoryJobTitlePage, SignatoryNamePage}
+import pages.signatories.*
 import pages.thirdparty.*
 import play.api.mvc.Call
 

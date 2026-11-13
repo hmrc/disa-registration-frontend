@@ -20,11 +20,11 @@ import controllers.actions.*
 import models.journeydata.JourneyData
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, RequestHeader}
+import play.api.mvc.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.*
-import viewmodels.checkAnswers.isaproducts.{InnovativeFinancialProductsSummary, IsaProductsSummary, PeerToPeerPlatformNumberSummary, PeerToPeerPlatformSummary}
+import viewmodels.checkAnswers.isaproducts.*
 import viewmodels.govuk.summarylist.*
 import views.html.isaproducts.IsaProductsCheckYourAnswersView
 

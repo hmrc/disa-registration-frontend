@@ -16,7 +16,7 @@
 
 package models.grs
 
-import play.api.libs.json.{Format, JsResult, JsString, JsValue}
+import play.api.libs.json.*
 
 sealed trait BusinessRegistrationStatus
 

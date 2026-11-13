@@ -22,7 +22,7 @@ import controllers.orgdetails.routes.*
 import forms.ChooseAddressFormProvider
 import models.NormalMode
 import models.addresslookup.LookupAddress
-import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
+import models.journeydata.*
 import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}

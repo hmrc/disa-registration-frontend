@@ -18,7 +18,7 @@ package viewmodels
 
 import base.SpecBase
 import config.FrontendAppConfig
-import controllers.signatories.routes.{RemoveSignatoryController, SignatoryCheckYourAnswersController, SignatoryNameController}
+import controllers.signatories.routes.*
 import models.NormalMode
 import models.journeydata.signatories.Signatory
 import org.jsoup.Jsoup

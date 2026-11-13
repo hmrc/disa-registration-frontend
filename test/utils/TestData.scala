@@ -18,13 +18,13 @@ package utils
 
 import generators.Generators
 import models.YesNoAnswer
-import models.journeydata.{BusinessVerification, CorrespondenceAddress, JourneyData, OrganisationDetails, OrganisationEmail, RegisteredAddress}
+import models.journeydata.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.certificatesofauthority.FcaArticles.Article14
 import models.journeydata.certificatesofauthority.FinancialOrganisation.EuropeanInstitution
 import models.journeydata.isaproducts.IsaProduct.CashIsas
-import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import models.journeydata.isaproducts.*
 import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.ByEmail
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.signatories.{Signatories, Signatory}

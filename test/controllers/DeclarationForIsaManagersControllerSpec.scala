@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import controllers.routes.TaskListController
 import models.journeydata.isaproducts.IsaProduct
-import models.journeydata.isaproducts.IsaProduct.{CashIsas, CashJuniorIsas, StocksAndShareJuniorIsas, StocksAndSharesIsas}
+import models.journeydata.isaproducts.IsaProduct.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verify, when}
 import play.api.inject.bind
@@ -74,7 +74,7 @@ class DeclarationForIsaManagersControllerSpec extends SpecBase {
           val request = FakeRequest(GET, routes.DeclarationForIsaManagersController.onPageLoad().url)
           val result  = route(application, request).value
 
-          status(result) mustEqual 303
+          status(result) mustEqual SEE_OTHER
           redirectLocation(result) mustBe Some(TaskListController.onPageLoad().url)
         }
       }

@@ -20,7 +20,7 @@ import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.checkAnswers.isaproducts.{InnovativeFinancialProductsSummary, IsaProductsSummary, PeerToPeerPlatformNumberSummary, PeerToPeerPlatformSummary}
+import viewmodels.checkAnswers.isaproducts.*
 import viewmodels.govuk.SummaryListFluency
 import views.html.isaproducts.IsaProductsCheckYourAnswersView
 

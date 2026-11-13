@@ -18,7 +18,7 @@ package viewmodels.govuk.checkAnswers.liaisonofficers
 
 import base.SpecBase
 import config.FrontendAppConfig
-import controllers.liaisonofficers.routes.{LiaisonOfficerNameController, LoCheckYourAnswersController, RemoveLiaisonOfficerController}
+import controllers.liaisonofficers.routes.*
 import forms.YesNoAnswerFormProvider
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication}
 import models.{NormalMode, YesNoAnswer}

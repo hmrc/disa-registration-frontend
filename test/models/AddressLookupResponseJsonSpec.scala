@@ -16,7 +16,7 @@
 
 package models
 
-import models.addresslookup.{AddressLookupAddress, AddressLookupCountry, AddressLookupResponse}
+import models.addresslookup.*
 import play.api.libs.json.*
 import utils.JsonFormatSpec
 

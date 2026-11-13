@@ -20,16 +20,16 @@ import controllers.certificatesofauthority.routes.{CoaCheckYourAnswersController
 import controllers.isaproducts.routes.{IsaProductsCheckYourAnswersController, IsaProductsController}
 import controllers.liaisonofficers.routes.{AddedLiaisonOfficersController, LiaisonOfficerNameController}
 import controllers.orgdetails.routes.{OrganisationDetailsCheckYourAnswersController, RegisteredIsaManagerController}
-import controllers.orgemail.routes.{EmailVerificationCodeController, OrganisationEmailAddressController, OrganisationEmailCyaController}
+import controllers.orgemail.routes.*
 import controllers.routes.SubmissionCyaController
 import controllers.signatories.routes.{AddedSignatoryController, SignatoryNameController}
-import controllers.thirdparty.routes.{AddedThirdPartiesController, ProductsManagedByThirdPartyController, ThirdPartiesCheckYourAnswersController}
+import controllers.thirdparty.routes.*
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.ThirdPartyOrganisations
-import models.journeydata.{DeclareAndSubmit, JourneyData, OrganisationDetails, OrganisationEmail, TaskListProgress}
+import models.journeydata.*
 import models.{CheckMode, NormalMode}
 import play.api.mvc.Call
 import uk.gov.hmrc.auth.core.CredentialRole

@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions.IdentifierAction
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.InternalServerErrorView
 

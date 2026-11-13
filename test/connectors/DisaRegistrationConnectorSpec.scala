@@ -24,9 +24,10 @@ import models.submission.EnrolmentSubmissionResponse
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.should.Matchers.shouldBe
+import play.api.http.Status.{NOT_FOUND, NO_CONTENT, UNAUTHORIZED}
 import play.api.inject
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.*
 
 import scala.concurrent.Future
 
@@ -72,8 +73,8 @@ class DisaRegistrationConnectorSpec extends SpecBase {
       "return None on a Not Found response" in new TestSetup {
         val upstreamErrorResponse: UpstreamErrorResponse = UpstreamErrorResponse(
           message = "Not found",
-          statusCode = 404,
-          reportAs = 404,
+          statusCode = NOT_FOUND,
+          reportAs = NOT_FOUND,
           headers = Map.empty
         )
 
@@ -88,8 +89,8 @@ class DisaRegistrationConnectorSpec extends SpecBase {
       "propagate UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
         val upstreamErrorResponse: UpstreamErrorResponse = UpstreamErrorResponse(
           message = "Not authorised to access this service",
-          statusCode = 401,
-          reportAs = 401,
+          statusCode = UNAUTHORIZED,
+          reportAs = UNAUTHORIZED,
           headers = Map.empty
         )
         when(mockRequestBuilder.execute[JourneyData](any(), any()))
@@ -130,8 +131,8 @@ class DisaRegistrationConnectorSpec extends SpecBase {
       "propagate UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
         val upstreamErrorResponse: UpstreamErrorResponse = UpstreamErrorResponse(
           message = "Not authorised to access this service",
-          statusCode = 401,
-          reportAs = 401,
+          statusCode = UNAUTHORIZED,
+          reportAs = UNAUTHORIZED,
           headers = Map.empty
         )
 
@@ -157,7 +158,7 @@ class DisaRegistrationConnectorSpec extends SpecBase {
 
       "return Unit on successful call" in new TestSetup {
         val mockHttpResponse: HttpResponse = HttpResponse(
-          status = 204,
+          status = NO_CONTENT,
           headers = Map.empty
         )
 
@@ -174,8 +175,8 @@ class DisaRegistrationConnectorSpec extends SpecBase {
       "return UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
         val upstreamErrorResponse: UpstreamErrorResponse = UpstreamErrorResponse(
           message = "Not authorised to access this service",
-          statusCode = 401,
-          reportAs = 401,
+          statusCode = UNAUTHORIZED,
+          reportAs = UNAUTHORIZED,
           headers = Map.empty
         )
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
@@ -218,8 +219,8 @@ class DisaRegistrationConnectorSpec extends SpecBase {
       "propagate UpstreamErrorResponse when the call to DISA Registration fails with an UpstreamErrorResponse" in new TestSetup {
         val upstreamErrorResponse: UpstreamErrorResponse = UpstreamErrorResponse(
           message = "Not authorised to access this service",
-          statusCode = 401,
-          reportAs = 401,
+          statusCode = UNAUTHORIZED,
+          reportAs = UNAUTHORIZED,
           headers = Map.empty
         )
 

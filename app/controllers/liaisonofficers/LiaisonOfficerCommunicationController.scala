@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes.TaskListController
 import forms.LiaisonOfficerCommunicationFormProvider
 import handlers.ErrorHandler
-import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication, LiaisonOfficers}
+import models.journeydata.liaisonofficers.*
 import models.requests.DataRequest
 import models.{Mode, ReturnTo}
 import navigation.Navigator
@@ -28,7 +28,7 @@ import pages.liaisonofficers.LiaisonOfficerCommunicationPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.*
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.liaisonofficers.LiaisonOfficerCommunicationView

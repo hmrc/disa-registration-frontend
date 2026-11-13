@@ -17,7 +17,7 @@
 package models.journeydata.orgdetails
 
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.{Address, ManualEntry}
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.*
 import utils.JsonFormatSpec
 
 class SelectedCorrespondenceAddressSpec extends JsonFormatSpec[SelectedCorrespondenceAddress] {

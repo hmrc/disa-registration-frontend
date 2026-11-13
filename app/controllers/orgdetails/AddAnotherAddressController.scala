@@ -22,13 +22,13 @@ import handlers.ErrorHandler
 import models.addresslookup.LookupAddress
 import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import models.journeydata.{CorrespondenceAddress, OrganisationDetails}
-import models.{Mode, NormalMode, ReturnTo}
+import models.*
 import navigation.Navigator
 import pages.organisationdetails.AddAnotherAddressPage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.*
 import services.{AddressLookupService, JourneyAnswersService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.orgdetails.AddAnotherAddressView

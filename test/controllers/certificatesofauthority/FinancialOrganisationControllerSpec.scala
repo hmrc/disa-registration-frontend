@@ -26,7 +26,7 @@ import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import views.html.certificatesofauthority.FinancialOrganisationView
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{atMostOnce, verify, when}
+import org.mockito.Mockito.*
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes

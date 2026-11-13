@@ -25,7 +25,7 @@ import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.checkAnswers.thirdparty.*
-import viewmodels.checkAnswers.thirdparty.finalcya.{InvestorFundsUsedByThirdPartySummary, ThirdPartyInvestorFundsPercentageSummary, ThirdPartyManagingReturnsSummary, ThirdPartyOrgDetailsSummary}
+import viewmodels.checkAnswers.thirdparty.finalcya.*
 import viewmodels.govuk.summarylist.*
 import views.html.thirdparty.ThirdPartyCheckYourAnswersView
 

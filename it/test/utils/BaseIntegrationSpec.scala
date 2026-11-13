@@ -43,6 +43,7 @@ trait BaseIntegrationSpec
     with TestData {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
+  protected val callAmountWithRetries: Int = 4
   implicit lazy val messagesApi: MessagesApi =
     app.injector.instanceOf[MessagesApi]
 
@@ -51,6 +52,7 @@ trait BaseIntegrationSpec
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure(config)
+    .configure("http-verbs.retries.intervals" -> Seq("1ms", "1ms", "1ms"))
     .build()
 
   def config: Map[String, String] =

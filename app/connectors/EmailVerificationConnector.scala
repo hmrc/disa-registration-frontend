@@ -16,14 +16,17 @@
 
 package connectors
 
+import com.typesafe.config.Config
 import config.FrontendAppConfig
-import models.emailverification.{SendEmailVerificationCodeRequest, VerifyEmailCodeRequest, VerifyEmailCodeResult}
+import models.emailverification.*
+import org.apache.pekko.actor.ActorSystem
 import play.api.Logging
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
+import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 
 import javax.inject.Inject
@@ -31,74 +34,83 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class EmailVerificationConnector @Inject() (
   httpClient: HttpClientV2,
-  appConfig: FrontendAppConfig
+  appConfig: FrontendAppConfig,
+  override protected val actorSystem: ActorSystem,
+  configurationProvider: Configuration
 )(implicit ec: ExecutionContext)
-    extends Logging {
+    extends BaseConnector
+    with Logging {
+
+  override protected val configuration: Config = configurationProvider.underlying
 
   def sendCode(email: String)(implicit hc: HeaderCarrier): Future[Unit] = {
     val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/v2/send-code"
 
-    httpClient
-      .post(url"$url")
-      .withBody(Json.toJson(SendEmailVerificationCodeRequest(email)))
-      .execute[HttpResponse]
-      .map { response =>
-        response.status match {
-          case OK =>
-            ()
+    retryFor[Unit]("POST Email Verification send code")(retryCondition) {
+      httpClient
+        .post(url"$url")
+        .withBody(Json.toJson(SendEmailVerificationCodeRequest(email)))
+        .execute[HttpResponse]
+        .map { response =>
+          response.status match {
+            case OK =>
+              ()
 
-          case status =>
-            val msg = upstreamErrorMessage(
-              endpoint = "POST /v2/send-code",
-              status = response.status,
-              body = response.body
-            )
-            logger.error(msg)
-            throw UpstreamErrorResponse(
-              message = msg,
-              statusCode = response.status,
-              reportAs = INTERNAL_SERVER_ERROR
-            )
+            case status =>
+              val msg = upstreamErrorMessage(
+                endpoint = "POST /v2/send-code",
+                status = response.status,
+                body = response.body
+              )
+              logger.error(msg)
+              throw UpstreamErrorResponse(
+                message = msg,
+                statusCode = response.status,
+                reportAs = INTERNAL_SERVER_ERROR
+              )
+          }
         }
-      }
+    }
   }
 
   def verifyCode(email: String, code: String)(implicit hc: HeaderCarrier): Future[VerifyEmailCodeResult] = {
     val url = s"${appConfig.emailVerificationBaseUrl}/email-verification/v2/verify-code"
 
-    httpClient
-      .post(url"$url")
-      .withBody(Json.toJson(VerifyEmailCodeRequest(email, code)))
-      .execute[HttpResponse]
-      .map { response =>
-        response.status match {
-          case OK =>
-            VerifyEmailCodeResult.Verified
+    retryFor[VerifyEmailCodeResult]("POST Email Verification verify code")(retryCondition) {
+      httpClient
+        .post(url"$url")
+        .withBody(Json.toJson(VerifyEmailCodeRequest(email, code)))
+        .execute[HttpResponse]
+        .map { response =>
+          response.status match {
+            case OK =>
+              VerifyEmailCodeResult.Verified
 
-          case status if status >= 400 && status < 500 =>
-            logger.warn(
-              upstreamErrorMessage(
+            case status if status >= BAD_REQUEST && status < INTERNAL_SERVER_ERROR =>
+              logger.warn(
+                upstreamErrorMessage(
+                  endpoint = "POST /v2/verify-code",
+                  status = response.status,
+                  body = response.body
+                )
+              )
+              VerifyEmailCodeResult.InvalidCode
+
+            case _ =>
+              val msg = upstreamErrorMessage(
                 endpoint = "POST /v2/verify-code",
                 status = response.status,
                 body = response.body
               )
-            )
-            VerifyEmailCodeResult.InvalidCode
-
-          case _ =>
-            val msg = upstreamErrorMessage(
-              endpoint = "POST /v2/verify-code",
-              status = response.status,
-              body = response.body
-            )
-            logger.error(msg)
-            throw UpstreamErrorResponse(
-              message = msg,
-              statusCode = response.status,
-              reportAs = INTERNAL_SERVER_ERROR
-            )
+              logger.error(msg)
+              throw UpstreamErrorResponse(
+                message = msg,
+                statusCode = response.status,
+                reportAs = INTERNAL_SERVER_ERROR
+              )
+          }
         }
-      }
+    }
   }
 
   private def upstreamErrorMessage(endpoint: String, status: Int, body: String): String =

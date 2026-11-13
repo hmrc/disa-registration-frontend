@@ -17,18 +17,17 @@
 package viewmodels.tasklist
 
 import controllers.routes.TaskListController
-import models.journeydata.{JourneyData, TaskListProgress}
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.ThirdPartyOrganisations
-import models.journeydata.{DeclareAndSubmit, OrganisationDetails, OrganisationEmail}
+import models.journeydata.*
 import play.api.i18n.Messages
 import uk.gov.hmrc.auth.core.{CredentialRole, User}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Empty, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
-import uk.gov.hmrc.govukfrontend.views.viewmodels.tasklist.{TaskList, TaskListItem, TaskListItemStatus, TaskListItemTitle}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.tasklist.*
 
 case class TaskListStatus(content: String, tagClass: Option[String] = None) {
   def toGovuk: TaskListItemStatus =

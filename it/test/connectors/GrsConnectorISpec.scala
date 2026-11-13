@@ -16,8 +16,10 @@
 
 package connectors
 
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import models.grs.*
 import models.journeydata.RegisteredAddress
+import play.api.http.Status.{CREATED, NOT_FOUND, OK, SERVICE_UNAVAILABLE}
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.BaseIntegrationSpec
@@ -26,6 +28,19 @@ import utils.WiremockHelper.{stubGet, stubPost}
 import java.time.LocalDate
 
 class GrsConnectorISpec extends BaseIntegrationSpec {
+
+  private val journeyStartUrl            = "http://localhost/start"
+  private val serviceUnavailableMessage = "Service unavailable"
+  private val testCompanyName            = "Test Company Ltd"
+  private val testCompanyNumber          = "01234567"
+  private val testTaxIdentifier           = "1234567890"
+  private val testBusinessPartnerId      = "X00000123456789"
+  private val testPostcode               = "AA11AA"
+  private val testAddressLine1            = "testLine1"
+  private val testAddressLine2            = "test town"
+  private val testAddressLine3            = "test city"
+  private val registeredStatus            = "REGISTERED"
+  private val passedVerificationStatus    = "PASS"
 
   override def config: Map[String, String] =
     super.config ++ Map(
@@ -49,25 +64,35 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
     "POST to the incorporated-entity-identification create journey URL for an incorporated entity company type" in {
       stubPost(
         "/incorporated-entity-identification/api/limited-company-journey",
-        201,
-        """{ "journeyStartUrl": "http://localhost/start" }"""
+        CREATED,
+        s"""{ "journeyStartUrl": "$journeyStartUrl" }"""
       )
 
       val response = await(connector.createJourney(GrsCompanyType.LimitedCompany, requestBody))
 
-      response shouldBe CreateJourneyResponse("http://localhost/start")
+      response shouldBe CreateJourneyResponse(journeyStartUrl)
     }
 
     "POST to the partnership-identification create journey URL for a partnership company type" in {
       stubPost(
         "/partnership-identification/api/general-partnership-journey",
-        201,
-        """{ "journeyStartUrl": "http://localhost/start" }"""
+        CREATED,
+        s"""{ "journeyStartUrl": "$journeyStartUrl" }"""
       )
 
       val response = await(connector.createJourney(GrsCompanyType.GeneralPartnership, requestBody))
 
-      response shouldBe CreateJourneyResponse("http://localhost/start")
+      response shouldBe CreateJourneyResponse(journeyStartUrl)
+    }
+
+    "retry when the backend returns a 5xx response" in {
+      val path = "/incorporated-entity-identification/api/limited-company-journey"
+      stubPost(path, SERVICE_UNAVAILABLE, serviceUnavailableMessage)
+
+      val ex = await(connector.createJourney(GrsCompanyType.LimitedCompany, requestBody).failed)
+
+      ex shouldBe a[UpstreamErrorResponse]
+      verify(callAmountWithRetries, postRequestedFor(urlEqualTo(path)))
     }
   }
 
@@ -79,55 +104,55 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
       val fetchJourneyUrl = s"/incorporated-entity-identification/api/journey/$testJourneyId"
 
       val testGRSJsonResponse =
-        """
+        s"""
           |{
           |  "companyProfile": {
-          |    "companyName": "Test Company Ltd",
-          |    "companyNumber": "01234567",
+          |    "companyName": "$testCompanyName",
+          |    "companyNumber": "$testCompanyNumber",
           |    "dateOfIncorporation": "2020-01-01",
           |    "unsanitisedCHROAddress": {
-          |      "address_line_1":"testLine1",
-          |      "address_line_2":"test town",
+          |      "address_line_1":"$testAddressLine1",
+          |      "address_line_2":"$testAddressLine2",
           |      "care_of":"test name",
           |      "country":"United Kingdom",
-          |      "locality":"test city",
+          |      "locality":"$testAddressLine3",
           |      "po_box":"123",
-          |      "postal_code":"AA11AA",
+          |      "postal_code":"$testPostcode",
           |      "premises":"1",
           |      "region":"test region"
           |    }
           |  },
           |  "identifiersMatch": true,
           |  "registration": {
-          |    "registrationStatus": "REGISTERED",
-          |    "registeredBusinessPartnerId": "X00000123456789"
+          |    "registrationStatus": "$registeredStatus",
+          |    "registeredBusinessPartnerId": "$testBusinessPartnerId"
           |  },
-          |  "ctutr": "1234567890",
+          |  "ctutr": "$testTaxIdentifier",
           |  "businessVerification": {
-          |    "verificationStatus": "PASS"
+          |    "verificationStatus": "$passedVerificationStatus"
           |  }
           |}
           |""".stripMargin
 
-      stubGet(fetchJourneyUrl, 200, testGRSJsonResponse)
+      stubGet(fetchJourneyUrl, OK, testGRSJsonResponse)
 
       val response = await(connector.fetchJourneyData(GrsCompanyType.LimitedCompany, testJourneyId))
 
       response shouldBe IncorporatedEntityGRSResponse(
-        companyNumber = Some("01234567"),
-        companyName = Some("Test Company Ltd"),
-        ctutr = Some("1234567890"),
+        companyNumber = Some(testCompanyNumber),
+        companyName = Some(testCompanyName),
+        ctutr = Some(testTaxIdentifier),
         dateOfIncorporation = Some(LocalDate.parse("2020-01-01")),
         identifiersMatch = true,
         businessRegistrationStatus = RegisteredStatus,
         businessVerificationStatus = Some(BvPass),
-        bpSafeId = Some("X00000123456789"),
+        bpSafeId = Some(testBusinessPartnerId),
         registeredAddress = Some(
           RegisteredAddress(
-            addressLine1 = Some("testLine1"),
-            addressLine2 = Some("test town"),
-            addressLine3 = Some("test city"),
-            postCode = Some("AA11AA")
+            addressLine1 = Some(testAddressLine1),
+            addressLine2 = Some(testAddressLine2),
+            addressLine3 = Some(testAddressLine3),
+            postCode = Some(testPostcode)
           )
         )
       )
@@ -137,34 +162,34 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
       val fetchJourneyUrl = s"/partnership-identification/api/journey/$testJourneyId"
 
       val testGRSJsonResponse =
-        """
+        s"""
           |{
-          |  "sautr": "1234567890",
-          |  "postcode": "AA11AA",
+          |  "sautr": "$testTaxIdentifier",
+          |  "postcode": "$testPostcode",
           |  "identifiersMatch": true,
           |  "registration": {
-          |    "registrationStatus": "REGISTERED",
-          |    "registeredBusinessPartnerId": "X00000123456789"
+          |    "registrationStatus": "$registeredStatus",
+          |    "registeredBusinessPartnerId": "$testBusinessPartnerId"
           |  },
           |  "businessVerification": {
-          |    "verificationStatus": "PASS"
+          |    "verificationStatus": "$passedVerificationStatus"
           |  }
           |}
           |""".stripMargin
 
-      stubGet(fetchJourneyUrl, 200, testGRSJsonResponse)
+      stubGet(fetchJourneyUrl, OK, testGRSJsonResponse)
 
       val response = await(connector.fetchJourneyData(GrsCompanyType.GeneralPartnership, testJourneyId))
 
       response shouldBe PartnershipGRSResponse(
-        sautr = Some("1234567890"),
-        saPostcode = Some("AA11AA"),
+        sautr = Some(testTaxIdentifier),
+        saPostcode = Some(testPostcode),
         companyNumber = None,
         companyName = None,
         identifiersMatch = true,
         businessRegistrationStatus = RegisteredStatus,
         businessVerificationStatus = Some(BvPass),
-        bpSafeId = Some("X00000123456789"),
+        bpSafeId = Some(testBusinessPartnerId),
         registeredAddress = None
       )
     }
@@ -172,14 +197,24 @@ class GrsConnectorISpec extends BaseIntegrationSpec {
     "propagate exception when backend returns an error status (404)" in {
       val fetchJourneyUrl = s"/incorporated-entity-identification/api/journey/$testJourneyId"
 
-      stubGet(fetchJourneyUrl, 404, """{"error":"Not Found"}""")
+      stubGet(fetchJourneyUrl, NOT_FOUND, """{"error":"Not Found"}""")
 
       val ex = intercept[UpstreamErrorResponse] {
         await(connector.fetchJourneyData(GrsCompanyType.LimitedCompany, testJourneyId))
       }
 
-      ex.statusCode shouldBe 404
+      ex.statusCode shouldBe NOT_FOUND
       ex.getMessage should include("Not Found")
+    }
+
+    "retry when the backend returns a 5xx response" in {
+      val fetchJourneyUrl = s"/incorporated-entity-identification/api/journey/$testJourneyId"
+      stubGet(fetchJourneyUrl, SERVICE_UNAVAILABLE, serviceUnavailableMessage)
+
+      val ex = await(connector.fetchJourneyData(GrsCompanyType.LimitedCompany, testJourneyId).failed)
+
+      ex shouldBe a[UpstreamErrorResponse]
+      verify(callAmountWithRetries, getRequestedFor(urlEqualTo(fetchJourneyUrl)))
     }
   }
 }

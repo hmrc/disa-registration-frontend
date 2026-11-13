@@ -22,7 +22,7 @@ import models.GetOrCreateJourneyData
 import models.journeydata.JourneyData
 import models.requests.{DataRequest, IdentifierRequest}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.*
 import play.api.mvc.Results.InternalServerError
 import play.api.mvc.{RequestHeader, Result}
 import play.api.test.FakeRequest
