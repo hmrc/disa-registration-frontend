@@ -42,7 +42,7 @@ trait BaseIntegrationSpec
     with CommonStubs
     with TestData {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier             = HeaderCarrier()
   implicit lazy val messagesApi: MessagesApi =
     app.injector.instanceOf[MessagesApi]
 
@@ -55,21 +55,21 @@ trait BaseIntegrationSpec
 
   def config: Map[String, String] =
     Map(
-      "auditing.enabled"                -> "false",
-      "microservice.services.auth.host" -> wiremockHost,
-      "microservice.services.auth.port" -> wiremockPort.toString,
-      "microservice.services.disa-registration.host" -> wiremockHost,
-      "microservice.services.disa-registration.port" -> wiremockPort.toString,
-      "microservice.services.tax-enrolments.host" -> wiremockHost,
-      "microservice.services.tax-enrolments.port" -> wiremockPort.toString,
+      "auditing.enabled"                                                       -> "false",
+      "microservice.services.auth.host"                                        -> wiremockHost,
+      "microservice.services.auth.port"                                        -> wiremockPort.toString,
+      "microservice.services.disa-registration.host"                           -> wiremockHost,
+      "microservice.services.disa-registration.port"                           -> wiremockPort.toString,
+      "microservice.services.tax-enrolments.host"                              -> wiremockHost,
+      "microservice.services.tax-enrolments.port"                              -> wiremockPort.toString,
       "microservice.services.incorporated-entity-identification-frontend.host" -> wiremockHost,
       "microservice.services.incorporated-entity-identification-frontend.port" -> wiremockPort.toString,
-      "microservice.services.partnership-identification-frontend.host" -> wiremockHost,
-      "microservice.services.partnership-identification-frontend.port" -> wiremockPort.toString,
-      "microservice.services.address-lookup.host" -> wiremockHost,
-      "microservice.services.address-lookup.port" -> wiremockPort.toString,
-      "microservice.services.email-verification.host" -> wiremockHost,
-      "microservice.services.email-verification.port" -> wiremockPort.toString,
+      "microservice.services.partnership-identification-frontend.host"         -> wiremockHost,
+      "microservice.services.partnership-identification-frontend.port"         -> wiremockPort.toString,
+      "microservice.services.address-lookup.host"                              -> wiremockHost,
+      "microservice.services.address-lookup.port"                              -> wiremockPort.toString,
+      "microservice.services.email-verification.host"                          -> wiremockHost,
+      "microservice.services.email-verification.port"                          -> wiremockPort.toString
     )
 
   override def beforeAll(): Unit = {
@@ -92,4 +92,71 @@ trait BaseIntegrationSpec
   implicit val mat: Materializer                  = app.injector.instanceOf[Materializer]
   implicit val ws: WSClient                       = app.injector.instanceOf[WSClient]
   implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+
+  val testEmail                   = "org@example.com"
+  val validGrsJourneyData: String =
+    s"""
+       |{
+       |  "groupId": "$testGroupId",
+       |  "enrolmentId": "$testString",
+       |  "businessVerification": {
+       |    "businessRegistrationPassed": true,
+       |    "businessVerificationPassed": true,
+       |    "ctutr": "1234567890"
+       |  }
+       |}
+       |""".stripMargin
+
+  val lookUpAddressResponse: String =
+    """[{
+      |  "id": "100023336956",
+      |  "address": { "lines": ["1 Test Street"], "town": "Testtown", "postcode": "AB1 2CD" }
+      |}]""".stripMargin
+
+  val grsRegAddressOrgDetailsJourneyData: String =
+    s"""
+       |{
+       |  "groupId": "$testGroupId",
+       |  "enrolmentId": "$testString",
+       |  "businessVerification": {
+       |    "businessRegistrationPassed": true,
+       |    "businessVerificationPassed": true,
+       |    "ctutr": "1234567890",
+       |    "registeredAddress": {
+       |      "addressLine1": "1 Test Street",
+       |      "addressLine2": "Testtown",
+       |      "addressLine3": "Testshire",
+       |      "postCode": "AB1 2CD"
+       |    }
+       |  },
+       |  "organisationDetails": {
+       |    "registeredToManageIsa": "no",
+       |    "tradingUsingDifferentName": "no",
+       |    "fcaNumber": "123456",
+       |    "registeredAddressCorrespondence": "no",
+       |    "correspondenceAddress": {
+       |      "addressLine1": "bhoooo",
+       |      "postCode": "AB1 23CD"
+       |    }
+       |  }
+       |}
+       |""".stripMargin
+
+  val isaProductsJourneyData: String =
+    s"""
+       |{
+       | "groupId": "$testGroupId",
+       | "enrolmentId": "$testString",
+       |  "businessVerification": {
+       |       "businessRegistrationPassed": true,
+       |       "businessVerificationPassed": true,
+       |       "ctutr": "1234567890"
+       |     },
+       | "isaProducts": {
+       |   "isaProducts": ["cashJuniorIsas", "cashIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"],
+       |   "p2pPlatform": "platform",
+       |   "p2pPlatformNumber": "1234567"
+       | }
+       |}
+       |""".stripMargin
 }

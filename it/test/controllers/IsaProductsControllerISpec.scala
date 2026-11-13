@@ -35,24 +35,8 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
   "GET /isa-products" should {
 
     "fetch data from the correct endpoint" in {
-      val journeyDataResponse =
-        s"""
-          |{
-          |    "groupId": "$testGroupId",
-          |    "enrolmentId": "$testString",
-          |    "businessVerification": {
-          |       "businessRegistrationPassed": true,
-          |       "businessVerificationPassed": true,
-          |       "ctutr": "1234567890"
-          |     },
-          |     "isaProducts": {
-          |       "isaProducts": ["cashJuniorIsas", "cashIsas", "stocksAndSharesIsas", "stocksAndSharesJuniorIsas", "innovativeFinanceIsas"]
-          |     }
-          |}
-          |""".stripMargin
-
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, journeyDataResponse)
+      stubGet(getJourneyDataUrl, OK, isaProductsJourneyData)
 
       val request =
         FakeRequest(GET, controllerEndpoint)
@@ -79,21 +63,8 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
 
     "call correct endpoint with correct data shape" in {
 
-      val testJourneyData: String =
-        s"""
-           |{
-           |  "groupId": "$testGroupId",
-           |  "enrolmentId": "$testString",
-           |  "businessVerification": {
-           |    "businessRegistrationPassed": true,
-           |    "businessVerificationPassed": true,
-           |    "ctutr": "1234567890"
-           |  }
-           |}
-           |""".stripMargin
-
       stubAuth()
-      stubGet(getJourneyDataUrl, OK, testJourneyData)
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
       stubPost(updateJourneyUrl, NO_CONTENT, "")
 
       val form = "value[0]" -> "cashJuniorIsas"
@@ -116,6 +87,44 @@ class IsaProductsControllerISpec extends BaseIntegrationSpec with CommonStubs wi
               |}""".stripMargin
           ))
       )
+    }
+
+    "return BAD_REQUEST when the form data submitted is invalid" in {
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
+      stubPost(updateJourneyUrl, NO_CONTENT, "")
+
+      val form = "value[0]" -> "wrongData"
+
+      val request =
+        FakeRequest(POST, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody(form)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe BAD_REQUEST
+      redirectLocation(result) shouldBe None
+    }
+
+    "return INTERNAL_SERVER_ERROR when updating the journey fails" in {
+
+      stubAuth()
+      stubGet(getJourneyDataUrl, OK, validGrsJourneyData)
+      stubPost(updateJourneyUrl, INTERNAL_SERVER_ERROR, "")
+
+      val form = "value[0]" -> "cashJuniorIsas"
+
+      val request =
+        FakeRequest(POST, controllerEndpoint)
+          .withSession(SessionKeys.authToken -> "Bearer mock-bearer-token")
+          .withFormUrlEncodedBody(form)
+
+      val result = route(app, request).get
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+      redirectLocation(result) shouldBe None
     }
   }
 }
