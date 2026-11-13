@@ -26,7 +26,7 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.Aliases.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow}
 import viewmodels.checkAnswers.certificatesOfAuthority.FinancialOrganisationSummary
-import viewmodels.govuk.all.{ActionItemViewModel, FluentActionItem, SummaryListRowViewModel, ValueViewModel}
+import viewmodels.govuk.all.*
 
 class FinancialOrganisationSummarySpec extends SpecBase {
 

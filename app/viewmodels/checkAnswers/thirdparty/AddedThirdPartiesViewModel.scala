@@ -20,14 +20,13 @@ import config.FrontendAppConfig
 import controllers.thirdparty.routes.*
 import models.ReturnTo._
 import models.journeydata.thirdparty.ThirdParty
-import models.{NormalMode, ReturnTo, YesNoAnswer}
+import models.*
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, GovukSummaryList}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.all.{FluentLegend, LegendViewModel, RadiosViewModel}
-import viewmodels.govuk.summarylist.*
+import viewmodels.govuk.all.*
 import viewmodels.implicits.*
 
 import javax.inject.Inject

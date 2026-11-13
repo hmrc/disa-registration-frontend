@@ -20,9 +20,9 @@ import base.SpecBase
 import config.FrontendAppConfig
 import models.emailverification.VerifyEmailCodeResult.{InvalidCode, Verified}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers.shouldBe
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK, SERVICE_UNAVAILABLE}
+import play.api.http.Status.*
 import play.api.inject
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -30,6 +30,12 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import scala.concurrent.Future
 
 class EmailVerificationConnectorSpec extends SpecBase {
+
+  private val testEmail                 = "test@example.com"
+  private val testVerificationCode      = "123456"
+  private val serviceUnavailableMessage = "Service unavailable"
+  private val connectionTimeoutMessage  = "Connection timeout"
+  private val sendCodeFailureMessage    = "Email verification call [POST /v2/send-code] failed"
 
   trait TestSetup {
 
@@ -62,7 +68,7 @@ class EmailVerificationConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(OK, "")))
 
         val result = connector
-          .sendCode("test@example.com")
+          .sendCode(testEmail)
           .futureValue
 
         result shouldBe ()
@@ -74,7 +80,7 @@ class EmailVerificationConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(OK, "")))
 
         connector
-          .sendCode("test@example.com")
+          .sendCode(testEmail)
           .futureValue
 
         verify(mockRequestBuilder).withBody(any())(any(), any(), any())
@@ -88,7 +94,7 @@ class EmailVerificationConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, upstreamBody)))
 
         val thrown = connector
-          .sendCode("test@example.com")
+          .sendCode(testEmail)
           .failed
           .futureValue
 
@@ -98,20 +104,21 @@ class EmailVerificationConnectorSpec extends SpecBase {
 
         upstreamError.statusCode mustEqual BAD_REQUEST
         upstreamError.reportAs mustEqual INTERNAL_SERVER_ERROR
-        upstreamError.getMessage must include("Email verification call [POST /v2/send-code] failed")
+        upstreamError.getMessage must include(sendCodeFailureMessage)
         upstreamError.getMessage must include(s"upstream status [$BAD_REQUEST]")
         upstreamError.getMessage must include(upstreamBody)
+        verify(mockRequestBuilder).execute[HttpResponse](any(), any())
       }
 
       "must fail with UpstreamErrorResponse when downstream returns SERVICE_UNAVAILABLE" in new TestSetup {
 
-        val upstreamBody = "Service unavailable"
+        val upstreamBody = serviceUnavailableMessage
 
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.successful(HttpResponse(SERVICE_UNAVAILABLE, upstreamBody)))
 
         val thrown = connector
-          .sendCode("test@example.com")
+          .sendCode(testEmail)
           .failed
           .futureValue
 
@@ -121,20 +128,21 @@ class EmailVerificationConnectorSpec extends SpecBase {
 
         upstreamError.statusCode mustEqual SERVICE_UNAVAILABLE
         upstreamError.reportAs mustEqual INTERNAL_SERVER_ERROR
-        upstreamError.getMessage must include("Email verification call [POST /v2/send-code] failed")
+        upstreamError.getMessage must include(sendCodeFailureMessage)
         upstreamError.getMessage must include(s"upstream status [$SERVICE_UNAVAILABLE]")
         upstreamError.getMessage must include(upstreamBody)
+        verify(mockRequestBuilder, times(callAmountWithRetries)).execute[HttpResponse](any(), any())
       }
 
       "must propagate Throwable when an unexpected error occurs" in new TestSetup {
 
-        val runtimeException = new RuntimeException("Connection timeout")
+        val runtimeException = new RuntimeException(connectionTimeoutMessage)
 
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.failed(runtimeException))
 
         val thrown = connector
-          .sendCode("test@example.com")
+          .sendCode(testEmail)
           .failed
           .futureValue
 
@@ -150,7 +158,7 @@ class EmailVerificationConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(OK, "")))
 
         val result = connector
-          .verifyCode("test@example.com", "123456")
+          .verifyCode(testEmail, testVerificationCode)
           .futureValue
 
         result shouldBe Verified
@@ -162,7 +170,7 @@ class EmailVerificationConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(OK, "")))
 
         connector
-          .verifyCode("test@example.com", "123456")
+          .verifyCode(testEmail, testVerificationCode)
           .futureValue
 
         verify(mockRequestBuilder).withBody(any())(any(), any(), any())
@@ -176,21 +184,22 @@ class EmailVerificationConnectorSpec extends SpecBase {
           .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, upstreamBody)))
 
         val result = connector
-          .verifyCode("test@example.com", "123456")
+          .verifyCode(testEmail, testVerificationCode)
           .futureValue
 
         result mustBe InvalidCode
+        verify(mockRequestBuilder).execute[HttpResponse](any(), any())
       }
 
       "must fail with UpstreamErrorResponse when downstream returns SERVICE_UNAVAILABLE" in new TestSetup {
 
-        val upstreamBody = "Service unavailable"
+        val upstreamBody = serviceUnavailableMessage
 
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.successful(HttpResponse(SERVICE_UNAVAILABLE, upstreamBody)))
 
         val thrown = connector
-          .verifyCode("test@example.com", "123456")
+          .verifyCode(testEmail, testVerificationCode)
           .failed
           .futureValue
 
@@ -203,17 +212,18 @@ class EmailVerificationConnectorSpec extends SpecBase {
         upstreamError.getMessage must include("Email verification call [POST /v2/verify-code] failed")
         upstreamError.getMessage must include(s"upstream status [$SERVICE_UNAVAILABLE]")
         upstreamError.getMessage must include(upstreamBody)
+        verify(mockRequestBuilder, times(callAmountWithRetries)).execute[HttpResponse](any(), any())
       }
 
       "must propagate Throwable when an unexpected error occurs" in new TestSetup {
 
-        val runtimeException = new RuntimeException("Connection timeout")
+        val runtimeException = new RuntimeException(connectionTimeoutMessage)
 
         when(mockRequestBuilder.execute[HttpResponse](any(), any()))
           .thenReturn(Future.failed(runtimeException))
 
         val thrown = connector
-          .verifyCode("test@example.com", "123456")
+          .verifyCode(testEmail, testVerificationCode)
           .failed
           .futureValue
 

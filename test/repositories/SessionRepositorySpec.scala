@@ -23,7 +23,7 @@ import org.mongodb.scala.model.Filters
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.mongo.MongoComponent
 
-import java.time.{Clock, Instant, ZoneOffset}
+import java.time.*
 
 class SessionRepositorySpec extends SpecBase {
 

@@ -17,7 +17,7 @@
 package controllers.liaisonofficers
 
 import base.SpecBase
-import controllers.actions.{AuthenticatedIdentifierAction, DataRetrievalAction, GrsGuardActionFilter}
+import controllers.actions.*
 import controllers.liaisonofficers.routes.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when

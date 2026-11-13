@@ -16,14 +16,18 @@
 
 package connectors
 
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import models.taxenrolments.TaxEnrolmentSubscription
-import play.api.http.Status.{BAD_REQUEST, OK}
+import play.api.http.Status.*
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.BaseIntegrationSpec
 import utils.WiremockHelper.stubGet
 
 class TaxEnrolmentsConnectorISpec extends BaseIntegrationSpec {
+
+  private val testServiceName = "HMRC-DISA-ORG"
+  private val pendingState    = "PENDING"
 
   private val connector = app.injector.instanceOf[TaxEnrolmentsConnector]
 
@@ -38,7 +42,7 @@ class TaxEnrolmentsConnectorISpec extends BaseIntegrationSpec {
            |  {
            |    "created": 1482329348256,
            |    "lastModified": 1482329348256,
-           |    "serviceName": "HMRC-DISA-ORG",
+            |    "serviceName": "$testServiceName",
            |    "identifiers": [
            |      {
            |        "key": "ZREF",
@@ -46,7 +50,7 @@ class TaxEnrolmentsConnectorISpec extends BaseIntegrationSpec {
            |      }
            |    ],
            |    "callback": "url passed in by the subscriber service",
-           |    "state": "PENDING",
+            |    "state": "$pendingState",
            |    "groupIdentifier": "$testGroupId"
            |  }
            |]
@@ -58,8 +62,8 @@ class TaxEnrolmentsConnectorISpec extends BaseIntegrationSpec {
 
       result shouldBe Seq(
         TaxEnrolmentSubscription(
-          serviceName = "HMRC-DISA-ORG",
-          state = "PENDING",
+          serviceName = testServiceName,
+          state = pendingState,
           groupIdentifier = Some(testGroupId)
         )
       )
@@ -79,6 +83,16 @@ class TaxEnrolmentsConnectorISpec extends BaseIntegrationSpec {
       val ex = await(connector.getSubscriptionsByGroupId(testGroupId).failed)
 
       ex shouldBe a[UpstreamErrorResponse]
+      verify(1, getRequestedFor(urlEqualTo(getSubscriptionsUrl)))
+    }
+
+    "retry when Tax Enrolments returns a 5xx response" in {
+      stubGet(getSubscriptionsUrl, SERVICE_UNAVAILABLE, "Service unavailable")
+
+      val ex = await(connector.getSubscriptionsByGroupId(testGroupId).failed)
+
+      ex shouldBe a[UpstreamErrorResponse]
+      verify(callAmountWithRetries, getRequestedFor(urlEqualTo(getSubscriptionsUrl)))
     }
   }
 }

@@ -23,7 +23,7 @@ import org.apache.pekko.actor.ActorSystem
 import play.api.Configuration
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{BadGatewayException, GatewayTimeoutException, HeaderCarrier, Retries, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,7 +35,7 @@ class TaxEnrolmentsConnector @Inject() (
   override protected val actorSystem: ActorSystem,
   configurationProvider: Configuration
 )(implicit ec: ExecutionContext)
-    extends Retries {
+    extends BaseConnector {
 
   override protected val configuration: Config = configurationProvider.underlying
 
@@ -44,11 +44,7 @@ class TaxEnrolmentsConnector @Inject() (
   ): Future[Seq[TaxEnrolmentSubscription]] = {
     val url = s"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/groups/$groupId/subscriptions"
 
-    retryFor("GET Tax Enrolments subscriptions by group ID") {
-      case _: BadGatewayException                          => true
-      case _: GatewayTimeoutException                      => true
-      case e: UpstreamErrorResponse if e.statusCode >= 500 => true
-    } {
+    retryFor("GET Tax Enrolments subscriptions by group ID")(retryCondition) {
       http
         .get(url"$url")
         .execute[Seq[TaxEnrolmentSubscription]]

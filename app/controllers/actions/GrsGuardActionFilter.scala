@@ -19,7 +19,7 @@ package controllers.actions
 import models.journeydata.BusinessVerification
 import models.requests.OptionalDataRequest
 import navigation.Navigator
-import play.api.mvc.{ActionFilter, Result, Results}
+import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 
 import javax.inject.Inject

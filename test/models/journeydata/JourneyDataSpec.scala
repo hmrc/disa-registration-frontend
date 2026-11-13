@@ -25,7 +25,7 @@ import models.journeydata.isaproducts.{IsaProduct, IsaProducts}
 import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.ByEmail
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.*
 import utils.JsonFormatSpec
 
 class JourneyDataSpec extends JsonFormatSpec[JourneyData] {

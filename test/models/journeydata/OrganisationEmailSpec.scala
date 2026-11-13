@@ -16,7 +16,7 @@
 
 package models.journeydata
 
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.*
 import utils.JsonFormatSpec
 
 class OrganisationEmailSpec extends JsonFormatSpec[OrganisationEmail] {

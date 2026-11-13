@@ -23,7 +23,7 @@ import forms.ThirdPartyConnectedOrganisationsFormProvider
 import models.NormalMode
 import models.YesNoAnswer.Yes
 import models.journeydata.JourneyData
-import models.journeydata.thirdparty.{ConnectedThirdPartySelection, ThirdParty, ThirdPartyOrganisations}
+import models.journeydata.thirdparty.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.data.Form

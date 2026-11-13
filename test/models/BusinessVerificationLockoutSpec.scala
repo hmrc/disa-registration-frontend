@@ -17,7 +17,7 @@
 package models
 
 import models.grs.BusinessVerificationLockout
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.*
 import utils.JsonFormatSpec
 
 import java.time.Instant

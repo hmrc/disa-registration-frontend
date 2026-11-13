@@ -18,7 +18,7 @@ package repositories
 
 import config.FrontendAppConfig
 import models.grs.BusinessVerificationLockout
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, UpdateOptions, Updates}
+import org.mongodb.scala.model.*
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 

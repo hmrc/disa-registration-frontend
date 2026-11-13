@@ -18,12 +18,18 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import models.addresslookup.LookupAddress
+import play.api.http.Status.{OK, SERVICE_UNAVAILABLE}
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import utils.BaseIntegrationSpec
 import utils.WiremockHelper.stubPost
 
 class AddressLookupConnectorISpec extends BaseIntegrationSpec {
+
+  private val testPostcode              = "BB00 0BB"
+  private val testFilter                = "Test"
+  private val testCountryName           = "United Kingdom"
+  private val serviceUnavailableMessage = "Service unavailable"
 
   val connector: AddressLookupConnector = app.injector.instanceOf[AddressLookupConnector]
 
@@ -33,7 +39,7 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
 
     "return parsed Address sequence when backend returns 200 OK" in {
       val responseBody =
-        """
+        s"""
           |[
           |  {
           |    "id": "GB1",
@@ -41,26 +47,26 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
           |    "address": {
           |      "lines": ["1 Test Street", "Test Area"],
           |      "town": "Test Town",
-          |      "postcode": "BB00 0BB",
+          |      "postcode": "$testPostcode",
           |      "country": {
           |        "code": "GB",
-          |        "name": "United Kingdom"
+          |        "name": "$testCountryName"
           |      }
           |    }
           |  }
           |]
           |""".stripMargin
 
-      stubPost(basePath, 200, responseBody)
+      stubPost(basePath, OK, responseBody)
 
-      val result = await(connector.searchAddress("BB00 0BB", Some("Test")))
+      val result = await(connector.searchAddress(testPostcode, Some(testFilter)))
 
       result shouldBe Seq(
         LookupAddress(
           addressLine1 = Some("1 Test Street"),
           addressLine2 = Some("Test Area"),
           addressLine3 = Some("Test Town"),
-          postCode = Some("BB00 0BB"),
+          postCode = Some(testPostcode),
           uprn = Some("123456789"),
           country = Some("United Kingdom")
         )
@@ -70,21 +76,21 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
     "send correct request body to downstream" in {
 
       val expectedRequestBody =
-        """
+        s"""
           |{
-          |  "postcode": "BB00 0BB",
-          |  "filter": "Test"
+          |  "postcode": "$testPostcode",
+          |  "filter": "$testFilter"
           |}
           |""".stripMargin
 
       val responseBody =
-        """
+        s"""
           |[
           |  {
           |    "uprn": 200000698110,
           |    "address": {
           |      "lines": ["Test Street"],
-          |      "postcode": "BB00 0BB",
+          |      "postcode": "$testPostcode",
           |      "country": {
           |        "code": "GB",
           |        "name": "United Kingdom"
@@ -94,9 +100,9 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
           |]
           |""".stripMargin
 
-      stubPost(basePath, 200, responseBody)
+      stubPost(basePath, OK, responseBody)
 
-      await(connector.searchAddress("BB00 0BB", Some("Test")))
+      await(connector.searchAddress(testPostcode, Some(testFilter)))
 
       verify(
         postRequestedFor(urlEqualTo(basePath))
@@ -107,20 +113,21 @@ class AddressLookupConnectorISpec extends BaseIntegrationSpec {
     "propagate UpstreamErrorResponse when backend returns an error" in {
 
       val errorResponse =
-        """
+        s"""
           |{
-          |  "message": "Service unavailable"
+          |  "message": "$serviceUnavailableMessage"
           |}
           |""".stripMargin
 
-      stubPost(basePath, 503, errorResponse)
+      stubPost(basePath, SERVICE_UNAVAILABLE, errorResponse)
 
       val ex = intercept[UpstreamErrorResponse] {
-        await(connector.searchAddress("BB00 0BB", None))
+        await(connector.searchAddress(testPostcode, None))
       }
 
-      ex.statusCode shouldBe 503
-      ex.getMessage should include("Service unavailable")
+      ex.statusCode shouldBe SERVICE_UNAVAILABLE
+      ex.getMessage should include(serviceUnavailableMessage)
+      verify(callAmountWithRetries, postRequestedFor(urlEqualTo(basePath)))
     }
   }
 }

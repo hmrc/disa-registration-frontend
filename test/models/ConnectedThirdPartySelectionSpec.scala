@@ -16,7 +16,7 @@
 
 package models
 
-import models.journeydata.thirdparty.{ConnectedThirdPartySelection, NoneSelected, SelectedParty}
+import models.journeydata.thirdparty.*
 import models.journeydata.thirdparty.ConnectedThirdPartySelection.noneAreConnectedFormValue
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

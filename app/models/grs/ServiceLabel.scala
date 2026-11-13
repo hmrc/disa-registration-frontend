@@ -16,7 +16,7 @@
 
 package models.grs
 
-import play.api.libs.json.{Json, OFormat, OWrites}
+import play.api.libs.json.*
 
 case class ServiceLabel(optServiceName: String)
 

@@ -16,7 +16,7 @@
 
 package models.journeydata.orgdetails
 
-import play.api.libs.json.{Format, JsError, JsSuccess, Json, Reads, Writes}
+import play.api.libs.json.*
 import config.Constants.noneRadioValue
 import models.addresslookup.LookupAddress
 

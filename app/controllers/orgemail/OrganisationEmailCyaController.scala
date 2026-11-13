@@ -21,7 +21,7 @@ import controllers.orgemail.routes.{EmailVerificationCodeController, Organisatio
 import models.NormalMode
 import models.journeydata.JourneyData
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.*
 import viewmodels.govuk.all.SummaryListViewModel
