@@ -54,7 +54,7 @@ class GrsConnectorSpec extends SpecBase {
 
     "createJourney" - {
       "must retry upstream 5xx errors" in new TestSetup {
-        val request = GrsCreateJourneyRequest(
+        val request               = GrsCreateJourneyRequest(
           continueUrl = "/continue",
           businessVerificationCheck = true,
           deskProServiceId = "service",
@@ -77,7 +77,7 @@ class GrsConnectorSpec extends SpecBase {
 
     "fetchJourneyData" - {
       "must retry upstream 5xx errors" in new TestSetup {
-        val journeyId = "testJourneyId"
+        val journeyId             = "testJourneyId"
         val upstreamErrorResponse = UpstreamErrorResponse(serviceUnavailableMessage, SERVICE_UNAVAILABLE)
 
         when(mockAppConfig.grsRetrieveResultUrl(GrsCompanyType.LimitedCompany, journeyId)).thenReturn(testUrl)
