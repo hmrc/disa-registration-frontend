@@ -16,7 +16,7 @@
 
 package services
 
-import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
+import models.journeydata.*
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 

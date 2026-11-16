@@ -16,61 +16,73 @@
 
 package connectors
 
+import com.typesafe.config.Config
 import config.FrontendAppConfig
 import models.grs.*
 import models.grs.GrsIdentificationService.{IncorporatedEntityIdentification, PartnershipIdentification}
+import org.apache.pekko.actor.ActorSystem
 import play.api.Logging
+import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpErrorFunctions, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.*
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GrsConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppConfig)(implicit val ec: ExecutionContext)
-    extends HttpErrorFunctions
+class GrsConnector @Inject() (
+  http: HttpClientV2,
+  appConfig: FrontendAppConfig,
+  override protected val actorSystem: ActorSystem,
+  configurationProvider: Configuration
+)(implicit val ec: ExecutionContext)
+    extends BaseConnector
+    with HttpErrorFunctions
     with Logging {
+
+  override protected val configuration: Config = configurationProvider.underlying
 
   def createJourney(
     companyType: GrsCompanyType,
     grsJourneyRequest: GrsCreateJourneyRequest
-  )(implicit hc: HeaderCarrier): Future[CreateJourneyResponse] = {
+  )(implicit hc: HeaderCarrier): Future[CreateJourneyResponse] =
+    retryFor[CreateJourneyResponse]("POST GRS create journey")(retryCondition) {
+      val url = appConfig.grsCreateJourneyUrl(companyType)
 
-    val url = appConfig.grsCreateJourneyUrl(companyType)
-
-    http
-      .post(url"$url")
-      .withBody(Json.toJson(grsJourneyRequest))
-      .setHeader("Content-Type" -> "application/json")
-      .execute[CreateJourneyResponse]
-      .recoverWith { case errResponse: UpstreamErrorResponse =>
-        logger.error(
-          s"Create GRS journey failed - Status: ${errResponse.statusCode}, Body: ${errResponse.message}"
-        )
-        Future.failed(errResponse)
-      }
-  }
+      http
+        .post(url"$url")
+        .withBody(Json.toJson(grsJourneyRequest))
+        .setHeader("Content-Type" -> "application/json")
+        .execute[CreateJourneyResponse]
+        .recoverWith { case errResponse: UpstreamErrorResponse =>
+          logger.error(
+            s"Create GRS journey failed - Status: ${errResponse.statusCode}, Body: ${errResponse.message}"
+          )
+          Future.failed(errResponse)
+        }
+    }
 
   def fetchJourneyData(companyType: GrsCompanyType, journeyId: String)(implicit
     hc: HeaderCarrier
-  ): Future[GRSResponse] = {
-    val url = url"${appConfig.grsRetrieveResultUrl(companyType, journeyId)}"
+  ): Future[GRSResponse] =
+    retryFor[GRSResponse]("GET GRS journey data")(retryCondition) {
+      val url = url"${appConfig.grsRetrieveResultUrl(companyType, journeyId)}"
 
-    val result: Future[GRSResponse] = companyType.identificationService match {
-      case IncorporatedEntityIdentification =>
-        http.get(url).execute[IncorporatedEntityGRSResponse]
-      case PartnershipIdentification        =>
-        http.get(url).execute[PartnershipGRSResponse]
-    }
+      val result: Future[GRSResponse] = companyType.identificationService match {
+        case IncorporatedEntityIdentification =>
+          http.get(url).execute[IncorporatedEntityGRSResponse]
+        case PartnershipIdentification        =>
+          http.get(url).execute[PartnershipGRSResponse]
+      }
 
-    result.recoverWith { case errResponse: UpstreamErrorResponse =>
-      logger.error(
-        s"Fetch GRS journey data failed - Status: ${errResponse.statusCode}, Body: ${errResponse.message}"
-      )
-      Future.failed(errResponse)
+      result.recoverWith { case errResponse: UpstreamErrorResponse =>
+        logger.error(
+          s"Fetch GRS journey data failed - Status: ${errResponse.statusCode}, Body: ${errResponse.message}"
+        )
+        Future.failed(errResponse)
+      }
     }
-  }
 }

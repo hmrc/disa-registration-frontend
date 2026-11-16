@@ -16,9 +16,9 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlEqualTo, verify}
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import models.emailverification.VerifyEmailCodeResult.{InvalidCode, Verified}
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK, SERVICE_UNAVAILABLE}
+import play.api.http.Status.*
 import play.api.libs.json.Json
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.UpstreamErrorResponse
@@ -26,6 +26,11 @@ import utils.BaseIntegrationSpec
 import utils.WiremockHelper.stubPost
 
 class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
+
+  private val testEmail                  = "test@example.com"
+  private val testVerificationCode       = "123456"
+  private val serviceUnavailableMessage = "Service unavailable"
+  private val sendCodeFailureMessage    = "Email verification call [POST /v2/send-code] failed"
 
   val connector: EmailVerificationConnector = app.injector.instanceOf[EmailVerificationConnector]
 
@@ -45,7 +50,7 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
 
       stubPost(sendCodePath, OK, responseBody)
 
-      val result = await(connector.sendCode("test@example.com"))
+      val result = await(connector.sendCode(testEmail))
 
       result shouldBe ()
     }
@@ -54,9 +59,9 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
 
       val expectedRequestBody =
         Json.parse(
-          """
+          s"""
             |{
-            |  "email": "test@example.com"
+            |  "email": "$testEmail"
             |}
             |""".stripMargin
         )
@@ -70,7 +75,7 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
 
       stubPost(sendCodePath, OK, responseBody)
 
-      await(connector.sendCode("test@example.com"))
+      await(connector.sendCode(testEmail))
 
       verify(
         postRequestedFor(urlEqualTo(sendCodePath))
@@ -90,36 +95,38 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
       stubPost(sendCodePath, BAD_REQUEST, errorResponse)
 
       val ex = intercept[UpstreamErrorResponse] {
-        await(connector.sendCode("test@example.com"))
+        await(connector.sendCode(testEmail))
       }
 
       ex.statusCode shouldBe BAD_REQUEST
       ex.reportAs shouldBe INTERNAL_SERVER_ERROR
-      ex.getMessage should include("Email verification call [POST /v2/send-code] failed")
+      ex.getMessage should include(sendCodeFailureMessage)
       ex.getMessage should include(s"upstream status [$BAD_REQUEST]")
       ex.getMessage should include("Invalid request")
+      verify(1, postRequestedFor(urlEqualTo(sendCodePath)))
     }
 
     "throw UpstreamErrorResponse when email-verification returns 503 Service Unavailable" in {
 
       val errorResponse =
-        """
+        s"""
           |{
-          |  "message": "Service unavailable"
+          |  "message": "$serviceUnavailableMessage"
           |}
           |""".stripMargin
 
       stubPost(sendCodePath, SERVICE_UNAVAILABLE, errorResponse)
 
       val ex = intercept[UpstreamErrorResponse] {
-        await(connector.sendCode("test@example.com"))
+        await(connector.sendCode(testEmail))
       }
 
       ex.statusCode shouldBe SERVICE_UNAVAILABLE
       ex.reportAs shouldBe INTERNAL_SERVER_ERROR
-      ex.getMessage should include("Email verification call [POST /v2/send-code] failed")
+      ex.getMessage should include(sendCodeFailureMessage)
       ex.getMessage should include(s"upstream status [$SERVICE_UNAVAILABLE]")
-      ex.getMessage should include("Service unavailable")
+      ex.getMessage should include(serviceUnavailableMessage)
+      verify(callAmountWithRetries, postRequestedFor(urlEqualTo(sendCodePath)))
     }
   }
 
@@ -136,7 +143,7 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
 
       stubPost(verifyCodePath, OK, responseBody)
 
-      val result = await(connector.verifyCode("test@example.com", "123456"))
+      val result = await(connector.verifyCode(testEmail, testVerificationCode))
 
       result shouldBe Verified
     }
@@ -145,10 +152,10 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
 
       val expectedRequestBody =
         Json.parse(
-          """
+          s"""
             |{
-            |  "email": "test@example.com",
-            |  "verificationCode": "123456"
+            |  "email": "$testEmail",
+            |  "verificationCode": "$testVerificationCode"
             |}
             |""".stripMargin
         )
@@ -162,7 +169,7 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
 
       stubPost(verifyCodePath, OK, responseBody)
 
-      await(connector.verifyCode("test@example.com", "123456"))
+      await(connector.verifyCode(testEmail, testVerificationCode))
 
       verify(
         postRequestedFor(urlEqualTo(verifyCodePath))
@@ -181,31 +188,33 @@ class EmailVerificationConnectorISpec extends BaseIntegrationSpec {
 
       stubPost(verifyCodePath, BAD_REQUEST, errorResponse)
 
-      val result = await(connector.verifyCode("test@example.com", "123456"))
+      val result = await(connector.verifyCode(testEmail, testVerificationCode))
 
       result shouldBe InvalidCode
+      verify(1, postRequestedFor(urlEqualTo(verifyCodePath)))
     }
 
     "throw UpstreamErrorResponse when email-verification returns 503 Service Unavailable" in {
 
       val errorResponse =
-        """
+        s"""
           |{
-          |  "message": "Service unavailable"
+          |  "message": "$serviceUnavailableMessage"
           |}
           |""".stripMargin
 
       stubPost(verifyCodePath, SERVICE_UNAVAILABLE, errorResponse)
 
       val ex = intercept[UpstreamErrorResponse] {
-        await(connector.verifyCode("test@example.com", "123456"))
+        await(connector.verifyCode(testEmail, testVerificationCode))
       }
 
       ex.statusCode shouldBe SERVICE_UNAVAILABLE
       ex.reportAs shouldBe INTERNAL_SERVER_ERROR
       ex.getMessage should include("Email verification call [POST /v2/verify-code] failed")
       ex.getMessage should include(s"upstream status [$SERVICE_UNAVAILABLE]")
-      ex.getMessage should include("Service unavailable")
+      ex.getMessage should include(serviceUnavailableMessage)
+      verify(callAmountWithRetries, postRequestedFor(urlEqualTo(verifyCodePath)))
     }
   }
 }

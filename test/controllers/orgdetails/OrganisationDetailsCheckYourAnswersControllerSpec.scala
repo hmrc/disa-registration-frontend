@@ -21,7 +21,7 @@ import models.YesNoAnswer
 import models.journeydata.JourneyData
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import viewmodels.checkAnswers.orgDetails.{AddedCorrespondenceAddressSummary, FirmReferenceNumberSummary, OrganisationTelephoneNumberSummary, RegisteredAddressCorrespondenceSummary, RegisteredIsaManagerSummary, TradingNameSummary, TradingUsingDifferentNameSummary, ZReferenceNumberSummary}
+import viewmodels.checkAnswers.orgDetails.*
 import viewmodels.govuk.summarylist.SummaryListViewModel
 import views.html.orgdetails.OrganisationDetailsCheckYourAnswersView
 

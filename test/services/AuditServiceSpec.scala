@@ -24,7 +24,8 @@ import models.requests.{DataRequest, IdentifierRequest}
 import models.submission.SubmissionResult
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.*
+import play.api.http.Status.SERVICE_UNAVAILABLE
 import play.api.inject
 import play.api.libs.json.JsObject
 import play.api.mvc.AnyContent
@@ -32,7 +33,7 @@ import play.api.test.FakeRequest
 import repositories.SessionRepository
 import uk.gov.hmrc.auth.core.User
 import uk.gov.hmrc.auth.core.retrieve.Credentials
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.*
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
@@ -174,7 +175,7 @@ class AuditServiceSpec extends SpecBase {
       stubAuditResult(Success)
 
       val jd     = testJourneyData
-      val reason = "ETMP returned 503"
+      val reason = s"ETMP returned $SERVICE_UNAVAILABLE"
 
       service
         .auditEnrolmentSubmission(

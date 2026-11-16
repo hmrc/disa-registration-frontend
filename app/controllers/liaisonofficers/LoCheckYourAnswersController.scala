@@ -21,10 +21,10 @@ import models.ReturnTo
 import models.journeydata.liaisonofficers.LiaisonOfficer
 import models.requests.DataRequest
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.*
+import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.checkAnswers.liaisonofficers.{LiaisonOfficerCommunicationSummary, LiaisonOfficerEmailSummary, LiaisonOfficerNameSummary, LiaisonOfficerPhoneNumberSummary}
+import viewmodels.checkAnswers.liaisonofficers.*
 import viewmodels.govuk.summarylist.*
 import views.html.liaisonofficers.LoCheckYourAnswersView
 

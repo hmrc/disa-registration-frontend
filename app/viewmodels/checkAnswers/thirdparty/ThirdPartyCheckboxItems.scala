@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers.thirdparty
 
 import models.journeydata.thirdparty.ConnectedThirdPartySelection.noneAreConnectedFormValue
-import models.journeydata.thirdparty.{ConnectedThirdPartySelection, NoneSelected, SelectedParty, ThirdParty}
+import models.journeydata.thirdparty.*
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.{CheckboxItem, ExclusiveCheckbox}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text

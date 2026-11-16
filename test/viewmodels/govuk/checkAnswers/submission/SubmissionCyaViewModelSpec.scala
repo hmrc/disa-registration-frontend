@@ -34,7 +34,7 @@ import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.ByEmail
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
-import models.journeydata.{JourneyData, OrganisationDetails, OrganisationEmail}
+import models.journeydata.*
 import models.{CheckMode, YesNoAnswer}
 import viewmodels.checkAnswers.submission.SubmissionCyaViewModel
 

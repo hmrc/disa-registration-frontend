@@ -19,7 +19,7 @@ package controllers.liaisonofficers
 import base.SpecBase
 import models.journeydata.JourneyData
 import models.journeydata.liaisonofficers.LiaisonOfficerCommunication.{ByEmail, ByPhone}
-import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficerCommunication, LiaisonOfficers}
+import models.journeydata.liaisonofficers.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import viewmodels.checkAnswers.liaisonofficers.*

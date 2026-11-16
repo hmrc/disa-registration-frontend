@@ -21,7 +21,7 @@ import models.journeydata.isaproducts.IsaProducts
 import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.ThirdPartyOrganisations
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.*
 
 case class JourneyData(
   groupId: String,

@@ -26,25 +26,25 @@ import controllers.routes.{SubmissionCyaController, TaskListController}
 import controllers.signatories.routes.*
 import controllers.thirdparty.routes.*
 import models.*
-import models.ReturnTo.{MultipleThirdPartiesCya, MultipleThirdPartiesCyaViaAddedThirdParties, OrganisationDetailsCya, SubmissionCya, SubmissionCyaViaAddedThirdParties}
+import models.ReturnTo.*
 import models.addresslookup.LookupAddress
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
 import models.journeydata.certificatesofauthority.CertificatesOfAuthorityYesNo.{No, Yes}
 import models.journeydata.isaproducts.InnovativeFinancialProduct.{CrowdFundedDebentures, PeertopeerLoansUsingAPlatformWith36hPermissions}
 import models.journeydata.isaproducts.IsaProduct.{CashIsas, InnovativeFinanceIsas}
-import models.journeydata.isaproducts.{InnovativeFinancialProduct, IsaProduct, IsaProducts}
+import models.journeydata.isaproducts.*
 import models.journeydata.liaisonofficers.{LiaisonOfficer, LiaisonOfficers}
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
 import models.journeydata.orgdetails.{AddAnotherAddress, SelectedCorrespondenceAddress}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.journeydata.thirdparty.{ThirdParty, ThirdPartyOrganisations}
-import models.journeydata.{CorrespondenceAddress, OrganisationDetails, OrganisationEmail}
+import models.journeydata.*
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{spy, verify, when}
+import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers.shouldBe
 import pages.*
-import pages.certificatesofauthority.{CertificatesOfAuthorityYesNoPage, FcaArticlesPage, FinancialOrganisationPage}
-import pages.isaproducts.{InnovativeFinancialProductsPage, IsaProductsPage, PeerToPeerPlatformNumberPage, PeerToPeerPlatformPage}
+import pages.certificatesofauthority.*
+import pages.isaproducts.*
 import pages.liaisonofficers.*
 import pages.organisationdetails.*
 import pages.orgemail.{OrganisationEmailAddressPage, OrganisationEmailVerificationCodePage}

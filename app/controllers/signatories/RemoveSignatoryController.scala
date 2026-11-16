@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes.TaskListController
 import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
-import models.{NormalMode, ReturnTo, YesNoAnswer}
+import models.*
 import models.YesNoAnswer.{No, Yes}
 import models.journeydata.signatories.{Signatories, Signatory}
 import models.requests.DataRequest
@@ -29,7 +29,7 @@ import pages.signatories.RemoveSignatoryPage
 import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.*
 import services.JourneyAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.signatories.RemoveSignatoryView

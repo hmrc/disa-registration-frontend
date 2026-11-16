@@ -18,7 +18,7 @@ package handlers
 
 import play.twirl.api.Html
 import views.ViewSpecBase
-import views.html.{ErrorTemplate, InternalServerErrorView, NotFoundView}
+import views.html.*
 
 class ErrorHandlerSpec extends ViewSpecBase {
 

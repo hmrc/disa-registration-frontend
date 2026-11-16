@@ -18,15 +18,15 @@ package controllers.thirdparty
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, GrsGuardActionFilter, IdentifierAction}
+import controllers.actions.*
 import controllers.routes.*
 import forms.YesNoAnswerFormProvider
 import models.requests.DataRequest
-import models.{Mode, ReturnTo, YesNoAnswer}
+import models.*
 import navigation.Navigator
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.thirdparty.AddedThirdPartiesSummary
 import views.html.thirdparty.AddedThirdPartiesView

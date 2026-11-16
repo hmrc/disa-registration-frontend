@@ -16,7 +16,7 @@
 
 package models.grs
 
-import play.api.libs.json.{Format, JsValue, Json}
+import play.api.libs.json.*
 import utils.JsonFormatSpec
 
 class GrsCreateJourneyRequestSpec extends JsonFormatSpec[GrsCreateJourneyRequest] {

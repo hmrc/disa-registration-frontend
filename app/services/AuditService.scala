@@ -25,12 +25,12 @@ import models.submission.SubmissionResult
 import play.api.Logging
 import play.api.libs.json.*
 import repositories.SessionRepository
-import services.AuditTypes.{Audit, EnrolmentStarted, EnrolmentSubmitted}
+import services.AuditTypes.*
 import uk.gov.hmrc.auth.core.CredentialRole
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.AuditExtensions
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Disabled, Failure, Success}
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.*
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.http.HeaderCarrierConverter

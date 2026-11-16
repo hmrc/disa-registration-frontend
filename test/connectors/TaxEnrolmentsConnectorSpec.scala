@@ -20,7 +20,8 @@ import base.SpecBase
 import config.FrontendAppConfig
 import models.taxenrolments.TaxEnrolmentSubscription
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.*
+import play.api.http.Status.{BAD_REQUEST, SERVICE_UNAVAILABLE}
 import play.api.inject
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{StringContextOps, UpstreamErrorResponse}
@@ -28,6 +29,8 @@ import uk.gov.hmrc.http.{StringContextOps, UpstreamErrorResponse}
 import scala.concurrent.Future
 
 class TaxEnrolmentsConnectorSpec extends SpecBase {
+
+  private val pendingState = "PENDING"
 
   trait TestSetup {
     val connector: TaxEnrolmentsConnector = applicationBuilder(
@@ -53,7 +56,7 @@ class TaxEnrolmentsConnectorSpec extends SpecBase {
         val subscriptions = Seq(
           TaxEnrolmentSubscription(
             serviceName = "HMRC-DISA-ORG",
-            state = "PENDING",
+            state = pendingState,
             groupIdentifier = Some(testGroupId)
           )
         )
@@ -67,8 +70,8 @@ class TaxEnrolmentsConnectorSpec extends SpecBase {
       "must propagate upstream errors" in new TestSetup {
         val upstreamErrorResponse = UpstreamErrorResponse(
           message = "Bad request",
-          statusCode = 400,
-          reportAs = 400,
+          statusCode = BAD_REQUEST,
+          reportAs = BAD_REQUEST,
           headers = Map.empty
         )
 
@@ -76,6 +79,23 @@ class TaxEnrolmentsConnectorSpec extends SpecBase {
           .thenReturn(Future.failed(upstreamErrorResponse))
 
         connector.getSubscriptionsByGroupId(testGroupId).failed.futureValue mustBe upstreamErrorResponse
+        verify(mockRequestBuilder).execute[Seq[TaxEnrolmentSubscription]](any(), any())
+      }
+
+      "must retry upstream 5xx errors" in new TestSetup {
+        val upstreamErrorResponse = UpstreamErrorResponse(
+          message = "Service unavailable",
+          statusCode = SERVICE_UNAVAILABLE,
+          reportAs = SERVICE_UNAVAILABLE,
+          headers = Map.empty
+        )
+
+        when(mockRequestBuilder.execute[Seq[TaxEnrolmentSubscription]](any(), any()))
+          .thenReturn(Future.failed(upstreamErrorResponse))
+
+        connector.getSubscriptionsByGroupId(testGroupId).failed.futureValue mustBe upstreamErrorResponse
+        verify(mockRequestBuilder, times(callAmountWithRetries))
+          .execute[Seq[TaxEnrolmentSubscription]](any(), any())
       }
     }
   }

@@ -22,10 +22,10 @@ import forms.YesNoAnswerFormProvider
 import models.YesNoAnswer.{No, Yes}
 import models.addresslookup.LookupAddress
 import models.journeydata.orgdetails.AddAnotherAddress
-import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails, RegisteredAddress}
-import models.{CheckMode, NormalMode, YesNoAnswer}
+import models.journeydata.*
+import models.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.libs.json.Writes
