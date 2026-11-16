@@ -16,9 +16,12 @@
 
 package connectors
 
+import com.typesafe.config.Config
 import config.FrontendAppConfig
 import models.addresslookup.{AddressLookupResponse, LookupAddress}
 import models.requests.AddressLookupRequest
+import org.apache.pekko.actor.ActorSystem
+import play.api.Configuration
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -30,26 +33,31 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AddressLookupConnector @Inject() (
   httpClient: HttpClientV2,
-  appConfig: FrontendAppConfig
-)(implicit ec: ExecutionContext) {
+  appConfig: FrontendAppConfig,
+  override protected val actorSystem: ActorSystem,
+  configurationProvider: Configuration
+)(implicit ec: ExecutionContext)
+    extends BaseConnector {
+
+  override protected val configuration: Config = configurationProvider.underlying
 
   def searchAddress(
     postcode: String,
     filter: Option[String]
-  )(implicit hc: HeaderCarrier): Future[Seq[LookupAddress]] = {
+  )(implicit hc: HeaderCarrier): Future[Seq[LookupAddress]] =
+    retryFor[Seq[LookupAddress]]("POST Address Lookup")(retryCondition) {
+      val url =
+        s"${appConfig.addressLookupBaseUrl}/address-lookup/lookup"
 
-    val url =
-      s"${appConfig.addressLookupBaseUrl}/address-lookup/lookup"
-
-    val requestBody =
-      AddressLookupRequest(
-        postcode = postcode,
-        filter = filter
-      )
-    httpClient
-      .post(url"$url")
-      .withBody(Json.toJson(requestBody))
-      .execute[Seq[AddressLookupResponse]]
-      .map(_.map(_.toLookupAddress))
-  }
+      val requestBody =
+        AddressLookupRequest(
+          postcode = postcode,
+          filter = filter
+        )
+      httpClient
+        .post(url"$url")
+        .withBody(Json.toJson(requestBody))
+        .execute[Seq[AddressLookupResponse]]
+        .map(_.map(_.toLookupAddress))
+    }
 }

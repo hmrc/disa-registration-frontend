@@ -16,7 +16,7 @@
 
 package models.session
 
-import play.api.libs.json.{Format, Json, OFormat}
+import play.api.libs.json.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant

@@ -17,7 +17,7 @@
 package controllers.orgemail
 
 import base.SpecBase
-import controllers.orgemail.routes.{EmailVerificationCodeController, OrganisationEmailAddressController, OrganisationEmailCyaController}
+import controllers.orgemail.routes.*
 import models.NormalMode
 import models.journeydata.{JourneyData, OrganisationEmail}
 import play.api.test.FakeRequest

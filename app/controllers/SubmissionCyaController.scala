@@ -20,7 +20,7 @@ import controllers.actions.*
 import controllers.routes.TaskListController
 import models.journeydata.TaskListProgress
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.submission.SubmissionCyaViewModel
 import views.html.SubmissionCyaView

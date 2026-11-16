@@ -16,7 +16,7 @@
 
 package models.requests
 
-import play.api.libs.json.{Json, OFormat, Writes}
+import play.api.libs.json.*
 
 case class AddressLookupRequest(
   postcode: String,

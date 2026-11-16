@@ -25,12 +25,12 @@ import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.ThirdPartyOrganisations
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, reset, verify, when}
+import org.mockito.Mockito.*
 import play.api.inject
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import services.AuditService
-import uk.gov.hmrc.auth.core.{Assistant, CredentialRole, User}
+import uk.gov.hmrc.auth.core.*
 import viewmodels.tasklist.TaskListViewModel
 import views.html.TaskListView
 

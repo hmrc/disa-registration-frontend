@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{JsValue, Json, OFormat}
+import play.api.libs.json.*
 import utils.JsonFormatSpec
 
 class GetOrCreateJourneyDataSpec extends JsonFormatSpec[GetOrCreateJourneyData] {

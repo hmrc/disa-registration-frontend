@@ -17,7 +17,7 @@
 package models
 
 import base.SpecBase
-import models.grs.{BvPass, IncorporatedEntityGRSResponse, NotCalledStatus, PartnershipGRSResponse, RegisteredStatus}
+import models.grs.*
 import models.journeydata.RegisteredAddress
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.libs.json.*

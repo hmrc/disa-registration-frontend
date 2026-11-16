@@ -18,7 +18,7 @@ package services
 
 import config.FrontendAppConfig
 import connectors.GrsConnector
-import models.grs.{GRSResponse, GrsCompanyType, GrsCreateJourneyRequest, Labels, ServiceLabel}
+import models.grs.*
 import play.api.Logging
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.mvc.RequestHeader

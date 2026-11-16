@@ -17,9 +17,9 @@
 package services
 
 import base.SpecBase
-import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
+import models.journeydata.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.libs.json.Writes
 import uk.gov.hmrc.http.HeaderCarrier

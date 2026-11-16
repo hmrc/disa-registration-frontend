@@ -16,8 +16,8 @@
 
 package viewmodels.checkAnswers.submission
 
-import controllers.certificatesofauthority.routes.{CertificatesOfAuthorityYesNoController, FcaArticlesController, FinancialOrganisationController}
-import controllers.isaproducts.routes.{InnovativeFinancialProductsController, IsaProductsController, PeerToPeerPlatformController, PeerToPeerPlatformNumberController}
+import controllers.certificatesofauthority.routes.*
+import controllers.isaproducts.routes.*
 import controllers.liaisonofficers.routes.AddedLiaisonOfficersController
 import controllers.orgdetails.routes.*
 import controllers.orgemail.routes.OrganisationEmailAddressController
@@ -25,13 +25,13 @@ import controllers.signatories.routes.AddedSignatoryController
 import models.ReturnTo.SubmissionCya
 import models.YesNoAnswer.No
 import models.journeydata.thirdparty.ThirdParty
-import models.journeydata.{CorrespondenceAddress, JourneyData, RegisteredAddress}
-import models.{CheckMode, ReturnTo, YesNoAnswer}
+import models.journeydata.*
+import models.*
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{Key, SummaryListRow, Value}
-import viewmodels.checkAnswers.liaisonofficers.{LiaisonOfficerCommunicationSummary, LiaisonOfficerEmailSummary, LiaisonOfficerNameSummary, LiaisonOfficerPhoneNumberSummary}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
+import viewmodels.checkAnswers.liaisonofficers.*
 import viewmodels.checkAnswers.signatories.{SignatoryJobTitleSummary, SignatoryNameSummary}
 import viewmodels.checkAnswers.thirdparty.finalcya.*
 import viewmodels.govuk.summarylist.*
@@ -83,7 +83,7 @@ object SubmissionCyaViewModel {
     val organisationDetails                       = answers.organisationDetails
     val correspondenceRow: Option[SummaryListRow] =
       organisationDetails.flatMap(_.registeredAddressCorrespondence) match {
-        case Some(No) =>
+        case answer if businessVerification.flatMap(_.registeredAddress).isEmpty || answer.contains(No) =>
           organisationDetails.flatMap(_.correspondenceAddress).flatMap { address =>
             addressRow(
               key = "submissionCya.correspondenceAddress.label",
@@ -92,7 +92,7 @@ object SubmissionCyaViewModel {
               hidden = Some("registeredAddressCorrespondence.change.hidden")
             )
           }
-        case _        =>
+        case _                                                                                          =>
           None
       }
 
@@ -141,14 +141,17 @@ object SubmissionCyaViewModel {
           hidden = "firmReferenceNumber.change.hidden"
         )
       },
-      organisationDetails.flatMap(_.registeredAddressCorrespondence).map { answer =>
-        changeRow(
-          key = "submissionCya.registeredAddressCorrespondence.label",
-          value = yesNo(answer),
-          href = RegisteredAddressCorrespondenceController.onPageLoad(CheckMode, returnTo).url,
-          hidden = "registeredAddressCorrespondence.change.hidden"
-        )
-      },
+      organisationDetails
+        .flatMap(_.registeredAddressCorrespondence)
+        .filter(_ => businessVerification.flatMap(_.registeredAddress).nonEmpty)
+        .map { answer =>
+          changeRow(
+            key = "submissionCya.registeredAddressCorrespondence.label",
+            value = yesNo(answer),
+            href = RegisteredAddressCorrespondenceController.onPageLoad(CheckMode, returnTo).url,
+            hidden = "registeredAddressCorrespondence.change.hidden"
+          )
+        },
       correspondenceRow,
       organisationDetails.flatMap(_.orgTelephoneNumber).map { answer =>
         changeRow(

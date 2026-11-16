@@ -21,12 +21,12 @@ import controllers.routes.TaskListController
 import controllers.orgdetails.routes.EnterYourOrganisationAddressController
 import forms.EnterYourOrganisationAddressFormProvider
 import models.{CheckMode, NormalMode}
-import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
+import models.journeydata.*
 import models.journeydata.orgdetails.AddAnotherAddress
 import models.journeydata.orgdetails.SelectedCorrespondenceAddress.ManualEntry
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{atMostOnce, never, verify, when}
+import org.mockito.Mockito.*
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Writes

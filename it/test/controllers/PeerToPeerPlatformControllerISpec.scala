@@ -16,14 +16,13 @@
 
 package controllers
 
-import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, postRequestedFor, urlEqualTo, verify}
+import com.github.tomakehurst.wiremock.client.WireMock.{status as _, *}
 import org.jsoup.Jsoup
-import play.api.http.Status.*
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, POST, contentAsString, redirectLocation, route, status, writeableOf_AnyContentAsEmpty, writeableOf_AnyContentAsFormUrlEncoded}
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.SessionKeys
 import utils.WiremockHelper.{stubGet, stubPost}
-import utils.{BaseIntegrationSpec, CommonStubs, WiremockHelper}
+import utils.*
 
 class PeerToPeerPlatformControllerISpec extends BaseIntegrationSpec with CommonStubs with WiremockHelper {
 

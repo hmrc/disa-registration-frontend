@@ -17,7 +17,7 @@
 package viewmodels.tasklist
 
 import base.SpecBase
-import models.journeydata.{DeclareAndSubmit, OrganisationDetails, TaskListProgress}
+import models.journeydata.*
 import models.journeydata.liaisonofficers.LiaisonOfficers
 import models.journeydata.signatories.Signatories
 import models.journeydata.thirdparty.ThirdPartyOrganisations

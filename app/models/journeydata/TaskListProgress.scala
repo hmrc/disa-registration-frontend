@@ -47,7 +47,4 @@ object TaskListProgress {
     journeyData.signatories.exists { signatories =>
       signatories.signatories.nonEmpty && signatories.signatories.forall(!_.inProgress)
     }
-
-  private def nonEmpty(value: String): Boolean =
-    value.trim.nonEmpty
 }

@@ -18,15 +18,14 @@ package controllers.orgdetails
 
 import base.SpecBase
 import controllers.orgdetails.routes.*
-import controllers.routes.*
 import forms.YesNoAnswerFormProvider
 import models.YesNoAnswer.{No, Yes}
 import models.addresslookup.LookupAddress
 import models.journeydata.orgdetails.AddAnotherAddress
-import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails, RegisteredAddress}
-import models.{CheckMode, NormalMode, YesNoAnswer}
+import models.journeydata.*
+import models.*
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.Mockito.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.data.Form
 import play.api.libs.json.Writes
@@ -91,7 +90,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
       }
     }
 
-    "must redirect to the start page when registered address is missing" in {
+    "must redirect to correspondence address entry when registered address is missing" in {
 
       val journeyData = JourneyData(
         groupId = testGroupId,
@@ -106,7 +105,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual GrsStartController.onPageLoad().url
+        redirectLocation(result).value mustEqual AddAnotherAddressController.onPageLoad(NormalMode, None).url
       }
     }
 
@@ -333,7 +332,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
       }
     }
 
-    "must redirect to start page when registered address is missing on submit" in {
+    "must redirect to correspondence address entry when registered address is missing on submit" in {
 
       val initialJourneyData = JourneyData(
         groupId = testGroupId,
@@ -350,7 +349,7 @@ class RegisteredAddressCorrespondenceControllerSpec extends SpecBase with Mockit
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual GrsStartController.onPageLoad().url
+        redirectLocation(result).value mustEqual AddAnotherAddressController.onPageLoad(NormalMode, None).url
       }
     }
 

@@ -20,7 +20,7 @@ import base.SpecBase
 import controllers.orgdetails.routes.*
 import controllers.routes.*
 import models.NormalMode
-import models.journeydata.{CorrespondenceAddress, JourneyData, OrganisationDetails}
+import models.journeydata.*
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*

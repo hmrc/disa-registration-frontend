@@ -20,15 +20,24 @@ import base.SpecBase
 import config.FrontendAppConfig
 import models.addresslookup.*
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.*
 import org.scalatest.matchers.should.Matchers.shouldBe
+import play.api.http.Status.SERVICE_UNAVAILABLE
 import play.api.inject
-import uk.gov.hmrc.http.UpstreamErrorResponse
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.Future
 
 class AddressLookupConnectorSpec extends SpecBase {
+
+  private val testPostcode     = "BB00 0BB"
+  private val testFilter       = "Test"
+  private val testCountryCode  = "GB"
+  private val testCountryName  = "United Kingdom"
+  private val testAddressLine1 = "1 Test Street"
+  private val testAddressLine2 = "Test Area"
+  private val testTown         = "Testtown"
 
   trait TestSetup {
 
@@ -64,13 +73,13 @@ class AddressLookupConnectorSpec extends SpecBase {
           Seq(
             AddressLookupResponse(
               address = AddressLookupAddress(
-                lines = Seq("1 Test Street", "Test Area"),
-                town = Some("Testtown"),
-                postcode = Some("BB00 0BB"),
+                lines = Seq(testAddressLine1, testAddressLine2),
+                town = Some(testTown),
+                postcode = Some(testPostcode),
                 country = Some(
                   AddressLookupCountry(
-                    code = "GB",
-                    name = "United Kingdom"
+                    code = testCountryCode,
+                    name = testCountryName
                   )
                 )
               ),
@@ -81,12 +90,12 @@ class AddressLookupConnectorSpec extends SpecBase {
         val expected =
           Seq(
             LookupAddress(
-              addressLine1 = Some("1 Test Street"),
-              addressLine2 = Some("Test Area"),
-              addressLine3 = Some("Testtown"),
-              postCode = Some("BB00 0BB"),
+              addressLine1 = Some(testAddressLine1),
+              addressLine2 = Some(testAddressLine2),
+              addressLine3 = Some(testTown),
+              postCode = Some(testPostcode),
               uprn = Some("123"),
-              country = Some("United Kingdom")
+              country = Some(testCountryName)
             )
           )
 
@@ -95,7 +104,7 @@ class AddressLookupConnectorSpec extends SpecBase {
         ).thenReturn(Future.successful(response))
 
         val result =
-          connector.searchAddress("BB00 0BB", Some("Test")).futureValue
+          connector.searchAddress(testPostcode, Some(testFilter)).futureValue
 
         result shouldBe expected
       }
@@ -108,11 +117,11 @@ class AddressLookupConnectorSpec extends SpecBase {
               address = AddressLookupAddress(
                 lines = Seq("Test Street"),
                 town = None,
-                postcode = Some("BB00 0BB"),
+                postcode = Some(testPostcode),
                 country = Some(
                   AddressLookupCountry(
-                    code = "GB",
-                    name = "United Kingdom"
+                    code = testCountryCode,
+                    name = testCountryName
                   )
                 )
               ),
@@ -124,7 +133,7 @@ class AddressLookupConnectorSpec extends SpecBase {
           mockRequestBuilder.execute[Seq[AddressLookupResponse]](any(), any())
         ).thenReturn(Future.successful(response))
 
-        connector.searchAddress("BB00 0BB", Some("Test")).futureValue
+        connector.searchAddress(testPostcode, Some(testFilter)).futureValue
 
         verify(mockRequestBuilder)
           .withBody(any())(any, any, any)
@@ -135,8 +144,8 @@ class AddressLookupConnectorSpec extends SpecBase {
         val upstreamErrorResponse =
           UpstreamErrorResponse(
             "Service unavailable",
-            503,
-            503,
+            SERVICE_UNAVAILABLE,
+            SERVICE_UNAVAILABLE,
             Map.empty
           )
 
@@ -145,9 +154,37 @@ class AddressLookupConnectorSpec extends SpecBase {
         ).thenReturn(Future.failed(upstreamErrorResponse))
 
         val thrown =
-          connector.searchAddress("BB00 0BB", None).failed.futureValue
+          connector.searchAddress(testPostcode, None).failed.futureValue
 
         thrown shouldBe upstreamErrorResponse
+        verify(mockRequestBuilder, times(callAmountWithRetries))
+          .execute[Seq[AddressLookupResponse]](any(), any())
+      }
+
+      "must retry when the request fails with a BadGatewayException" in new TestSetup {
+
+        val exception = new BadGatewayException("Bad gateway")
+
+        when(
+          mockRequestBuilder.execute[Seq[AddressLookupResponse]](any(), any())
+        ).thenReturn(Future.failed(exception))
+
+        connector.searchAddress(testPostcode, None).failed.futureValue shouldBe exception
+        verify(mockRequestBuilder, times(callAmountWithRetries))
+          .execute[Seq[AddressLookupResponse]](any(), any())
+      }
+
+      "must retry when the request fails with a GatewayTimeoutException" in new TestSetup {
+
+        val exception = new GatewayTimeoutException("Gateway timeout")
+
+        when(
+          mockRequestBuilder.execute[Seq[AddressLookupResponse]](any(), any())
+        ).thenReturn(Future.failed(exception))
+
+        connector.searchAddress(testPostcode, None).failed.futureValue shouldBe exception
+        verify(mockRequestBuilder, times(callAmountWithRetries))
+          .execute[Seq[AddressLookupResponse]](any(), any())
       }
 
       "must propagate Throwable when unexpected error occurs" in new TestSetup {
@@ -160,7 +197,7 @@ class AddressLookupConnectorSpec extends SpecBase {
         ).thenReturn(Future.failed(exception))
 
         val thrown =
-          connector.searchAddress("BB00 0BB", None).failed.futureValue
+          connector.searchAddress(testPostcode, None).failed.futureValue
 
         thrown shouldBe exception
       }

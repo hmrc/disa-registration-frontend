@@ -60,9 +60,9 @@ case class OrganisationDetails(
     }
 
   private def correspondenceAddressComplete: Boolean =
-    registeredAddressCorrespondence.exists {
-      case YesNoAnswer.Yes => true
-      case YesNoAnswer.No  => hasSelectedCorrespondenceAddress
+    registeredAddressCorrespondence match {
+      case Some(YesNoAnswer.Yes) => true
+      case _                     => hasSelectedCorrespondenceAddress
     }
 }
 

@@ -21,7 +21,7 @@ import controllers.certificatesofauthority.routes
 import models.CheckMode
 import models.journeydata.JourneyData
 import models.journeydata.certificatesofauthority.CertificatesOfAuthority
-import models.journeydata.certificatesofauthority.FcaArticles.{Article14, Article21, Article25}
+import models.journeydata.certificatesofauthority.FcaArticles.*
 import org.scalatest.matchers.must.Matchers.*
 import viewmodels.checkAnswers.certificatesOfAuthority.FcaArticlesSummary
 

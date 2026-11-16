@@ -21,14 +21,14 @@ import forms.YesNoAnswerFormProvider
 import handlers.ErrorHandler
 import handlers.JourneyHandler.clearStalePages
 import models.YesNoAnswer.{No, Yes}
-import models.journeydata.{CorrespondenceAddress, OrganisationDetails, RegisteredAddress}
-import models.{Mode, ReturnTo, YesNoAnswer}
+import models.journeydata.*
+import models.*
 import navigation.Navigator
 import pages.organisationdetails.RegisteredAddressCorrespondencePage
 import play.api.data.Form
 import play.api.i18n.Lang.logger
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.*
 import services.{AddressLookupService, JourneyAnswersService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -65,7 +65,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
         regAddr <- bv.registeredAddress
       } yield regAddr) match {
         case None =>
-          Redirect(controllers.routes.GrsStartController.onPageLoad())
+          Redirect(routes.AddAnotherAddressController.onPageLoad(mode, returnTo))
 
         case Some(registeredAddress) =>
           val preparedForm = request.journeyData
@@ -88,7 +88,7 @@ class RegisteredAddressCorrespondenceController @Inject() (
 
       registeredAddress match {
         case None                    =>
-          Future.successful(Redirect(controllers.routes.GrsStartController.onPageLoad()))
+          Future.successful(Redirect(routes.AddAnotherAddressController.onPageLoad(mode, returnTo)))
         case Some(registeredAddress) =>
           form
             .bindFromRequest()

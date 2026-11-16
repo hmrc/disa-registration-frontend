@@ -21,8 +21,8 @@ import models.ReturnTo
 import models.journeydata.signatories.Signatory
 import models.requests.DataRequest
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n.*
+import play.api.mvc.*
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.checkAnswers.signatories.{SignatoryJobTitleSummary, SignatoryNameSummary}
 import viewmodels.govuk.summarylist.*

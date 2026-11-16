@@ -17,17 +17,16 @@
 package viewmodels.checkAnswers.liaisonofficers
 
 import config.FrontendAppConfig
-import controllers.liaisonofficers.routes.{LiaisonOfficerNameController, LoCheckYourAnswersController, RemoveLiaisonOfficerController}
+import controllers.liaisonofficers.routes.*
 import models.ReturnTo.{SubmissionCya, SubmissionCyaViaAddedLiaisonOfficers}
 import models.journeydata.liaisonofficers.LiaisonOfficer
-import models.{NormalMode, ReturnTo, YesNoAnswer}
+import models.*
 import play.api.data.Form
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.html.components.{GovukRadios, GovukSummaryList}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.govuk.all.{FluentLegend, LegendViewModel, RadiosViewModel}
-import viewmodels.govuk.summarylist.*
+import viewmodels.govuk.all.*
 import viewmodels.implicits.*
 
 import javax.inject.Inject

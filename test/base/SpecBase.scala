@@ -17,7 +17,7 @@
 package base
 
 import config.FrontendAppConfig
-import connectors.{AddressLookupConnector, DisaRegistrationConnector, EmailVerificationConnector, TaxEnrolmentsConnector}
+import connectors.*
 import controllers.actions.*
 import handlers.ErrorHandler
 import models.journeydata.JourneyData
@@ -27,7 +27,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues, TryValues}
+import org.scalatest.*
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Messages, MessagesApi}
@@ -44,7 +44,7 @@ import uk.gov.hmrc.auth.core.{CredentialRole, User}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.{JourneyDataBuilder, TestData, UuidGenerator}
+import utils.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,7 +59,7 @@ trait SpecBase
     with AuthTestSupport
     with BeforeAndAfterEach
     with BeforeAndAfterAll
-    with TestData
+    with utils.TestData
     with MockitoSugar
     with JourneyDataBuilder {
 
@@ -68,8 +68,9 @@ trait SpecBase
 
   def messages(key: String)(implicit app: Application): String = messages(app).messages(key)
 
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  implicit val hc: HeaderCarrier    = HeaderCarrier()
+  implicit val ec: ExecutionContext        = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val hc: HeaderCarrier           = HeaderCarrier()
+  protected val callAmountWithRetries: Int = 4
 
   // Mocks
   protected val mockAuditConnector: AuditConnector                                     = mock[AuditConnector]
@@ -151,6 +152,7 @@ trait SpecBase
     )
 
     new GuiceApplicationBuilder()
+      .configure("http-verbs.retries.intervals" -> Seq("1ms", "1ms", "1ms"))
       .overrides((defaultOverrides ++ overrides).distinct: _*)
   }
 

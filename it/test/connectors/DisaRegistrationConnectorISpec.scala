@@ -16,6 +16,7 @@
 
 package connectors
 
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import models.GetOrCreateJourneyData
 import models.journeydata.JourneyData
 import models.journeydata.isaproducts.IsaProduct.CashJuniorIsas
@@ -25,7 +26,7 @@ import play.api.http.Status.*
 import play.api.test.Helpers.await
 import uk.gov.hmrc.http.{JsValidationException, UpstreamErrorResponse}
 import utils.BaseIntegrationSpec
-import utils.WiremockHelper.{stubGet, stubPost, stubPut}
+import utils.WiremockHelper.*
 
 class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
 
@@ -217,6 +218,15 @@ class DisaRegistrationConnectorISpec extends BaseIntegrationSpec {
       val err = await(connector.declareAndSubmit(testGroupId).failed)
 
       err shouldBe an[UpstreamErrorResponse]
+    }
+
+    "not retry when the DISA backend returns a 5xx response" in {
+      stubPost(declareAndSubmitUrl, SERVICE_UNAVAILABLE, "Service unavailable")
+
+      val err = await(connector.declareAndSubmit(testGroupId).failed)
+
+      err shouldBe an[UpstreamErrorResponse]
+      verify(1, postRequestedFor(urlEqualTo(declareAndSubmitUrl)))
     }
 
     "propagate exception when the call fails with bad json" in {

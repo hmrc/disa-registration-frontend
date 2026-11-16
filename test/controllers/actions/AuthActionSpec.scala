@@ -20,8 +20,8 @@ import base.SpecBase
 import config.FrontendAppConfig
 import controllers.routes
 import org.mockito.ArgumentMatchers.{any => anyArg}
-import org.mockito.Mockito.{times, verify, when}
-import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
+import org.mockito.Mockito.*
+import play.api.mvc.*
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.auth.core.*
